@@ -54,20 +54,20 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/drawable_selector_ds_enable"
+        android:background="@drawable/drawable_selector_bg_enable"
         android:gravity="center"
         android:text="drawableselector enable测试"
-        android:textColor="@color/purple_200"
+        android:textColor="@drawable/drawable_selector_text_enable"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_ds" />
 
-    <EditText
+    <TextView
         android:id="@+id/tv_ds_press"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/drawable_selector_ds_press"
+        android:background="@drawable/drawable_selector_bg_press"
         android:clickable="true"
         android:focusable="true"
         android:gravity="center"

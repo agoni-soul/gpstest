@@ -1,7 +1,6 @@
 package com.soul.selector
 
 import android.os.Bundle
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.soul.gpstest.R
@@ -20,7 +19,7 @@ class SelectorActivity: AppCompatActivity() {
     private val mTvDsEnable: TextView by lazy {
         findViewById(R.id.tv_ds_enable)
     }
-    private val mTvDsPress: EditText by lazy {
+    private val mTvDsPress: TextView by lazy {
         findViewById(R.id.tv_ds_press)
     }
     private val mTvCount: TextView by lazy {
@@ -34,7 +33,7 @@ class SelectorActivity: AppCompatActivity() {
         mTvDS.setOnClickListener {
             mCount ++
             mTvCount.text = mCount.toString()
-            when (mCount % 6) {
+            when (mCount % 2) {
                 0 -> {
                     mTvDsEnable.isEnabled = true
 

@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="item_horizontal_interval">16dp</dimen>
+    <dimen name="item_vertical_interval">24dp</dimen>
+</resources>

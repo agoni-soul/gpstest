@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="custom_dialog_style" parent="android:Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item><!--除去title-->
+        <item name="android:backgroundDimEnabled">true</item><!--半透明-->
+        <item name="android:windowBackground">@android:color/transparent</item><!--除去背景色-->
+        <item name="android:radius">13dp</item>
+    </style>
+
+    <style name="background_transparent">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    　　<item name="android:windowIsTranslucent">true</item>
+    　　<item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+        <item name="android:windowNoTitle">true</item><!--除去title-->
+    </style>
+
+    <style name="business_home_add_popup_anim">
+        <item name="android:windowEnterAnimation">@anim/business_home_add_anim_enter</item>
+        <item name="android:windowExitAnimation">@anim/business_home_add_anim_out</item>
+    </style>
+
+    <style name="MaterialAnimations" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+</resources>

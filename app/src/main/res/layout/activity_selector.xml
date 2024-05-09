@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_cs"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|start"
+        android:text="Colorselector测试"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_cs_test_content"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="Colorselector测试内容"
+        android:textColor="@color/purple_200"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_cs" />
+
+    <TextView
+        android:id="@+id/tv_ds"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center_vertical|start"
+        android:text="drawableselector测试"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_cs_test_content" />
+
+    <TextView
+        android:id="@+id/tv_ds_test_content"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="drawableselector测试"
+        android:background="@drawable/drawable_selector_ds"
+        android:textColor="@color/purple_200"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ds"
+        app:layout_constraintEnd_toStartOf="@+id/tv_click_count"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_click_count"
+        tools:text="1"
+        android:background="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="@+id/tv_ds_test_content"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_ds_test_content"
+        app:layout_constraintEnd_toEndOf="@+id/tv_ds_test_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

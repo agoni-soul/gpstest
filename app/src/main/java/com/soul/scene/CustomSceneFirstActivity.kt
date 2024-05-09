@@ -1,0 +1,47 @@
+package com.soul.scene
+
+import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.transition.Scene
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.view.Gravity
+import android.widget.FrameLayout
+import android.widget.TextView
+import com.soul.gpstest.R
+
+class CustomSceneFirstActivity : AppCompatActivity() {
+    private val flContent: FrameLayout by lazy {
+        findViewById(R.id.flContent)
+    }
+
+    private val tvText: TextView by lazy {
+        findViewById(R.id.tvText)
+    }
+
+    private val ivFirstImage: TextView by lazy {
+        findViewById(R.id.ivFirstImage)
+    }
+
+    private var isFirst = true
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_custom_scene_first)
+
+        val firstScene = Scene.getSceneForLayout(flContent, R.layout.layout_first_scene, this)
+        val secondScene = Scene.getSceneForLayout(flContent, R.layout.layout_second_scene, this)
+
+        tvText.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (isFirst) {
+                    TransitionManager.go(secondScene, Slide(Gravity.TOP).removeTarget(R.id.ivFirstImage))
+                } else {
+                    TransitionManager.go(firstScene, Slide(Gravity.BOTTOM))
+                }
+                isFirst = !isFirst
+            }
+        }
+    }
+}

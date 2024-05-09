@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">GPSTest</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="refresh_connect_device">请将%s 重新配网</string>
+    <string name="refresh_connect">重新配网</string>
+
+    <string name="config_scanning">正在搜索</string>
+    <string name="accessibility_service">无障碍模式</string>
+    <string name="accessibility_service_description">无障碍描述</string>
+    <string name="config_gateway_searching">%1$s搜索%2$s中…</string>
+    <string name="config_near_gateway">请注意将%1$s靠近网关\n若长时间未搜索到，可尝试重新操作设备</string>
+    <string name="config_bind_success">绑定成功</string>
+    <string name="config_bind_fail">绑定失败</string>
+    <string name="config_check_cause">查看原因</string>
+    <string name="config_searching_subdevice">搜索到%s及其关联设备如下：</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_service_description"
+    android:packageNames="com.soul.gpstest"
+    android:accessibilityEventTypes="typeNotificationStateChanged"
+    android:accessibilityFlags="flagReportViewIds"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:notificationTimeout="400"
+    android:canRetrieveWindowContent="true"
+    android:canPerformGestures="true"
+    android:settingsActivity="com.soul.android.accessibility.ServiceSettingsActivity"
+    />

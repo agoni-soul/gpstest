@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.soul.gpstest">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.GPSTest">
+        <activity
+            android:name=".CoroutineActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.soul.scene.CustomSceneSecondActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.scene.CustomSceneFirstActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.scene.SceneSecondActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.scene.SceneFirstActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.transparency.TransparencyActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent" />
+        <activity
+            android:name="com.soul.network.NetworkActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.remoteviews.ShowNotificationActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.remoteviews.RemoteViewActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.gps.GpsActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.animation.AnimationActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.util.PermissionTransparentActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.waterfall.WaterFallActivity"
+            android:exported="true" >
+        </activity>
+        <activity
+            android:name="com.soul.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.GPSTest.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.settings.panel.action.INTERNET_CONNECTIVITY" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.settings.panel.action.NFC" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.settings.panel.action.WIFI" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.settings.panel.action.VOLUME" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+
+        <service
+            android:name="com.soul.service.CustomAccessibilityService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/accessibility_service"
+            android:packageNames="com.soul.gpstest"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility" />
+        </service>
+        <service
+            android:name="com.soul.service.AccessService"
+            android:exported="true"
+            android:label="暗黑魔心的无障碍服务"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityService.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/allocation" />
+        </service>
+
+        <activity
+            android:name="com.soul.wifi.WifiActivity"
+            android:exported="true" />
+
+        <activity
+            android:name="com.soul.selector.SelectorActivity"
+            android:exported="true" />
+
+        <receiver
+            android:name="com.soul.receiver.MainReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

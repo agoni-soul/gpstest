@@ -1,0 +1,322 @@
+[
+  {
+    "category": "10",
+    "categoryName": "插座"
+  },
+  {
+    "category": "13",
+    "categoryName": "智能灯具"
+  },
+  {
+    "category": "14",
+    "categoryName": "智能窗帘"
+  },
+  {
+    "category": "AB",
+    "categoryName": "空调"
+  },
+  {
+    "category": "AC",
+    "categoryName": "家用空调"
+  },
+  {
+    "category": "B0",
+    "categoryName": "微波炉"
+  },
+  {
+    "category": "B1",
+    "categoryName": "大烤箱"
+  },
+  {
+    "category": "B2",
+    "categoryName": "蒸汽炉"
+  },
+  {
+    "category": "B4",
+    "categoryName": "小烤箱"
+  },
+  {
+    "category": "B6",
+    "categoryName": "抽油烟机"
+  },
+  {
+    "category": "B7",
+    "categoryName": "灶具"
+  },
+  {
+    "category": "B8",
+    "categoryName": "智能扫地机"
+  },
+  {
+    "category": "B9",
+    "categoryName": "多头灶"
+  },
+  {
+    "category": "CA",
+    "categoryName": "冰箱"
+  },
+  {
+    "category": "CC",
+    "categoryName": "中央空调"
+  },
+  {
+    "category": "CD",
+    "categoryName": "空气能热水器"
+  },
+  {
+    "category": "DA",
+    "categoryName": "波轮洗衣机"
+  },
+  {
+    "category": "DB",
+    "categoryName": "滚筒洗衣机"
+  },
+  {
+    "category": "DC",
+    "categoryName": "干衣机"
+  },
+  {
+    "category": "E1",
+    "categoryName": "洗碗机"
+  },
+  {
+    "category": "E2",
+    "categoryName": "电热水器"
+  },
+  {
+    "category": "E3",
+    "categoryName": "燃气热水器"
+  },
+  {
+    "category": "EA",
+    "categoryName": "电饭煲"
+  },
+  {
+    "category": "EC",
+    "categoryName": "电压力锅"
+  },
+  {
+    "category": "ED",
+    "categoryName": "净饮设备"
+  },
+  {
+    "category": "FA",
+    "categoryName": "风扇"
+  },
+  {
+    "category": "FB",
+    "categoryName": "取暖器"
+  },
+  {
+    "category": "FC",
+    "categoryName": "净化器"
+  },
+  {
+    "category": "FD",
+    "categoryName": "加湿器"
+  },
+  {
+    "category": "FE",
+    "categoryName": "空调扇"
+  },
+  {
+    "category": "A1",
+    "categoryName": "除湿机"
+  },
+  {
+    "category": "C8",
+    "categoryName": "酒柜"
+  },
+  {
+    "category": "F1",
+    "categoryName": "破壁机"
+  },
+  {
+    "category": "BB",
+    "categoryName": "HI炒灶"
+  },
+  {
+    "category": "F2",
+    "categoryName": "咖啡机"
+  },
+  {
+    "category": "16",
+    "categoryName": "智能网关"
+  },
+  {
+    "category": "E7",
+    "categoryName": "电磁炉"
+  },
+  {
+    "category": "17",
+    "categoryName": "晾衣架"
+  },
+  {
+    "category": "09",
+    "categoryName": "智能门锁（wifi门锁）"
+  },
+  {
+    "category": "D9",
+    "categoryName": "复式洗衣机"
+  },
+  {
+    "category": "CB",
+    "categoryName": "大屏智能冰箱"
+  },
+  {
+    "category": "1F",
+    "categoryName": "燃气传感器"
+  },
+  {
+    "category": "BF",
+    "categoryName": "微波蒸汽烤箱"
+  },
+  {
+    "category": "9A",
+    "categoryName": "微波烤箱"
+  },
+  {
+    "category": "9B",
+    "categoryName": "蒸汽烤箱"
+  },
+  {
+    "category": "20",
+    "categoryName": "智能门锁（配mini网关）"
+  },
+  {
+    "category": "70",
+    "categoryName": "智能料理机"
+  },
+  {
+    "category": "E6",
+    "categoryName": "燃热壁挂炉"
+  },
+  {
+    "category": "CE",
+    "categoryName": "新风"
+  },
+  {
+    "category": "CF",
+    "categoryName": "户式水机"
+  },
+  {
+    "category": "2A",
+    "categoryName": "Mini网关"
+  },
+  {
+    "category": "21",
+    "categoryName": "网关子设备（非mini网关）"
+  },
+  {
+    "category": "EA",
+    "categoryName": "电饭煲"
+  },
+  {
+    "category": "ED",
+    "categoryName": "净水器"
+  },
+  {
+    "category": "FA",
+    "categoryName": "电风扇"
+  },
+  {
+    "category": "B8",
+    "categoryName": "扫地机器人"
+  },
+  {
+    "category": "E1",
+    "categoryName": "洗碗机"
+  },
+  {
+    "category": "EA",
+    "categoryName": "电饭煲-布谷"
+  },
+  {
+    "category": "ED",
+    "categoryName": "净水器-布谷"
+  },
+  {
+    "category": "FA",
+    "categoryName": "电风扇-布谷"
+  },
+  {
+    "category": "B8",
+    "categoryName": "扫地机器人"
+  },
+  {
+    "category": "E1",
+    "categoryName": "洗碗机-布谷"
+  },
+  {
+    "category": "B8",
+    "categoryName": "扫地机器人-布谷"
+  },
+  {
+    "category": "1A",
+    "categoryName": "面板网关"
+  },
+  {
+    "category": "1A",
+    "categoryName": "开关面板（网关）"
+  },
+  {
+    "category": "1A",
+    "categoryName": "蓝牙网关"
+  },
+  {
+    "category": "F1",
+    "categoryName": "布谷-破壁机"
+  },
+  {
+    "category": "9C",
+    "categoryName": "集成灶"
+  },
+  {
+    "category": "14",
+    "categoryName": "智能窗帘"
+  },
+  {
+    "category": "26",
+    "categoryName": "浴霸"
+  },
+  {
+    "category": "C1",
+    "categoryName": "电壁挂炉"
+  },
+  {
+    "category": "33",
+    "categoryName": "空气炸锅"
+  },
+  {
+    "category": "34",
+    "categoryName": "厨房净洗中心"
+  },
+  {
+    "category": "35",
+    "categoryName": "开关"
+  },
+  {
+    "category": "40",
+    "categoryName": "智能凉霸"
+  },
+  {
+    "category": "44",
+    "categoryName": "智慧屏"
+  },
+  {
+    "category": "45",
+    "categoryName": "通用网关"
+  },
+  {
+    "category": "46",
+    "categoryName": "衣物护理柜"
+  },
+  {
+    "category": "4F",
+    "categoryName": "住宅新风"
+  },
+  {
+    "category": "54",
+    "categoryName": "全屋智能传感器"
+  }
+]

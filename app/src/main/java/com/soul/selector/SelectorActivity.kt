@@ -1,6 +1,7 @@
 package com.soul.selector
 
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.soul.gpstest.R
@@ -14,7 +15,13 @@ import com.soul.gpstest.R
  */
 class SelectorActivity: AppCompatActivity() {
     private val mTvDS: TextView by lazy {
-        findViewById(R.id.tv_ds_test_content)
+        findViewById(R.id.tv_ds)
+    }
+    private val mTvDsEnable: TextView by lazy {
+        findViewById(R.id.tv_ds_enable)
+    }
+    private val mTvDsPress: EditText by lazy {
+        findViewById(R.id.tv_ds_press)
     }
     private val mTvCount: TextView by lazy {
         findViewById(R.id.tv_click_count)
@@ -29,10 +36,44 @@ class SelectorActivity: AppCompatActivity() {
             mTvCount.text = mCount.toString()
             when (mCount % 6) {
                 0 -> {
-                    mTvDS.isEnabled = true
+                    mTvDsEnable.isEnabled = true
+
+                    mTvDsPress.isEnabled = true
+                    mTvDsPress.isClickable = true
+                    mTvDsPress.isFocusable = true
+                    mTvDsPress.requestFocus()
                 }
                 1 -> {
+                    mTvDsEnable.isEnabled = false
 
+                    mTvDsPress.isEnabled = true
+                    mTvDsPress.isClickable = false
+                    mTvDsPress.isFocusable = true
+                    mTvDsPress.requestFocus()
+                }
+                2 -> {
+                    mTvDsPress.isEnabled = true
+                    mTvDsPress.isClickable = true
+                    mTvDsPress.isFocusable = false
+                    mTvDsPress.requestFocus()
+                }
+                3 -> {
+                    mTvDsPress.isEnabled = false
+                    mTvDsPress.isClickable = true
+                    mTvDsPress.isFocusable = false
+                    mTvDsPress.requestFocus()
+                }
+                4 -> {
+                    mTvDsPress.isEnabled = true
+                    mTvDsPress.isClickable = false
+                    mTvDsPress.isFocusable = false
+                    mTvDsPress.requestFocus()
+                }
+                5 -> {
+                    mTvDsPress.isEnabled = false
+                    mTvDsPress.isClickable = false
+                    mTvDsPress.isFocusable = true
+                    mTvDsPress.requestFocus()
                 }
             }
         }

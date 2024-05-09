@@ -33,7 +33,7 @@ class SelectorActivity: AppCompatActivity() {
         mTvDS.setOnClickListener {
             mCount ++
             mTvCount.text = mCount.toString()
-            when (mCount % 2) {
+            when (mCount % 6) {
                 0 -> {
                     mTvDsEnable.isEnabled = true
 

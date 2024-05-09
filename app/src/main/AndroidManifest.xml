@@ -130,6 +130,10 @@
             android:name="com.soul.selector.SelectorActivity"
             android:exported="true" />
 
+        <activity
+            android:name="com.soul.volume.VolumeActivity"
+            android:exported="true" />
+
         <receiver
             android:name="com.soul.receiver.MainReceiver"
             android:exported="true">

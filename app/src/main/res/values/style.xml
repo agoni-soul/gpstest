@@ -26,4 +26,8 @@
     <style name="MaterialAnimations" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowContentTransitions">true</item>
     </style>
+
+    <style name="style_volume_adjust_thum">
+        <item name="android:drawable">@drawable/drawable_shape_circle_24</item>
+    </style>
 </resources>

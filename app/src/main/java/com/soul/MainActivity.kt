@@ -2,10 +2,8 @@ package com.soul
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.ActivityOptions
 import android.app.AlertDialog
 import android.app.AppOpsManager
-import android.app.Dialog
 import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.Intent
@@ -41,13 +39,11 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
-import com.soul.bean.BindSubDeviceBean
 import com.soul.bean.SubDeviceResultBean
 import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.R
 import com.soul.log.DOFLogUtil
-import com.soul.remoteviews.RemoteViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
 import com.soul.selector.SelectorActivity
@@ -55,9 +51,9 @@ import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
 import com.soul.util.PermissionUtils
+import com.soul.volume.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
-import org.json.JSONArray
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -160,6 +156,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById(R.id.btn_activity_waterfall)
     }
 
+    private val mBtnActivityVolume: Button by lazy {
+        findViewById(R.id.btn_activity_volume)
+    }
+
     @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -184,6 +184,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         mBtnActivityRecyclerView.setOnClickListener(this)
         mBtnActivityWaterFall.setOnClickListener(this)
         mBtnActivitySelector.setOnClickListener(this)
+        mBtnActivityVolume.setOnClickListener(this)
 
         Log.d("haha", Build.VERSION.SDK_INT.toString())
 
@@ -744,6 +745,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 R.id.btn_activity_selector -> {
                     val intent = Intent(this, SelectorActivity::class.java)
+                    startActivity(intent)
+                }
+                R.id.btn_activity_volume -> {
+                    val intent = Intent(this, VolumeActivity::class.java)
                     startActivity(intent)
                 }
                 else -> {

@@ -181,6 +181,14 @@
                 android:text="selector测试"
                 app:layout_constraintTop_toBottomOf="@+id/btn_activity_waterfall" />
 
+            <Button
+                android:id="@+id/btn_activity_volume"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
+                android:text="媒体声音测试"
+                app:layout_constraintTop_toBottomOf="@+id/btn_activity_selector" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

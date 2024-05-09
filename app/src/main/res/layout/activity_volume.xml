@@ -26,11 +26,14 @@
 
     <SeekBar
         android:id="@+id/sb_volume_adjust"
-        style="@style/ActivityTranslucent"
+        style="@style/style_volume_adjust_thum"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginHorizontal="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="40dp"
+        android:layout_marginEnd="10dp"
+        android:splitTrack="false"
+        android:thumb="@drawable/drawable_shape_circle_24"
         app:layout_constraintEnd_toStartOf="@+id/iv_volume_up"
         app:layout_constraintStart_toEndOf="@+id/iv_volume_down"
         app:layout_constraintTop_toTopOf="parent" />

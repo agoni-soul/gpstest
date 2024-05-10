@@ -4,18 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/include_volume_music"
-        layout="@layout/include_volume_adjust"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_volume"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <include
-        android:id="@+id/include_volume_clock"
-        layout="@layout/include_volume_adjust"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/include_volume_music" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,9 +17,7 @@ import com.soul.gpstest.R
  *     version: 1.0
  */
 class VolumeActivity : AppCompatActivity() {
-    companion object {
-        val TAG = javaClass.simpleName
-    }
+    private val TAG = javaClass.simpleName
 
     private val mVolumeRecyclerView: RecyclerView by lazy {
         findViewById(R.id.rv_volume)
@@ -48,7 +46,7 @@ class VolumeActivity : AppCompatActivity() {
             AudioManager.STREAM_VOICE_CALL,
             AudioManager.STREAM_RING,
             AudioManager.STREAM_SYSTEM,
-            AudioManager.STREAM_NOTIFICATION
+            AudioManager.STREAM_NOTIFICATION,
         )
         mVolumeAdjustAdapter.updateVolumeData(volumeList)
         mVolumeAdjustAdapter.setHasStableIds(true)

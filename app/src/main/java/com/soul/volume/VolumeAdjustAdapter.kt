@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioManager
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SeekBar
@@ -20,6 +21,8 @@ import com.soul.gpstest.R
  */
 class VolumeAdjustAdapter(private val mContext: Context, volumeList: MutableList<Int>? = null) :
     RecyclerView.Adapter<VolumeAdjustViewHolder>() {
+    private val TAG = javaClass.simpleName
+
     private lateinit var mAudioManager: AudioManager
 
     private val mVolumeList = mutableListOf<Int>()
@@ -72,6 +75,12 @@ class VolumeAdjustAdapter(private val mContext: Context, volumeList: MutableList
                 AudioManager.FLAG_SHOW_UI
             }
         }
+        // 总音量差值
+        val volumeDiffValue = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            mAudioManager.getStreamMaxVolume(streamType) - mAudioManager.getStreamMinVolume(streamType)
+        } else  {
+            mAudioManager.getStreamMaxVolume(streamType)
+        }
         holder.mSbVolumeAdjust.apply {
             max = mAudioManager.getStreamMaxVolume(streamType)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -101,15 +110,16 @@ class VolumeAdjustAdapter(private val mContext: Context, volumeList: MutableList
         }
         holder.mIvVolumeDown.setOnClickListener {
             val volume: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                mAudioManager.getStreamVolume(streamType)
+                (mAudioManager.getStreamVolume(streamType) - (0.05 * volumeDiffValue).toInt().coerceAtLeast(1))
                     .coerceAtLeast(mAudioManager.getStreamMinVolume(streamType))
             } else {
-                mAudioManager.getStreamVolume(streamType).coerceAtLeast(0)
+                (mAudioManager.getStreamVolume(streamType) - (0.05 * volumeDiffValue).toInt().coerceAtLeast(1)).coerceAtLeast(0)
             }
+            Log.d(TAG, "setOnClickListener: volume = $volume, flag = $flag, streamType = $streamType")
             mAudioManager.setStreamVolume(streamType, volume, flag)
         }
         holder.mIvVolumeUp.setOnClickListener {
-            val volume: Int = mAudioManager.getStreamVolume(streamType)
+            val volume: Int = (mAudioManager.getStreamVolume(streamType) + (0.05 * volumeDiffValue).toInt().coerceAtLeast(1))
                 .coerceAtMost(mAudioManager.getStreamMaxVolume(streamType))
             mAudioManager.setStreamVolume(streamType, volume, flag)
         }

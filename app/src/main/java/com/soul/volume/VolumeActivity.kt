@@ -48,7 +48,7 @@ class VolumeActivity : AppCompatActivity() {
             AudioManager.STREAM_VOICE_CALL,
             AudioManager.STREAM_RING,
             AudioManager.STREAM_SYSTEM,
-            AudioManager.STREAM_NOTIFICATION
+            AudioManager.STREAM_NOTIFICATION,
         )
         mVolumeAdjustAdapter.updateVolumeData(volumeList)
         mVolumeAdjustAdapter.setHasStableIds(true)

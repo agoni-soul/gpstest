@@ -17,9 +17,7 @@ import com.soul.gpstest.R
  *     version: 1.0
  */
 class VolumeActivity : AppCompatActivity() {
-    companion object {
-        val TAG = javaClass.simpleName
-    }
+    private val TAG = javaClass.simpleName
 
     private val mVolumeRecyclerView: RecyclerView by lazy {
         findViewById(R.id.rv_volume)

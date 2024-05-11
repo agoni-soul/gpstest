@@ -677,7 +677,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 R.id.btn_test1 -> {
                     isWifiConnected(this)
 
-                    com.soul.NetWorkUtils.requestNetwork(this)
+                    NetWorkUtils.requestNetwork(this)
                     val b =
                         mConnectivityManager.bindProcessToNetwork(mConnectivityManager.activeNetwork)
                     Log.d("haha", "bindProcessToNetwork: $b")

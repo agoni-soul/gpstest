@@ -19,9 +19,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
-class GpsActivity : AppCompatActivity() {
+class GpsActivity : BaseActivity() {
 
     companion object {
         const val ACCESS_FIND_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
@@ -82,16 +83,26 @@ class GpsActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gps)
+    override fun onStart() {
+        super.onStart()
+        if (isGPSAble()) {
+            initData()
+        } else {
+            openGPS()
+        }
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.activity_gps
+    }
+
+    override fun initView() {
         mBtnLocationReset.setOnClickListener {
             mTvLocation.text = "默认定位信息"
         }
         mBtnLocationShow.setOnClickListener {
             initData()
         }
-
         mBtnCoarseLocation.setOnClickListener {
             if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 val dialog = AlertDialog.Builder(this)
@@ -112,7 +123,6 @@ class GpsActivity : AppCompatActivity() {
                 Toast.makeText(this, "模糊定位权限已经开启", Toast.LENGTH_SHORT).show()
             }
         }
-
         mBtnFindLocation.setOnClickListener {
             if (ActivityCompat.checkSelfPermission(this, ACCESS_FIND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 val dialog = AlertDialog.Builder(this)
@@ -133,8 +143,6 @@ class GpsActivity : AppCompatActivity() {
                 Toast.makeText(this, "精准定位权限已经开启", Toast.LENGTH_SHORT).show()
             }
         }
-
-
         mBtnRefreshWifi.setOnClickListener {
             val scanResult = mWifiManager.scanResults
             val connectInfo = mWifiManager.connectionInfo
@@ -144,16 +152,7 @@ class GpsActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (isGPSAble()) {
-            initData()
-        } else {
-            openGPS()
-        }
-    }
-
-    private fun initData() {
+    override fun initData() {
         if (ActivityCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "定位权限未开启", Toast.LENGTH_SHORT).show()

@@ -3,6 +3,7 @@ package com.soul.selector
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
 
@@ -12,7 +13,7 @@ import com.soul.gpstest.R
  *     desc   :
  *     version: 1.0
  */
-class SelectorActivity: AppCompatActivity() {
+class SelectorActivity: BaseActivity() {
     private val mTvDS: TextView by lazy {
         findViewById(R.id.tv_ds)
     }
@@ -26,10 +27,9 @@ class SelectorActivity: AppCompatActivity() {
         findViewById(R.id.tv_click_count)
     }
     private var mCount = 0
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_selector)
+    override fun getLayoutId(): Int = R.layout.activity_selector
 
+    override fun initView() {
         mTvDS.setOnClickListener {
             mCount ++
             mTvCount.text = mCount.toString()
@@ -76,5 +76,8 @@ class SelectorActivity: AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun initData() {
     }
 }

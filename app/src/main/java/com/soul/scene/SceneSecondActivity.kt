@@ -2,6 +2,7 @@ package com.soul.scene
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
 /**
@@ -13,9 +14,12 @@ import com.soul.gpstest.R
  *     version: 1.0
  * </pre>
  */
-class SceneSecondActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scene_second)
+class SceneSecondActivity : BaseActivity() {
+    override fun getLayoutId(): Int = R.layout.activity_scene_second
+
+    override fun initView() {
+    }
+
+    override fun initData() {
     }
 }

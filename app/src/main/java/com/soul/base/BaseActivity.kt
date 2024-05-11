@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
  *     version: 1.0
  */
 abstract class BaseActivity: AppCompatActivity() {
-    protected val TAG = javaClass.simpleName
+    protected open val TAG = javaClass.simpleName
 
     abstract fun getLayoutId(): Int
 

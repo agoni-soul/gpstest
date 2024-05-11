@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 import kotlinx.coroutines.*
 
@@ -17,8 +18,7 @@ import kotlinx.coroutines.*
  *     version: 1.0
  * </pre>
  */
-class CoroutineScopeActivity: AppCompatActivity() {
-    val TAG = this.javaClass.name
+class CoroutineScopeActivity: BaseActivity() {
 
     private val mBtnStart: Button by lazy {
         findViewById(R.id.btn_start_coroutine_scope)
@@ -36,10 +36,9 @@ class CoroutineScopeActivity: AppCompatActivity() {
         findViewById(R.id.tv_coroutine_scope_second)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_coroutine_scope)
+    override fun getLayoutId(): Int = R.layout.activity_coroutine_scope
 
+    override fun initView() {
         mBtnStart.setOnClickListener {
             val array = ArrayList<String>()
             array.add("abce")
@@ -74,6 +73,9 @@ class CoroutineScopeActivity: AppCompatActivity() {
         mBtnCancel.setOnClickListener {
             mScanDeviceJob?.cancelChildren()
         }
+    }
+
+    override fun initData() {
     }
 
     private var mSSID = "abcd"

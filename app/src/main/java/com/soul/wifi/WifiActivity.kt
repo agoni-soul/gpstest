@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
@@ -38,7 +39,7 @@ import com.soul.util.PermissionUtils
  *     version: 1.0
  * </pre>
  */
-class WifiActivity: AppCompatActivity() {
+class WifiActivity: BaseActivity() {
 
     private var mTvConnectWifi: TextView? = null
 
@@ -49,11 +50,9 @@ class WifiActivity: AppCompatActivity() {
     private var mWifiAdapter: WifiAdapter? = null
 
     private var mWifiReceiver: WifiReceiver? = null
+    override fun getLayoutId(): Int = R.layout.activity_wifi
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wifi)
-
+    override fun initView() {
         mTvConnectWifi = findViewById(R.id.tv_connect_wifi)
         mTvRefresh = findViewById(R.id.tv_refresh)
         mTvRefresh?.setOnClickListener {
@@ -61,6 +60,9 @@ class WifiActivity: AppCompatActivity() {
         }
 
         mRv = findViewById(R.id.rv_list_wifi)
+    }
+
+    override fun initData() {
         addReceiver()
         startWifiScan()
     }

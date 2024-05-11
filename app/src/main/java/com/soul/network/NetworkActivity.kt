@@ -8,21 +8,20 @@ import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 import java.lang.Exception
 
-class NetworkActivity : AppCompatActivity() {
+class NetworkActivity : BaseActivity() {
     private val mWebView: WebView by lazy {
         findViewById(R.id.web_view)
     }
 
     private var mExitTime = 0L
 
-    @SuppressLint("SetJavaScriptEnabled")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_network)
+    override fun getLayoutId(): Int = R.layout.activity_network
 
+    override fun initView() {
         mWebView.webViewClient = object: WebViewClient() {
             override fun shouldOverrideUrlLoading(
                 view: WebView?,
@@ -46,5 +45,8 @@ class NetworkActivity : AppCompatActivity() {
         }
         mWebView.settings.javaScriptEnabled = true
         mWebView.loadUrl("https://www.baidu.com")
+    }
+
+    override fun initData() {
     }
 }

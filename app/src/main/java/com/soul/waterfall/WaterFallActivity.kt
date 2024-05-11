@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 import org.json.JSONArray
 import org.json.JSONException
@@ -27,7 +28,7 @@ import kotlin.random.Random
  *     desc   :
  *     version: 1.0
  */
-class WaterFallActivity : AppCompatActivity() {
+class WaterFallActivity : BaseActivity() {
 
     companion object {
         const val BASE_CONTENT = "你了解发号施令旅339ajk,]】；国妮啊后发交电话费盖提亚武器先擦"
@@ -56,12 +57,9 @@ class WaterFallActivity : AppCompatActivity() {
     }
 
     private lateinit var mCustomViewAdapter: CustomViewAdapter
+    override fun getLayoutId(): Int = R.layout.activity_waterfall
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_waterfall)
-//        BindViewInject.inject(this, true)
+    override fun initView() {
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         mRv.layoutManager = layoutManager
@@ -114,6 +112,9 @@ class WaterFallActivity : AppCompatActivity() {
             readJson()
 
         }
+    }
+
+    override fun initData() {
     }
 
     private fun createSingleTextView(content: String, i: Int = 0) {

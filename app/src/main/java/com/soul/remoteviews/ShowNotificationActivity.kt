@@ -2,11 +2,15 @@ package com.soul.remoteviews
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
-class ShowNotificationActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_show_notification)
+class ShowNotificationActivity : BaseActivity() {
+    override fun getLayoutId(): Int = R.layout.activity_show_notification
+
+    override fun initView() {
+    }
+
+    override fun initData() {
     }
 }

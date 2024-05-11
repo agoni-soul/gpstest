@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/drawable_shape_circle_24.xml" value="0.199" />
+        <entry key="app/src/main/res/layout/activity_custom_recycler_view.xml" value="0.21829710144927536" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25317028985507245" />
         <entry key="app/src/main/res/layout/activity_volume.xml" value="0.25317028985507245" />
         <entry key="app/src/main/res/layout/include_volume_adjust.xml" value="0.25317028985507245" />

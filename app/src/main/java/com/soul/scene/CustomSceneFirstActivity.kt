@@ -9,9 +9,10 @@ import android.transition.TransitionManager
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
-class CustomSceneFirstActivity : AppCompatActivity() {
+class CustomSceneFirstActivity : BaseActivity() {
     private val flContent: FrameLayout by lazy {
         findViewById(R.id.flContent)
     }
@@ -25,11 +26,9 @@ class CustomSceneFirstActivity : AppCompatActivity() {
     }
 
     private var isFirst = true
+    override fun getLayoutId(): Int = R.layout.activity_custom_scene_first
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_custom_scene_first)
-
+    override fun initView() {
         val firstScene = Scene.getSceneForLayout(flContent, R.layout.layout_first_scene, this)
         val secondScene = Scene.getSceneForLayout(flContent, R.layout.layout_second_scene, this)
 
@@ -43,5 +42,8 @@ class CustomSceneFirstActivity : AppCompatActivity() {
                 isFirst = !isFirst
             }
         }
+    }
+
+    override fun initData() {
     }
 }

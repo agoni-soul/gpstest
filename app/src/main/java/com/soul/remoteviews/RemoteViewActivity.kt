@@ -22,11 +22,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 import com.soul.ui.textView.ClickSpan
 
 
-class RemoteViewActivity : AppCompatActivity(), View.OnClickListener {
+class RemoteViewActivity : BaseActivity(), View.OnClickListener {
     private val mCreateRemoteViewBt: Button by lazy {
         findViewById(R.id.create_remote_view_bt)
     }
@@ -43,14 +44,15 @@ class RemoteViewActivity : AppCompatActivity(), View.OnClickListener {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_remote_view)
+    override fun getLayoutId(): Int = R.layout.activity_remote_view
 
+    override fun initView() {
         mCreateRemoteViewBt.setOnClickListener(this)
         mAddRemoteViewBt.setOnClickListener(this)
         mRemoveRemoteViewBt.setOnClickListener(this)
+    }
 
+    override fun initData() {
         val name = intent.extras?.getString("device", "") ?: ""
         val content = getString(R.string.refresh_connect_device, name)
         val ssContent = SpannableString(content)

@@ -6,10 +6,11 @@ import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
 
-open class CustomSceneSecondActivity : AppCompatActivity() {
+open class CustomSceneSecondActivity : BaseActivity() {
     private val sceneRoot: ConstraintLayout by lazy {
         findViewById(R.id.sceneRoot)
     }
@@ -17,10 +18,9 @@ open class CustomSceneSecondActivity : AppCompatActivity() {
         findViewById(R.id.vSquare)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_custom_scene_second)
+    override fun getLayoutId(): Int = R.layout.activity_custom_scene_second
 
+    override fun initView() {
         vSquare.setOnClickListener {
             TransitionManager.beginDelayedTransition(sceneRoot, TransitionSet().apply {
                 addTransition(ChangeImageTransform())
@@ -37,6 +37,15 @@ open class CustomSceneSecondActivity : AppCompatActivity() {
                 vSquare.layoutParams = it
             }
         }
+    }
+
+    override fun initData() {
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_custom_scene_second)
+
     }
 
     /**

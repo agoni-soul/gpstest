@@ -14,19 +14,26 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.soul.base.BaseActivity
 import com.soul.gpstest.R
 
-class TransparencyActivity : Activity() {
+class TransparencyActivity : BaseActivity() {
 
     private val isHandlePermission: Boolean = false
+    override fun getLayoutId(): Int = R.layout.activity_transparency
+
+    override fun initView() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        val permissions = intent.getStringArrayExtra("permissions") as Array<String>?
+        requestPermissions(permissions)
+    }
+
+    override fun initData() {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        setContentView(R.layout.activity_transparency)
-        val permissions = intent.getStringArrayExtra("permissions") as Array<String>?
-        requestPermissions(permissions)
     }
 
     private fun requestPermissions(permissions: Array<String>?) {

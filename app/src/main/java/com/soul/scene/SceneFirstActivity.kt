@@ -12,7 +12,10 @@ import android.view.Window
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivitySceneFirstBinding
 
 /**
  * <pre>
@@ -23,12 +26,14 @@ import com.soul.gpstest.R
  *     version: 1.0
  * </pre>
  */
-class SceneFirstActivity : BaseActivity() {
+class SceneFirstActivity : BaseMvvmActivity<ActivitySceneFirstBinding, BaseViewModel>() {
     private var activity: Activity? = null
 
     private val ivImage: ImageView by lazy {
         findViewById(R.id.ivFirstImage)
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_scene_first
 

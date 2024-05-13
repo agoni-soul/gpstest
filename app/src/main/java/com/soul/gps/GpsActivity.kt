@@ -20,18 +20,17 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityGpsBinding
 
-class GpsActivity : BaseActivity() {
+class GpsActivity : BaseMvvmActivity<ActivityGpsBinding, BaseViewModel>() {
 
     companion object {
         const val ACCESS_FIND_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
 
         const val ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
-    }
-
-    private val mContext: Context by lazy {
-        this
     }
 
     private val mTvLocation: TextView by lazy {
@@ -91,6 +90,8 @@ class GpsActivity : BaseActivity() {
             openGPS()
         }
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int {
         return R.layout.activity_gps

@@ -10,9 +10,12 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityCustomSceneFirstBinding
 
-class CustomSceneFirstActivity : BaseActivity() {
+class CustomSceneFirstActivity : BaseMvvmActivity<ActivityCustomSceneFirstBinding, BaseViewModel>() {
     private val flContent: FrameLayout by lazy {
         findViewById(R.id.flContent)
     }
@@ -26,6 +29,8 @@ class CustomSceneFirstActivity : BaseActivity() {
     }
 
     private var isFirst = true
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
+
     override fun getLayoutId(): Int = R.layout.activity_custom_scene_first
 
     override fun initView() {

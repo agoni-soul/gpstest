@@ -15,9 +15,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityTransparencyBinding
 
-class TransparencyActivity : BaseActivity() {
+class TransparencyActivity : BaseMvvmActivity<ActivityTransparencyBinding, BaseViewModel>() {
 
     private val isHandlePermission: Boolean = false
     override fun getLayoutId(): Int = R.layout.activity_transparency
@@ -31,6 +34,8 @@ class TransparencyActivity : BaseActivity() {
 
     override fun initData() {
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -7,10 +7,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityCustomSceneSecondBinding
 
 
-open class CustomSceneSecondActivity : BaseActivity() {
+open class CustomSceneSecondActivity : BaseMvvmActivity<ActivityCustomSceneSecondBinding, BaseViewModel>() {
     private val sceneRoot: ConstraintLayout by lazy {
         findViewById(R.id.sceneRoot)
     }
@@ -41,6 +44,8 @@ open class CustomSceneSecondActivity : BaseActivity() {
 
     override fun initData() {
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

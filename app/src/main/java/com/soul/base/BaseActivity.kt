@@ -1,5 +1,6 @@
 package com.soul.base
 
+import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
@@ -19,11 +20,10 @@ abstract class BaseActivity: AppCompatActivity() {
 
     abstract fun initData()
 
+    protected lateinit var mContext: Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(getLayoutId())
-
-        initView()
-        initData()
+        mContext = this
     }
 }

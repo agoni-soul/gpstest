@@ -6,7 +6,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityCoroutineScopeBinding
 import kotlinx.coroutines.*
 
 /**
@@ -18,7 +21,7 @@ import kotlinx.coroutines.*
  *     version: 1.0
  * </pre>
  */
-class CoroutineScopeActivity: BaseActivity() {
+class CoroutineScopeActivity: BaseMvvmActivity<ActivityCoroutineScopeBinding, BaseViewModel>() {
 
     private val mBtnStart: Button by lazy {
         findViewById(R.id.btn_start_coroutine_scope)
@@ -35,6 +38,8 @@ class CoroutineScopeActivity: BaseActivity() {
     private val mTvSecondScope: TextView by lazy {
         findViewById(R.id.tv_coroutine_scope_second)
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_coroutine_scope
 

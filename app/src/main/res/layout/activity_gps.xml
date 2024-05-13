@@ -1,67 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.soul.gps.GpsActivity">
-
-    <TextView
-        android:id="@+id/text_gps"
-        android:text="默认定位信息"
-        android:textStyle="bold"
+<layout>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_height="match_parent"
+        tools:context="com.soul.gps.GpsActivity">
 
-    <Button
-        android:id="@+id/btn_gps_show"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="刷新"
-        app:layout_constraintTop_toBottomOf="@+id/text_gps"/>
+        <TextView
+            android:id="@+id/text_gps"
+            android:text="默认定位信息"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <Button
-        android:id="@+id/btn_gps_reset"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="重置经纬信息"
-        app:layout_constraintTop_toBottomOf="@+id/btn_gps_show"/>
+        <Button
+            android:id="@+id/btn_gps_show"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="刷新"
+            app:layout_constraintTop_toBottomOf="@+id/text_gps"/>
 
-    <Button
-        android:id="@+id/btn_coarse_location"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="申请模糊定位权限"
-        app:layout_constraintTop_toBottomOf="@+id/btn_gps_reset"/>
+        <Button
+            android:id="@+id/btn_gps_reset"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="重置经纬信息"
+            app:layout_constraintTop_toBottomOf="@+id/btn_gps_show"/>
 
-    <Button
-        android:id="@+id/btn_find_location"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="申请精准定位权限"
-        app:layout_constraintTop_toBottomOf="@+id/btn_coarse_location"/>
+        <Button
+            android:id="@+id/btn_coarse_location"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="申请模糊定位权限"
+            app:layout_constraintTop_toBottomOf="@+id/btn_gps_reset"/>
 
-    <TextView
-        android:id="@+id/tv_connect_wifi"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="无法获取wifi信息"
-        app:layout_constraintTop_toBottomOf="@+id/btn_find_location"/>
+        <Button
+            android:id="@+id/btn_find_location"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="申请精准定位权限"
+            app:layout_constraintTop_toBottomOf="@+id/btn_coarse_location"/>
 
-    <Button
-        android:id="@+id/btn_refresh_wifi"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="重新获取wifi信息"
-        app:layout_constraintTop_toBottomOf="@+id/tv_connect_wifi"/>
+        <TextView
+            android:id="@+id/tv_connect_wifi"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="无法获取wifi信息"
+            app:layout_constraintTop_toBottomOf="@+id/btn_find_location"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/btn_refresh_wifi"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="重新获取wifi信息"
+            app:layout_constraintTop_toBottomOf="@+id/tv_connect_wifi"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

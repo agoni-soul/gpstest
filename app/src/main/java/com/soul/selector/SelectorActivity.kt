@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivitySelectorBinding
 
 
 /**
@@ -13,7 +16,7 @@ import com.soul.gpstest.R
  *     desc   :
  *     version: 1.0
  */
-class SelectorActivity: BaseActivity() {
+class SelectorActivity: BaseMvvmActivity<ActivitySelectorBinding, BaseViewModel>() {
     private val mTvDS: TextView by lazy {
         findViewById(R.id.tv_ds)
     }
@@ -27,6 +30,8 @@ class SelectorActivity: BaseActivity() {
         findViewById(R.id.tv_click_count)
     }
     private var mCount = 0
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
+
     override fun getLayoutId(): Int = R.layout.activity_selector
 
     override fun initView() {

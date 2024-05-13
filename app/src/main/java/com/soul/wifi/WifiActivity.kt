@@ -25,7 +25,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityWifiBinding
 import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
 
@@ -39,7 +42,7 @@ import com.soul.util.PermissionUtils
  *     version: 1.0
  * </pre>
  */
-class WifiActivity: BaseActivity() {
+class WifiActivity: BaseMvvmActivity<ActivityWifiBinding, BaseViewModel>() {
 
     private var mTvConnectWifi: TextView? = null
 
@@ -66,6 +69,8 @@ class WifiActivity: BaseActivity() {
         addReceiver()
         startWifiScan()
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun onDestroy() {
         unregisterReceiver(mWifiReceiver)

@@ -23,11 +23,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityRemoteViewBinding
 import com.soul.ui.textView.ClickSpan
 
 
-class RemoteViewActivity : BaseActivity(), View.OnClickListener {
+class RemoteViewActivity : BaseMvvmActivity<ActivityRemoteViewBinding, BaseViewModel>(), View.OnClickListener {
     private val mCreateRemoteViewBt: Button by lazy {
         findViewById(R.id.create_remote_view_bt)
     }
@@ -43,6 +46,8 @@ class RemoteViewActivity : BaseActivity(), View.OnClickListener {
     private val mNotificationManager: NotificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_remote_view
 

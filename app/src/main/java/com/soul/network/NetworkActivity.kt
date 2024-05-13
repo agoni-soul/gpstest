@@ -9,15 +9,19 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityNetworkBinding
 import java.lang.Exception
 
-class NetworkActivity : BaseActivity() {
+class NetworkActivity : BaseMvvmActivity<ActivityNetworkBinding, BaseViewModel>() {
     private val mWebView: WebView by lazy {
         findViewById(R.id.web_view)
     }
 
     private var mExitTime = 0L
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_network
 

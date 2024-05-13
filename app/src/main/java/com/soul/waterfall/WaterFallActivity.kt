@@ -13,7 +13,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityWaterfallBinding
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -28,7 +31,7 @@ import kotlin.random.Random
  *     desc   :
  *     version: 1.0
  */
-class WaterFallActivity : BaseActivity() {
+class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewModel>() {
 
     companion object {
         const val BASE_CONTENT = "你了解发号施令旅339ajk,]】；国妮啊后发交电话费盖提亚武器先擦"
@@ -57,6 +60,8 @@ class WaterFallActivity : BaseActivity() {
     }
 
     private lateinit var mCustomViewAdapter: CustomViewAdapter
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
+
     override fun getLayoutId(): Int = R.layout.activity_waterfall
 
     override fun initView() {

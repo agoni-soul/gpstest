@@ -50,6 +50,7 @@ import com.soul.selector.SelectorActivity
 import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
+import com.soul.ui.dialog.CustomDialogFragment
 import com.soul.util.PermissionUtils
 import com.soul.volume.VolumeActivity
 import com.soul.waterfall.WaterFallActivity

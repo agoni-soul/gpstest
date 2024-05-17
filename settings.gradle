@@ -15,5 +15,4 @@
 rootProject.name = "GPSTest"
 include ':app'
 include ':starrysky'
-include ':evs_sdk'
 

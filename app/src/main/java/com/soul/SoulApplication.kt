@@ -1,7 +1,6 @@
 package com.soul
 
 import android.app.Application
-import com.lzx.starrysky.StarrySky
 
 
 /**
@@ -18,6 +17,5 @@ class SoulApplication: Application() {
     }
 
     private fun initComponents() {
-        StarrySky
     }
 }

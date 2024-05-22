@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name="com.soul.SoulApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -22,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GPSTest">
         <activity
-            android:name=".CoroutineActivity"
+            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
             android:exported="false" />
         <activity
             android:name="com.soul.scene.CustomSceneSecondActivity"
@@ -54,9 +55,6 @@
             android:exported="true" />
         <activity
             android:name="com.soul.animation.AnimationActivity"
-            android:exported="true" />
-        <activity
-            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
             android:exported="true" />
         <activity
             android:name="com.soul.util.PermissionTransparentActivity"

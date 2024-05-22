@@ -14,4 +14,5 @@
 //}
 rootProject.name = "GPSTest"
 include ':app'
+//include ':starrysky'
 

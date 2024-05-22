@@ -13,9 +13,9 @@ import com.soul.base.BaseViewModel
  *     version: 1.0
  */
 class VolumeViewModel(application: Application): BaseViewModel(application) {
-    private val mIsMediaPrepareLiveData: LiveData<Boolean> by lazy {
+    private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
         MutableLiveData()
     }
 
-    fun getIsMediaPrepare(): LiveData<Boolean> = mIsMediaPrepareLiveData
+    fun getIsMediaPrepare(): MutableLiveData<Boolean> = mIsMediaPrepareLiveData
 }

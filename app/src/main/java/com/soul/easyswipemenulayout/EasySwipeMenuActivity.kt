@@ -22,34 +22,28 @@ import com.soul.gpstest.databinding.ActivityEasySwipeMenuBinding
  *     version: 1.0
  */
 class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, BaseViewModel>() {
-    private val ll: EasySwipeMenuLayout? = null
+    private lateinit var myAdapter: MyAdapter
+    private val listData: MutableList<String> by lazy {
+        mutableListOf()
+    }
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_easy_swipe_menu
 
     override fun initView() {
-        recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
-        recyclerView?.layoutManager = LinearLayoutManager(this)
+        mViewDataBinding.recyclerview.layoutManager = LinearLayoutManager(this)
         myAdapter = MyAdapter(this)
-        recyclerView?.setAdapter(myAdapter!!)
-        inflater = layoutInflater
+        mViewDataBinding.recyclerview.adapter = myAdapter
     }
 
     override fun initData() {
-        listData = ArrayList<String>()
         for (i in 0..19) {
-            listData?.add("index is =$i")
+            listData.add("index is =$i")
         }
-        myAdapter?.updateData(listData!!)
-        myAdapter?.notifyDataSetChanged()
+        myAdapter.updateData(listData)
+        myAdapter.notifyDataSetChanged()
     }
-
-
-    private var recyclerView: RecyclerView? = null
-    private var myAdapter: MyAdapter? = null
-    private var listData: MutableList<String>? = null
-    private var inflater: LayoutInflater? = null
 
     inner class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyHolder>() {
         private val listData: MutableList<String> = mutableListOf()
@@ -70,7 +64,7 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
         override fun onBindViewHolder(helper: MyHolder, position: Int) {
             helper.rightMenu2.setOnClickListener {
                 Toast.makeText(context, "收藏", Toast.LENGTH_SHORT).show()
-                val easySwipeMenuLayout: EasySwipeMenuLayout = helper.es
+                val easySwipeMenuLayout: EasySwipeMenuLayout = helper.esSwipe
                 easySwipeMenuLayout.resetStatus()
             }
             helper.content.setOnClickListener {
@@ -87,10 +81,10 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
 class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val rightMenu2: TextView
     val content: LinearLayout
-    val es: EasySwipeMenuLayout
+    val esSwipe: EasySwipeMenuLayout
 
     init {
-        es = itemView.findViewById(R.id.es)
+        esSwipe = itemView.findViewById(R.id.es_swipe)
         rightMenu2 = itemView.findViewById(R.id.right_menu_2)
         content = itemView.findViewById(R.id.content)
     }

@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical">
 
     <com.soul.easyswipemenulayout.EasySwipeMenuLayout
-        android:id="@+id/es"
-
+        android:id="@+id/es_swipe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:contentView="@+id/content"
@@ -21,16 +21,15 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:background="@android:color/holo_blue_dark"
-
             android:orientation="horizontal"
             android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:text="分享" />
+                android:text="分享"
+                android:focusable="true" />
 
         </LinearLayout>
 
@@ -64,7 +63,8 @@
                 android:background="@android:color/holo_blue_bright"
                 android:clickable="true"
                 android:padding="20dp"
-                android:text="删除" />
+                android:text="删除"
+                android:focusable="true" />
 
             <TextView
                 android:id="@+id/right_menu_2"
@@ -73,7 +73,8 @@
                 android:background="@android:color/holo_orange_dark"
                 android:clickable="true"
                 android:padding="20dp"
-                android:text="收藏" />
+                android:text="收藏"
+                android:focusable="true" />
 
         </LinearLayout>
     </com.soul.easyswipemenulayout.EasySwipeMenuLayout>

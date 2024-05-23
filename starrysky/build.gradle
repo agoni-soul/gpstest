@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
+//apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'com.novoda.bintray-release'
 
 android {
@@ -30,12 +31,16 @@ android {
         abortOnError false
     }
 
-    androidExtensions {
-        experimental = true
-    }
+//    androidExtensions {
+//        experimental = true
+//    }
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 }
 

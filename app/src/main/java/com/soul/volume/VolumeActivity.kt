@@ -80,9 +80,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     override fun initData() {
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val uri =
-        "http://isure6.stream.qqmusic.qq.com/C200001KBxQw0PWq7Y.m4a?guid=2000000194&vkey=8F7A8529D0AA51DE9742C450949E9528AD5B7D98F851657AA06189E992067E2A28F51C0CC6B42C577C61264804DA728EC4DE743DFD583E9D&uin=0&fromtag=20194&trace=5cdf245b6863abb0"
-        mMediaPlayer = MediaPlayer.create(this, Uri.parse(uri))
+        mMediaPlayer = MediaPlayer.create(this, R.raw.raw_music)
         mMediaPlayer.setOnPreparedListener {
             mViewModel?.getIsMediaPrepare()?.postValue(true)
         }
@@ -98,7 +96,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             getIsMediaPrepare().postValue(false)
             getIsMediaPrepare().observe(this@VolumeActivity) {
                 Log.d(TAG, "observe: isMediaPrepare = $it, isPlaying = ${mMediaPlayer.isPlaying}")
-                if (it) {
+                if (!it) {
                     mMediaPlayer.start()
                 }
             }
@@ -108,9 +106,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     private fun initMusic() {
         try {
             mMediaPlayer.reset()
-            val uri =
-                "http://isure6.stream.qqmusic.qq.com/C200001KBxQw0PWq7Y.m4a?guid=2000000194&vkey=8F7A8529D0AA51DE9742C450949E9528AD5B7D98F851657AA06189E992067E2A28F51C0CC6B42C577C61264804DA728EC4DE743DFD583E9D&uin=0&fromtag=20194&trace=5cdf245b6863abb0"
-            mMediaPlayer.setDataSource(mContext, Uri.parse(uri))
+            mMediaPlayer = MediaPlayer.create(this, R.raw.raw_music)
             mMediaPlayer.prepareAsync()
         } catch (e: Exception) {
             e.printStackTrace()

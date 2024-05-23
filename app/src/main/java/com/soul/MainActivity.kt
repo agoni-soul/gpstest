@@ -12,7 +12,6 @@ import android.graphics.Color
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -30,22 +29,25 @@ import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
+import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseViewModel
 import com.soul.bean.SubDeviceResultBean
 import com.soul.coroutineScope.CoroutineScopeActivity
+import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.R
+import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.log.DOFLogUtil
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
 import com.soul.selector.SelectorActivity
 import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
+import com.soul.ui.dialog.CustomDialog
 import com.soul.util.PermissionUtils
 import com.soul.volume.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
@@ -56,66 +58,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
-    private val TAG = "haha"
-
-    private val mBtnSkipGPS: TextView by lazy {
-        findViewById(R.id.btn_skip_gps)
-    }
-    private val mBtnSkipRemoteView: Button by lazy {
-        findViewById(R.id.btn_skip_remote_view)
-    }
-    private val mBtnSkipNetwork: Button by lazy {
-        findViewById(R.id.btn_skip_network)
-    }
-    private val mBtnRefresh: Button by lazy {
-        findViewById(R.id.btn_refresh)
-    }
-    private val mBtnTest: Button by lazy {
-        findViewById(R.id.btn_test)
-    }
-    private val mBtnTest1: Button by lazy {
-        findViewById(R.id.btn_test1)
-    }
-    private val mBtnAnimation: Button by lazy {
-        findViewById(R.id.btn_animation)
-    }
-
-    private val mBtnPermission: Button by lazy {
-        findViewById(R.id.btn_permission)
-    }
-
-    private val mBtnDialogFragment: Button by lazy {
-        findViewById(R.id.btn_dialog_fragment)
-    }
-
-    private val mBtnActivityScene: Button by lazy {
-        findViewById(R.id.btn_activity_scene)
-    }
-
-    private val mBtnActivityCoroutineScope: Button by lazy {
-        findViewById(R.id.btn_activity_coroutineScope)
-    }
-
-    private val mBtnActivityCustomScene: Button by lazy {
-        findViewById(R.id.btn_activity_custom_scene)
-    }
-
-    private val mBtnActivityCustomScene2: Button by lazy {
-        findViewById(R.id.btn_activity_custom_scene2)
-    }
-
-    private val mBtnActivityRecyclerView: Button by lazy {
-        findViewById(R.id.btn_activity_recyclerview)
-    }
-
-    private val mBtnActivitySelector: Button by lazy {
-        findViewById(R.id.btn_activity_selector)
-    }
-
-    private val mIvWifi: ImageView by lazy {
-        findViewById(R.id.iv_scan_device)
-    }
+class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
     private var mCustomAccessibilityService: CustomAccessibilityService? = null
 
@@ -123,61 +66,150 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     }
 
-    private lateinit var mNetworkCallback: ConnectivityManager.NetworkCallback
+    private var dialog: CustomDialog? = null
 
-    private lateinit var mConnectivityDiagnosticsManager: ConnectivityDiagnosticsManager
+//    @RequiresApi(Build.VERSION_CODES.R)
+//    private val mConnectivityDiagnosticsCallback = ExampleCallback()
 
-    private lateinit var mConnectivityManager: ConnectivityManager
+//    private lateinit var mNetworkCallback: ConnectivityManager.NetworkCallback
 
-    private lateinit var mWifiManager: WifiManager
+//    private lateinit var mConnectivityDiagnosticsManager: ConnectivityDiagnosticsManager
 
-    private val mClMain: ConstraintLayout by lazy {
-        findViewById(R.id.cl_main)
+    private val mConnectivityManager: ConnectivityManager by lazy {
+        getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
-    private val mTvSpan: TextView by lazy {
-        findViewById(R.id.tv_span)
+//    private lateinit var mWifiManager: WifiManager
+
+    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
+    override fun getLayoutId(): Int = R.layout.activity_main
+
+    override fun initView() {
+        mViewDataBinding?.btnSkipGps?.setOnClickListener(this)
+        mViewDataBinding?.btnSkipRemoteView?.setOnClickListener(this)
+        mViewDataBinding?.btnSkipNetwork?.setOnClickListener(this)
+        mViewDataBinding?.btnRefresh?.setOnClickListener(this)
+        mViewDataBinding?.btnTest?.setOnClickListener(this)
+        mViewDataBinding?.btnTest1?.setOnClickListener(this)
+        mViewDataBinding?.btnPermission?.setOnClickListener(this)
+        mViewDataBinding?.btnDialogFragment?.setOnClickListener(this)
+        mViewDataBinding?.btnAnimation?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityScene?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityCoroutineScope?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityCustomScene?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityCustomScene2?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityRecyclerview?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityWaterfall?.setOnClickListener(this)
+        mViewDataBinding?.btnActivitySelector?.setOnClickListener(this)
+        mViewDataBinding?.btnActivityVolume?.setOnClickListener(this)
+        mViewDataBinding?.btnActivitySlide?.setOnClickListener {
+            val intent = Intent(mContext, EasySwipeMenuActivity::class.java)
+            startActivity(intent)
+        }
+
+        Log.d("haha", Build.VERSION.SDK_INT.toString())
+
+
+        /**
+        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
+        mConnectivityDiagnosticsManager = getSystemService(Context.CONNECTIVITY_DIAGNOSTICS_SERVICE) as ConnectivityDiagnosticsManager
+        val request = NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build()
+        mConnectivityDiagnosticsManager.registerConnectivityDiagnosticsCallback(
+        request,
+        Executors.newSingleThreadExecutor(),
+        mConnectivityDiagnodsticsCallback
+        )
+
+        mNetworkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
+        super.onBlockedStatusChanged(network, blocked)
+        Log.d("haha", "onBlockedStatusChanged Network = $network \t blocked = $blocked")
+        }
+
+        override fun onAvailable(network: Network) {
+        super.onAvailable(network)
+        Log.d("haha", "onAvailable Network = $network")
+        }
+
+        override fun onCapabilitiesChanged(
+        network: Network,
+        networkCapabilities: NetworkCapabilities
+        ) {
+        super.onCapabilitiesChanged(network, networkCapabilities)
+        Log.d(
+        "haha",
+        "onCapabilitiesChanged Network = $network \t networkCapabilities = $networkCapabilities"
+        )
+        }
+
+        override fun onLinkPropertiesChanged(
+        network: Network,
+        linkProperties: LinkProperties
+        ) {
+        super.onLinkPropertiesChanged(network, linkProperties)
+        val addresses = linkProperties.linkAddresses;
+        var hostAddress: String? = null
+        for (address in addresses) {
+        if (address.address.hostAddress?.contains(".") == true) {
+        hostAddress = address.address.hostAddress
+        Log.d(TAG, "hostAddress = $hostAddress")
+        break
+        }
+        }
+        Log.d(TAG, "linkProperties: ${linkProperties.linkAddresses}")
+        pingforInetAddresss(hostAddress ?: "")
+        //                pingForCMD("163.177.151.110")
+        Log.d(
+        "haha",
+        "onLinkPropertiesChanged Network = $network \t linkProperties = $linkProperties"
+        )
+        }
+
+        override fun onLosing(network: Network, maxMsToLive: Int) {
+        super.onLosing(network, maxMsToLive)
+        Log.d("haha", "onLosing Network = $network \t maxMsToLive = $maxMsToLive")
+        }
+
+        override fun onLost(network: Network) {
+        super.onLost(network)
+        Log.d("haha", "onLost Network = $network")
+        }
+
+        override fun onUnavailable() {
+        super.onUnavailable()
+        Log.d("haha", "onUnavailable")
+        }
+        }
+
+        mConnectivityManager.registerNetworkCallback(request, mNetworkCallback)
+        }
+
+        val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermissions()
+        ) { permissions ->
+        when {
+        permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+        // Precise location access granted.
+        }
+        permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+        // Only approximate location access granted.
+        } else -> {
+        // No location access granted.
+        }
+        }
+        }
+        locationPermissionRequest.launch(arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION))
+         **/
     }
 
-    private val mIvSuccess: ImageView by lazy {
-        findViewById(R.id.iv_success)
-    }
-
-    private val mBtnActivityWaterFall: Button by lazy {
-        findViewById(R.id.btn_activity_waterfall)
-    }
-
-    private val mBtnActivityVolume: Button by lazy {
-        findViewById(R.id.btn_activity_volume)
-    }
-
-    @SuppressLint("WrongConstant")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        DOFLogUtil.init()
-        setContentView(R.layout.activity_main)
-
-        mConnectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        mBtnSkipGPS.setOnClickListener(this)
-        mBtnSkipRemoteView.setOnClickListener(this)
-        mBtnSkipNetwork.setOnClickListener(this)
-        mBtnRefresh.setOnClickListener(this)
-        mBtnTest.setOnClickListener(this)
-        mBtnTest1.setOnClickListener(this)
-        mBtnPermission.setOnClickListener(this)
-        mBtnDialogFragment.setOnClickListener(this)
-        mBtnAnimation.setOnClickListener(this)
-        mBtnActivityScene.setOnClickListener(this)
-        mBtnActivityCoroutineScope.setOnClickListener(this)
-        mBtnActivityCustomScene.setOnClickListener(this)
-        mBtnActivityCustomScene2.setOnClickListener(this)
-        mBtnActivityRecyclerView.setOnClickListener(this)
-        mBtnActivityWaterFall.setOnClickListener(this)
-        mBtnActivitySelector.setOnClickListener(this)
-        mBtnActivityVolume.setOnClickListener(this)
-
+    override fun initData() {
         setupWindowAnimations()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            accessibilityTest()
+        }
 
         val builder = SpannableStringBuilder("请注意将温度传感器靠近网关\n若长时间未搜索到，可尝试重新操作设备")
         val str = "重新操作设备"
@@ -195,13 +227,86 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         }, builder.length - str.length, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        mTvSpan.text = builder
-        mTvSpan.movementMethod = LinkMovementMethod.getInstance()
+        mViewDataBinding?.tvSpan?.text = builder
+        mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun accessibilityTest() {
+//        mViewDataBinding?.btnSkipGps?.isEnabled = true
+//        mViewDataBinding?.btnSkipNetwork?.isEnabled = true
+//        mViewDataBinding?.btnSkipRemoteView?.isEnabled = true
+//        mViewDataBinding?.btnSkipRefresh?.isEnabled = true
+//        mViewDataBinding?.btnSkipGps?.isFocusable = true
+//        mViewDataBinding?.btnSkipNetwork?.isFocusable = true
+//        mViewDataBinding?.btnSkipRemoteView?.isFocusable = true
+//        mViewDataBinding?.btnSkipRefresh?.isFocusable = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            mViewDataBinding?.btnSkipGps?.focusable = View.FOCUSABLE
+//            mViewDataBinding?.btnSkipNetwork?.focusable = View.FOCUSABLE
+//            mViewDataBinding?.btnSkipRemoteView?.focusable = View.FOCUSABLE
+//            mViewDataBinding?.btnSkipRefresh?Network.focusable = View.FOCUSABLE
+
+//            val event = AccessibilityEvent()
+//            event.eventType = AccessibilityEvent.TYPE_VIEW_FOCUSED
+//            mViewDataBinding?.btnSkipGps?.onInitializeAccessibilityEvent(event)
+
+//            val btnSkipGPSNode = mViewDataBinding?.btnSkipGps?.createAccessibilityNodeInfo()
+//            val btnSkipNetwork = mViewDataBinding?.btnSkipNetwork?.createAccessibilityNodeInfo()
+//            val btnSkipRemoteView = mViewDataBinding?.btnSkipRemoteView?.createAccessibilityNodeInfo()
+//            val btnRefreshNetwork = mViewDataBinding?.btnSkipRefresh?.createAccessibilityNodeInfo()
+//
+//            btnSkipGPSNode.setTraversalAfter(mViewDataBinding?.btnSkipNetwork?)
+//            btnSkipNetwork.setTraversalAfter(mViewDataBinding?.btnSkipRemoteView?)
+//            btnSkipRemoteView.setTraversalAfter(mViewDataBinding?.btnSkipRefresh?)
+
+//            mViewDataBinding?.btnSkipGps?.accessibilityTraversalBefore = R.id.btn_skip_network
+//            mViewDataBinding?.btnSkipNetwork?.accessibilityTraversalBefore = R.id.btn_skip_remote_view
+//            mViewDataBinding?.btnSkipRemoteView?.accessibilityTraversalBefore = R.id.btn_refresh
+
+//            if (mAccessibilityManager.isEnabled) {
+//                mViewDataBinding?.btnSkipGps?.sendAccessibilityEventUnchecked(event)
+//            }
+        }
+
+//        mViewDataBinding?.btnSkipGps?.findUserSetNextFocus(mViewDataBinding?.clMain?, View.FOCUS_DOWN)
+
+
+//        mViewDataBinding?.btnSkipGps?.nextFocusDownId = R.id.btn_skip_network
+//        mViewDataBinding?.btnSkipGps?.nextFocusDownId = R.id.btn_skip_network
+//        mViewDataBinding?.btnSkipNetwork?.nextFocusDownId = R.id.btn_skip_remote_view
+//        mViewDataBinding?.btnSkipNetwork?.nextFocusDownId = R.id.btn_skip_remote_view
+//        mViewDataBinding?.btnSkipNetwork?.nextFocusUpId = R.id.btn_skip_gps
+//        mViewDataBinding?.btnSkipRemoteView?.nextFocusUpId = R.id.btn_skip_network
+//        mViewDataBinding?.btnSkipRemoteView?.nextFocusDownId = R.id.btn_refresh
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            val btnSkipGPSNodeInfo = AccessibilityNodeInfo(mViewDataBinding?.btnSkipGps?)
+//            val btnSkipRemoteViewNodeInfo = AccessibilityNodeInfo(mViewDataBinding?.btnSkipRemoteView?)
+//            val btnSkipNetworkNodeInfo = AccessibilityNodeInfo(mViewDataBinding?.btnSkipNetwork?)
+//            btnSkipGPSNodeInfo.setTraversalAfter(mViewDataBinding?.btnSkipNetwork?)
+//            btnSkipNetworkNodeInfo.setTraversalBefore(mViewDataBinding?.btnSkipGps?)
+//            btnSkipNetworkNodeInfo.setTraversalAfter(mViewDataBinding?.btnSkipRemoteView?)
+//            btnSkipRemoteViewNodeInfo.setTraversalBefore(mViewDataBinding?.btnSkipNetwork?)
+//
+//            DOFLogUtil.d(TAG, "btnSkipGPSNodeInfo = $btnSkipGPSNodeInfo")
+//        } else {
+//            DOFLogUtil.d(TAG, "version = ${Build.VERSION.SDK_INT}")
+//        }
+
+        /*
+        val instance: BaseService = BaseService.getInstance()
+        instance.init(this)
+        if (!instance.checkAccessibilityEnabled("暗黑魔心的无障碍服务")) {
+            instance.goAccess()
+        }
+         */
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun test1() {
-        val accessibilityNodeInfo = AccessibilityNodeInfo(mClMain)
+        mViewDataBinding ?: return
+        val accessibilityNodeInfo = AccessibilityNodeInfo(mViewDataBinding!!.clMain)
         val list = accessibilityNodeInfo.actionList
 
         list?.let {
@@ -215,11 +320,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         val mBtnGPSProvider = object : AccessibilityNodeProvider() {
             override fun createAccessibilityNodeInfo(virtualViewId: Int): AccessibilityNodeInfo? {
-                return AccessibilityNodeInfo(mBtnSkipGPS)
+                return mViewDataBinding?.btnSkipGps?.let { AccessibilityNodeInfo(it) }
             }
 
             override fun findFocus(focus: Int): AccessibilityNodeInfo? {
-                return AccessibilityNodeInfo(mBtnSkipGPS)
+                return mViewDataBinding?.btnSkipGps?.let { AccessibilityNodeInfo(it) }
             }
         }
         mBtnGPSProvider.createAccessibilityNodeInfo(AccessibilityNodeProvider.HOST_VIEW_ID)
@@ -378,26 +483,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //                    startActivity(intent)
 //                    val c = getSystemService(NETWORK_POLICY_SERVICE) as NetworkPolicyManager
 
-                    mIvSuccess.visibility = View.VISIBLE
+                    mViewDataBinding?.ivSuccess?.visibility = View.VISIBLE
                     val animation = AnimationUtils.loadAnimation(this, R.anim.success_up_anim)
-                    mIvSuccess.startAnimation(animation)
+                    mViewDataBinding?.ivSuccess?.startAnimation(animation)
                 }
                 R.id.btn_skip_network -> {
                     /*
                     val intent = Intent(this, NetworkActivity::class.java);
                     startActivity(intent)
                      */
-                    mBtnSkipGPS.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED)
+                    mViewDataBinding?.btnSkipGps?.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED)
 
                     val constructor = AccessibilityEvent::class.java.getDeclaredConstructor()
                     constructor.isAccessible = true
                     val accessibilityEvent = constructor.newInstance()
                     accessibilityEvent.eventType = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-                    accessibilityEvent.className = mBtnSkipGPS.javaClass.name
+                    accessibilityEvent.className = mViewDataBinding?.btnSkipGps?.javaClass?.name
                     DOFLogUtil.d(TAG, "accessibilityEvent = $accessibilityEvent")
                     DOFLogUtil.d(
                         TAG,
-                        "accessibilityEvent = ${mBtnSkipGPS.accessibilityTraversalAfter}"
+                        "accessibilityEvent = ${mViewDataBinding?.btnSkipGps?.accessibilityTraversalAfter}"
                     )
                 }
                 R.id.btn_refresh -> {
@@ -649,7 +754,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 //                mConnectivityDiagnosticsCallback
 //            )
 //        }
-        mConnectivityManager.unregisterNetworkCallback(mNetworkCallback)
+//        mConnectivityManager.unregisterNetworkCallback(mNetworkCallback)
     }
 
     fun hasPermissionToReadNetworkStats(): Boolean {

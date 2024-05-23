@@ -1,6 +1,7 @@
 package com.soul
 
 import android.app.Application
+import com.soul.log.DOFLogUtil
 
 
 /**
@@ -9,11 +10,12 @@ import android.app.Application
  *     desc   :
  *     version: 1.0
  */
-class SoulApplication: Application() {
+class SoulApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
         initComponents()
+        DOFLogUtil.init()
     }
 
     private fun initComponents() {

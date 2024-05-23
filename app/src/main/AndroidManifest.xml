@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -22,9 +21,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GPSTest">
-        <activity
-            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
-            android:exported="false" />
         <activity
             android:name="com.soul.scene.CustomSceneSecondActivity"
             android:exported="true" />
@@ -61,8 +57,7 @@
             android:exported="true" />
         <activity
             android:name="com.soul.waterfall.WaterFallActivity"
-            android:exported="true" >
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name="com.soul.MainActivity"
             android:exported="true"
@@ -132,6 +127,9 @@
             android:name="com.soul.volume.VolumeActivity"
             android:exported="true" />
 
+        <activity android:name="com.soul.easyswipemenulayout.EasySwipeMenuActivity"
+            android:exported="true" />
+
         <receiver
             android:name="com.soul.receiver.MainReceiver"
             android:exported="true">
@@ -140,7 +138,8 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.soul.volume.VolumeBroadReceiver"
+        <receiver
+            android:name="com.soul.volume.VolumeBroadReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />

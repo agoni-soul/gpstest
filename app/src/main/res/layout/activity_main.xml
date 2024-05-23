@@ -1,196 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cl_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <ScrollView
+<layout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cl_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-
-            <TextView
-                android:id="@+id/btn_skip_gps"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:accessibilityTraversalBefore="@+id/btn_skip_network"
-                android:gravity="center"
-                android:importantForAccessibility="auto"
-                android:text="GPS权限"
-                android:textSize="24sp"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/btn_skip_remote_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="消息通知"
-                android:importantForAccessibility="yes"
-                android:text="消息通知 RemoteViews"
-                android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@+id/btn_skip_gps" />
 
-            <Button
-                android:id="@+id/btn_skip_network"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:accessibilityTraversalBefore="@+id/btn_refresh"
-                android:contentDescription="网络"
-                android:importantForAccessibility="yes"
-                android:text="Network"
-                app:layout_constraintTop_toBottomOf="@+id/btn_skip_remote_view" />
+                <TextView
+                    android:id="@+id/btn_skip_gps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityTraversalBefore="@+id/btn_skip_network"
+                    android:gravity="center"
+                    android:importantForAccessibility="auto"
+                    android:text="GPS权限"
+                    android:textSize="24sp"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/btn_refresh"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="auto"
-                android:text="刷新网络"
-                app:layout_constraintTop_toBottomOf="@+id/btn_skip_network" />
+                <Button
+                    android:id="@+id/btn_skip_remote_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="消息通知"
+                    android:importantForAccessibility="yes"
+                    android:text="消息通知 RemoteViews"
+                    android:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_skip_gps" />
 
-            <Button
-                android:id="@+id/btn_test"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="auto"
-                android:text="测试"
-                app:layout_constraintTop_toBottomOf="@+id/btn_refresh" />
+                <Button
+                    android:id="@+id/btn_skip_network"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityTraversalBefore="@+id/btn_refresh"
+                    android:contentDescription="网络"
+                    android:importantForAccessibility="yes"
+                    android:text="Network"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_skip_remote_view" />
 
-            <Button
-                android:id="@+id/btn_test1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="auto"
-                android:text="测试1"
-                app:layout_constraintTop_toBottomOf="@+id/btn_test" />
+                <Button
+                    android:id="@+id/btn_refresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="auto"
+                    android:text="刷新网络"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_skip_network" />
 
-            <Button
-                android:id="@+id/btn_permission"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="权限"
-                app:layout_constraintTop_toBottomOf="@+id/btn_test1" />
+                <Button
+                    android:id="@+id/btn_test"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="auto"
+                    android:text="测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_refresh" />
 
-            <Button
-                android:id="@+id/btn_dialog_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="弹窗"
-                app:layout_constraintTop_toBottomOf="@+id/btn_permission" />
+                <Button
+                    android:id="@+id/btn_test1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="auto"
+                    android:text="测试1"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_test" />
 
-            <Button
-                android:id="@+id/btn_animation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="动画"
-                app:layout_constraintTop_toBottomOf="@+id/btn_dialog_fragment" />
+                <Button
+                    android:id="@+id/btn_permission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="权限"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_test1" />
 
-            <Button
-                android:id="@+id/btn_activity_scene"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="Activity转场动画"
-                app:layout_constraintTop_toBottomOf="@+id/btn_animation" />
+                <Button
+                    android:id="@+id/btn_dialog_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="弹窗"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_permission" />
 
-            <Button
-                android:id="@+id/btn_activity_coroutineScope"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="协程测试"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
+                <Button
+                    android:id="@+id/btn_animation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="动画"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_dialog_fragment" />
 
-            <Button
-                android:id="@+id/btn_activity_custom_scene"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="自定义Activity动画"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
+                <Button
+                    android:id="@+id/btn_activity_scene"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="Activity转场动画"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_animation" />
 
-            <Button
-                android:id="@+id/btn_activity_custom_scene2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="自定义Activity动画2"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
+                <Button
+                    android:id="@+id/btn_activity_coroutineScope"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="协程测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
 
-            <Button
-                android:id="@+id/btn_activity_recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="刷新RecyclerView"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_custom_scene2" />
+                <Button
+                    android:id="@+id/btn_activity_custom_scene"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="自定义Activity动画"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
 
-            <ImageView
-                android:id="@+id/iv_scan_device"
-                android:layout_width="108dp"
-                android:layout_height="108dp"
-                android:layout_gravity="center"
-                android:src="@drawable/net_ic_wlan"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_recyclerview" />
+                <Button
+                    android:id="@+id/btn_activity_custom_scene2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="自定义Activity动画2"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
 
-            <TextView
-                android:id="@+id/tv_span"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好"
-                android:textSize="16sp"
-                app:layout_constraintTop_toBottomOf="@+id/iv_scan_device" />
+                <Button
+                    android:id="@+id/btn_activity_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="刷新RecyclerView"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_custom_scene2" />
 
-            <ImageView
-                android:id="@+id/iv_success"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginBottom="40dp"
-                android:src="@drawable/config_command_ic_sucess_s"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                <ImageView
+                    android:id="@+id/iv_scan_device"
+                    android:layout_width="108dp"
+                    android:layout_height="108dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/net_ic_wlan"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_recyclerview" />
 
-            <Button
-                android:id="@+id/btn_activity_waterfall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="瀑布流布局"
-                app:layout_constraintTop_toBottomOf="@+id/tv_span" />
+                <TextView
+                    android:id="@+id/tv_span"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_scan_device" />
 
-            <Button
-                android:id="@+id/btn_activity_selector"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="selector测试"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_waterfall" />
+                <ImageView
+                    android:id="@+id/iv_success"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="40dp"
+                    android:src="@drawable/config_command_ic_sucess_s"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-            <Button
-                android:id="@+id/btn_activity_volume"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                android:text="媒体声音测试"
-                app:layout_constraintTop_toBottomOf="@+id/btn_activity_selector" />
+                <Button
+                    android:id="@+id/btn_activity_waterfall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="瀑布流布局"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_span" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <Button
+                    android:id="@+id/btn_activity_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="selector测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_waterfall" />
 
-    </ScrollView>
+                <Button
+                    android:id="@+id/btn_activity_volume"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="媒体声音测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_selector" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <Button
+                    android:id="@+id/btn_activity_slide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="左滑删除测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_volume" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

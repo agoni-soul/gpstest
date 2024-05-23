@@ -3,15 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll_root"
     android:layout_width="match_parent"
-
     android:layout_height="wrap_content"
     android:clickable="true"
     android:orientation="vertical">
-    /**
-    * Created by guanaj on .
-    */
 
-    <com.guanaj.easyswipemenulibrary.EasySwipeMenuLayout
+    <com.soul.easyswipemenulayout.EasySwipeMenuLayout
         android:id="@+id/es"
 
         android:layout_width="match_parent"
@@ -80,5 +76,5 @@
                 android:text="收藏" />
 
         </LinearLayout>
-    </com.guanaj.easyswipemenulibrary.EasySwipeMenuLayout>
+    </com.soul.easyswipemenulayout.EasySwipeMenuLayout>
 </LinearLayout>

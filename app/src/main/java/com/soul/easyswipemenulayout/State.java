@@ -1,4 +1,4 @@
-package com.guanaj.easyswipemenulibrary;
+package com.soul.easyswipemenulayout;
 
 /**
  * Created by guanaj on 2017/6/6.

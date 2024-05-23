@@ -60,8 +60,7 @@
             android:exported="true" />
         <activity
             android:name="com.soul.waterfall.WaterFallActivity"
-            android:exported="true" >
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name="com.soul.MainActivity"
             android:exported="true"
@@ -131,6 +130,9 @@
             android:name="com.soul.volume.VolumeActivity"
             android:exported="true" />
 
+        <activity android:name="com.soul.easyswipemenulayout.EasySwipeMenuActivity"
+            android:exported="true" />
+
         <receiver
             android:name="com.soul.receiver.MainReceiver"
             android:exported="true">
@@ -139,7 +141,8 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.soul.volume.VolumeBroadReceiver"
+        <receiver
+            android:name="com.soul.volume.VolumeBroadReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />

@@ -4,7 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityEasySwipeMenuBinding
+import com.soul.log.DOFLogUtil
 
 
 /**
@@ -23,6 +25,7 @@ import com.soul.gpstest.databinding.ActivityEasySwipeMenuBinding
  */
 class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, BaseViewModel>() {
     private lateinit var myAdapter: MyAdapter
+    private lateinit var mLinearLayoutManager: LinearLayoutManager
     private val listData: MutableList<String> by lazy {
         mutableListOf()
     }
@@ -32,9 +35,22 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
     override fun getLayoutId(): Int = R.layout.activity_easy_swipe_menu
 
     override fun initView() {
-        mViewDataBinding.recyclerview.layoutManager = LinearLayoutManager(this)
+        val wm: WindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        DOFLogUtil.d(TAG, "match_parent = ${wm.defaultDisplay.width}")
+        mLinearLayoutManager = LinearLayoutManager(this)
+        mViewDataBinding.recyclerview.layoutManager = mLinearLayoutManager
         myAdapter = MyAdapter(this)
         mViewDataBinding.recyclerview.adapter = myAdapter
+        mViewDataBinding.recyclerview.viewTreeObserver.addOnGlobalLayoutListener(listener)
+    }
+
+    private val listener: OnGlobalLayoutListener by lazy {
+        OnGlobalLayoutListener {
+            val width = mViewDataBinding.recyclerview.width
+            val itemWidth = mLinearLayoutManager.width
+            DOFLogUtil.d(TAG, "viewTreeObserver: width = $width, itemWidth = $itemWidth")
+            mViewDataBinding.recyclerview.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+        }
     }
 
     override fun initData() {
@@ -44,43 +60,44 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
         myAdapter.updateData(listData)
         myAdapter.notifyDataSetChanged()
     }
+}
 
-    inner class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyHolder>() {
-        private val listData: MutableList<String> = mutableListOf()
+class MyAdapter(private val context: Context) : RecyclerView.Adapter<MyHolder>() {
+    private val TAG = javaClass.simpleName
+    private val listData: MutableList<String> = mutableListOf()
 
-        fun updateData(listData: MutableList<String>) {
-            this.listData.clear()
-            this.listData.addAll(listData)
+    fun updateData(listData: MutableList<String>) {
+        this.listData.clear()
+        this.listData.addAll(listData)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.adapter_item_rv_swipemenu, null, false)
+        return MyHolder(view)
+    }
+
+    override fun getItemCount(): Int = listData.size
+
+    override fun onBindViewHolder(helper: MyHolder, position: Int) {
+        helper.rightMenu2.setOnClickListener {
+            Toast.makeText(context, "收藏", Toast.LENGTH_SHORT).show()
+            val easySwipeMenuLayout: EasySwipeMenuLayout = helper.esSwipe
+            easySwipeMenuLayout.resetStatus()
         }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.adapter_item_rv_swipemenu, null, false)
-            return MyHolder(view)
+        DOFLogUtil.d(TAG, "width = ${helper.content.width}")
+        helper.content.setOnClickListener {
+            Toast.makeText(
+                context, "setOnClickListener", Toast.LENGTH_SHORT
+            ).show()
         }
-
-        override fun getItemCount(): Int = listData.size
-
-        override fun onBindViewHolder(helper: MyHolder, position: Int) {
-            helper.rightMenu2.setOnClickListener {
-                Toast.makeText(context, "收藏", Toast.LENGTH_SHORT).show()
-                val easySwipeMenuLayout: EasySwipeMenuLayout = helper.esSwipe
-                easySwipeMenuLayout.resetStatus()
-            }
-            helper.content.setOnClickListener {
-                Toast.makeText(
-                    context, "setOnClickListener", Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
     }
 
 }
 
 class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val rightMenu2: TextView
-    val content: LinearLayout
+    val content: TextView
     val esSwipe: EasySwipeMenuLayout
 
     init {

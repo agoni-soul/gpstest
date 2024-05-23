@@ -13,40 +13,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:contentView="@+id/content"
-        app:leftMenuView="@+id/left"
         app:rightMenuView="@+id/right">
 
-        <LinearLayout
-            android:id="@+id/left"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_dark"
-            android:orientation="horizontal"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:text="分享"
-                android:focusable="true" />
-
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#cccccc"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="内容区域" />
-
-        </LinearLayout>
+            android:gravity="start|center_vertical"
+            android:padding="20dp"
+            android:text="内容区域" />
 
         <LinearLayout
             android:id="@+id/right"

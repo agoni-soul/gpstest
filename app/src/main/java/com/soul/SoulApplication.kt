@@ -1,7 +1,6 @@
 package com.soul
 
 import android.app.Application
-import com.lzx.starrysky.StarrySky
 import com.soul.log.DOFLogUtil
 
 
@@ -11,7 +10,7 @@ import com.soul.log.DOFLogUtil
  *     desc   :
  *     version: 1.0
  */
-class SoulApplication: Application() {
+class SoulApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -20,6 +19,5 @@ class SoulApplication: Application() {
     }
 
     private fun initComponents() {
-        StarrySky
     }
 }

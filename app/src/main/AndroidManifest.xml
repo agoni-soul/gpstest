@@ -53,9 +53,6 @@
             android:name="com.soul.animation.AnimationActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
-            android:exported="true" />
-        <activity
             android:name="com.soul.util.PermissionTransparentActivity"
             android:exported="true" />
         <activity

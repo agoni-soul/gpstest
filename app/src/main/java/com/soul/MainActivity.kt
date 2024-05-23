@@ -12,7 +12,6 @@ import android.graphics.Color
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -28,13 +27,8 @@ import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
@@ -54,7 +48,6 @@ import com.soul.selector.SelectorActivity
 import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
-import com.soul.ui.dialog.CustomDialogFragment
 import com.soul.util.PermissionUtils
 import com.soul.volume.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
@@ -318,11 +311,14 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         list?.let {
             for (accessibilityAction in list) {
-                DOFLogUtil.d(TAG, "id = ${accessibilityAction.id}, label = ${accessibilityAction.label}")
+                DOFLogUtil.d(
+                    TAG,
+                    "id = ${accessibilityAction.id}, label = ${accessibilityAction.label}"
+                )
             }
         }
 
-        val mBtnGPSProvider = object: AccessibilityNodeProvider() {
+        val mBtnGPSProvider = object : AccessibilityNodeProvider() {
             override fun createAccessibilityNodeInfo(virtualViewId: Int): AccessibilityNodeInfo? {
                 return mViewDataBinding?.btnSkipGps?.let { AccessibilityNodeInfo(it) }
             }
@@ -351,7 +347,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     @SuppressLint("WrongConstant")
-    fun getUid(context: Context): Int?{
+    fun getUid(context: Context): Int? {
         try {
             val pm = context.packageManager
             val ai = pm.getApplicationInfo(context.packageName, PackageManager.GET_ACTIVITIES)
@@ -381,7 +377,11 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     private fun wifiInfo() {
-        if (ActivityCompat.checkSelfPermission(this, GpsActivity.ACCESS_FIND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                GpsActivity.ACCESS_FIND_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             val dialog = AlertDialog.Builder(this)
             dialog.apply {
                 setTitle("请求精准定位权限")
@@ -420,7 +420,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             .setNetworkSpecifier(ssid)
             .build()
 
-        val callback = object: ConnectivityManager.NetworkCallback() {
+        val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 Log.i("haha", "onAvailable $network ${network.javaClass.name}")
             }
@@ -464,11 +464,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onClick(v: View?) {
         v?.let {
-            when(v.id) {
+            when (v.id) {
                 R.id.btn_skip_gps -> {
 //                    val intent = Intent(this, GpsActivity::class.java);
 //                    startActivity(intent)
-                    val resultList = "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
+                    val resultList =
+                        "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
                     var bean: SubDeviceResultBean? = null
                     try {
                         bean = GsonUtils.fromJson(resultList, SubDeviceResultBean::class.java)
@@ -499,7 +500,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     accessibilityEvent.eventType = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
                     accessibilityEvent.className = mViewDataBinding?.btnSkipGps?.javaClass?.name
                     DOFLogUtil.d(TAG, "accessibilityEvent = $accessibilityEvent")
-                    DOFLogUtil.d(TAG, "accessibilityEvent = ${mViewDataBinding?.btnSkipGps?.accessibilityTraversalAfter}")
+                    DOFLogUtil.d(
+                        TAG,
+                        "accessibilityEvent = ${mViewDataBinding?.btnSkipGps?.accessibilityTraversalAfter}"
+                    )
                 }
                 R.id.btn_refresh -> {
 //                    val panelIntent = Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY)
@@ -652,13 +656,15 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 }
                 R.id.btn_activity_recyclerview -> {
                     if (!PermissionUtils.checkGPSPermission()) {
-                        PermissionUtils.requestPermissions(this,
+                        PermissionUtils.requestPermissions(
+                            this,
                             Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION
                         )
                     } else {
 
-                        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+                        val wifiManager =
+                            applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
                         wifiManager?.let {
                             val result = it.scanResults
                         }
@@ -688,8 +694,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private fun accessibilityManagerTest() {
 
-        val accessibilityManager = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        accessibilityManager.addAccessibilityStateChangeListener(object : AccessibilityManager.AccessibilityStateChangeListener {
+        val accessibilityManager =
+            getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        accessibilityManager.addAccessibilityStateChangeListener(object :
+            AccessibilityManager.AccessibilityStateChangeListener {
             override fun onAccessibilityStateChanged(enabled: Boolean) {
                 if (enabled) {
                 }
@@ -814,7 +822,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private fun isWifiConnected(context: Context) {
         val wifiNetworkInfo = mConnectivityManager.activeNetworkInfo
         if (wifiNetworkInfo?.detailedState == NetworkInfo.DetailedState.OBTAINING_IPADDR
-            || wifiNetworkInfo?.detailedState == NetworkInfo.DetailedState.CONNECTING) {
+            || wifiNetworkInfo?.detailedState == NetworkInfo.DetailedState.CONNECTING
+        ) {
             Log.d(TAG, "WIFI_CONNECTING")
         } else if (wifiNetworkInfo?.detailedState == NetworkInfo.DetailedState.CONNECTED) {
             Log.d(TAG, "WIFI_CONNECT")

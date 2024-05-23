@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
 
 /**
@@ -26,14 +24,9 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     // 调节音量
     private lateinit var mAudioManager: AudioManager
     private lateinit var mVolumeBroadReceiver: VolumeBroadReceiver
+
     // 媒体播放器
     private lateinit var mMediaPlayer: MediaPlayer
-    private val mOnPreparedListener: MediaPlayer.OnPreparedListener by lazy {
-        object : MediaPlayer.OnPreparedListener {
-            override fun onPrepared(mp: MediaPlayer?) {
-            }
-        }
-    }
 
     private lateinit var mVolumeAdjustAdapter: VolumeAdjustAdapter
 
@@ -78,7 +71,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
             tvPlayer.setOnClickListener {
                 Log.d(TAG, "isPlaying = ${mMediaPlayer.isPlaying}")
-                if (!mMediaPlayer.isPlaying) {
+                if (mViewModel?.getIsMediaPrepare()?.value == true && !mMediaPlayer.isPlaying) {
                     mMediaPlayer.start()
                 }
             }
@@ -87,20 +80,41 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     override fun initData() {
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mMediaPlayer = MediaPlayer()
-        mMediaPlayer.setOnPreparedListener(mOnPreparedListener)
+        val uri =
+        "http://isure6.stream.qqmusic.qq.com/C200001KBxQw0PWq7Y.m4a?guid=2000000194&vkey=8F7A8529D0AA51DE9742C450949E9528AD5B7D98F851657AA06189E992067E2A28F51C0CC6B42C577C61264804DA728EC4DE743DFD583E9D&uin=0&fromtag=20194&trace=5cdf245b6863abb0"
+        mMediaPlayer = MediaPlayer.create(this, Uri.parse(uri))
+        mMediaPlayer.setOnPreparedListener {
+            mViewModel?.getIsMediaPrepare()?.postValue(true)
+        }
+        mMediaPlayer.setOnErrorListener(object : MediaPlayer.OnErrorListener {
+            override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
+                Log.e(TAG, "MediaPlayer onError")
+                return true
+            }
+        })
         initMusic()
+
+        mViewModel?.apply {
+            getIsMediaPrepare().postValue(false)
+            getIsMediaPrepare().observe(this@VolumeActivity) {
+                Log.d(TAG, "observe: isMediaPrepare = $it, isPlaying = ${mMediaPlayer.isPlaying}")
+                if (it) {
+                    mMediaPlayer.start()
+                }
+            }
+        }
     }
 
     private fun initMusic() {
-        MainScope().launch {
-            try {
-                val uri = "http://isure6.stream.qqmusic.qq.com/C200001KBxQw0PWq7Y.m4a?guid=2000000194&vkey=8F7A8529D0AA51DE9742C450949E9528AD5B7D98F851657AA06189E992067E2A28F51C0CC6B42C577C61264804DA728EC4DE743DFD583E9D&uin=0&fromtag=20194&trace=5cdf245b6863abb0"
-                mMediaPlayer.setDataSource(mContext, Uri.parse(uri))
-                mMediaPlayer.prepare()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        try {
+            mMediaPlayer.reset()
+            val uri =
+                "http://isure6.stream.qqmusic.qq.com/C200001KBxQw0PWq7Y.m4a?guid=2000000194&vkey=8F7A8529D0AA51DE9742C450949E9528AD5B7D98F851657AA06189E992067E2A28F51C0CC6B42C577C61264804DA728EC4DE743DFD583E9D&uin=0&fromtag=20194&trace=5cdf245b6863abb0"
+            mMediaPlayer.setDataSource(mContext, Uri.parse(uri))
+            mMediaPlayer.prepareAsync()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.d(TAG, "initMusic: exception = ${e.message}")
         }
     }
 

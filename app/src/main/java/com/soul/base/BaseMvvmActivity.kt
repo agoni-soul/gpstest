@@ -14,25 +14,32 @@ import androidx.lifecycle.ViewModelProvider
  */
 abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActivity() {
 
-    protected lateinit var mViewDataBinding: V
+    protected var mViewDataBinding: V? = null
 
-    protected lateinit var mViewModel: VM
+    protected var mViewModel: VM? = null
 
-    protected abstract fun getViewModelClass(): Class<VM>
+    protected abstract fun getViewModelClass(): Class<VM>?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewDataBinding = DataBindingUtil.setContentView(this, getLayoutId())
-        val modelClass: Class<VM> = getViewModelClass()
-        mViewModel = ViewModelProvider(this).get(modelClass)
-        lifecycle.addObserver(mViewModel)
+        val modelClass: Class<VM>? = getViewModelClass()
+        modelClass?.let {
+            mViewModel = ViewModelProvider(this).get(it)
+        }
+        mViewModel?.let {
+            lifecycle.addObserver(it)
+        }
         initView()
         initData()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mViewDataBinding.unbind()
-        lifecycle.removeObserver(mViewModel)
+        mViewDataBinding?.unbind()
+        mViewDataBinding = null
+        mViewModel?.let {
+            lifecycle.removeObserver(it)
+        }
     }
 }

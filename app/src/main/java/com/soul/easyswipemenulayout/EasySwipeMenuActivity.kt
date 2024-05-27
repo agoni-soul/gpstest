@@ -38,10 +38,12 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
         val wm: WindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         DOFLogUtil.d(TAG, "match_parent = ${wm.defaultDisplay.width}")
         mLinearLayoutManager = LinearLayoutManager(this)
-        mViewDataBinding?.recyclerview?.layoutManager = mLinearLayoutManager
         easySwipeMenuAdapter = EasySwipeMenuAdapter(this)
-        mViewDataBinding?.recyclerview?.adapter = easySwipeMenuAdapter
-        mViewDataBinding?.recyclerview?.viewTreeObserver?.addOnGlobalLayoutListener(listener)
+        mViewDataBinding?.recyclerview?.apply {
+            this.layoutManager = mLinearLayoutManager
+            adapter = easySwipeMenuAdapter
+            viewTreeObserver.addOnGlobalLayoutListener(listener)
+        }
     }
 
     private val listener: OnGlobalLayoutListener by lazy {
@@ -73,7 +75,7 @@ class EasySwipeMenuAdapter(private val context: Context) : RecyclerView.Adapter<
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EasySwipeMenuHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.adapter_item_rv_swipemenu, null, false)
+            .inflate(R.layout.adapter_item_rv_swipemenu, parent, false)
         return EasySwipeMenuHolder(view)
     }
 

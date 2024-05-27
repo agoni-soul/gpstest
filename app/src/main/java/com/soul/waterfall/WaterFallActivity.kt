@@ -1,7 +1,5 @@
 package com.soul.waterfall
 
-import android.annotation.SuppressLint
-import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -10,9 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.soul.base.BaseActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
@@ -149,7 +145,7 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
 
     private fun readJson() {
         mMap.clear()
-        val jsonStr = ReadJsonUtil.readJson("BusinessHomeDeviceType.json", this) ?: return
+        val jsonStr = ReadJsonUtil.readJson("DeviceType.json", this) ?: return
         val json = JSONArray(jsonStr)
         try {
             var i = 0
@@ -181,7 +177,7 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
     private fun showPopupWindow() {
         if (mPopupWindow == null) {
             mPopupWindow = MaskPopupWindow(this)
-            mPopupWindow?.animationStyle = R.style.business_home_add_popup_anim
+            mPopupWindow?.animationStyle = R.style.add_popup_anim
         }
         if (mPopupWindow?.isShowing == true) {
             mPopupWindow?.dismiss()

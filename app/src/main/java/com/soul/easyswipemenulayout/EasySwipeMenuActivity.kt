@@ -1,15 +1,9 @@
 package com.soul.easyswipemenulayout
 
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.WindowManager
-import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
@@ -64,47 +58,3 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
     }
 }
 
-class EasySwipeMenuAdapter(private val context: Context) : RecyclerView.Adapter<EasySwipeMenuHolder>() {
-    private val TAG = javaClass.simpleName
-    private val listData: MutableList<String> = mutableListOf()
-
-    fun updateData(listData: MutableList<String>) {
-        this.listData.clear()
-        this.listData.addAll(listData)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EasySwipeMenuHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.adapter_item_rv_swipemenu, parent, false)
-        return EasySwipeMenuHolder(view)
-    }
-
-    override fun getItemCount(): Int = listData.size
-
-    override fun onBindViewHolder(helper: EasySwipeMenuHolder, position: Int) {
-        helper.rightMenu2.setOnClickListener {
-            Toast.makeText(context, "收藏", Toast.LENGTH_SHORT).show()
-            val easySwipeMenuLayout: EasySwipeMenuLayout = helper.esSwipe
-            easySwipeMenuLayout.resetStatus()
-        }
-        DOFLogUtil.d(TAG, "width = ${helper.content.width}")
-        helper.content.setOnClickListener {
-            Toast.makeText(
-                context, "setOnClickListener", Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
-}
-
-class EasySwipeMenuHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val rightMenu2: TextView
-    val content: TextView
-    val esSwipe: EasySwipeMenuLayout
-
-    init {
-        esSwipe = itemView.findViewById(R.id.es_swipe)
-        rightMenu2 = itemView.findViewById(R.id.right_menu_2)
-        content = itemView.findViewById(R.id.content)
-    }
-}

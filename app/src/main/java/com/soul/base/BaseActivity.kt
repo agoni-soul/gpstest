@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.soul.gpstest.R
 
@@ -36,7 +37,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         hideTitleAndActionBar()
         setContentView(getLayoutId())
-        setNavigationBarColor()
+        setNavigationBarColor(getNavigationBarColor())
         setStatusBarColor()
         mContext = this
     }
@@ -52,9 +53,12 @@ abstract class BaseActivity : AppCompatActivity() {
     /**
      * 设置导航栏颜色
      */
-    protected fun setNavigationBarColor() {
-        window.navigationBarColor = Color.TRANSPARENT
+    protected fun setNavigationBarColor(color: Int) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.navigationBarColor = color
     }
+
+    protected open fun getNavigationBarColor(): Int = Color.TRANSPARENT
 
     protected fun setStatusBarColor() {
         val decorView = window.decorView

@@ -56,5 +56,9 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
         easySwipeMenuAdapter.updateData(listData)
         easySwipeMenuAdapter.notifyDataSetChanged()
     }
+
+    override fun getNavigationBarColor(): Int {
+        return resources.getColor(R.color.yellow)
+    }
 }
 

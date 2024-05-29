@@ -1,80 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.soul.easyswipemenulayout.EasySwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/ll_root"
+    android:id="@+id/es_swipe"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clickable="true"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"    app:contentView="@+id/content"
+    app:rightMenuView="@+id/ll_right">
 
-    <com.soul.easyswipemenulayout.EasySwipeMenuLayout
-        android:id="@+id/es"
-
+    <TextView
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:contentView="@+id/content"
-        app:leftMenuView="@+id/left"
-        app:rightMenuView="@+id/right">
+        android:background="#cccccc"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="内容区域" />
 
-        <LinearLayout
-            android:id="@+id/left"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_dark"
+    <LinearLayout
+        android:id="@+id/ll_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow"
+        android:orientation="horizontal">
 
-            android:orientation="horizontal"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:text="分享" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#cccccc"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="内容区域" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/right"
-
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_red_light"
-            android:orientation="horizontal">
+            android:background="@android:color/holo_blue_bright"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="20dp"
+            android:text="删除" />
 
-            <TextView
-                android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/right_menu_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_orange_dark"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="20dp"
+            android:text="收藏" />
 
-                android:layout_height="wrap_content"
-                android:background="@android:color/holo_blue_bright"
-                android:clickable="true"
-                android:padding="20dp"
-                android:text="删除" />
-
-            <TextView
-                android:id="@+id/right_menu_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/holo_orange_dark"
-                android:clickable="true"
-                android:padding="20dp"
-                android:text="收藏" />
-
-        </LinearLayout>
-    </com.soul.easyswipemenulayout.EasySwipeMenuLayout>
-</LinearLayout>
+    </LinearLayout>
+</com.soul.easyswipemenulayout.EasySwipeMenuLayout>

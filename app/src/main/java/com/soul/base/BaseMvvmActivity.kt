@@ -25,7 +25,7 @@ abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActi
         mViewDataBinding = DataBindingUtil.setContentView(this, getLayoutId())
         val modelClass: Class<VM>? = getViewModelClass()
         modelClass?.let {
-            mViewModel = ViewModelProvider(this).get(modelClass)
+            mViewModel = ViewModelProvider(this).get(it)
         }
         mViewModel?.let {
             lifecycle.addObserver(it)

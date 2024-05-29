@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 public class EasySwipeMenuLayout extends ViewGroup {
 
-    private static final String TAG = "EasySwipeMenuLayout";
+    private final String TAG = this.getClass().getSimpleName();
     private final ArrayList<View> mMatchParentChildren = new ArrayList<>(1);
     private int mLeftViewResID;
     private int mRightViewResID;
@@ -55,7 +55,6 @@ public class EasySwipeMenuLayout extends ViewGroup {
     public EasySwipeMenuLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr);
-
     }
 
     /**
@@ -130,6 +129,7 @@ public class EasySwipeMenuLayout extends ViewGroup {
                 if (measureMatchParentChildren) {
                     if (lp.width == LayoutParams.MATCH_PARENT ||
                             lp.height == LayoutParams.MATCH_PARENT) {
+                        Log.d(TAG, "onMeasure: lp.width = " + lp.width + ", lp.height = " + lp.height);
                         mMatchParentChildren.add(child);
                     }
                 }
@@ -154,6 +154,7 @@ public class EasySwipeMenuLayout extends ViewGroup {
                             - lp.leftMargin - lp.rightMargin);
                     childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                             width, MeasureSpec.EXACTLY);
+                    Log.d(TAG, "i = " + i + ", width = " + width + ", childWidthMeasureSpec = " + childWidthMeasureSpec);
                 } else {
                     childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
                             lp.leftMargin + lp.rightMargin,
@@ -166,6 +167,7 @@ public class EasySwipeMenuLayout extends ViewGroup {
                             - lp.topMargin - lp.bottomMargin);
                     childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
                             height, MeasureSpec.EXACTLY);
+                    Log.d(TAG, "i = " + i + ", height = " + height + ", childHeightMeasureSpec = " + childHeightMeasureSpec);
                 } else {
                     childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec,
                             lp.topMargin + lp.bottomMargin,
@@ -216,6 +218,7 @@ public class EasySwipeMenuLayout extends ViewGroup {
             int cLeft = left + mContentViewLp.leftMargin;
             cRight = left + mContentViewLp.leftMargin + mContentView.getMeasuredWidth();
             int cBottom = cTop + mContentView.getMeasuredHeight();
+            Log.d(TAG, "ContentView: width = " + (cRight - cLeft) + ", height = " + (cBottom - cTop));
             mContentView.layout(cLeft, cTop, cRight, cBottom);
         }
         if (mLeftView != null) {
@@ -224,6 +227,7 @@ public class EasySwipeMenuLayout extends ViewGroup {
             int lLeft = 0 - mLeftView.getMeasuredWidth() + leftViewLp.leftMargin + leftViewLp.rightMargin;
             int lRight = 0 - leftViewLp.rightMargin;
             int lBottom = lTop + mLeftView.getMeasuredHeight();
+            Log.d(TAG, "LeftView: width = " + (lRight - lLeft) + ", height = " + (lBottom - lTop));
             mLeftView.layout(lLeft, lTop, lRight, lBottom);
         }
         if (mRightView != null) {
@@ -232,6 +236,7 @@ public class EasySwipeMenuLayout extends ViewGroup {
             int lLeft = mContentView.getRight() + mContentViewLp.rightMargin + rightViewLp.leftMargin;
             int lRight = lLeft + mRightView.getMeasuredWidth();
             int lBottom = lTop + mRightView.getMeasuredHeight();
+            Log.d(TAG, "RightView: width = " + (lRight - lLeft) + ", height = " + (lBottom - lTop));
             mRightView.layout(lLeft, lTop, lRight, lBottom);
         }
 

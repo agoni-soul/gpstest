@@ -7,8 +7,10 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import com.soul.gpstest.R
 
 
@@ -27,6 +29,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected var mUseStatusBarColor = true
 
+//    protected lateinit var mController: WindowInsetsController
+
     abstract fun getLayoutId(): Int
 
     abstract fun initView()
@@ -43,7 +47,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     /**
-     * 隐藏导航栏[ActionBar]
+     * 隐藏标题栏[ActionBar]
      */
     protected open fun hideTitleAndActionBar() {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -62,7 +66,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected fun setStatusBarColor() {
         val decorView = window.decorView
-        val option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+        val option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE).or(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         decorView.systemUiVisibility = option
         window.statusBarColor = Color.TRANSPARENT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !mUseStatusBarColor) {

@@ -1,6 +1,7 @@
 package com.soul.easyswipemenulayout
 
 import android.content.Context
+import android.os.Build
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.WindowManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,6 +60,14 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
 
     override fun getNavigationBarColor(): Int {
         return resources.getColor(R.color.yellow)
+    }
+
+    override fun getStatusBarColor(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            resources.getColor(R.color.yellow, null)
+        } else {
+            resources.getColor(R.color.yellow)
+        }
     }
 }
 

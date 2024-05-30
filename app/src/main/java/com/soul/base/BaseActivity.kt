@@ -12,6 +12,7 @@ import android.view.*
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
 import com.soul.log.DOFLogUtil
 
@@ -184,6 +185,7 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     private fun createStatusBarView(activity: Activity): View {
         val statusBarView = View(activity)
+        statusBarView.background = ResourcesCompat.getDrawable(resources, R.color.transparent, null)
         val statusBarParams: ViewGroup.LayoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, getStatusBarHeight(activity)
         )

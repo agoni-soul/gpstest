@@ -834,12 +834,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private fun isSatisfiedAndroidVersion(version: Int): Boolean = Build.VERSION.SDK_INT >= version
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun test() {
-        val network = mConnectivityManager.activeNetwork
-
-    }
-
 //    @RequiresApi(Build.VERSION_CODES.R)
 //    class ExampleCallback : ConnectivityDiagnosticsManager.ConnectivityDiagnosticsCallback() {
 //        override fun onConnectivityReportAvailable(report: ConnectivityDiagnosticsManager.ConnectivityReport) {

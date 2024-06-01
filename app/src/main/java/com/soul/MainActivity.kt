@@ -8,6 +8,7 @@ import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.graphics.Color
 import android.net.*
 import android.net.wifi.WifiManager
@@ -22,12 +23,15 @@ import android.text.style.ForegroundColorSpan
 import android.transition.Slide
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.annotation.ColorInt
+import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
@@ -57,6 +61,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
+import kotlin.math.absoluteValue
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -229,6 +234,30 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    override fun getStatusBarColor(): Int {
+        return R.color.transparent
+    }
+
+    override fun getNavigationBarColor(): Int {
+        return R.color.cyan
+    }
+
+    override fun isBlackStatusText(): Boolean {
+        return true
+    }
+
+    override fun isShowStatus(): Boolean {
+        return false
+    }
+
+    override fun isShowNavigation(): Boolean {
+        return false
+    }
+
+    override fun getRootViewId(): Int {
+        return R.id.cl_main
     }
 
     @RequiresApi(Build.VERSION_CODES.R)

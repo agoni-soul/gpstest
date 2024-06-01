@@ -14,6 +14,7 @@
     <color name="peony">#FF00FF</color>
     <color name="cyan">#00FFFF</color>
     <color name="orange">#FF7F00</color>
+    <color name="transparent">#00000000</color>
 
     <color name="b3ffffff">#B3FFFFFF</color>
     <color name="gray">#1FFFFFFF</color>

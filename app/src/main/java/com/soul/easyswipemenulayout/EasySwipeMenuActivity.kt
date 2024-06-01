@@ -59,15 +59,11 @@ class EasySwipeMenuActivity : BaseMvvmActivity<ActivityEasySwipeMenuBinding, Bas
     }
 
     override fun getNavigationBarColor(): Int {
-        return resources.getColor(R.color.yellow)
+        return R.color.yellow
     }
 
     override fun getStatusBarColor(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            resources.getColor(R.color.yellow, null)
-        } else {
-            resources.getColor(R.color.yellow)
-        }
+        return R.color.yellow
     }
 }
 

@@ -195,6 +195,6 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
     }
 
     override fun getNavigationBarColor(): Int {
-        return resources.getColor(R.color.black)
+        return R.color.black
     }
 }

@@ -23,12 +23,15 @@ import android.text.style.ForegroundColorSpan
 import android.transition.Slide
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.annotation.ColorInt
+import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
@@ -58,6 +61,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
+import kotlin.math.absoluteValue
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -233,15 +237,15 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     override fun getStatusBarColor(): Int {
-        return resources.getColor(R.color.yellow)
+        return R.color.transparent
     }
 
     override fun getNavigationBarColor(): Int {
-        return resources.getColor(R.color.cyan)
+        return R.color.cyan
     }
 
     override fun isBlackStatusText(): Boolean {
-        return false
+        return true
     }
 
     override fun isShowStatus(): Boolean {

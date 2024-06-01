@@ -61,9 +61,6 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         hideTitleAndActionBar()
-        if (!isShowStatus()) {
-//            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        }
         setContentView(getLayoutId())
         setStatusBarColor(getStatusBarColor())
         setNavigationBarColor(getNavigationBarColor())
@@ -78,7 +75,7 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     private fun setNavigationBarColor(color: Int) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.navigationBarColor = color
+        window.navigationBarColor = resources.getColor(color)
     }
 
     /**
@@ -88,7 +85,7 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     private fun setStatusBarColor(color: Int) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = color
+        window.statusBarColor = resources.getColor(color)
     }
 
     private fun handleNavigationVAndStatusVisibility() {
@@ -154,30 +151,32 @@ abstract class BaseActivity : AppCompatActivity() {
         } else {
             uiOption = uiOption.or(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
-            window.statusBarColor = Color.TRANSPARENT
-            if (getRootViewId() != 0) {
-                val rootView = findViewById<ViewGroup>(getRootViewId())
-                if (rootView != null) {
-                    rootView.fitsSystemWindows = true
-                    // 留出高度 setFitsSystemWindows  true代表会调整布局，会把状态栏的高度留出来
-                    val contentView: View = rootView.getChildAt(0)
-                    contentView.fitsSystemWindows = true
-                    // 在原来的位置上添加一个状态栏
-                    val statusBarView = createStatusBarView(this)
-                    rootView.addView(statusBarView, 0)
-                }
-            }
+            Color.TRANSPARENT
+            window.statusBarColor = resources.getColor(getStatusBarColor())
+            addStatusBarView()
             DOFLogUtil.d(TAG, "uiOption = $uiOption, isShowStatus = $isShowStatus")
         }
         DOFLogUtil.d(TAG, "uiOption = $uiOption")
         window.decorView.systemUiVisibility = uiOption
+    }
 
-        // 这种方法顶部会有黑边，
-//        if (isShowStatus) {
-//            val lp = window.attributes
-//            lp.flags = lp.flags.and(WindowManager.LayoutParams.FLAG_FULLSCREEN.inv())
-//            window.attributes = lp
-//        }
+    /**
+     * 把创建的StatusBar添加到布局中
+     */
+    protected fun addStatusBarView() {
+        if (getRootViewId() != 0) {
+            val rootView = findViewById<ViewGroup>(getRootViewId())
+            DOFLogUtil.d(TAG, "rootView = $rootView")
+            if (rootView != null) {
+                rootView.fitsSystemWindows = true
+                // 在原来的位置上添加一个状态栏
+                val statusBarView = createStatusBarView(this)
+                statusBarView.fitsSystemWindows = true
+                DOFLogUtil.d(TAG, "statusBarView = $statusBarView, height = ${statusBarView.height}")
+                rootView.addView(statusBarView, 0)
+                rootView.requestLayout()
+            }
+        }
     }
 
     /**
@@ -185,7 +184,7 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     private fun createStatusBarView(activity: Activity): View {
         val statusBarView = View(activity)
-        statusBarView.background = ResourcesCompat.getDrawable(resources, R.color.transparent, null)
+        statusBarView.background = ResourcesCompat.getDrawable(resources, getStatusBarColor(), null)
         val statusBarParams: ViewGroup.LayoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, getStatusBarHeight(activity)
         )

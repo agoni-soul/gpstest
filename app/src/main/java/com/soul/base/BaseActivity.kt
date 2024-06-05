@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.soul.log.DOFLogUtil
 
@@ -92,11 +93,11 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun handleNavigationVAndStatusVisibility() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            handleAdvancedSystemNavigationAndStatus()
-//        } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            handleAdvancedSystemNavigationAndStatus()
+        } else {
             handleNormalSystemNavigationAndStatus()
-//        }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -110,6 +111,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val isShowStatus = isShowStatus()
         val isBlackStatusText = isBlackStatusText()
         window.insetsController!!.apply {
+            // TODO 隐藏导航栏，上滑仍会会显示，后续再研究
             if (isShowNavigation) {
                 show(WindowInsetsCompat.Type.navigationBars())
             } else {
@@ -118,7 +120,14 @@ abstract class BaseActivity : AppCompatActivity() {
             if (isShowStatus) {
                 show(WindowInsetsCompat.Type.statusBars())
             } else {
-                hide(WindowInsetsCompat.Type.statusBars())
+                // TODO 顶部有黑边，暂时不生效，后续再研究
+//                hide(WindowInsetsCompat.Type.statusBars())
+//                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                val uiOption = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+                window.decorView.systemUiVisibility = uiOption
+                Color.TRANSPARENT
+                window.statusBarColor = resources.getColor(getStatusBarColor())
+                addStatusBarView()
             }
             if (isBlackStatusText) {
                 setSystemBarsAppearance(
@@ -150,8 +159,7 @@ abstract class BaseActivity : AppCompatActivity() {
             DOFLogUtil.d(TAG, "uiOption = $uiOption, isBlackStatusText = $isBlackStatusText")
         }
         // 设置状态栏字体颜色为黑色
-        if (isShowStatus) {
-        } else {
+        if (!isShowStatus) {
             uiOption = uiOption.or(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
             Color.TRANSPARENT

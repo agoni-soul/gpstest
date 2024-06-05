@@ -236,7 +236,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     override fun getNavigationBarColor(): Int {
-        return R.color.cyan
+        return R.color.transparent
     }
 
     override fun isBlackStatusText(): Boolean {

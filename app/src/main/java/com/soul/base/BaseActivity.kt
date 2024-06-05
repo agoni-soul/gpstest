@@ -46,9 +46,12 @@ abstract class BaseActivity : AppCompatActivity() {
         supportActionBar?.hide()
     }
 
-    protected open fun getNavigationBarColor(): Int = Color.TRANSPARENT
+    protected open fun getNavigationBarColor(): Int = R.color.transparent
 
-    protected open fun getStatusBarColor(): Int = Color.TRANSPARENT
+    /**
+     * 顶部状态栏不展示时，背景颜色需要设置为透明色
+     */
+    protected open fun getStatusBarColor(): Int = R.color.transparent
 
     protected open fun isShowNavigation(): Boolean = true
 

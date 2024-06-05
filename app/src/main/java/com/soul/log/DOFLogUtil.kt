@@ -167,9 +167,9 @@ object DOFLogUtil {
         LogHelper.getInstance().e(TAG, msg)
     }
 
-    fun e(tag: String?, msg: String?) {
-        LogHelper.getInstance().e(tag, msg)
-    }
+//    fun e(tag: String?, msg: String?) {
+//        LogHelper.getInstance().e(tag, msg)
+//    }
 
     fun e(modelName: String?, tag: String?, msg: String?) {
         LogHelper.getInstance().e(modelName, tag, msg)

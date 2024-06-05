@@ -7,10 +7,12 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
+import com.soul.log.DOFLogUtil
 
 
 /**
@@ -69,10 +71,15 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             mVolumeAdjustAdapter.setHasStableIds(true)
             rvVolume.adapter = mVolumeAdjustAdapter
 
-            tvPlayer.setOnClickListener {
-                Log.d(TAG, "isPlaying = ${mMediaPlayer.isPlaying}")
+            ivVolumePlay.isEnabled = false
+            ivVolumePlay.setOnClickListener {
+                Log.d(TAG, "isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}, isPlaying = ${mMediaPlayer.isPlaying}")
                 if (mViewModel?.getIsMediaPrepare()?.value == true && !mMediaPlayer.isPlaying) {
                     mMediaPlayer.start()
+                    it.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
+                } else if (mMediaPlayer.isPlaying) {
+                    mMediaPlayer.pause()
+                    it.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                 }
             }
         }
@@ -93,11 +100,10 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         initMusic()
 
         mViewModel?.apply {
-            getIsMediaPrepare().postValue(false)
             getIsMediaPrepare().observe(this@VolumeActivity) {
                 Log.d(TAG, "observe: isMediaPrepare = $it, isPlaying = ${mMediaPlayer.isPlaying}")
-                if (!it) {
-                    mMediaPlayer.start()
+                if (it) {
+                    mViewDataBinding?.ivVolumePlay?.isEnabled = true
                 }
             }
         }
@@ -105,12 +111,16 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     private fun initMusic() {
         try {
-            mMediaPlayer.reset()
+            DOFLogUtil.d(TAG, "1")
+//            mMediaPlayer.reset()
+            DOFLogUtil.d(TAG, "2")
             mMediaPlayer = MediaPlayer.create(this, R.raw.raw_music)
-            mMediaPlayer.prepareAsync()
+            DOFLogUtil.d(TAG, "3")
+            mMediaPlayer.prepare()
+            DOFLogUtil.d(TAG, "4")
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.d(TAG, "initMusic: exception = ${e.message}")
+            Log.e(TAG, "initMusic: exception = ${e.message}")
         }
     }
 

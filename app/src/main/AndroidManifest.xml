@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <application
         android:name="com.soul.SoulApplication"
@@ -128,7 +128,8 @@
             android:name="com.soul.volume.VolumeActivity"
             android:exported="true" />
 
-        <activity android:name="com.soul.easyswipemenulayout.EasySwipeMenuActivity"
+        <activity
+            android:name="com.soul.easyswipemenulayout.EasySwipeMenuActivity"
             android:exported="true" />
 
         <receiver

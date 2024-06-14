@@ -2,13 +2,18 @@ package com.soul.volume
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.gpstest.R
 
@@ -96,7 +101,12 @@ class VolumeAdjustAdapter(private val mContext: Context, volumeList: MutableList
                     fromUser: Boolean
                 ) {
                     if (fromUser) {
-                        mAudioManager.setStreamVolume(streamType, progress, flag)
+                        // TODO 后续处理这儿权限逻辑，详细处理
+                        if (isHaveNotificationPermission()) {
+                            mAudioManager.setStreamVolume(streamType, progress, flag)
+                        } else {
+                            Toast.makeText(mContext, "没有权限", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
@@ -122,6 +132,19 @@ class VolumeAdjustAdapter(private val mContext: Context, volumeList: MutableList
             val volume: Int = (mAudioManager.getStreamVolume(streamType) + (0.05 * volumeDiffValue).toInt().coerceAtLeast(1))
                 .coerceAtMost(mAudioManager.getStreamMaxVolume(streamType))
             mAudioManager.setStreamVolume(streamType, volume, flag)
+        }
+    }
+
+    private fun isHaveNotificationPermission(): Boolean {
+        return NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+    }
+
+    private fun requestNotificationPermission() {
+        if (!isHaveNotificationPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                mContext.startActivity(intent)
+            }
         }
     }
 }

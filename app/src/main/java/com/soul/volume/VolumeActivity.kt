@@ -5,7 +5,6 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnBufferingUpdateListener
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +17,13 @@ import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
 import com.soul.log.DOFLogUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import rx.Scheduler
+import rx.schedulers.Schedulers
+import java.util.Timer
+import java.util.TimerTask
 
 
 /**
@@ -34,6 +40,21 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     // 媒体播放器
     private lateinit var mMediaPlayer: MediaPlayer
+    private val mTimerTask: TimerTask by lazy {
+        object : TimerTask() {
+            override fun run() {
+                MainScope().launch(Dispatchers.Main) {
+                    if (mViewModel?.getIsMediaPrepare()?.value == true && mMediaPlayer.isPlaying) {
+                        mViewDataBinding?.tvLeavingTime?.text = calculateTime(mMediaPlayer.currentPosition.toLong())
+                        mViewDataBinding?.sbMusicProgress?.progress = mMediaPlayer.currentPosition
+                    }
+                }
+            }
+        }
+    }
+    private val mTimer: Timer by lazy {
+        Timer()
+    }
 
     private lateinit var mVolumeAdjustAdapter: VolumeAdjustAdapter
 
@@ -78,16 +99,24 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
             ivVolumePlay.isEnabled = false
             ivVolumePlay.setOnClickListener {
-                Log.d(TAG, "isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}, isPlaying = ${mMediaPlayer.isPlaying}")
+                Log.d(
+                    TAG,
+                    "isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}, isPlaying = ${mMediaPlayer.isPlaying}"
+                )
                 if (mViewModel?.getIsMediaPrepare()?.value == true && !mMediaPlayer.isPlaying) {
                     mMediaPlayer.start()
+                    startTimerTask()
                     Log.d(TAG, "setOnClickListener: duration = ${mMediaPlayer.duration}")
                     it.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
                 } else if (mMediaPlayer.isPlaying) {
                     mMediaPlayer.pause()
-                    it.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                    stopTimerTask()
+                    it.background =
+                        ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                 } else {
-                    it.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_pause_unable, null)
+                    stopTimerTask()
+                    it.background =
+                        ResourcesCompat.getDrawable(resources, R.drawable.ic_pause_unable, null)
                 }
             }
 
@@ -99,6 +128,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 ) {
                     if (fromUser) {
                         mMediaPlayer.seekTo(progress)
+                        mViewDataBinding?.tvLeavingTime?.text = calculateTime(progress.toLong())
                         Log.d(TAG, "onProgressChanged: progress = $progress")
                     }
                 }
@@ -113,6 +143,14 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         }
     }
 
+    private fun startTimerTask() {
+        mTimer.schedule(mTimerTask, 0, 1000)
+    }
+
+    private fun stopTimerTask() {
+        mTimer.cancel()
+    }
+
     override fun initData() {
         initMusic()
         mViewDataBinding?.sbMusicProgress?.max = mMediaPlayer.duration
@@ -125,6 +163,9 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 Log.d(TAG, "observe: isMediaPrepare = $it, isPlaying = ${mMediaPlayer.isPlaying}")
                 if (it) {
                     mViewDataBinding?.ivVolumePlay?.isEnabled = true
+                    mViewDataBinding?.tvLeavingTime?.text = calculateTime(0)
+                    mViewDataBinding?.tvAmountTime?.text =
+                        calculateTime(mMediaPlayer.duration.toLong())
                 }
             }
         }
@@ -138,9 +179,11 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 mViewModel?.getIsMediaPrepare()?.postValue(true)
             }
             mMediaPlayer.setOnCompletionListener {
-                Log.d(TAG, "initMusic: duration = ${mMediaPlayer.duration}")
                 Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
-                mViewDataBinding?.ivVolumePlay?.background = ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                mViewDataBinding?.ivVolumePlay?.background =
+                    ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                stopTimerTask()
+                mViewDataBinding?.tvLeavingTime?.text = calculateTime(mMediaPlayer.duration.toLong())
             }
             mMediaPlayer.setOnBufferingUpdateListener(object : OnBufferingUpdateListener {
                 override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
@@ -151,6 +194,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
                     Log.e(TAG, "MediaPlayer onError")
                     mp?.release()
+                    stopTimerTask()
                     return true
                 }
             })
@@ -165,10 +209,25 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         }
     }
 
+    private fun calculateTime(time: Long): String {
+        val secondTime = (time / 1000) % 60
+        val minuteTime = (time / 1000 / 60) % 60
+        val hourTime = time / 1000 / 60 / 60
+        val stringFormat = "%02d"
+        return if (hourTime == 0L) {
+            "${stringFormat.format(minuteTime)}:${stringFormat.format(secondTime)}"
+        } else {
+            "${stringFormat.format(hourTime)}:" +
+                    "${stringFormat.format(minuteTime)}:" +
+                    stringFormat.format(secondTime)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mVolumeBroadReceiver)
         mMediaPlayer.stop()
         mMediaPlayer.release()
+        stopTimerTask()
     }
 }

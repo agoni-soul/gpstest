@@ -2,6 +2,7 @@ package com.soul.volume
 
 import android.content.Context
 import android.content.IntentFilter
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnBufferingUpdateListener
@@ -20,10 +21,7 @@ import com.soul.log.DOFLogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import rx.Scheduler
-import rx.schedulers.Schedulers
-import java.util.Timer
-import java.util.TimerTask
+import java.util.*
 
 
 /**
@@ -55,6 +53,12 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     private val mTimer: Timer by lazy {
         Timer()
     }
+    private val musicList = mutableListOf(
+        "https://audio04.dmhmusic.com/71_53_T10052914726_128_4_1_0_sdk-cpm/cn/0209/M00/E0/68/ChR47F3qO9CAUEXuAEDUqVV8yoM106.mp3?xcode=f20e00a6d434b53fe095eedbde0a3bf617e5502",
+        "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3",
+        "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
+    )
+    private var mPlayingMusicIndex = 0
 
     private lateinit var mVolumeAdjustAdapter: VolumeAdjustAdapter
 
@@ -140,6 +144,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 }
 
             })
+            sbMusicProgress.isEnabled = false
         }
     }
 
@@ -153,19 +158,22 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     override fun initData() {
         initMusic()
-        mViewDataBinding?.sbMusicProgress?.max = mMediaPlayer.duration
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mViewDataBinding?.sbMusicProgress?.min = 0
-        }
 
         mViewModel?.apply {
             getIsMediaPrepare().observe(this@VolumeActivity) {
                 Log.d(TAG, "observe: isMediaPrepare = $it, isPlaying = ${mMediaPlayer.isPlaying}")
                 if (it) {
-                    mViewDataBinding?.ivVolumePlay?.isEnabled = true
-                    mViewDataBinding?.tvLeavingTime?.text = calculateTime(0)
-                    mViewDataBinding?.tvAmountTime?.text =
-                        calculateTime(mMediaPlayer.duration.toLong())
+                    mViewDataBinding?.apply {
+                        ivVolumePlay.isEnabled = true
+                        tvLeavingTime.text = calculateTime(0)
+                        tvAmountTime.text = calculateTime(mMediaPlayer.duration.toLong())
+
+                        sbMusicProgress.max = mMediaPlayer.duration
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            sbMusicProgress.min = 0
+                        }
+                        sbMusicProgress.isEnabled = true
+                    }
                 }
             }
         }
@@ -174,7 +182,15 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     private fun initMusic() {
         try {
             mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            mMediaPlayer = MediaPlayer.create(this, R.raw.raw_music)
+            mMediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .build()
+                )
+                setDataSource(musicList[mPlayingMusicIndex])
+            }
             mMediaPlayer.setOnPreparedListener {
                 mViewModel?.getIsMediaPrepare()?.postValue(true)
             }
@@ -190,6 +206,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     Log.d(TAG, "onBufferingUpdate: percent = $percent")
                 }
             })
+            mMediaPlayer.isLooping = true
             mMediaPlayer.setOnErrorListener(object : MediaPlayer.OnErrorListener {
                 override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
                     Log.e(TAG, "MediaPlayer onError")
@@ -198,11 +215,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     return true
                 }
             })
-            DOFLogUtil.d(TAG, "1")
-//            mMediaPlayer.reset()
-            DOFLogUtil.d(TAG, "2")
-            mMediaPlayer.prepare()
-            DOFLogUtil.d(TAG, "3")
+            mMediaPlayer.prepareAsync()
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e(TAG, "initMusic: exception = ${e.message}")

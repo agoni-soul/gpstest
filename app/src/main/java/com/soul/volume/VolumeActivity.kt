@@ -239,7 +239,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mVolumeBroadReceiver)
-        mMediaPlayer.stop()
         mMediaPlayer.release()
         stopTimerTask()
     }

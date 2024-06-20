@@ -13,6 +13,8 @@ import io.reactivex.disposables.CompositeDisposable
  *     version: 1.0
  */
 open class BaseViewModel(application: Application): AndroidViewModel(application), LifecycleObserver {
+    protected val TAG = javaClass.simpleName
+
     protected val mApplication = application
 
     var mCompositeDisposable: CompositeDisposable? = null
@@ -24,5 +26,9 @@ open class BaseViewModel(application: Application): AndroidViewModel(application
     override fun onCleared() {
         super.onCleared()
         mCompositeDisposable?.dispose()
+    }
+
+    open fun onDestroy() {
+        onCleared()
     }
 }

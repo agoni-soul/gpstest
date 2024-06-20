@@ -17,7 +17,8 @@
     <color name="transparent">#00000000</color>
 
     <color name="b3ffffff">#B3FFFFFF</color>
-    <color name="gray">#1FFFFFFF</color>
+    <color name="gray_606060">#FF606060</color>
+    <color name="gray_A0A0A0">#FFA0A0A0</color>
     <color name="ff292c30">#FF292C30</color>
     <color name="gray_990c0c0c">#990C0C0C</color>
 

@@ -36,23 +36,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     // 媒体播放器
     private var mMediaPlayer: MediaPlayer? = null
-    private val mTimerTask: TimerTask by lazy {
-        object : TimerTask() {
-            override fun run() {
-                MainScope().launch(Dispatchers.Main) {
-                    if (mViewModel?.getIsMediaPrepare()?.value == true && mMediaPlayer?.isPlaying == true) {
-                        mViewDataBinding?.tvLeavingTime?.text =
-                            calculateTime(mMediaPlayer?.currentPosition?.toLong() ?: 0)
-                        mViewDataBinding?.sbMusicProgress?.progress =
-                            mMediaPlayer?.currentPosition ?: 0
-                    }
-                }
-            }
-        }
-    }
-    private val mTimer: Timer by lazy {
-        Timer()
-    }
+    private var mTimerTask: TimerTask? = null
+    private var mTimer: Timer? = null
     private val musicList = mutableListOf(
         "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3",
         "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
@@ -101,21 +86,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             rvVolume.adapter = mVolumeAdjustAdapter
 
             ivSongPrevious.setOnClickListener {
-                Log.d(
-                    TAG,
-                    "ivSongPrevious: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
-                )
-                mMediaPlayer?.stop()
-                stopTimerTask()
-                it.background =
-                    ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-
-                mPlayingMusicIndex--
-                if (mPlayingMusicIndex < 0) {
-                    mPlayingMusicIndex = musicList.size - 1
-                }
-                mViewModel?.getIsMediaPrepare()?.postValue(false)
-                playMusic()
+                playPreviousMusic()
             }
             ivSongPlay.setOnClickListener {
                 Log.d(
@@ -132,21 +103,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 }
             }
             ivSongNext.setOnClickListener {
-                Log.d(
-                    TAG,
-                    "ivSongNext: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
-                )
-                mMediaPlayer?.stop()
-                stopTimerTask()
-                it.background =
-                    ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-
-                mPlayingMusicIndex++
-                if (mPlayingMusicIndex >= musicList.size) {
-                    mPlayingMusicIndex = 0
-                }
-                mViewModel?.getIsMediaPrepare()?.postValue(false)
-                playMusic()
+                playNextMusic()
             }
 
             sbMusicProgress.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -177,11 +134,25 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     }
 
     private fun startTimerTask() {
-        mTimer.schedule(mTimerTask, 0, 1000)
+        mTimer = Timer()
+        mTimerTask =
+            object : TimerTask() {
+                override fun run() {
+                    MainScope().launch(Dispatchers.Main) {
+                        if (mViewModel?.getIsMediaPrepare()?.value == true && mMediaPlayer?.isPlaying == true) {
+                            mViewDataBinding?.tvLeavingTime?.text =
+                                calculateTime(mMediaPlayer?.currentPosition?.toLong() ?: 0)
+                            mViewDataBinding?.sbMusicProgress?.progress =
+                                mMediaPlayer?.currentPosition ?: 0
+                        }
+                    }
+                }
+            }
+        mTimer!!.schedule(mTimerTask, 0, 1000)
     }
 
     private fun stopTimerTask() {
-        mTimer.cancel()
+        mTimer?.cancel()
     }
 
     override fun initData() {
@@ -279,6 +250,42 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     private fun playMusic() {
         mMediaPlayer?.setDataSource(musicList[mPlayingMusicIndex])
         mMediaPlayer?.prepareAsync()
+    }
+
+    private fun playNextMusic() {
+        Log.d(
+            TAG,
+            "playNextMusic: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
+        )
+        mPlayingMusicIndex++
+        if (mPlayingMusicIndex >= musicList.size) {
+            mPlayingMusicIndex = 0
+        }
+
+        mMediaPlayer?.reset()
+        stopTimerTask()
+        mViewDataBinding?.ivSongPlay?.background =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+        mViewModel?.getIsMediaPrepare()?.postValue(false)
+        playMusic()
+    }
+
+    private fun playPreviousMusic() {
+        Log.d(
+            TAG,
+            "playPreviousMusic: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
+        )
+        mMediaPlayer?.reset()
+        stopTimerTask()
+        mViewDataBinding?.ivSongPlay?.background =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+
+        mPlayingMusicIndex--
+        if (mPlayingMusicIndex < 0) {
+            mPlayingMusicIndex = musicList.size - 1
+        }
+        mViewModel?.getIsMediaPrepare()?.postValue(false)
+        playMusic()
     }
 
     private fun calculateTime(time: Long): String {

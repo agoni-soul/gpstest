@@ -54,7 +54,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         Timer()
     }
     private val musicList = mutableListOf(
-        "https://audio04.dmhmusic.com/71_53_T10052914726_128_4_1_0_sdk-cpm/cn/0209/M00/E0/68/ChR47F3qO9CAUEXuAEDUqVV8yoM106.mp3?xcode=f20e00a6d434b53fe095eedbde0a3bf617e5502",
         "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3",
         "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
     )
@@ -106,7 +105,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     TAG,
                     "ivSongPrevious: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
                 )
-                mMediaPlayer?.pause()
+                mMediaPlayer?.stop()
                 stopTimerTask()
                 it.background =
                     ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
@@ -137,7 +136,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     TAG,
                     "ivSongNext: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
                 )
-                mMediaPlayer?.pause()
+                mMediaPlayer?.stop()
                 stopTimerTask()
                 it.background =
                     ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
@@ -214,12 +213,12 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         try {
             mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
             mMediaPlayer = MediaPlayer().apply {
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .build()
-                )
+//                setAudioAttributes(
+//                    AudioAttributes.Builder()
+//                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+//                        .setUsage(AudioAttributes.USAGE_ALARM)
+//                        .build()
+//                )
             }
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
@@ -232,11 +231,13 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     stopTimerTask()
                     mViewDataBinding?.tvLeavingTime?.text = calculateTime(duration.toLong())
                 }
+                // 网络链接歌曲，缓存进度百分比
                 setOnBufferingUpdateListener { mp, percent ->
                     Log.d(
                         TAG,
                         "onBufferingUpdate: percent = $percent"
                     )
+                    mViewDataBinding?.sbMusicProgress?.secondaryProgress = ((mMediaPlayer?.duration ?: 0) * 1L * percent / 100).toInt()
                 }
                 setOnErrorListener { mp, what, extra ->
                     Log.e(

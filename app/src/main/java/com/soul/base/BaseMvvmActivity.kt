@@ -2,9 +2,11 @@ package com.soul.base
 
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
+import com.soul.gpstest.R
 import com.soul.log.DOFLogUtil
 
 
@@ -25,6 +27,7 @@ abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewDataBinding = DataBindingUtil.setContentView(this, getLayoutId())
+        mViewDataBinding?.root?.background =  ContextCompat.getDrawable(mContext, R.color.white)
         if (!isShowStatus()) {
             addStatusBarView()
         }

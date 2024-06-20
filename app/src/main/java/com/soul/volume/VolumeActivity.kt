@@ -2,9 +2,7 @@ package com.soul.volume
 
 import android.content.Context
 import android.content.IntentFilter
-import android.media.AudioAttributes
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,10 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import java.util.*
 
 
 /**
@@ -33,16 +27,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     // 调节音量
     private lateinit var mAudioManager: AudioManager
     private lateinit var mVolumeBroadReceiver: VolumeBroadReceiver
-
-    // 媒体播放器
-    private var mMediaPlayer: MediaPlayer? = null
-    private var mTimerTask: TimerTask? = null
-    private var mTimer: Timer? = null
-    private val musicList = mutableListOf(
-        "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3",
-        "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
-    )
-    private var mPlayingMusicIndex = 0
 
     private lateinit var mVolumeAdjustAdapter: VolumeAdjustAdapter
 
@@ -93,9 +77,9 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     TAG,
                     "ivSongPlay: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
                 )
-                if (mMediaPlayer?.isPlaying == true) {
-                    mMediaPlayer?.pause()
-                    stopTimerTask()
+                if (mViewModel?.isMusicPlaying() == true) {
+                    mViewModel?.musicPause()
+                    mViewModel?.stopTimerTask()
                     it.background =
                         ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                 } else if (mViewModel?.getIsMediaPrepare()?.value == false) {
@@ -114,7 +98,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 ) {
                     if (fromUser) {
                         if (mViewModel?.getIsMediaPrepare()?.value == true) {
-                            mMediaPlayer?.seekTo(progress)
+                            mViewModel?.musicSeekTo(progress)
                             mViewDataBinding?.tvLeavingTime?.text = calculateTime(progress.toLong())
                             Log.d(TAG, "onProgressChanged: progress = $progress")
                         } else {
@@ -133,159 +117,73 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         }
     }
 
-    private fun startTimerTask() {
-        mTimer = Timer()
-        mTimerTask =
-            object : TimerTask() {
-                override fun run() {
-                    MainScope().launch(Dispatchers.Main) {
-                        if (mViewModel?.getIsMediaPrepare()?.value == true && mMediaPlayer?.isPlaying == true) {
-                            mViewDataBinding?.tvLeavingTime?.text =
-                                calculateTime(mMediaPlayer?.currentPosition?.toLong() ?: 0)
-                            mViewDataBinding?.sbMusicProgress?.progress =
-                                mMediaPlayer?.currentPosition ?: 0
-                        }
-                    }
-                }
-            }
-        mTimer!!.schedule(mTimerTask, 0, 1000)
-    }
-
-    private fun stopTimerTask() {
-        mTimer?.cancel()
-    }
-
     override fun initData() {
-        initMusic()
+        mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         mViewModel?.apply {
+            initMusic()
+            initMusicList()
             getIsMediaPrepare().observe(this@VolumeActivity) {
                 Log.d(TAG, "observe: isMediaPrepare = $it")
                 if (it) {
                     mViewDataBinding?.apply {
+                        val duration = getMusicDuration().value ?: 0
                         tvLeavingTime.text = calculateTime(0)
-                        tvAmountTime.text = calculateTime(mMediaPlayer?.duration?.toLong() ?: 0)
+                        tvAmountTime.text = calculateTime(duration.toLong())
 
                         ivSongPlay.background =
                             ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
-                        sbMusicProgress.max = mMediaPlayer?.duration ?: 0
+                        sbMusicProgress.max = duration
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             sbMusicProgress.min = 0
                         }
-                        mMediaPlayer?.start()
+                        musicStart()
                         startTimerTask()
                     }
                 }
             }
-        }
-    }
 
-    private fun initMusic() {
-        try {
-            mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            mMediaPlayer = MediaPlayer().apply {
-//                setAudioAttributes(
-//                    AudioAttributes.Builder()
-//                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-//                        .setUsage(AudioAttributes.USAGE_ALARM)
-//                        .build()
-//                )
-            }
-            mMediaPlayer!!.apply {
-                setOnPreparedListener {
-                    mViewModel?.getIsMediaPrepare()?.postValue(true)
-                }
-                setOnCompletionListener {
-                    Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
-                    mViewDataBinding?.ivSongPlay?.background =
-                        ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-                    stopTimerTask()
-                    mViewDataBinding?.tvLeavingTime?.text = calculateTime(duration.toLong())
-                }
-                // 网络链接歌曲，缓存进度百分比
-                setOnBufferingUpdateListener { mp, percent ->
-                    Log.d(
-                        TAG,
-                        "onBufferingUpdate: percent = $percent"
-                    )
-                    mViewDataBinding?.sbMusicProgress?.secondaryProgress = ((mMediaPlayer?.duration ?: 0) * 1L * percent / 100).toInt()
-                }
-                setOnErrorListener { mp, what, extra ->
-                    Log.e(
-                        TAG,
-                        "MediaPlayer onError: what = ${mediaErrorWhatToStr(what)}, extra = ${
-                            mediaErrorExtraToStr(extra)
-                        }"
-                    )
-                    mp?.release()
-                    stopTimerTask()
-                    true
+            getMusicDuration().observe(this@VolumeActivity) {
+                mViewDataBinding?.apply {
+                    tvAmountTime.text = calculateTime(it.toLong())
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Log.e(TAG, "initMusic: exception = ${e.message}")
-        }
-    }
 
-    private fun mediaErrorWhatToStr(what: Int): String {
-        return when (what) {
-            MediaPlayer.MEDIA_ERROR_UNKNOWN -> "MEDIA_ERROR_UNKNOWN"
-            MediaPlayer.MEDIA_ERROR_SERVER_DIED -> "MEDIA_ERROR_SERVER_DIED"
-            else -> "MEDIA_ERROR_UNKNOWN"
-        }
-    }
+            getMusicProgress().observe(this@VolumeActivity) {
+                mViewDataBinding?.apply {
+                    tvLeavingTime.text = calculateTime(it.toLong())
+                    sbMusicProgress.progress = it
+                    if (it == getMusicDuration().value) {
+                        Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
+                        // TODO 进行后续处理
+                    }
+                }
+            }
 
-    private fun mediaErrorExtraToStr(extra: Int): String {
-        return when (extra.toLong()) {
-            MediaPlayer.MEDIA_ERROR_IO.toLong() -> "MEDIA_ERROR_IO"
-            MediaPlayer.MEDIA_ERROR_MALFORMED.toLong() -> "MEDIA_ERROR_MALFORMED"
-            MediaPlayer.MEDIA_ERROR_UNSUPPORTED.toLong() -> "MEDIA_ERROR_UNSUPPORTED"
-            MediaPlayer.MEDIA_ERROR_TIMED_OUT.toLong() -> "MEDIA_ERROR_TIMED_OUT"
-            -2147483648L -> "MEDIA_ERROR_SYSTEM"
-            else -> "NOT_IN_MEDIA_ERROR_UNKNOWN"
+            getMusicCacheProgress().observe(this@VolumeActivity) {
+                mViewDataBinding?.apply {
+                    sbMusicProgress.secondaryProgress = it
+                }
+            }
         }
     }
 
     private fun playMusic() {
-        mMediaPlayer?.setDataSource(musicList[mPlayingMusicIndex])
-        mMediaPlayer?.prepareAsync()
+        mViewModel?.apply {
+            playMusic(mPlayingMusicIndex)
+        }
     }
 
     private fun playNextMusic() {
-        Log.d(
-            TAG,
-            "playNextMusic: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
-        )
-        mPlayingMusicIndex++
-        if (mPlayingMusicIndex >= musicList.size) {
-            mPlayingMusicIndex = 0
-        }
-
-        mMediaPlayer?.reset()
-        stopTimerTask()
         mViewDataBinding?.ivSongPlay?.background =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-        mViewModel?.getIsMediaPrepare()?.postValue(false)
-        playMusic()
+        mViewModel?.playNextMusic()
     }
 
     private fun playPreviousMusic() {
-        Log.d(
-            TAG,
-            "playPreviousMusic: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
-        )
-        mMediaPlayer?.reset()
-        stopTimerTask()
         mViewDataBinding?.ivSongPlay?.background =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-
-        mPlayingMusicIndex--
-        if (mPlayingMusicIndex < 0) {
-            mPlayingMusicIndex = musicList.size - 1
-        }
-        mViewModel?.getIsMediaPrepare()?.postValue(false)
-        playMusic()
+        mViewModel?.playPreviousMusic()
     }
 
     private fun calculateTime(time: Long): String {
@@ -305,8 +203,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mVolumeBroadReceiver)
-        mMediaPlayer?.release()
-        mMediaPlayer = null
-        stopTimerTask()
+        mViewModel?.onDestroy()
     }
 }

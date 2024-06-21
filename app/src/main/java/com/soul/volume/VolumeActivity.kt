@@ -213,21 +213,39 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     }
 
     private fun playMusic() {
-        mViewModel?.apply {
-            playMusic(mPlayingMusicIndex)
+        mViewModel?.playCurrentMusic()
+        mViewDataBinding?.apply {
+            val songName = mViewModel?.getSongInfo()?.let {
+                "${it.singer} - ${it.songName}"
+            } ?: "播放音乐"
+            tvSongName.text = songName
+            ivSongPlay.background =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         }
     }
 
     private fun playNextMusic() {
-        mViewDataBinding?.ivSongPlay?.background =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         mViewModel?.playNextMusic()
+        mViewDataBinding?.apply {
+            val songName = mViewModel?.getSongInfo()?.let {
+                "${it.singer} - ${it.songName}"
+            } ?: "播放音乐"
+            tvSongName.text = songName
+            ivSongPlay.background =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+        }
     }
 
     private fun playPreviousMusic() {
-        mViewDataBinding?.ivSongPlay?.background =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         mViewModel?.playPreviousMusic()
+        mViewDataBinding?.apply {
+            val songName = mViewModel?.getSongInfo()?.let {
+                "${it.singer} - ${it.songName}"
+            } ?: "播放音乐"
+            tvSongName.text = songName
+            ivSongPlay.background =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+        }
     }
 
     override fun onDestroy() {

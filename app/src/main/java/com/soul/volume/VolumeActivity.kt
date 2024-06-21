@@ -97,12 +97,14 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     fromUser: Boolean
                 ) {
                     if (fromUser) {
-                        if (mViewModel?.getIsMediaPrepare()?.value == true) {
-                            mViewModel?.musicSeekTo(progress)
-                            mViewDataBinding?.tvLeavingTime?.text = calculateTime(progress.toLong())
-                            Log.d(TAG, "onProgressChanged: progress = $progress")
-                        } else {
-                            Toast.makeText(mContext, "音频没有准备好, 暂不可调节", Toast.LENGTH_SHORT).show()
+                        mViewModel?.apply {
+                            if (getIsMediaPrepare().value == true) {
+                                musicSeekTo(progress)
+                                mViewDataBinding?.tvLeavingTime?.text = calculateTime(progress.toLong())
+                                Log.d(TAG, "onProgressChanged: progress = $progress")
+                            } else {
+                                Toast.makeText(mContext, "音频没有准备好, 暂不可调节", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
@@ -127,16 +129,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 Log.d(TAG, "observe: isMediaPrepare = $it")
                 if (it) {
                     mViewDataBinding?.apply {
-                        val duration = getMusicDuration().value ?: 0
-                        tvLeavingTime.text = calculateTime(0)
-                        tvAmountTime.text = calculateTime(duration.toLong())
-
                         ivSongPlay.background =
                             ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
-                        sbMusicProgress.max = duration
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            sbMusicProgress.min = 0
-                        }
                         musicStart()
                         startTimerTask()
                     }
@@ -145,7 +139,13 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
             getMusicDuration().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
+                    Log.d(TAG, "music duration = $it")
+                    tvLeavingTime.text = calculateTime(0)
                     tvAmountTime.text = calculateTime(it.toLong())
+                    sbMusicProgress.max = it
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        sbMusicProgress.min = 0
+                    }
                 }
             }
 
@@ -153,15 +153,16 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 mViewDataBinding?.apply {
                     tvLeavingTime.text = calculateTime(it.toLong())
                     sbMusicProgress.progress = it
-                    if (it == getMusicDuration().value) {
+                    if (it > 0 && it == getMusicDuration().value) {
                         Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
-                        // TODO 进行后续处理
+                        playNextMusic()
                     }
                 }
             }
 
             getMusicCacheProgress().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
+                    Log.d(TAG, "secondaryProgress = ${sbMusicProgress.secondaryProgress}, cacheProgress = $it")
                     sbMusicProgress.secondaryProgress = it
                 }
             }
@@ -184,20 +185,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         mViewDataBinding?.ivSongPlay?.background =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         mViewModel?.playPreviousMusic()
-    }
-
-    private fun calculateTime(time: Long): String {
-        val secondTime = (time / 1000) % 60
-        val minuteTime = (time / 1000 / 60) % 60
-        val hourTime = time / 1000 / 60 / 60
-        val stringFormat = "%02d"
-        return if (hourTime == 0L) {
-            "${stringFormat.format(minuteTime)}:${stringFormat.format(secondTime)}"
-        } else {
-            "${stringFormat.format(hourTime)}:" +
-                    "${stringFormat.format(minuteTime)}:" +
-                    stringFormat.format(secondTime)
-        }
     }
 
     override fun onDestroy() {

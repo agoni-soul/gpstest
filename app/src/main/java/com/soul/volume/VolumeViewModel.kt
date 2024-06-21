@@ -126,6 +126,20 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
             )
         )
+        mMusicList.add(
+            SongInfo(
+                "嘉宾",
+                "张远",
+                "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3"
+            )
+        )
+//        mMusicList.add(
+//            SongInfo(
+//                "以后别做朋友",
+//                "周兴哲",
+//                ""
+//            )
+//        )
         for (i in 0 until mMusicList.size) {
             mRandomIndexList.add(i)
         }

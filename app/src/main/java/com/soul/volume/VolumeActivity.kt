@@ -205,9 +205,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
             isMediaPlayerError().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
-                    sbMusicProgress.progress = 0
-                    sbMusicProgress.secondaryProgress = 0
-
                     ivSongPlay.background =
                         ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                 }

@@ -96,8 +96,10 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
                             mediaErrorExtraToStr(extra)
                         }"
                     )
-                    mp?.release()
+                    mp?.stop()
                     stopTimerTask()
+                    mMusicProgressLiveData.postValue(0)
+                    mMusicCacheProgressLiveData.postValue(0)
                     mIsMediaPlayerErrorLiveData.postValue(true)
                     true
                 }

@@ -129,16 +129,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 Log.d(TAG, "observe: isMediaPrepare = $it")
                 if (it) {
                     mViewDataBinding?.apply {
-                        val duration = getMusicDuration().value ?: 0
-                        tvLeavingTime.text = calculateTime(0)
-                        tvAmountTime.text = calculateTime(duration.toLong())
-
                         ivSongPlay.background =
                             ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
-                        sbMusicProgress.max = duration
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            sbMusicProgress.min = 0
-                        }
                         musicStart()
                         startTimerTask()
                     }
@@ -147,7 +139,13 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
             getMusicDuration().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
+                    Log.d(TAG, "music duration = $it")
+                    tvLeavingTime.text = calculateTime(0)
                     tvAmountTime.text = calculateTime(it.toLong())
+                    sbMusicProgress.max = it
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        sbMusicProgress.min = 0
+                    }
                 }
             }
 

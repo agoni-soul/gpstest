@@ -8,6 +8,8 @@ import com.soul.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.util.*
 
 
@@ -180,7 +182,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 }
             }
         }
-        mTimer!!.schedule(mTimerTask, 0, 1000)
+        mTimer!!.schedule(mTimerTask, 0, 100)
     }
 
     fun stopTimerTask() {
@@ -287,6 +289,26 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                     "${stringFormat.format(minuteTime)}:" +
                     stringFormat.format(secondTime)
         }
+    }
+
+    fun getFromAssets(fileName: String): String {
+        try {
+            val inputReader = InputStreamReader(mApplication.resources.assets.open(fileName))
+            val bufReader = BufferedReader(inputReader)
+            var result = ""
+            do {
+                val line = bufReader.readLine()
+                Log.d(TAG, "line = $line")
+                if (line.trim() != "") {
+                    result += line + "\r\n"
+                }
+            } while( line != null)
+            Log.d(TAG, "result = $result")
+            return result
+        } catch (e: Exception) {
+            Log.i(TAG, "${e.message}")
+        }
+        return ""
     }
 
     override fun onDestroy() {

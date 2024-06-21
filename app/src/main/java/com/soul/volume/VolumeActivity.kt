@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 
 /**
@@ -218,6 +220,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             val songName = mViewModel?.getSongInfo()?.let {
                 "${it.singer} - ${it.songName}"
             } ?: "播放音乐"
+            val songLrc = mViewModel?.getFromAssets("周兴哲-以后别做朋友.lrc")
+            Log.d(TAG, "songLrc = \n${songLrc}")
             tvSongName.text = songName
             ivSongPlay.background =
                 ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)

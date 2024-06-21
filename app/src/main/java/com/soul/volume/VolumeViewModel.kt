@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.soul.base.BaseViewModel
+import com.soul.log.DOFLogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -74,9 +75,9 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
                 setOnBufferingUpdateListener { mp, percent ->
                     Log.d(
                         TAG,
-                        "onBufferingUpdate: percent = $percent"
+                        "onBufferingUpdate: duration = ${mp.duration}, percent = $percent"
                     )
-                    mMusicCacheProgressLiveData.postValue(((mMediaPlayer?.duration ?: 0) * 1L * percent / 100).toInt())
+                    mMusicCacheProgressLiveData.postValue((mp.duration * 1L * percent / 100).toInt())
                 }
                 setOnErrorListener { mp, what, extra ->
                     Log.e(
@@ -100,6 +101,9 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         mMusicList.clear()
         mMusicList.add("http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3")
         mMusicList.add("http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3")
+        for (i in 0 until mMusicList.size) {
+            mRandomIndexList.add(i)
+        }
         playSequentialMode()
     }
 
@@ -175,15 +179,12 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun playRandomMode() {
-        val random = Random()
         mRandomIndexList.shuffle()
     }
 
     fun playSequentialMode() {
-        mRandomIndexList.clear()
-        var i = 0
-        mMusicList.forEach { _ ->
-            mRandomIndexList.add(i ++)
+        for (i in 0 until mMusicList.size) {
+            mRandomIndexList[i] = i
         }
     }
 
@@ -203,8 +204,23 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun playMusic(index: Int) {
+        DOFLogUtil.d(TAG, "playMusic: index = $index")
         mMediaPlayer?.setDataSource(mMusicList[index])
         mMediaPlayer?.prepareAsync()
+    }
+
+    fun calculateTime(time: Long): String {
+        val secondTime = (time / 1000) % 60
+        val minuteTime = (time / 1000 / 60) % 60
+        val hourTime = time / 1000 / 60 / 60
+        val stringFormat = "%02d"
+        return if (hourTime == 0L) {
+            "${stringFormat.format(minuteTime)}:${stringFormat.format(secondTime)}"
+        } else {
+            "${stringFormat.format(hourTime)}:" +
+                    "${stringFormat.format(minuteTime)}:" +
+                    stringFormat.format(secondTime)
+        }
     }
 
     override fun onDestroy() {

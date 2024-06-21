@@ -5,7 +5,6 @@ import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.soul.base.BaseViewModel
-import com.soul.log.DOFLogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -204,7 +203,6 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun playMusic(index: Int) {
-        DOFLogUtil.d(TAG, "playMusic: index = $index")
         mMediaPlayer?.setDataSource(mMusicList[index])
         mMediaPlayer?.prepareAsync()
     }

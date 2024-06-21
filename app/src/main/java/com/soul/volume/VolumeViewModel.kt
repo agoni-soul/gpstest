@@ -17,7 +17,7 @@ import java.util.*
  *     desc   :
  *     version: 1.0
  */
-class VolumeViewModel(application: Application): BaseViewModel(application) {
+class VolumeViewModel(application: Application) : BaseViewModel(application) {
     companion object {
         private const val PLAY_MODE_SEQUENTIAL = 0
         private const val PLAY_MODE_LOOP = 1
@@ -28,7 +28,7 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     private var mMediaPlayer: MediaPlayer? = null
     private var mTimerTask: TimerTask? = null
     private var mTimer: Timer? = null
-    private val mMusicList = mutableListOf<String>()
+    private val mMusicList = mutableListOf<SongInfo>()
     private val mRandomIndexList = mutableListOf<Int>()
     var mPlayingMusicIndex = 0
         private set
@@ -112,12 +112,28 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
 
     fun initMusicList() {
         mMusicList.clear()
-        mMusicList.add("http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3")
-        mMusicList.add("http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3")
+        mMusicList.add(
+            SongInfo(
+                "骗子",
+                "文夫",
+                "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
+                "请先说你好",
+                "贺一航",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
+            )
+        )
         for (i in 0 until mMusicList.size) {
             mRandomIndexList.add(i)
         }
         playModeSequential()
+    }
+
+    fun getSongInfo(): SongInfo {
+        return mMusicList[mRandomIndexList[mPlayingMusicIndex]]
     }
 
     private fun mediaErrorWhatToStr(what: Int): String {
@@ -142,14 +158,14 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     fun startTimerTask() {
         mTimer = Timer()
         mTimerTask = object : TimerTask() {
-                override fun run() {
-                    MainScope().launch(Dispatchers.Main) {
-                        if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
-                            mMusicProgressLiveData.postValue(mMediaPlayer?.currentPosition ?: 0)
-                        }
+            override fun run() {
+                MainScope().launch(Dispatchers.Main) {
+                    if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
+                        mMusicProgressLiveData.postValue(mMediaPlayer?.currentPosition ?: 0)
                     }
                 }
             }
+        }
         mTimer!!.schedule(mTimerTask, 0, 1000)
     }
 
@@ -226,6 +242,7 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         if (indexTemp < 0) {
             indexTemp += mMusicList.size
         }
+        mPlayingMusicIndex = indexTemp
         playNewMusic(mRandomIndexList[indexTemp])
     }
 
@@ -236,8 +253,8 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         playMusic(index)
     }
 
-    fun playMusic(index: Int) {
-        mMediaPlayer?.setDataSource(mMusicList[index])
+    private fun playMusic(index: Int) {
+        mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
         mMediaPlayer?.prepareAsync()
 
         mMusicProgressLiveData.postValue(0)

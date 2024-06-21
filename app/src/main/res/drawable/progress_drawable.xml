@@ -1,13 +1,13 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@color/gray_606060"/> <!-- 这是背景颜色 -->
+            <solid android:color="@color/gray_A0A0A0"/> <!-- 这是背景颜色 -->
         </shape>
     </item>
     <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape>
-                <solid android:color="@color/gray_A0A0A0"/> <!-- 这是进度颜色 -->
+                <solid android:color="@color/gray_606060"/> <!-- 这是进度颜色 -->
             </shape>
         </clip>
     </item>

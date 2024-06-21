@@ -8,13 +8,15 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/tv_player"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_song_name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_margin="16dp"
             android:gravity="center"
             android:text="播放音乐"
-            android:textSize="32sp"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <SeekBar
@@ -29,7 +31,7 @@
             android:thumb="@drawable/drawable_shape_circle_6"
             app:layout_constraintEnd_toStartOf="@+id/tv_amount_time"
             app:layout_constraintStart_toEndOf="@+id/tv_leaving_time"
-            app:layout_constraintTop_toBottomOf="@+id/tv_player" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_song_name" />
 
         <TextView
             android:id="@+id/tv_leaving_time"

@@ -75,20 +75,21 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             ivSongPlay.setOnClickListener {
                 Log.d(
                     TAG,
-                    "ivSongPlay: isMediaPrepare = ${mViewModel?.getIsMediaPrepare()?.value}"
+                    "ivSongPlay: isMediaPrepare = ${mViewModel?.isMediaPrepare()?.value}"
                 )
-                if (mViewModel?.isMusicPlaying() == true) {
+                if (mViewModel?.isMediaPrepare()?.value == false) {
+                    playMusic()
+                } else if (mViewModel?.isMusicPlaying() == true) {
                     mViewModel?.musicPause()
                     mViewModel?.stopTimerTask()
                     it.background =
                         ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-                } else if (mViewModel?.getIsMediaPrepare()?.value == false) {
-                    playMusic()
                 }
             }
             ivSongNext.setOnClickListener {
                 playNextMusic()
             }
+            setPlayMode()
 
             sbMusicProgress.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(
@@ -96,26 +97,59 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    if (fromUser) {
-                        mViewModel?.apply {
-                            if (getIsMediaPrepare().value == true) {
-                                musicSeekTo(progress)
-                                mViewDataBinding?.tvLeavingTime?.text = calculateTime(progress.toLong())
-                                Log.d(TAG, "onProgressChanged: progress = $progress")
-                            } else {
-                                Toast.makeText(mContext, "音频没有准备好, 暂不可调节", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    val progress = seekBar?.progress ?: return
+                    mViewModel?.apply {
+                        if (isMediaPrepare().value == true) {
+                            musicSeekTo(progress)
+                            mViewDataBinding?.tvLeavingTime?.text =
+                                calculateTime(progress.toLong())
+                            Log.d(TAG, "onProgressChanged: progress = $progress")
+                        } else {
+                            Toast.makeText(mContext, "音频没有准备好, 暂不可调节", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
                 }
 
             })
+        }
+    }
+
+    private fun setPlayMode() {
+        mViewModel?.apply {
+            if (isSequentialPlayMode()) {
+                mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_sequential)
+            } else if (isShufflePlayMode()) {
+                mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_shuffle)
+            } else if (isLoopPlayMode()) {
+                mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_loop)
+            } else {
+                playModeSequential()
+                mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_sequential)
+            }
+        }
+        mViewDataBinding?.ivPlayMode?.setOnClickListener {
+            mViewModel?.apply {
+                if (isSequentialPlayMode()) {
+                    playModeShuffle()
+                    mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_shuffle)
+                } else if (isShufflePlayMode()) {
+                    playModeLoop()
+                    mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_loop)
+                } else if (isLoopPlayMode()) {
+                    playModeSequential()
+                    mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_sequential)
+                } else {
+                    playModeSequential()
+                    mViewDataBinding?.ivPlayMode?.setImageResource(R.drawable.ic_play_mode_sequential)
+                }
+            }
         }
     }
 
@@ -125,7 +159,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         mViewModel?.apply {
             initMusic()
             initMusicList()
-            getIsMediaPrepare().observe(this@VolumeActivity) {
+            isMediaPrepare().observe(this@VolumeActivity) {
                 Log.d(TAG, "observe: isMediaPrepare = $it")
                 if (it) {
                     mViewDataBinding?.apply {
@@ -155,15 +189,24 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     sbMusicProgress.progress = it
                     if (it > 0 && it == getMusicDuration().value) {
                         Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
-                        playNextMusic()
+                        Log.d(TAG, "playMode = ${mViewModel?.mPlayMode}")
+                        if (!isLoopPlayMode()) {
+                            playNextMusic()
+                        }
                     }
                 }
             }
 
             getMusicCacheProgress().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
-                    Log.d(TAG, "secondaryProgress = ${sbMusicProgress.secondaryProgress}, cacheProgress = $it")
                     sbMusicProgress.secondaryProgress = it
+                }
+            }
+
+            isMediaPlayerError().observe(this@VolumeActivity) {
+                mViewDataBinding?.apply {
+                    ivSongPlay.background =
+                        ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                 }
             }
         }

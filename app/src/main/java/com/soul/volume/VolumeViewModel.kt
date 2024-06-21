@@ -18,6 +18,12 @@ import java.util.*
  *     version: 1.0
  */
 class VolumeViewModel(application: Application): BaseViewModel(application) {
+    companion object {
+        private const val PLAY_MODE_SEQUENTIAL = 0
+        private const val PLAY_MODE_LOOP = 1
+        private const val PLAY_MODE_SHUFFLE = 2
+    }
+
     // 媒体播放器
     private var mMediaPlayer: MediaPlayer? = null
     private var mTimerTask: TimerTask? = null
@@ -25,6 +31,9 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     private val mMusicList = mutableListOf<String>()
     private val mRandomIndexList = mutableListOf<Int>()
     var mPlayingMusicIndex = 0
+        private set
+
+    var mPlayMode = PLAY_MODE_SEQUENTIAL
         private set
 
     private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
@@ -43,13 +52,19 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         MutableLiveData(0)
     }
 
-    fun getIsMediaPrepare(): MutableLiveData<Boolean> = mIsMediaPrepareLiveData
+    private val mIsMediaPlayerErrorLiveData: MutableLiveData<Boolean> by lazy {
+        MutableLiveData(false)
+    }
+
+    fun isMediaPrepare(): MutableLiveData<Boolean> = mIsMediaPrepareLiveData
 
     fun getMusicDuration(): MutableLiveData<Int> = mMusicDurationLiveData
 
     fun getMusicProgress(): MutableLiveData<Int> = mMusicProgressLiveData
 
     fun getMusicCacheProgress(): MutableLiveData<Int> = mMusicCacheProgressLiveData
+
+    fun isMediaPlayerError(): MutableLiveData<Boolean> = mIsMediaPlayerErrorLiveData
 
     fun initMusic() {
         try {
@@ -72,10 +87,6 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
                 }
                 // 网络链接歌曲，缓存进度百分比
                 setOnBufferingUpdateListener { mp, percent ->
-                    Log.d(
-                        TAG,
-                        "onBufferingUpdate: duration = ${mp.duration}, percent = $percent"
-                    )
                     mMusicCacheProgressLiveData.postValue((mp.duration * 1L * percent / 100).toInt())
                 }
                 setOnErrorListener { mp, what, extra ->
@@ -85,8 +96,11 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
                             mediaErrorExtraToStr(extra)
                         }"
                     )
-                    mp?.release()
+                    mp?.stop()
                     stopTimerTask()
+                    mMusicProgressLiveData.postValue(0)
+                    mMusicCacheProgressLiveData.postValue(0)
+                    mIsMediaPlayerErrorLiveData.postValue(true)
                     true
                 }
             }
@@ -103,7 +117,7 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         for (i in 0 until mMusicList.size) {
             mRandomIndexList.add(i)
         }
-        playSequentialMode()
+        playModeSequential()
     }
 
     private fun mediaErrorWhatToStr(what: Int): String {
@@ -130,7 +144,7 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         mTimerTask = object : TimerTask() {
                 override fun run() {
                     MainScope().launch(Dispatchers.Main) {
-                        if (getIsMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
+                        if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
                             mMusicProgressLiveData.postValue(mMediaPlayer?.currentPosition ?: 0)
                         }
                     }
@@ -168,6 +182,10 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         playOtherMusic(mPlayingMusicIndex)
     }
 
+    fun playCurrentMusic() {
+        playOtherMusic(mPlayingMusicIndex)
+    }
+
     fun playNextMusic() {
         Log.d(
             TAG,
@@ -177,15 +195,31 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
         playOtherMusic(mPlayingMusicIndex)
     }
 
-    fun playRandomMode() {
+    fun playModeShuffle() {
         mRandomIndexList.shuffle()
+        mMediaPlayer?.isLooping = false
+        mPlayMode = PLAY_MODE_SHUFFLE
     }
 
-    fun playSequentialMode() {
+    fun isShufflePlayMode(): Boolean = mPlayMode == PLAY_MODE_SHUFFLE
+
+    fun playModeLoop() {
+        playModeSequential()
+        mMediaPlayer?.isLooping = true
+        mPlayMode = PLAY_MODE_LOOP
+    }
+
+    fun isLoopPlayMode(): Boolean = mPlayMode == PLAY_MODE_LOOP
+
+    fun playModeSequential() {
         for (i in 0 until mMusicList.size) {
             mRandomIndexList[i] = i
         }
+        mMediaPlayer?.isLooping = false
+        mPlayMode = PLAY_MODE_SEQUENTIAL
     }
+
+    fun isSequentialPlayMode(): Boolean = mPlayMode == PLAY_MODE_SEQUENTIAL
 
     private fun playOtherMusic(index: Int) {
         var indexTemp = index % mMusicList.size
@@ -205,6 +239,9 @@ class VolumeViewModel(application: Application): BaseViewModel(application) {
     fun playMusic(index: Int) {
         mMediaPlayer?.setDataSource(mMusicList[index])
         mMediaPlayer?.prepareAsync()
+
+        mMusicProgressLiveData.postValue(0)
+        mMusicCacheProgressLiveData.postValue(0)
     }
 
     fun calculateTime(time: Long): String {

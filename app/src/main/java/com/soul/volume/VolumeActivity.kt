@@ -17,6 +17,7 @@ import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
@@ -216,7 +217,11 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         val spanStr= SpannableString(content)
                         val boldSpan = StyleSpan(Typeface.BOLD)
                         spanStr.setSpan(boldSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        val fgdColorSpan = ForegroundColorSpan(mContext.resources.getColor(R.color.blue))
+                        val fgdColorSpan = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            ForegroundColorSpan(mContext.resources.getColor(R.color.blue, null))
+                        } else {
+                            ForegroundColorSpan(mContext.resources.getColor(R.color.blue))
+                        }
                         spanStr.setSpan(fgdColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         val sizeSpan = AbsoluteSizeSpan(DpToPxTransfer.sp2px(mContext, 18))
                         spanStr.setSpan(sizeSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

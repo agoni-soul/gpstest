@@ -25,6 +25,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private const val PLAY_MODE_SEQUENTIAL = 0
         private const val PLAY_MODE_LOOP = 1
         private const val PLAY_MODE_SHUFFLE = 2
+
+        private const val UPDATE_LRC_INTERNAL = 1000L
     }
 
     // 媒体播放器
@@ -39,7 +41,10 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     var mPlayMode = PLAY_MODE_SEQUENTIAL
         private set
 
-    var rows: MutableList<LrcRow>? = null
+    var mLrcRows: MutableList<LrcRow>? = null
+        private set
+
+    var mCurrentLrcIndex: Int = 0
         private set
 
     private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
@@ -202,12 +207,24 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             override fun run() {
                 MainScope().launch(Dispatchers.Main) {
                     if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
-                        mMusicProgressLiveData.postValue(mMediaPlayer?.currentPosition ?: 0)
+                        val currentPosition = mMediaPlayer?.currentPosition ?: 0
+                        mMusicProgressLiveData.postValue(currentPosition)
+                        mLrcRows?.let {
+                            while (mCurrentLrcIndex < it.size - 1) {
+                                val lrcRow = it[mCurrentLrcIndex]
+                                if (lrcRow.time + UPDATE_LRC_INTERNAL > currentPosition) {
+                                    return@let
+                                } else {
+                                    mCurrentLrcIndex ++
+                                }
+                            }
+                        }
+                        Log.d(TAG, "mCurrentLrcIndex = $mCurrentLrcIndex")
                     }
                 }
             }
         }
-        mTimer!!.schedule(mTimerTask, 0, 100)
+        mTimer!!.schedule(mTimerTask, 0, UPDATE_LRC_INTERNAL)
     }
 
     fun stopTimerTask() {
@@ -319,14 +336,15 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     private fun obtainSongLrc() {
         val currentSongInfo = getSongInfo()
+        mCurrentLrcIndex = 0
         if (currentSongInfo.songName != "以后别做朋友") {
-            rows = null
+            mLrcRows = null
             return
         }
         // TODO 后续优化歌曲歌词相关逻辑
         val songLrc = getFromAssets("周兴哲-以后别做朋友.lrc")
         val builder = DefaultLrcBuilder()
-        rows = builder.getLrcRows(songLrc)
+        mLrcRows = builder.getLrcRows(songLrc)
     }
 
     private fun getFromAssets(fileName: String): String {

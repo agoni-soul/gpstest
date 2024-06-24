@@ -12,7 +12,8 @@ import kotlin.math.pow
  */
 class LrcRow() : Comparable<LrcRow> {
     private var strTime: String? = null
-    private var time: Long = 0
+    var time: Long = 0
+        private set
     var content: String? = null
         private set
 

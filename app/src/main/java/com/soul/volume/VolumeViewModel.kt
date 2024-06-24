@@ -25,6 +25,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private const val PLAY_MODE_SEQUENTIAL = 0
         private const val PLAY_MODE_LOOP = 1
         private const val PLAY_MODE_SHUFFLE = 2
+
+        private const val UPDATE_LRC_INTERNAL = 1000L
     }
 
     // 媒体播放器
@@ -37,6 +39,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private set
 
     var mPlayMode = PLAY_MODE_SEQUENTIAL
+        private set
+
+    var mLrcRows: MutableList<LrcRow>? = null
+        private set
+
+    var mCurrentLrcIndex: Int = 0
         private set
 
     private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
@@ -117,6 +125,13 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mMusicList.clear()
         mMusicList.add(
             SongInfo(
+                "以后别做朋友",
+                "周兴哲",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
                 "骗子",
                 "文夫",
                 "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3"
@@ -134,13 +149,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "嘉宾",
                 "张远",
                 "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3"
-            )
-        )
-        mMusicList.add(
-            SongInfo(
-                "以后别做朋友",
-                "周兴哲",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3"
             )
         )
         mMusicList.add(
@@ -199,12 +207,24 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             override fun run() {
                 MainScope().launch(Dispatchers.Main) {
                     if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
-                        mMusicProgressLiveData.postValue(mMediaPlayer?.currentPosition ?: 0)
+                        val currentPosition = mMediaPlayer?.currentPosition ?: 0
+                        mMusicProgressLiveData.postValue(currentPosition)
+                        mLrcRows?.let {
+                            while (mCurrentLrcIndex < it.size - 1) {
+                                val lrcRow = it[mCurrentLrcIndex]
+                                if (lrcRow.time + UPDATE_LRC_INTERNAL > currentPosition) {
+                                    return@let
+                                } else {
+                                    mCurrentLrcIndex ++
+                                }
+                            }
+                        }
+                        Log.d(TAG, "mCurrentLrcIndex = $mCurrentLrcIndex")
                     }
                 }
             }
         }
-        mTimer!!.schedule(mTimerTask, 0, 100)
+        mTimer!!.schedule(mTimerTask, 0, UPDATE_LRC_INTERNAL)
     }
 
     fun stopTimerTask() {
@@ -297,6 +317,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
         mMusicProgressLiveData.postValue(0)
         mMusicCacheProgressLiveData.postValue(0)
+        obtainSongLrc()
     }
 
     fun calculateTime(time: Long): String {
@@ -313,7 +334,20 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    fun getFromAssets(fileName: String): String {
+    private fun obtainSongLrc() {
+        val currentSongInfo = getSongInfo()
+        mCurrentLrcIndex = 0
+        if (currentSongInfo.songName != "以后别做朋友") {
+            mLrcRows = null
+            return
+        }
+        // TODO 后续优化歌曲歌词相关逻辑
+        val songLrc = getFromAssets("周兴哲-以后别做朋友.lrc")
+        val builder = DefaultLrcBuilder()
+        mLrcRows = builder.getLrcRows(songLrc)
+    }
+
+    private fun getFromAssets(fileName: String): String {
         try {
             val inputReader = InputStreamReader(mApplication.resources.assets.open(fileName))
             val bufReader = BufferedReader(inputReader)

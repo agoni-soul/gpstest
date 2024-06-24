@@ -2,23 +2,29 @@ package com.soul.volume
 
 import android.content.Context
 import android.content.IntentFilter
+import android.graphics.Typeface
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
+import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
 import com.soul.util.DpToPxTransfer
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.lang.*
 
 
@@ -190,9 +196,29 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             }
 
             getMusicProgress().observe(this@VolumeActivity) {
+                var currentSongLrc = ""
+                mViewModel?.apply {
+                    if (!mLrcRows.isNullOrEmpty()) {
+                        currentSongLrc = mLrcRows?.get(mCurrentLrcIndex)?.content ?: ""
+                    }
+                }
+                Log.d(TAG, currentSongLrc)
                 mViewDataBinding?.apply {
                     tvLeavingTime.text = calculateTime(it.toLong())
                     sbMusicProgress.progress = it
+                    val content = tvSongLrc.text.toString()
+                    val start = content.indexOf(currentSongLrc)
+                    if (start != -1) {
+                        val end = start + currentSongLrc.length
+                        val spanStr= SpannableString(content)
+                        val boldSpan = StyleSpan(Typeface.BOLD)
+                        spanStr.setSpan(boldSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        val fgdColorSpan = ForegroundColorSpan(mContext.resources.getColor(R.color.blue))
+                        spanStr.setSpan(fgdColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        val sizeSpan = AbsoluteSizeSpan(DpToPxTransfer.sp2px(mContext, 20))
+                        spanStr.setSpan(sizeSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        tvSongLrc.text = spanStr
+                    }
                     if (it > 0 && it == getMusicDuration().value) {
                         Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
                         Log.d(TAG, "playMode = ${mViewModel?.mPlayMode}")
@@ -220,13 +246,29 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     private fun playMusic() {
         mViewModel?.playCurrentMusic()
+        resetObtainSongInfo()
+    }
+
+    private fun playNextMusic() {
+        mViewModel?.playNextMusic()
+        resetObtainSongInfo()
+    }
+
+    private fun playPreviousMusic() {
+        mViewModel?.playPreviousMusic()
+        resetObtainSongInfo()
+    }
+
+    private fun resetObtainSongInfo() {
         mViewDataBinding?.apply {
             val songName = mViewModel?.getSongInfo()?.let {
                 "《${it.songName}》-${it.singer}"
             } ?: "播放音乐"
-            val songLrc = mViewModel?.getFromAssets("周兴哲-以后别做朋友.lrc")
-            val builder = DefaultLrcBuilder()
-            val rows = builder.getLrcRows(songLrc)
+            tvSongName.text = songName
+            ivSongPlay.background =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+
+            val rows = mViewModel?.mLrcRows
             val sb = StringBuilder()
             if (!rows.isNullOrEmpty()) {
                 rows.forEach {row ->
@@ -235,7 +277,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     }
                 }
             }
-            Log.d(TAG, sb.toString().trim())
             if (sb.isEmpty()) {
                 nsvSongLrc.visibility = View.GONE
             } else {
@@ -256,34 +297,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     }
                 })
             }
-
-            tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-        }
-    }
-
-    private fun playNextMusic() {
-        mViewModel?.playNextMusic()
-        mViewDataBinding?.apply {
-            val songName = mViewModel?.getSongInfo()?.let {
-                "${it.singer} - ${it.songName}"
-            } ?: "播放音乐"
-            tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-        }
-    }
-
-    private fun playPreviousMusic() {
-        mViewModel?.playPreviousMusic()
-        mViewDataBinding?.apply {
-            val songName = mViewModel?.getSongInfo()?.let {
-                "${it.singer} - ${it.songName}"
-            } ?: "播放音乐"
-            tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         }
     }
 

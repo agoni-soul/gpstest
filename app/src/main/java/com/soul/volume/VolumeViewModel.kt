@@ -209,17 +209,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                     if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
                         val currentPosition = mMediaPlayer?.currentPosition ?: 0
                         mMusicProgressLiveData.postValue(currentPosition)
-                        mLrcRows?.let {
-                            while (mCurrentLrcIndex < it.size - 1) {
-                                val lrcRow = it[mCurrentLrcIndex]
-                                if (lrcRow.time + UPDATE_LRC_INTERNAL > currentPosition) {
-                                    return@let
-                                } else {
-                                    mCurrentLrcIndex ++
-                                }
-                            }
-                        }
-                        Log.d(TAG, "mCurrentLrcIndex = $mCurrentLrcIndex")
+                        updateLrcLinePosition(currentPosition)
                     }
                 }
             }
@@ -245,6 +235,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     fun musicSeekTo(progress: Int) {
         mMediaPlayer?.seekTo(progress)
+        mMediaPlayer?.currentPosition?.let {
+            updateLrcLinePosition(it)
+        }
     }
 
     fun playPreviousMusic() {
@@ -332,6 +325,20 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                     "${stringFormat.format(minuteTime)}:" +
                     stringFormat.format(secondTime)
         }
+    }
+
+    private fun updateLrcLinePosition(currentPosition: Int) {
+        mLrcRows?.let {
+            while (mCurrentLrcIndex < it.size - 1) {
+                val lrcRow = it[mCurrentLrcIndex]
+                if (lrcRow.time + UPDATE_LRC_INTERNAL > currentPosition) {
+                    return@let
+                } else {
+                    mCurrentLrcIndex ++
+                }
+            }
+        }
+        Log.d(TAG, "mCurrentLrcIndex = $mCurrentLrcIndex")
     }
 
     private fun obtainSongLrc() {

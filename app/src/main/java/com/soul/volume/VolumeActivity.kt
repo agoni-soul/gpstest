@@ -6,7 +6,6 @@ import android.graphics.Typeface
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -18,7 +17,6 @@ import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
-import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
@@ -41,6 +39,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     private lateinit var mVolumeBroadReceiver: VolumeBroadReceiver
 
     private lateinit var mVolumeAdjustAdapter: VolumeAdjustAdapter
+
+    private var mLastLrcIndex = 0
 
     override fun getViewModelClass(): Class<VolumeViewModel> = VolumeViewModel::class.java
 
@@ -215,9 +215,14 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         spanStr.setSpan(boldSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         val fgdColorSpan = ForegroundColorSpan(mContext.resources.getColor(R.color.blue))
                         spanStr.setSpan(fgdColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        val sizeSpan = AbsoluteSizeSpan(DpToPxTransfer.sp2px(mContext, 20))
+                        val sizeSpan = AbsoluteSizeSpan(DpToPxTransfer.sp2px(mContext, 18))
                         spanStr.setSpan(sizeSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         tvSongLrc.text = spanStr
+
+                        if (mLastLrcIndex >= 2 && mLastLrcIndex != mCurrentLrcIndex) {
+                            nsvSongLrc.smoothScrollTo(0, tvSongLrc.lineHeight * (mCurrentLrcIndex - 2))
+                        }
+                        mLastLrcIndex = mCurrentLrcIndex
                     }
                     if (it > 0 && it == getMusicDuration().value) {
                         Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
@@ -289,7 +294,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         val lineHeight = tvSongLrc.lineHeight
                         val layoutParams = nsvSongLrc.layoutParams
                         if (lineCount * lineHeight > layoutParams.height) {
-                            layoutParams.height = DpToPxTransfer.dp2px(mContext, 100)
+                            layoutParams.height = 5 * lineHeight
                         }
                         nsvSongLrc.layoutParams = layoutParams
                         nsvSongLrc.requestLayout()

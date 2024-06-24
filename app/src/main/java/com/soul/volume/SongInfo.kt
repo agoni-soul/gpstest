@@ -7,4 +7,9 @@ package com.soul.volume
  *     desc   :
  *     version: 1.0
  */
-data class SongInfo(val songName: String, val singer: String?, val songUrl: String)
+data class SongInfo(
+    val songName: String,
+    val singer: String?,
+    val songUrl: String,
+    val lrcUrl: String? = null
+)

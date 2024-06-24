@@ -220,13 +220,29 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     private fun playMusic() {
         mViewModel?.playCurrentMusic()
+        resetObtainSongInfo()
+    }
+
+    private fun playNextMusic() {
+        mViewModel?.playNextMusic()
+        resetObtainSongInfo()
+    }
+
+    private fun playPreviousMusic() {
+        mViewModel?.playPreviousMusic()
+        resetObtainSongInfo()
+    }
+
+    private fun resetObtainSongInfo() {
         mViewDataBinding?.apply {
             val songName = mViewModel?.getSongInfo()?.let {
                 "《${it.songName}》-${it.singer}"
             } ?: "播放音乐"
-            val songLrc = mViewModel?.getFromAssets("周兴哲-以后别做朋友.lrc")
-            val builder = DefaultLrcBuilder()
-            val rows = builder.getLrcRows(songLrc)
+            tvSongName.text = songName
+            ivSongPlay.background =
+                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+
+            val rows = mViewModel?.rows
             val sb = StringBuilder()
             if (!rows.isNullOrEmpty()) {
                 rows.forEach {row ->
@@ -235,7 +251,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     }
                 }
             }
-            Log.d(TAG, sb.toString().trim())
             if (sb.isEmpty()) {
                 nsvSongLrc.visibility = View.GONE
             } else {
@@ -256,34 +271,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     }
                 })
             }
-
-            tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-        }
-    }
-
-    private fun playNextMusic() {
-        mViewModel?.playNextMusic()
-        mViewDataBinding?.apply {
-            val songName = mViewModel?.getSongInfo()?.let {
-                "${it.singer} - ${it.songName}"
-            } ?: "播放音乐"
-            tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-        }
-    }
-
-    private fun playPreviousMusic() {
-        mViewModel?.playPreviousMusic()
-        mViewDataBinding?.apply {
-            val songName = mViewModel?.getSongInfo()?.let {
-                "${it.singer} - ${it.songName}"
-            } ?: "播放音乐"
-            tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         }
     }
 

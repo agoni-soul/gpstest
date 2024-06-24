@@ -39,6 +39,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     var mPlayMode = PLAY_MODE_SEQUENTIAL
         private set
 
+    var rows: MutableList<LrcRow>? = null
+        private set
+
     private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
         MutableLiveData(false)
     }
@@ -117,6 +120,13 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mMusicList.clear()
         mMusicList.add(
             SongInfo(
+                "以后别做朋友",
+                "周兴哲",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
                 "骗子",
                 "文夫",
                 "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3"
@@ -134,13 +144,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "嘉宾",
                 "张远",
                 "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3"
-            )
-        )
-        mMusicList.add(
-            SongInfo(
-                "以后别做朋友",
-                "周兴哲",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3"
             )
         )
         mMusicList.add(
@@ -297,6 +300,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
         mMusicProgressLiveData.postValue(0)
         mMusicCacheProgressLiveData.postValue(0)
+        obtainSongLrc()
     }
 
     fun calculateTime(time: Long): String {
@@ -313,7 +317,19 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
-    fun getFromAssets(fileName: String): String {
+    private fun obtainSongLrc() {
+        val currentSongInfo = getSongInfo()
+        if (currentSongInfo.songName != "以后别做朋友") {
+            rows = null
+            return
+        }
+        // TODO 后续优化歌曲歌词相关逻辑
+        val songLrc = getFromAssets("周兴哲-以后别做朋友.lrc")
+        val builder = DefaultLrcBuilder()
+        rows = builder.getLrcRows(songLrc)
+    }
+
+    private fun getFromAssets(fileName: String): String {
         try {
             val inputReader = InputStreamReader(mApplication.resources.assets.open(fileName))
             val bufReader = BufferedReader(inputReader)

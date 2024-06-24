@@ -1,5 +1,6 @@
 package com.soul.volume
 
+import android.util.Log
 import kotlin.math.pow
 
 
@@ -10,11 +11,10 @@ import kotlin.math.pow
  *     version: 1.0
  */
 class LrcRow() : Comparable<LrcRow> {
-    private val TAG = javaClass.simpleName
-
     private var strTime: String? = null
     private var time: Long = 0
-    private var content: String? = null
+    var content: String? = null
+        private set
 
     constructor(strTime: String, time: Long, content: String) : this() {
         this.strTime = strTime
@@ -43,7 +43,7 @@ class LrcRow() : Comparable<LrcRow> {
                     val lrcRow = LrcRow(temp, timeConvert(temp), content)
                     listTimes.add(lrcRow)
                 }
-                return null
+                return listTimes
             } catch (e: Exception) {
                 e.printStackTrace()
                 return null

@@ -15,7 +15,7 @@ import java.util.Collections
  *     version: 1.0
  */
 class DefaultLrcBuilder: ILrcBuilder {
-    val TAG = javaClass.simpleName
+    val TAG: String = javaClass.simpleName
 
     override fun getLrcRows(rawLrc: String?): MutableList<LrcRow>? {
         Log.d(TAG, "getLrcRows by rawString")
@@ -25,7 +25,7 @@ class DefaultLrcBuilder: ILrcBuilder {
         }
         val reader = StringReader(rawLrc)
         val br = BufferedReader(reader)
-        var line: String? = null
+        var line: String?
         val rows = mutableListOf<LrcRow>()
         try {
             do {
@@ -43,9 +43,6 @@ class DefaultLrcBuilder: ILrcBuilder {
             } while (line != null)
             if (rows.isNotEmpty()) {
                 rows.sort()
-                for (low in rows) {
-                    Log.d(TAG, "lrcRow: $low")
-                }
             }
             return rows
         } catch (e: Exception) {

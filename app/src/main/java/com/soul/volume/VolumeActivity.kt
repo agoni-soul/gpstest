@@ -89,13 +89,16 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     TAG,
                     "ivSongPlay: isMediaPrepare = ${mViewModel?.isMediaPrepare()?.value}"
                 )
-                if (mViewModel?.isMediaPrepare()?.value == false) {
-                    playMusic()
-                } else if (mViewModel?.isMusicPlaying() == true) {
-                    mViewModel?.musicPause()
-                    mViewModel?.stopTimerTask()
-                    it.background =
-                        ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                when (mViewModel?.mMediaPlayerStatus) {
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
+                        playPauseMusic()
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_PAUSE -> {
+                        playResumeMusic()
+                    }
+                    else -> {
+                        playMusic()
+                    }
                 }
             }
             ivSongNext.setOnClickListener {
@@ -252,6 +255,24 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     private fun playMusic() {
         mViewModel?.playCurrentMusic()
         resetObtainSongInfo()
+    }
+
+    private fun playResumeMusic() {
+        mViewDataBinding?.ivSongPlay?.background =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
+        mViewModel?.apply {
+            musicStart()
+            startTimerTask()
+        }
+    }
+
+    private fun playPauseMusic() {
+        mViewDataBinding?.ivSongPlay?.background =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+        mViewModel?.apply {
+            musicPause()
+            stopTimerTask()
+        }
     }
 
     private fun playNextMusic() {

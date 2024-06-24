@@ -26,6 +26,15 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private const val PLAY_MODE_LOOP = 1
         private const val PLAY_MODE_SHUFFLE = 2
 
+        const val MEDIA_PLAYER_STATUS_INIT = 0
+        const val MEDIA_PLAYER_STATUS_PREPARE = 1
+        const val MEDIA_PLAYER_STATUS_START = 2
+        const val MEDIA_PLAYER_STATUS_PAUSE = 3
+        const val MEDIA_PLAYER_STATUS_STOP = 4
+        const val MEDIA_PLAYER_STATUS_COMPLETE = 5
+        const val MEDIA_PLAYER_STATUS_ERROR = 6
+        const val MEDIA_PLAYER_STATUS_RELEASE = 7
+
         private const val UPDATE_LRC_INTERNAL = 1000L
     }
 
@@ -45,6 +54,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private set
 
     var mCurrentLrcIndex: Int = 0
+        private set
+
+    var mMediaPlayerStatus: Int = 0
         private set
 
     private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
@@ -90,10 +102,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
                     mIsMediaPrepareLiveData.postValue(true)
+                    mMediaPlayerStatus = MEDIA_PLAYER_STATUS_PREPARE
                     mMusicDurationLiveData.postValue(mMediaPlayer?.duration ?: 0)
                 }
                 setOnCompletionListener {
                     mMusicProgressLiveData.postValue(duration)
+                    mMediaPlayerStatus = MEDIA_PLAYER_STATUS_COMPLETE
                     stopTimerTask()
                 }
                 // 网络链接歌曲，缓存进度百分比
@@ -108,6 +122,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                         }"
                     )
                     mp?.stop()
+                    mMediaPlayerStatus = MEDIA_PLAYER_STATUS_STOP
                     stopTimerTask()
                     mMusicProgressLiveData.postValue(0)
                     mMusicCacheProgressLiveData.postValue(0)
@@ -227,10 +242,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     fun musicPause() {
         mMediaPlayer?.pause()
+        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_PAUSE
     }
 
     fun musicStart() {
         mMediaPlayer?.start()
+        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_START
     }
 
     fun musicSeekTo(progress: Int) {
@@ -307,6 +324,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private fun playMusic(index: Int) {
         mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
         mMediaPlayer?.prepareAsync()
+        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_INIT
 
         mMusicProgressLiveData.postValue(0)
         mMusicCacheProgressLiveData.postValue(0)
@@ -334,7 +352,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 if (lrcRow.time + UPDATE_LRC_INTERNAL > currentPosition) {
                     return@let
                 } else {
-                    mCurrentLrcIndex ++
+                    mCurrentLrcIndex++
                 }
             }
         }
@@ -364,7 +382,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 if (!line?.trim().isNullOrEmpty()) {
                     result.append(line + "\r\n")
                 }
-            } while( line != null)
+            } while (line != null)
             return result.toString()
         } catch (e: Exception) {
             Log.e(TAG, "${e.message}")
@@ -375,6 +393,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     override fun onDestroy() {
         super.onDestroy()
         mMediaPlayer?.release()
+        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_RELEASE
         mMediaPlayer = null
         stopTimerTask()
     }

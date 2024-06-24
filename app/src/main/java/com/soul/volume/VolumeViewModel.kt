@@ -142,49 +142,64 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             SongInfo(
                 "以后别做朋友",
                 "周兴哲",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vnxcdmd"
             )
         )
         mMusicList.add(
             SongInfo(
                 "骗子",
                 "文夫",
-                "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=mwckvdhdk"
             )
         )
         mMusicList.add(
             SongInfo(
                 "请先说你好",
                 "贺一航",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vmhnccmk"
             )
         )
         mMusicList.add(
             SongInfo(
                 "嘉宾",
                 "张远",
-                "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=wvxkdxvxm"
             )
         )
         mMusicList.add(
             SongInfo(
                 "年少有为",
                 "李荣浩",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vvnmxvxx&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=vvnmxvxx&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vvnmxvxx"
             )
         )
         mMusicList.add(
             SongInfo(
                 "秘密海域",
                 "深海鱼子酱",
-                "http://www.eev3.com/plug/down.php?ac=music&id=whnmxhsww&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=whnmxhsww&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=whnmxhsww"
             )
         )
         mMusicList.add(
             SongInfo(
                 "再见，再也不见",
                 "欢子",
-                "http://www.eev3.com/plug/down.php?ac=music&id=mmhwvxsn&k=320kmp3"
+                "http://www.eev3.com/plug/down.php?ac=music&id=mmhwvxsn&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=mmhwvxsn"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
+                "可不可以",
+                "张紫豪",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmc&k=320kmp3",
+                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vmhnccmc"
             )
         )
         for (i in 0 until mMusicList.size) {

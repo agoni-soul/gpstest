@@ -218,10 +218,12 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         mViewModel?.playCurrentMusic()
         mViewDataBinding?.apply {
             val songName = mViewModel?.getSongInfo()?.let {
-                "${it.singer} - ${it.songName}"
+                "《${it.songName}》-${it.singer}"
             } ?: "播放音乐"
             val songLrc = mViewModel?.getFromAssets("周兴哲-以后别做朋友.lrc")
-            Log.d(TAG, "songLrc = \n${songLrc}")
+            val builder = DefaultLrcBuilder()
+            val rows = builder.getLrcRows(songLrc)
+
             tvSongName.text = songName
             ivSongPlay.background =
                 ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)

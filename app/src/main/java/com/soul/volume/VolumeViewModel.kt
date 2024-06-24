@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
+import java.lang.*
 
 
 /**
@@ -135,13 +136,34 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3"
             )
         )
-//        mMusicList.add(
-//            SongInfo(
-//                "以后别做朋友",
-//                "周兴哲",
-//                ""
-//            )
-//        )
+        mMusicList.add(
+            SongInfo(
+                "以后别做朋友",
+                "周兴哲",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
+                "年少有为",
+                "李荣浩",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vvnmxvxx&k=320kmp3"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
+                "秘密海域",
+                "深海鱼子酱",
+                "http://www.eev3.com/plug/down.php?ac=music&id=whnmxhsww&k=320kmp3"
+            )
+        )
+        mMusicList.add(
+            SongInfo(
+                "再见，再也不见",
+                "欢子",
+                "http://www.eev3.com/plug/down.php?ac=music&id=mmhwvxsn&k=320kmp3"
+            )
+        )
         for (i in 0 until mMusicList.size) {
             mRandomIndexList.add(i)
         }
@@ -295,18 +317,16 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         try {
             val inputReader = InputStreamReader(mApplication.resources.assets.open(fileName))
             val bufReader = BufferedReader(inputReader)
-            var result = ""
+            val result = StringBuilder()
             do {
-                val line = bufReader.readLine()
-                Log.d(TAG, "line = $line")
-                if (line.trim() != "") {
-                    result += line + "\r\n"
+                val line: String? = bufReader.readLine()
+                if (!line?.trim().isNullOrEmpty()) {
+                    result.append(line + "\r\n")
                 }
             } while( line != null)
-            Log.d(TAG, "result = $result")
-            return result
+            return result.toString()
         } catch (e: Exception) {
-            Log.i(TAG, "${e.message}")
+            Log.e(TAG, "${e.message}")
         }
         return ""
     }

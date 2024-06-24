@@ -1,5 +1,7 @@
 package com.soul.volume
 
+import kotlin.math.pow
+
 
 /**
  *     author : yangzy33
@@ -18,14 +20,6 @@ class LrcRow() : Comparable<LrcRow> {
         this.strTime = strTime
         this.time = time
         this.content = content
-    }
-
-    override fun toString(): String {
-        return "[$strTime] $content"
-    }
-
-    override fun compareTo(other: LrcRow): Int {
-
     }
 
     companion object {
@@ -60,9 +54,30 @@ class LrcRow() : Comparable<LrcRow> {
             val timeTemp = timeString.replace(".", ":")
             val times = timeTemp.split(":")
             val minute = times[0].toIntOrNull() ?: 0
-            val second = times[1].toIntOrNull() ?: 0
-            var milli = times[2].toIntOrNull() ?: 0
+            val second: Int = if (times[1].length > 2) {
+                times[1].substring(0, 2).toIntOrNull() ?: 0
+            } else {
+                (times[1].toIntOrNull() ?: 0) % 60
+            }
+            val milli: Int = if (times[2].length > 3) {
+                times[2].substring(0, 3).toIntOrNull() ?: 0
+            } else {
+                times[2].toIntOrNull() ?: 0
+            }
             return minute * 60 * 1000L + second * 1000L + milli
         }
+    }
+
+    override fun toString(): String {
+        return "[$strTime] $content"
+    }
+
+    override fun compareTo(other: LrcRow): Int {
+        var differ = this.time - other.time
+        val boundary = 2.0.pow(32.0).toLong()
+        if (differ >= boundary || differ < boundary * (-1)) {
+            differ %= boundary
+        }
+        return differ.toInt()
     }
 }

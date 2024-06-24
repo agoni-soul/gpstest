@@ -6,6 +6,8 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
@@ -14,8 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
+import com.soul.util.DpToPxTransfer
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.*
 
 
 /**
@@ -223,6 +227,35 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             val songLrc = mViewModel?.getFromAssets("周兴哲-以后别做朋友.lrc")
             val builder = DefaultLrcBuilder()
             val rows = builder.getLrcRows(songLrc)
+            val sb = StringBuilder()
+            if (!rows.isNullOrEmpty()) {
+                rows.forEach {row ->
+                    row.content?.let {
+                        sb.append("$it\n")
+                    }
+                }
+            }
+            Log.d(TAG, sb.toString().trim())
+            if (sb.isEmpty()) {
+                nsvSongLrc.visibility = View.GONE
+            } else {
+                nsvSongLrc.visibility = View.VISIBLE
+                tvSongLrc.text = sb.toString().trim()
+                val vto = tvSongLrc.viewTreeObserver
+                vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout()  {
+                        val lineCount = tvSongLrc.lineCount
+                        val lineHeight = tvSongLrc.lineHeight
+                        val layoutParams = nsvSongLrc.layoutParams
+                        if (lineCount * lineHeight > layoutParams.height) {
+                            layoutParams.height = DpToPxTransfer.dp2px(mContext, 100)
+                        }
+                        nsvSongLrc.layoutParams = layoutParams
+                        nsvSongLrc.requestLayout()
+                        tvSongLrc.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    }
+                })
+            }
 
             tvSongName.text = songName
             ivSongPlay.background =

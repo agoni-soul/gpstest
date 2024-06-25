@@ -57,10 +57,16 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         mVolumeBroadReceiver.setCallback(object : VolumeBroadReceiver.VolumeCallback {
             override fun handleVolumeChange() {
                 mVolumeAdjustAdapter.notifyDataSetChanged()
+//                mViewModel?.setLeftChannel()
+            }
+
+            override fun handleNoisyAudioStream() {
+
             }
         })
         val intentFilter = IntentFilter()
         intentFilter.addAction(VolumeBroadReceiver.VOLUME_CHANGED_ACTION)
+        intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         registerReceiver(mVolumeBroadReceiver, intentFilter)
     }
 
@@ -86,10 +92,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 playPreviousMusic()
             }
             ivSongPlay.setOnClickListener {
-                Log.d(
-                    TAG,
-                    "ivSongPlay: isMediaPrepare = ${mViewModel?.isMediaPrepare()?.value}"
-                )
                 when (mViewModel?.getMediaPlayerStatus()?.value) {
                     VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
                         playPauseMusic()
@@ -121,7 +123,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     val progress = seekBar?.progress ?: return
                     mViewModel?.apply {
-                        if (isMediaPrepare().value == true) {
+                        if (getMediaPlayerStatus().value == VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE) {
                             musicSeekTo(progress)
                             mViewDataBinding?.tvLeavingTime?.text =
                                 calculateTime(progress.toLong())

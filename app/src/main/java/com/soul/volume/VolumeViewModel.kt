@@ -1,6 +1,8 @@
 package com.soul.volume
 
 import android.app.Application
+import android.content.Context
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -38,6 +40,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private const val UPDATE_LRC_INTERNAL = 1000L
     }
 
+    private var mAudioManager: AudioManager? = null
     // 媒体播放器
     private var mMediaPlayer: MediaPlayer? = null
     private var mTimerTask: TimerTask? = null
@@ -60,10 +63,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         MutableLiveData(MEDIA_PLAYER_STATUS_INIT)
     }
 
-    private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
-        MutableLiveData(false)
-    }
-
     private val mMusicDurationLiveData: MutableLiveData<Int> by lazy {
         MutableLiveData(0)
     }
@@ -76,7 +75,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         MutableLiveData(0)
     }
 
-    fun isMediaPrepare(): MutableLiveData<Boolean> = mIsMediaPrepareLiveData
+    init {
+        mAudioManager = mApplication.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    }
 
     fun getMusicDuration(): MutableLiveData<Int> = mMusicDurationLiveData
 
@@ -98,7 +99,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             }
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
-                    mIsMediaPrepareLiveData.postValue(true)
                     mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARE)
                     mMusicDurationLiveData.postValue(mMediaPlayer?.duration ?: 0)
                 }
@@ -232,7 +232,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mTimerTask = object : TimerTask() {
             override fun run() {
                 MainScope().launch(Dispatchers.Main) {
-                    if (isMediaPrepare().value == true && mMediaPlayer?.isPlaying == true) {
+                    if (getMediaPlayerStatus().value == VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE &&
+                        mMediaPlayer?.isPlaying == true) {
                         val currentPosition = mMediaPlayer?.currentPosition ?: 0
                         mMusicProgressLiveData.postValue(currentPosition)
                         updateLrcLinePosition(currentPosition)
@@ -269,10 +270,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun playPreviousMusic() {
-        Log.d(
-            TAG,
-            "playPreviousMusic: isMediaPrepare = ${mIsMediaPrepareLiveData.value}"
-        )
         mPlayingMusicIndex--
         playOtherMusic(mPlayingMusicIndex)
     }
@@ -282,10 +279,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun playNextMusic() {
-        Log.d(
-            TAG,
-            "playNextMusic: isMediaPrepare = ${mIsMediaPrepareLiveData.value}"
-        )
         mPlayingMusicIndex++
         playOtherMusic(mPlayingMusicIndex)
     }
@@ -327,8 +320,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     private fun playNewMusic(index: Int) {
         stopTimerTask()
-        mIsMediaPrepareLiveData.postValue(false)
         mMediaPlayer?.reset()
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_INIT)
         playMusic(index)
     }
 
@@ -360,7 +353,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mLrcRows?.let {
             while (mCurrentLrcIndex < it.size - 1) {
                 val lrcRow = it[mCurrentLrcIndex]
-                if (lrcRow.time + UPDATE_LRC_INTERNAL > currentPosition) {
+                if (lrcRow.time > currentPosition) {
                     return@let
                 } else {
                     mCurrentLrcIndex++
@@ -407,5 +400,20 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_RELEASE)
         mMediaPlayer = null
         stopTimerTask()
+    }
+
+    fun setLeftChannel() {
+        val volume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0F
+        mMediaPlayer?.setVolume(volume, 0F)
+    }
+
+    fun setRightChannel() {
+        val volume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0F
+        mMediaPlayer?.setVolume(0f, volume)
+    }
+
+    private fun setStereoChannel() {
+        val volume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0F
+        mMediaPlayer?.setVolume(volume, volume)
     }
 }

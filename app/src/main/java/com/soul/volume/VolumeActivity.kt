@@ -90,7 +90,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     TAG,
                     "ivSongPlay: isMediaPrepare = ${mViewModel?.isMediaPrepare()?.value}"
                 )
-                when (mViewModel?.mMediaPlayerStatus) {
+                when (mViewModel?.getMediaPlayerStatus()?.value) {
                     VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
                         playPauseMusic()
                     }
@@ -175,14 +175,51 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         mViewModel?.apply {
             initMusic()
             initMusicList()
-            isMediaPrepare().observe(this@VolumeActivity) {
-                Log.d(TAG, "observe: isMediaPrepare = $it")
-                if (it) {
-                    mViewDataBinding?.apply {
-                        ivSongPlay.background =
-                            ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
+
+            getMediaPlayerStatus().observe(this@VolumeActivity) {
+                Log.d(TAG, "media player status = $it")
+                when (it) {
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_INIT -> {
+                        mViewDataBinding?.apply {
+                            ivSongPlay.background =
+                                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                        }
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE -> {
                         musicStart()
                         startTimerTask()
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
+                        mViewDataBinding?.apply {
+                            ivSongPlay.background =
+                                ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
+                        }
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_PAUSE -> {
+                        mViewDataBinding?.apply {
+                            ivSongPlay.background =
+                                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                        }
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_STOP,
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_ERROR -> {
+                        mViewDataBinding?.ivSongPlay?.background =
+                            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_COMPLETE -> {
+                        Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "playMode = ${mViewModel?.mPlayMode}")
+                        if (isLoopPlayMode()) {
+                            mViewDataBinding?.ivSongPlay?.background =
+                                ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
+                        } else {
+                            mViewDataBinding?.ivSongPlay?.background =
+                                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
+                            playNextMusic()
+                        }
+                    }
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_RELEASE -> {
+
                     }
                 }
             }
@@ -232,26 +269,12 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         }
                         mLastLrcIndex = mCurrentLrcIndex
                     }
-                    if (it > 0 && it == getMusicDuration().value) {
-                        Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "playMode = ${mViewModel?.mPlayMode}")
-                        if (!isLoopPlayMode()) {
-                            playNextMusic()
-                        }
-                    }
                 }
             }
 
             getMusicCacheProgress().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
                     sbMusicProgress.secondaryProgress = it
-                }
-            }
-
-            isMediaPlayerError().observe(this@VolumeActivity) {
-                mViewDataBinding?.apply {
-                    ivSongPlay.background =
-                        ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                 }
             }
         }
@@ -263,8 +286,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     }
 
     private fun playResumeMusic() {
-        mViewDataBinding?.ivSongPlay?.background =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
         mViewModel?.apply {
             musicStart()
             startTimerTask()
@@ -272,8 +293,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
     }
 
     private fun playPauseMusic() {
-        mViewDataBinding?.ivSongPlay?.background =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
         mViewModel?.apply {
             musicPause()
             stopTimerTask()
@@ -296,9 +315,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 "《${it.songName}》-${it.singer}"
             } ?: "播放音乐"
             tvSongName.text = songName
-            ivSongPlay.background =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
-
             val rows = mViewModel?.mLrcRows
             val sb = StringBuilder()
             if (!rows.isNullOrEmpty()) {

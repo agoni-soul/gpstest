@@ -56,8 +56,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     var mCurrentLrcIndex: Int = 0
         private set
 
-    var mMediaPlayerStatus: Int = 0
-        private set
+    private val mMediaPlayerStatusLiveData: MutableLiveData<Int> by lazy {
+        MutableLiveData(MEDIA_PLAYER_STATUS_INIT)
+    }
 
     private val mIsMediaPrepareLiveData: MutableLiveData<Boolean> by lazy {
         MutableLiveData(false)
@@ -75,10 +76,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         MutableLiveData(0)
     }
 
-    private val mIsMediaPlayerErrorLiveData: MutableLiveData<Boolean> by lazy {
-        MutableLiveData(false)
-    }
-
     fun isMediaPrepare(): MutableLiveData<Boolean> = mIsMediaPrepareLiveData
 
     fun getMusicDuration(): MutableLiveData<Int> = mMusicDurationLiveData
@@ -87,7 +84,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     fun getMusicCacheProgress(): MutableLiveData<Int> = mMusicCacheProgressLiveData
 
-    fun isMediaPlayerError(): MutableLiveData<Boolean> = mIsMediaPlayerErrorLiveData
+    fun getMediaPlayerStatus(): MutableLiveData<Int> = mMediaPlayerStatusLiveData
 
     fun initMusic() {
         try {
@@ -102,12 +99,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
                     mIsMediaPrepareLiveData.postValue(true)
-                    mMediaPlayerStatus = MEDIA_PLAYER_STATUS_PREPARE
+                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARE)
                     mMusicDurationLiveData.postValue(mMediaPlayer?.duration ?: 0)
                 }
                 setOnCompletionListener {
                     mMusicProgressLiveData.postValue(duration)
-                    mMediaPlayerStatus = MEDIA_PLAYER_STATUS_COMPLETE
+                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_COMPLETE)
                     stopTimerTask()
                 }
                 // 网络链接歌曲，缓存进度百分比
@@ -122,11 +119,10 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                         }"
                     )
                     mp?.stop()
-                    mMediaPlayerStatus = MEDIA_PLAYER_STATUS_STOP
+                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_ERROR)
                     stopTimerTask()
                     mMusicProgressLiveData.postValue(0)
                     mMusicCacheProgressLiveData.postValue(0)
-                    mIsMediaPlayerErrorLiveData.postValue(true)
                     true
                 }
             }
@@ -257,12 +253,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     fun musicPause() {
         mMediaPlayer?.pause()
-        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_PAUSE
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PAUSE)
     }
 
     fun musicStart() {
         mMediaPlayer?.start()
-        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_START
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_START)
     }
 
     fun musicSeekTo(progress: Int) {
@@ -339,7 +335,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private fun playMusic(index: Int) {
         mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
         mMediaPlayer?.prepareAsync()
-        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_INIT
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_INIT)
 
         mMusicProgressLiveData.postValue(0)
         mMusicCacheProgressLiveData.postValue(0)
@@ -408,7 +404,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     override fun onDestroy() {
         super.onDestroy()
         mMediaPlayer?.release()
-        mMediaPlayerStatus = MEDIA_PLAYER_STATUS_RELEASE
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_RELEASE)
         mMediaPlayer = null
         stopTimerTask()
     }

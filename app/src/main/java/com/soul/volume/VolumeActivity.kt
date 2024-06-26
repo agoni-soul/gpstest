@@ -188,8 +188,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         }
                     }
                     VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE -> {
-                        musicStart()
-                        startTimerTask()
+                        playResumeMusic()
                     }
                     VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
                         mViewDataBinding?.apply {
@@ -245,7 +244,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         currentSongLrc = mLrcRows?.get(mCurrentLrcIndex)?.content ?: ""
                     }
                 }
-                Log.d(TAG, currentSongLrc)
                 mViewDataBinding?.apply {
                     tvLeavingTime.text = calculateTime(it.toLong())
                     sbMusicProgress.progress = it

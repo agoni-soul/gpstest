@@ -99,10 +99,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             }
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
+                    Log.d(TAG, "setOnPreparedListener: prepared")
                     mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARE)
                     mMusicDurationLiveData.postValue(mMediaPlayer?.duration ?: 0)
                 }
                 setOnCompletionListener {
+                    Log.d(TAG, "setOnCompletionListener: onCompletion")
                     mMusicProgressLiveData.postValue(duration)
                     mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_COMPLETE)
                     stopTimerTask()
@@ -119,6 +121,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                         }"
                     )
                     mp?.stop()
+                    Log.d(TAG, "setOnErrorListener: onError")
                     mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_ERROR)
                     stopTimerTask()
                     mMusicProgressLiveData.postValue(0)
@@ -232,7 +235,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mTimerTask = object : TimerTask() {
             override fun run() {
                 MainScope().launch(Dispatchers.Main) {
-                    if (getMediaPlayerStatus().value == VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE &&
+                    if (getMediaPlayerStatus().value == MEDIA_PLAYER_STATUS_START &&
                         mMediaPlayer?.isPlaying == true) {
                         val currentPosition = mMediaPlayer?.currentPosition ?: 0
                         mMusicProgressLiveData.postValue(currentPosition)
@@ -249,7 +252,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun isMusicPlaying(): Boolean {
-        return mMediaPlayer?.isPlaying ?: false
+        return (mMediaPlayerStatusLiveData.value == MEDIA_PLAYER_STATUS_START ||
+                mMediaPlayerStatusLiveData.value == MEDIA_PLAYER_STATUS_PAUSE) &&
+                mMediaPlayer?.isPlaying ?: false
     }
 
     fun musicPause() {
@@ -321,6 +326,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private fun playNewMusic(index: Int) {
         stopTimerTask()
         mMediaPlayer?.reset()
+        Log.d(TAG, "playNewMusic: reset")
         mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_INIT)
         playMusic(index)
     }
@@ -328,6 +334,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private fun playMusic(index: Int) {
         mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
         mMediaPlayer?.prepareAsync()
+        Log.d(TAG, "playMusic: prepareAsync")
         mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_INIT)
 
         mMusicProgressLiveData.postValue(0)

@@ -123,7 +123,9 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
                     val progress = seekBar?.progress ?: return
                     mViewModel?.apply {
-                        if (getMediaPlayerStatus().value == VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE) {
+                        val value = getMediaPlayerStatus().value
+                        if (value == VolumeViewModel.MEDIA_PLAYER_STATUS_START ||
+                            value == VolumeViewModel.MEDIA_PLAYER_STATUS_PAUSE) {
                             musicSeekTo(progress)
                             mViewDataBinding?.tvLeavingTime?.text =
                                 calculateTime(progress.toLong())

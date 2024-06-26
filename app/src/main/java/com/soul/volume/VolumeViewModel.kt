@@ -359,7 +359,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private fun updateLrcLinePosition(currentPosition: Int) {
         mLrcRows?.let {
             while (mCurrentLrcIndex < it.size - 1) {
-                val lrcRow = it[mCurrentLrcIndex]
+                val lrcRow = it[mCurrentLrcIndex + 1]
+//                Log.d(TAG, "lrcRowTime = ${calculateTime(lrcRow.time)}, songTime = ${calculateTime(currentPosition.toLong())}")
                 if (lrcRow.time > currentPosition) {
                     return@let
                 } else {
@@ -367,7 +368,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 }
             }
         }
-        Log.d(TAG, "mCurrentLrcIndex = $mCurrentLrcIndex")
+//        Log.d(TAG, "mCurrentLrcIndex = ${mCurrentLrcIndex + 1}")
     }
 
     private fun obtainSongLrc() {

@@ -17,7 +17,6 @@ import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
@@ -189,8 +188,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                                 ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                         }
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARE -> {
-                        playResumeMusic()
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARING -> {
+
                     }
                     VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
                         mViewDataBinding?.apply {
@@ -221,7 +220,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                             playNextMusic()
                         }
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_RELEASE -> {
+                    VolumeViewModel.MEDIA_PLAYER_STATUS_END -> {
 
                     }
                 }

@@ -28,14 +28,15 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private const val PLAY_MODE_LOOP = 1
         private const val PLAY_MODE_SHUFFLE = 2
 
-        const val MEDIA_PLAYER_STATUS_INIT = 0
-        const val MEDIA_PLAYER_STATUS_PREPARE = 1
-        const val MEDIA_PLAYER_STATUS_START = 2
-        const val MEDIA_PLAYER_STATUS_PAUSE = 3
-        const val MEDIA_PLAYER_STATUS_STOP = 4
-        const val MEDIA_PLAYER_STATUS_COMPLETE = 5
-        const val MEDIA_PLAYER_STATUS_ERROR = 6
-        const val MEDIA_PLAYER_STATUS_RELEASE = 7
+        const val MEDIA_PLAYER_STATUS_INIT = 100
+        const val MEDIA_PLAYER_STATUS_PREPARING = 101
+        const val MEDIA_PLAYER_STATUS_PREPARED = 102
+        const val MEDIA_PLAYER_STATUS_START = 103
+        const val MEDIA_PLAYER_STATUS_PAUSE = 104
+        const val MEDIA_PLAYER_STATUS_STOP = 105
+        const val MEDIA_PLAYER_STATUS_COMPLETE = 106
+        const val MEDIA_PLAYER_STATUS_ERROR = 107
+        const val MEDIA_PLAYER_STATUS_END = 108
 
         private const val UPDATE_LRC_INTERNAL = 1000L
     }
@@ -100,7 +101,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
                     Log.d(TAG, "setOnPreparedListener: prepared")
-                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARE)
+                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARED)
                     mMusicDurationLiveData.postValue(mMediaPlayer?.duration ?: 0)
                 }
                 setOnCompletionListener {
@@ -335,7 +336,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
         mMediaPlayer?.prepareAsync()
         Log.d(TAG, "playMusic: prepareAsync")
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_INIT)
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARING)
 
         mMusicProgressLiveData.postValue(0)
         mMusicCacheProgressLiveData.postValue(0)
@@ -405,7 +406,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     override fun onDestroy() {
         super.onDestroy()
         mMediaPlayer?.release()
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_RELEASE)
+        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_END)
         mMediaPlayer = null
         stopTimerTask()
     }

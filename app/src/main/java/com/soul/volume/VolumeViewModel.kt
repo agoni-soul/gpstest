@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
-import java.lang.*
 
 
 /**
@@ -42,6 +41,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private var mAudioManager: AudioManager? = null
+
     // 媒体播放器
     private var mMediaPlayer: MediaPlayer? = null
     private var mTimerTask: TimerTask? = null
@@ -60,8 +60,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     var mCurrentLrcIndex: Int = 0
         private set
 
-    private val mMediaPlayerStatusLiveData: MutableLiveData<Int> by lazy {
-        MutableLiveData(MEDIA_PLAYER_STATUS_INIT)
+    private val mMediaPlayerStatusLiveData: MutableLiveData<MediaStatus> by lazy {
+        MutableLiveData(MediaStatus.MEDIA_PLAYER_STATUS_INIT)
     }
 
     private val mMusicDurationLiveData: MutableLiveData<Int> by lazy {
@@ -86,7 +86,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
     fun getMusicCacheProgress(): MutableLiveData<Int> = mMusicCacheProgressLiveData
 
-    fun getMediaPlayerStatus(): MutableLiveData<Int> = mMediaPlayerStatusLiveData
+    fun getMediaPlayerStatus(): MutableLiveData<MediaStatus> = mMediaPlayerStatusLiveData
 
     fun initMusic() {
         try {
@@ -101,13 +101,14 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             mMediaPlayer!!.apply {
                 setOnPreparedListener {
                     Log.d(TAG, "setOnPreparedListener: prepared")
-                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARED)
+                    obtainSongLrc()
+                    mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_PREPARED)
                     mMusicDurationLiveData.postValue(mMediaPlayer?.duration ?: 0)
                 }
                 setOnCompletionListener {
                     Log.d(TAG, "setOnCompletionListener: onCompletion")
                     mMusicProgressLiveData.postValue(duration)
-                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_COMPLETE)
+                    mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE)
                     stopTimerTask()
                 }
                 // 网络链接歌曲，缓存进度百分比
@@ -121,9 +122,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                             mediaErrorExtraToStr(extra)
                         }"
                     )
-                    mp?.stop()
                     Log.d(TAG, "setOnErrorListener: onError")
-                    mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_ERROR)
+                    mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_ERROR)
                     stopTimerTask()
                     mMusicProgressLiveData.postValue(0)
                     mMusicCacheProgressLiveData.postValue(0)
@@ -142,7 +142,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             SongInfo(
                 "以后别做朋友",
                 "周兴哲",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3",
+                "g",
                 "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vnxcdmd"
             )
         )
@@ -236,8 +236,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mTimerTask = object : TimerTask() {
             override fun run() {
                 MainScope().launch(Dispatchers.Main) {
-                    if (getMediaPlayerStatus().value == MEDIA_PLAYER_STATUS_START &&
-                        mMediaPlayer?.isPlaying == true) {
+                    if (getMediaPlayerStatus().value == MediaStatus.MEDIA_PLAYER_STATUS_START &&
+                        mMediaPlayer?.isPlaying == true
+                    ) {
                         val currentPosition = mMediaPlayer?.currentPosition ?: 0
                         mMusicProgressLiveData.postValue(currentPosition)
                         updateLrcLinePosition(currentPosition)
@@ -253,25 +254,45 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun isMusicPlaying(): Boolean {
-        return (mMediaPlayerStatusLiveData.value == MEDIA_PLAYER_STATUS_START ||
-                mMediaPlayerStatusLiveData.value == MEDIA_PLAYER_STATUS_PAUSE) &&
+        return (mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
+                mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE) &&
                 mMediaPlayer?.isPlaying ?: false
     }
 
     fun musicPause() {
-        mMediaPlayer?.pause()
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PAUSE)
+        val value = mMediaPlayerStatusLiveData.value
+        if (value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE) {
+            mMediaPlayer?.pause()
+            mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_PAUSE)
+        }
     }
 
     fun musicStart() {
-        mMediaPlayer?.start()
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_START)
+        val value = mMediaPlayerStatusLiveData.value
+        Log.d(TAG, "musicStart: mediaStatus = ${value?.name}")
+        if (value == MediaStatus.MEDIA_PLAYER_STATUS_PREPARED ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE) {
+            mMediaPlayer?.start()
+            mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_START)
+        }
     }
 
     fun musicSeekTo(progress: Int) {
-        mMediaPlayer?.seekTo(progress)
-        mMediaPlayer?.currentPosition?.let {
-            updateLrcLinePosition(it)
+        val value = mMediaPlayerStatusLiveData.value
+        if (value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_PREPARED ||
+            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE) {
+            mMediaPlayer?.seekTo(progress)
+            mMediaPlayer?.currentPosition?.let {
+                updateLrcLinePosition(it)
+            }
+        } else {
+            // 处理调节进度异常情况
         }
     }
 
@@ -328,19 +349,20 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         stopTimerTask()
         mMediaPlayer?.reset()
         Log.d(TAG, "playNewMusic: reset")
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_INIT)
+        mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_INIT)
         playMusic(index)
     }
 
     private fun playMusic(index: Int) {
-        mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
-        mMediaPlayer?.prepareAsync()
-        Log.d(TAG, "playMusic: prepareAsync")
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_PREPARING)
+        if (mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_INIT) {
+            mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
+            mMediaPlayer?.prepareAsync()
+            Log.d(TAG, "playMusic: prepareAsync")
+            mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_PREPARING)
 
-        mMusicProgressLiveData.postValue(0)
-        mMusicCacheProgressLiveData.postValue(0)
-        obtainSongLrc()
+            mMusicProgressLiveData.postValue(0)
+            mMusicCacheProgressLiveData.postValue(0)
+        }
     }
 
     fun calculateTime(time: Long): String {
@@ -406,23 +428,29 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     override fun onDestroy() {
         super.onDestroy()
         mMediaPlayer?.release()
-        mMediaPlayerStatusLiveData.postValue(MEDIA_PLAYER_STATUS_END)
+        mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_END)
         mMediaPlayer = null
         stopTimerTask()
     }
 
     fun setLeftChannel() {
         val volume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0F
-        mMediaPlayer?.setVolume(volume, 0F)
+        if (mMediaPlayerStatusLiveData.value != MediaStatus.MEDIA_PLAYER_STATUS_ERROR) {
+            mMediaPlayer?.setVolume(volume, 0F)
+        }
     }
 
     fun setRightChannel() {
         val volume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0F
-        mMediaPlayer?.setVolume(0f, volume)
+        if (mMediaPlayerStatusLiveData.value != MediaStatus.MEDIA_PLAYER_STATUS_ERROR) {
+            mMediaPlayer?.setVolume(0f, volume)
+        }
     }
 
     private fun setStereoChannel() {
         val volume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)?.toFloat() ?: 0F
-        mMediaPlayer?.setVolume(volume, volume)
+        if (mMediaPlayerStatusLiveData.value != MediaStatus.MEDIA_PLAYER_STATUS_ERROR) {
+            mMediaPlayer?.setVolume(volume, volume)
+        }
     }
 }

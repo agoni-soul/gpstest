@@ -91,11 +91,12 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                 playPreviousMusic()
             }
             ivSongPlay.setOnClickListener {
+                Log.d(TAG, "mediastatus = ${mViewModel?.getMediaPlayerStatus()?.value?.name}")
                 when (mViewModel?.getMediaPlayerStatus()?.value) {
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_START -> {
                         playPauseMusic()
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_PAUSE -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_PAUSE -> {
                         playResumeMusic()
                     }
                     else -> {
@@ -123,8 +124,8 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     val progress = seekBar?.progress ?: return
                     mViewModel?.apply {
                         val value = getMediaPlayerStatus().value
-                        if (value == VolumeViewModel.MEDIA_PLAYER_STATUS_START ||
-                            value == VolumeViewModel.MEDIA_PLAYER_STATUS_PAUSE) {
+                        if (value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
+                            value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE) {
                             musicSeekTo(progress)
                             mViewDataBinding?.tvLeavingTime?.text =
                                 calculateTime(progress.toLong())
@@ -182,33 +183,37 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             getMediaPlayerStatus().observe(this@VolumeActivity) {
                 Log.d(TAG, "media player status = $it")
                 when (it) {
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_INIT -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_INIT -> {
                         mViewDataBinding?.apply {
                             ivSongPlay.background =
                                 ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                         }
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_PREPARING -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_PREPARING -> {
 
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_START -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_PREPARED -> {
+                        musicStart()
+                        resetObtainSongInfo()
+                    }
+                    MediaStatus.MEDIA_PLAYER_STATUS_START -> {
                         mViewDataBinding?.apply {
                             ivSongPlay.background =
                                 ResourcesCompat.getDrawable(resources, R.drawable.ic_play, null)
                         }
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_PAUSE -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_PAUSE -> {
                         mViewDataBinding?.apply {
                             ivSongPlay.background =
                                 ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                         }
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_STOP,
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_ERROR -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_STOP,
+                    MediaStatus.MEDIA_PLAYER_STATUS_ERROR -> {
                         mViewDataBinding?.ivSongPlay?.background =
                             ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null)
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_COMPLETE -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE -> {
                         Toast.makeText(mContext, "播放完成", Toast.LENGTH_SHORT).show()
                         Log.d(TAG, "playMode = ${mViewModel?.mPlayMode}")
                         if (isLoopPlayMode()) {
@@ -220,7 +225,10 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                             playNextMusic()
                         }
                     }
-                    VolumeViewModel.MEDIA_PLAYER_STATUS_END -> {
+                    MediaStatus.MEDIA_PLAYER_STATUS_END -> {
+
+                    }
+                    else -> {
 
                     }
                 }
@@ -283,7 +291,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     private fun playMusic() {
         mViewModel?.playCurrentMusic()
-        resetObtainSongInfo()
     }
 
     private fun playResumeMusic() {
@@ -302,12 +309,10 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
     private fun playNextMusic() {
         mViewModel?.playNextMusic()
-        resetObtainSongInfo()
     }
 
     private fun playPreviousMusic() {
         mViewModel?.playPreviousMusic()
-        resetObtainSongInfo()
     }
 
     private fun resetObtainSongInfo() {

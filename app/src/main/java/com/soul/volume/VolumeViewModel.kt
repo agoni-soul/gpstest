@@ -142,7 +142,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             SongInfo(
                 "以后别做朋友",
                 "周兴哲",
-                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3g",
+                "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3",
                 "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vnxcdmd"
             )
         )

@@ -1,5 +1,7 @@
 package com.soul.volume
 
+import java.io.Serializable
+
 
 /**
  *     author : yangzy33
@@ -14,4 +16,15 @@ data class SongInfo(
     var songFileName: String? = null,
     val lrcUrl: String? = null,
     var lrcFileName: String? = null,
-)
+) : Cloneable, Serializable {
+
+    @Throws(CloneNotSupportedException::class)
+    override fun clone(): SongInfo {
+        return super.clone() as SongInfo
+    }
+
+    override fun toString(): String {
+        return "(songName: $songName, singer: $singer, songUrl: $songUrl, " +
+                "songFileName: $songFileName, lrcUrl: $lrcUrl, lrcFileName: $lrcFileName)"
+    }
+}

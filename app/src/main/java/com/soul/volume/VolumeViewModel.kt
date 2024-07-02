@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -36,17 +37,13 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private var mTimer: Timer? = null
     private val mMusicList = mutableListOf<SongInfo>()
     private val mRandomIndexList = mutableListOf<Int>()
-    var mPlayingMusicIndex = 0
-        private set
+    private var mPlayingMusicIndex = 0
 
     var mPlayMode = PLAY_MODE_SEQUENTIAL
         private set
 
-    var mLrcRows: MutableList<LrcRow>? = null
-        private set
-
-    var mCurrentLrcIndex: Int = 0
-        private set
+    private var mCurrentLrcIndex: Int = 0
+    fun getCurrentLrcIndex(): Int = mCurrentLrcIndex
 
     private val mMediaPlayerStatusLiveData: MutableLiveData<MediaStatus> by lazy {
         MutableLiveData(MediaStatus.MEDIA_PLAYER_STATUS_INIT)
@@ -64,6 +61,10 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         MutableLiveData(0)
     }
 
+    private val mLrcRowsLiveData: MutableLiveData<MutableList<LrcRow>?> by lazy {
+        MutableLiveData(null)
+    }
+
     init {
         mAudioManager = mApplication.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
@@ -75,6 +76,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     fun getMusicCacheProgress(): MutableLiveData<Int> = mMusicCacheProgressLiveData
 
     fun getMediaPlayerStatus(): MutableLiveData<MediaStatus> = mMediaPlayerStatusLiveData
+
+    fun getLrcRows(): MutableLiveData<MutableList<LrcRow>?> = mLrcRowsLiveData
 
     fun initMusic() {
         try {
@@ -338,6 +341,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mMediaPlayer?.reset()
         Log.d(TAG, "playNewMusic: reset")
         mMediaPlayerStatusLiveData.value = MediaStatus.MEDIA_PLAYER_STATUS_INIT
+        mLrcRowsLiveData.value = null
         playMusic(index)
     }
 
@@ -351,7 +355,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
             mMusicProgressLiveData.postValue(0)
             mMusicCacheProgressLiveData.postValue(0)
-            MainScope().launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 CacheFile.downloadSongInfo(mApplication, mMusicList[index])
             }
         }
@@ -372,7 +376,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private fun updateLrcLinePosition(currentPosition: Int) {
-        mLrcRows?.let {
+        mLrcRowsLiveData.value?.let {
             while (mCurrentLrcIndex < it.size - 1) {
                 val lrcRow = it[mCurrentLrcIndex + 1]
 //                Log.d(TAG, "lrcRowTime = ${calculateTime(lrcRow.time)}, songTime = ${calculateTime(currentPosition.toLong())}")
@@ -387,9 +391,11 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private fun obtainSongLrc() {
-        val currentSongInfo = getSongInfo()
-        mCurrentLrcIndex = 0
-        handleSongLrcFile(currentSongInfo)
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentSongInfo = getSongInfo()
+            mCurrentLrcIndex = 0
+            handleSongLrcFile(currentSongInfo)
+        }
     }
 
     private fun handleSongLrcFile(songInfo: SongInfo?) {
@@ -404,7 +410,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 cacheFile?.let {
                     val songLrc = String(it)
                     val builder = DefaultLrcBuilder()
-                    mLrcRows = builder.getLrcRows(songLrc)
+                    mLrcRowsLiveData.postValue(builder.getLrcRows(songLrc))
                 }
             }
         } catch (e: Exception) {

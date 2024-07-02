@@ -24,42 +24,42 @@ object CacheFile {
 
     fun downloadSongInfo(context: Context?, songInfo: SongInfo?) {
         if (context == null || songInfo == null) return
+        val fileName = "${songInfo.singer}-${songInfo.songName}"
         if (!songInfo.lrcUrl.isNullOrBlank()) {
-            val fileName = "songLrcCache"
-            downloadFile(context, songInfo.lrcUrl, songInfo.lrcFileName, fileName) { isLocalExist, fileBytes ->
-                if (isLocalExist || fileBytes == null) return@downloadFile
-                try {
-                    val songLrcDir = File(context.externalCacheDir, fileName)
-                    songInfo.lrcFileName = "${songInfo.singer}-${songInfo.songName}.lrc"
-                    val file = File(songLrcDir, songInfo.lrcFileName!!)
-                    val fos = FileOutputStream(file)
-                    fos.write(fileBytes)
-                    fos.close()
-                } catch (e: IOException) {
-                    songInfo.lrcFileName = null
-                    e.printStackTrace()
-                    Log.e(TAG, "lrcUrl: e.msg = ${e.message}")
-                }
+            val isSuccess = writeFile(context, songInfo.lrcUrl, "songLrcCache", fileName, "lrc")
+            if (isSuccess) {
+                songInfo.lrcFileName = "$fileName.lrc"
             }
         }
         if (songInfo.songUrl.isNotBlank()) {
-            val fileName = "SongCache"
-            downloadFile(context, songInfo.songUrl, songInfo.songFileName, fileName) {isLocalExist, fileBytes ->
+            val isSuccess = writeFile(context, songInfo.lrcUrl, "songCache", fileName, "mp3")
+            if (isSuccess) {
+                songInfo.songFileName = "$fileName.mp3"
+            }
+        }
+        Log.d(TAG, songInfo.toString())
+    }
+
+    private fun writeFile(context: Context?, url: String?, folderName: String, lrcFileName: String, suffixName: String): Boolean {
+        context ?: return false
+        var isSuccessDownload = false
+        if (!url.isNullOrBlank()) {
+            downloadFile(context, url, lrcFileName, folderName) { isLocalExist, fileBytes ->
                 if (isLocalExist || fileBytes == null) return@downloadFile
                 try {
-                    val songDir = File(context.externalCacheDir, fileName)
-                    songInfo.songFileName = "${songInfo.singer}-${songInfo.songName}.mp3"
-                    val file = File(songDir, songInfo.songFileName!!)
+                    val songLrcDir = File(context.externalCacheDir, folderName)
+                    val file = File(songLrcDir, "$lrcFileName.$suffixName")
                     val fos = FileOutputStream(file)
                     fos.write(fileBytes)
                     fos.close()
+                    isSuccessDownload = true
                 } catch (e: IOException) {
-                    songInfo.songFileName = null
                     e.printStackTrace()
-                    Log.e(TAG, "songUrl: e.msg = ${e.message}")
+                    Log.e(TAG, "writeFile: e.msg = ${e.message}")
                 }
             }
         }
+        return isSuccessDownload
     }
 
     fun downloadFile(context: Context, url: String?, urlFileName: String?, cacheFolder:String, dataCallback: (Boolean, ByteArray?) -> Unit){

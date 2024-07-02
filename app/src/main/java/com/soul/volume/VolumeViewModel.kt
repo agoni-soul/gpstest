@@ -10,6 +10,7 @@ import com.soul.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
@@ -26,16 +27,6 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         private const val PLAY_MODE_SEQUENTIAL = 0
         private const val PLAY_MODE_LOOP = 1
         private const val PLAY_MODE_SHUFFLE = 2
-
-        const val MEDIA_PLAYER_STATUS_INIT = 100
-        const val MEDIA_PLAYER_STATUS_PREPARING = 101
-        const val MEDIA_PLAYER_STATUS_PREPARED = 102
-        const val MEDIA_PLAYER_STATUS_START = 103
-        const val MEDIA_PLAYER_STATUS_PAUSE = 104
-        const val MEDIA_PLAYER_STATUS_STOP = 105
-        const val MEDIA_PLAYER_STATUS_COMPLETE = 106
-        const val MEDIA_PLAYER_STATUS_ERROR = 107
-        const val MEDIA_PLAYER_STATUS_END = 108
 
         private const val UPDATE_LRC_INTERNAL = 1000L
     }
@@ -236,9 +227,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mTimerTask = object : TimerTask() {
             override fun run() {
                 MainScope().launch(Dispatchers.Main) {
-                    if (getMediaPlayerStatus().value == MediaStatus.MEDIA_PLAYER_STATUS_START &&
-                        mMediaPlayer?.isPlaying == true
-                    ) {
+                    if (mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_START) {
                         val currentPosition = mMediaPlayer?.currentPosition ?: 0
                         mMusicProgressLiveData.postValue(currentPosition)
                         updateLrcLinePosition(currentPosition)
@@ -254,8 +243,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun isMusicPlaying(): Boolean {
-        return (mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
-                mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE) &&
+        return mMediaPlayerStatusLiveData.value != MediaStatus.MEDIA_PLAYER_STATUS_ERROR &&
                 mMediaPlayer?.isPlaying ?: false
     }
 
@@ -349,11 +337,12 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         stopTimerTask()
         mMediaPlayer?.reset()
         Log.d(TAG, "playNewMusic: reset")
-        mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_INIT)
+        mMediaPlayerStatusLiveData.value = MediaStatus.MEDIA_PLAYER_STATUS_INIT
         playMusic(index)
     }
 
     private fun playMusic(index: Int) {
+        Log.d(TAG, "playMusic: mediaStatus = ${mMediaPlayerStatusLiveData.value}")
         if (mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_INIT) {
             mMediaPlayer?.setDataSource(mMusicList[index].songUrl)
             mMediaPlayer?.prepareAsync()
@@ -362,6 +351,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
 
             mMusicProgressLiveData.postValue(0)
             mMusicCacheProgressLiveData.postValue(0)
+            MainScope().launch(Dispatchers.IO) {
+                CacheLrcFile.downloadFile(mApplication, mMusicList[index])
+            }
         }
     }
 

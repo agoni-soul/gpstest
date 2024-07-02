@@ -193,7 +193,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
 
                     }
                     MediaStatus.MEDIA_PLAYER_STATUS_PREPARED -> {
-                        musicStart()
+                        playResumeMusic()
                         resetObtainSongInfo()
                     }
                     MediaStatus.MEDIA_PLAYER_STATUS_START -> {

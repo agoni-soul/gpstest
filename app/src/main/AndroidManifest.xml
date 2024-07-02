@@ -126,7 +126,7 @@
             android:exported="true" />
 
         <activity
-            android:name="com.soul.volume.VolumeActivity"
+            android:name="com.soul.volume.ui.VolumeActivity"
             android:exported="true" />
 
         <activity
@@ -142,7 +142,7 @@
         </receiver>
 
         <receiver
-            android:name="com.soul.volume.VolumeBroadReceiver"
+            android:name="com.soul.volume.receiver.VolumeBroadReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />

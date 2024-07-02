@@ -49,7 +49,7 @@ import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
 import com.soul.util.PermissionUtils
-import com.soul.volume.VolumeActivity
+import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
 import java.io.BufferedReader

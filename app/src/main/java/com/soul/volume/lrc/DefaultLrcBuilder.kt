@@ -1,11 +1,10 @@
-package com.soul.volume
+package com.soul.volume.lrc
 
 import android.util.Log
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.StringReader
 import java.lang.*
-import java.util.Collections
 
 
 /**

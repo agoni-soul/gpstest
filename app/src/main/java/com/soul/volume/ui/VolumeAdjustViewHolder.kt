@@ -1,4 +1,4 @@
-package com.soul.volume
+package com.soul.volume.ui
 
 import android.view.View
 import android.widget.ImageView

@@ -11,5 +11,7 @@ data class SongInfo(
     val songName: String,
     val singer: String?,
     val songUrl: String,
-    val lrcUrl: String? = null
+    var songFileName: String? = null,
+    val lrcUrl: String? = null,
+    var lrcFileName: String? = null,
 )

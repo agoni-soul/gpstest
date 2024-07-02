@@ -10,9 +10,6 @@ import com.soul.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.util.*
 
 
@@ -134,7 +131,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "以后别做朋友",
                 "周兴哲",
                 "http://www.eev3.com/plug/down.php?ac=music&id=vnxcdmd&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vnxcdmd"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vnxcdmd"
             )
         )
         mMusicList.add(
@@ -142,7 +139,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "骗子",
                 "文夫",
                 "http://www.eev3.com/plug/down.php?ac=music&id=mwckvdhdk&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=mwckvdhdk"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=mwckvdhdk"
             )
         )
         mMusicList.add(
@@ -150,7 +147,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "请先说你好",
                 "贺一航",
                 "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmk&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vmhnccmk"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vmhnccmk"
             )
         )
         mMusicList.add(
@@ -158,7 +155,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "嘉宾",
                 "张远",
                 "http://www.eev3.com/plug/down.php?ac=music&id=wvxkdxvxm&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=wvxkdxvxm"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=wvxkdxvxm"
             )
         )
         mMusicList.add(
@@ -166,7 +163,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "年少有为",
                 "李荣浩",
                 "http://www.eev3.com/plug/down.php?ac=music&id=vvnmxvxx&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vvnmxvxx"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vvnmxvxx"
             )
         )
         mMusicList.add(
@@ -174,7 +171,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "秘密海域",
                 "深海鱼子酱",
                 "http://www.eev3.com/plug/down.php?ac=music&id=whnmxhsww&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=whnmxhsww"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=whnmxhsww"
             )
         )
         mMusicList.add(
@@ -182,7 +179,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "再见，再也不见",
                 "欢子",
                 "http://www.eev3.com/plug/down.php?ac=music&id=mmhwvxsn&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=mmhwvxsn"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=mmhwvxsn"
             )
         )
         mMusicList.add(
@@ -190,7 +187,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 "可不可以",
                 "张紫豪",
                 "http://www.eev3.com/plug/down.php?ac=music&id=vmhnccmc&k=320kmp3",
-                "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vmhnccmc"
+                lrcUrl = "http://www.eev3.com/plug/down.php?ac=music&lk=lrc&id=vmhnccmc"
             )
         )
         for (i in 0 until mMusicList.size) {
@@ -251,7 +248,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         val value = mMediaPlayerStatusLiveData.value
         if (value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
             value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE ||
-            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE) {
+            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE
+        ) {
             mMediaPlayer?.pause()
             mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_PAUSE)
         }
@@ -263,7 +261,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         if (value == MediaStatus.MEDIA_PLAYER_STATUS_PREPARED ||
             value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
             value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE ||
-            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE) {
+            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE
+        ) {
             mMediaPlayer?.start()
             mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_START)
         }
@@ -274,7 +273,8 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         if (value == MediaStatus.MEDIA_PLAYER_STATUS_START ||
             value == MediaStatus.MEDIA_PLAYER_STATUS_PAUSE ||
             value == MediaStatus.MEDIA_PLAYER_STATUS_PREPARED ||
-            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE) {
+            value == MediaStatus.MEDIA_PLAYER_STATUS_COMPLETE
+        ) {
             mMediaPlayer?.seekTo(progress)
             mMediaPlayer?.currentPosition?.let {
                 updateLrcLinePosition(it)
@@ -352,7 +352,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
             mMusicProgressLiveData.postValue(0)
             mMusicCacheProgressLiveData.postValue(0)
             MainScope().launch(Dispatchers.IO) {
-                CacheLrcFile.downloadFile(mApplication, mMusicList[index])
+                CacheFile.downloadSongInfo(mApplication, mMusicList[index])
             }
         }
     }
@@ -389,32 +389,27 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private fun obtainSongLrc() {
         val currentSongInfo = getSongInfo()
         mCurrentLrcIndex = 0
-        if (currentSongInfo.songName != "以后别做朋友") {
-            mLrcRows = null
-            return
-        }
-        // TODO 后续优化歌曲歌词相关逻辑
-        val songLrc = getFromAssets("周兴哲-以后别做朋友.lrc")
-        val builder = DefaultLrcBuilder()
-        mLrcRows = builder.getLrcRows(songLrc)
+        handleSongLrcFile(currentSongInfo)
     }
 
-    private fun getFromAssets(fileName: String): String {
+    private fun handleSongLrcFile(songInfo: SongInfo?) {
+        songInfo ?: return
         try {
-            val inputReader = InputStreamReader(mApplication.resources.assets.open(fileName))
-            val bufReader = BufferedReader(inputReader)
-            val result = StringBuilder()
-            do {
-                val line: String? = bufReader.readLine()
-                if (!line?.trim().isNullOrEmpty()) {
-                    result.append(line + "\r\n")
+            CacheFile.downloadFile(
+                mApplication,
+                songInfo.lrcUrl,
+                songInfo.lrcFileName,
+                "songLrcCache"
+            ) { _, cacheFile ->
+                cacheFile?.let {
+                    val songLrc = String(it)
+                    val builder = DefaultLrcBuilder()
+                    mLrcRows = builder.getLrcRows(songLrc)
                 }
-            } while (line != null)
-            return result.toString()
+            }
         } catch (e: Exception) {
             Log.e(TAG, "${e.message}")
         }
-        return ""
     }
 
     override fun onDestroy() {

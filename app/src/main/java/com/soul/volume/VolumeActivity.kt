@@ -18,11 +18,14 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
 import com.soul.util.DpToPxTransfer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.lang.*
 
 
@@ -194,7 +197,6 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                     }
                     MediaStatus.MEDIA_PLAYER_STATUS_PREPARED -> {
                         playResumeMusic()
-                        resetObtainSongInfo()
                     }
                     MediaStatus.MEDIA_PLAYER_STATUS_START -> {
                         mViewDataBinding?.apply {
@@ -249,8 +251,9 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             getMusicProgress().observe(this@VolumeActivity) {
                 var currentSongLrc = ""
                 mViewModel?.apply {
-                    if (!mLrcRows.isNullOrEmpty()) {
-                        currentSongLrc = mLrcRows?.get(mCurrentLrcIndex)?.content ?: ""
+                    val lrcRows = getLrcRows().value
+                    if (!lrcRows.isNullOrEmpty()) {
+                        currentSongLrc = lrcRows[getCurrentLrcIndex()].content ?: ""
                     }
                 }
                 mViewDataBinding?.apply {
@@ -273,10 +276,10 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                         spanStr.setSpan(sizeSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         tvSongLrc.text = spanStr
 
-                        if (mLastLrcIndex >= 2 && mLastLrcIndex != mCurrentLrcIndex) {
-                            nsvSongLrc.smoothScrollTo(0, tvSongLrc.lineHeight * (mCurrentLrcIndex - 2))
+                        if (mLastLrcIndex >= 2 && mLastLrcIndex != getCurrentLrcIndex()) {
+                            nsvSongLrc.smoothScrollTo(0, tvSongLrc.lineHeight * (getCurrentLrcIndex() - 2))
                         }
-                        mLastLrcIndex = mCurrentLrcIndex
+                        mLastLrcIndex = getCurrentLrcIndex()
                     }
                 }
             }
@@ -284,6 +287,12 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
             getMusicCacheProgress().observe(this@VolumeActivity) {
                 mViewDataBinding?.apply {
                     sbMusicProgress.secondaryProgress = it
+                }
+            }
+
+            getLrcRows().observe(this@VolumeActivity) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    resetObtainSongInfo(it)
                 }
             }
         }
@@ -315,16 +324,15 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
         mViewModel?.playPreviousMusic()
     }
 
-    private fun resetObtainSongInfo() {
+    private fun resetObtainSongInfo(lrcRows: MutableList<LrcRow>?) {
         mViewDataBinding?.apply {
             val songName = mViewModel?.getSongInfo()?.let {
                 "《${it.songName}》-${it.singer}"
             } ?: "播放音乐"
             tvSongName.text = songName
-            val rows = mViewModel?.mLrcRows
             val sb = StringBuilder()
-            if (!rows.isNullOrEmpty()) {
-                rows.forEach {row ->
+            if (!lrcRows.isNullOrEmpty()) {
+                lrcRows.forEach { row ->
                     row.content?.let {
                         sb.append("$it\n")
                     }

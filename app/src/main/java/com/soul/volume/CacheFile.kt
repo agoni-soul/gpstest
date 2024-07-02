@@ -65,7 +65,6 @@ object CacheFile {
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Toast.makeText(context, "没有写权限", Toast.LENGTH_SHORT).show()
         }
-        var isFileExist = false
         val fileDir = File(context.externalCacheDir, cacheFolder)
         Log.d(TAG, "fileDir isExist() = ${fileDir.exists()}")
         if (!fileDir.exists()) {

@@ -19,7 +19,7 @@ import com.blankj.utilcode.util.Utils
  */
 object PermissionUtils {
 
-    private val TAG = "PermissionUtils"
+    private val TAG = javaClass.simpleName
 
     var permissionDenyList = arrayListOf<String>()
 

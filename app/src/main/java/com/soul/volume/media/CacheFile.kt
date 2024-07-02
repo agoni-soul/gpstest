@@ -1,10 +1,11 @@
-package com.soul.volume
+package com.soul.volume.media
 
 import android.Manifest
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.soul.util.PermissionUtils
+import com.soul.volume.bean.SongInfo
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File

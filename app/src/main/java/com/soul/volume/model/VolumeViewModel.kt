@@ -1,4 +1,4 @@
-package com.soul.volume
+package com.soul.volume.model
 
 import android.app.Application
 import android.content.Context
@@ -8,6 +8,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseViewModel
+import com.soul.volume.media.CacheFile
+import com.soul.volume.lrc.DefaultLrcBuilder
+import com.soul.volume.media.PlayMode
+import com.soul.volume.bean.SongInfo
+import com.soul.volume.lrc.LrcRow
+import com.soul.volume.media.MediaStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -22,10 +28,6 @@ import java.util.*
  */
 class VolumeViewModel(application: Application) : BaseViewModel(application) {
     companion object {
-        private const val PLAY_MODE_SEQUENTIAL = 0
-        private const val PLAY_MODE_LOOP = 1
-        private const val PLAY_MODE_SHUFFLE = 2
-
         private const val UPDATE_LRC_INTERNAL = 1000L
     }
 
@@ -39,7 +41,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     private val mRandomIndexList = mutableListOf<Int>()
     private var mPlayingMusicIndex = 0
 
-    var mPlayMode = PLAY_MODE_SEQUENTIAL
+    var mPlayMode = PlayMode.PLAY_MODE_SEQUENTIAL
         private set
 
     private var mCurrentLrcIndex: Int = 0
@@ -304,28 +306,28 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     fun playModeShuffle() {
         mRandomIndexList.shuffle()
         mMediaPlayer?.isLooping = false
-        mPlayMode = PLAY_MODE_SHUFFLE
+        mPlayMode = PlayMode.PLAY_MODE_SHUFFLE
     }
 
-    fun isShufflePlayMode(): Boolean = mPlayMode == PLAY_MODE_SHUFFLE
+    fun isShufflePlayMode(): Boolean = mPlayMode == PlayMode.PLAY_MODE_SHUFFLE
 
     fun playModeLoop() {
         playModeSequential()
         mMediaPlayer?.isLooping = true
-        mPlayMode = PLAY_MODE_LOOP
+        mPlayMode = PlayMode.PLAY_MODE_LOOP
     }
 
-    fun isLoopPlayMode(): Boolean = mPlayMode == PLAY_MODE_LOOP
+    fun isLoopPlayMode(): Boolean = mPlayMode == PlayMode.PLAY_MODE_LOOP
 
     fun playModeSequential() {
         for (i in 0 until mMusicList.size) {
             mRandomIndexList[i] = i
         }
         mMediaPlayer?.isLooping = false
-        mPlayMode = PLAY_MODE_SEQUENTIAL
+        mPlayMode = PlayMode.PLAY_MODE_SEQUENTIAL
     }
 
-    fun isSequentialPlayMode(): Boolean = mPlayMode == PLAY_MODE_SEQUENTIAL
+    fun isSequentialPlayMode(): Boolean = mPlayMode == PlayMode.PLAY_MODE_SEQUENTIAL
 
     private fun playOtherMusic(index: Int) {
         var indexTemp = index % mMusicList.size

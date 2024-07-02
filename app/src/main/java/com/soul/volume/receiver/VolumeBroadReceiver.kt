@@ -1,4 +1,4 @@
-package com.soul.volume
+package com.soul.volume.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,7 +12,7 @@ class VolumeBroadReceiver: BroadcastReceiver() {
 
     private var mCallback: VolumeCallback? = null
 
-    fun setCallback(callback:VolumeCallback?) {
+    fun setCallback(callback: VolumeCallback?) {
         mCallback = callback
     }
 

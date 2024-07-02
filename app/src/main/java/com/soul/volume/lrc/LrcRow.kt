@@ -1,6 +1,5 @@
-package com.soul.volume
+package com.soul.volume.lrc
 
-import android.util.Log
 import kotlin.math.pow
 
 

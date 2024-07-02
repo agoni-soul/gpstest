@@ -1,4 +1,4 @@
-package com.soul.volume
+package com.soul.volume.bean
 
 import java.io.Serializable
 

@@ -1,4 +1,4 @@
-package com.soul.volume
+package com.soul.volume.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.gpstest.R

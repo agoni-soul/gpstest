@@ -1,4 +1,6 @@
-package com.soul.volume
+package com.soul.volume.lrc
+
+import com.soul.volume.lrc.LrcRow
 
 
 /**

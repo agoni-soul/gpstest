@@ -7,6 +7,9 @@ package com.soul.volume.media
  *     desc   :
  *     version: 1.0
  */
+object PlayModeUtil {
+}
+
 enum class PlayMode {
     /**
      * 顺序播放

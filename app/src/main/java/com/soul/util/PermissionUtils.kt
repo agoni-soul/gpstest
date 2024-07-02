@@ -2,9 +2,9 @@ package com.soul.util
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.blankj.utilcode.util.Utils
 
@@ -19,26 +19,19 @@ import com.blankj.utilcode.util.Utils
  */
 object PermissionUtils {
 
-    var permissionDenyList = arrayListOf<String>()
+    private val TAG = "PermissionUtils"
 
-    fun checkPermissions(): Boolean {
-        if (ActivityCompat.checkSelfPermission(Utils.getApp(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return false
-        }
-        return true
-    }
+    var permissionDenyList = arrayListOf<String>()
 
     /**
      * 检查权限是否开启
      *
      * @param permission 权限名
      */
-    fun checkPermission(permission: String): Boolean {
+    fun checkSinglePermission(permission: String): Boolean {
         permissionDenyList.clear()
         val isGrant = ActivityCompat.checkSelfPermission(Utils.getApp(), permission) == PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "checkSinglePermission: ${permission}: isGrant = $isGrant")
         if (!isGrant) {
             permissionDenyList.add(permission)
         }
@@ -50,7 +43,7 @@ object PermissionUtils {
      *
      * @param permissions 权限名
      */
-    fun checkPermission(vararg permissions: String): Boolean {
+    fun checkMultiPermission(vararg permissions: String): Boolean {
         permissionDenyList.clear()
         var areGrantAllPermissions = true
         for (permission in permissions) {
@@ -70,5 +63,5 @@ object PermissionUtils {
         activity.startActivity(intent)
     }
 
-    fun checkGPSPermission(): Boolean = checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    fun checkGPSPermission(): Boolean = checkMultiPermission(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
 }

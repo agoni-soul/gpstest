@@ -18,7 +18,7 @@ import org.json.JSONObject
  */
 object DOFLogUtil {
 
-    private val TAG = "DOFLog"
+    private val TAG = javaClass.simpleName
 
     fun init() {
         init(true)

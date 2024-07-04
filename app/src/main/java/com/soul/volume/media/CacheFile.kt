@@ -107,4 +107,59 @@ object CacheFile {
             Log.e(TAG, "ems = ${e.message}")
         }
     }
+
+    fun clearCacheFile(context: Context?) {
+        try {
+            val dir = context?.externalCacheDir
+            val isSuccess = deleteDirectory(dir)
+            Log.d(TAG, "clearCacheFile: dir.name = ${dir?.name}, isSuccess = $isSuccess")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(TAG, "e.msg = ${e.message}")
+        }
+    }
+
+    private fun deleteDirectory(dir: File?): Boolean {
+        if (dir?.isDirectory == true) {
+            val children = dir.list() ?: return true
+            for (i in children.indices) {
+                Log.d(TAG, "deleteDirectory: fileName = ${children[i]}")
+                val isSuccess = deleteDirectory(File(dir, children[i]))
+                Log.d(TAG, "deleteDirectory: fileName = ${children[i]}, isSuccess = $isSuccess")
+                if (!isSuccess) {
+                    return false
+                }
+            }
+        }
+        Log.d(TAG, "deleteDirectory: fileName = ${dir?.name}")
+        return dir?.delete() ?: false
+    }
+
+    fun calculateCacheSize(context: Context?) {
+        try {
+            val dir = context?.externalCacheDir
+            val isSuccess = deleteDirectory(dir)
+            Log.d(TAG, "clearCacheFile: dir.name = ${dir?.name}, isSuccess = $isSuccess")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(TAG, "e.msg = ${e.message}")
+        }
+    }
+
+    private fun getFolderSize(folder: File?): Long {
+        folder ?: 0L
+        var size = 0L
+        val files = folder!!.listFiles()
+        files?.let {
+            val count = files.size
+            for (i in 0 until count) {
+                if (files[i].isFile) {
+                    size += files[i].length()
+                } else if (files[i].isDirectory) {
+                    size += getFolderSize(files[i])
+                }
+            }
+        }
+        return size
+    }
 }

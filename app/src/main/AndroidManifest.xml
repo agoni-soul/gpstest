@@ -142,10 +142,18 @@
         </receiver>
 
         <receiver
-            android:name="com.soul.volume.receiver.VolumeBroadReceiver"
+            android:name="com.soul.receiver.VolumeBroadReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.soul.receiver.DownloadReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
     </application>

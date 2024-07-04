@@ -24,7 +24,7 @@ import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
 import com.soul.util.DpToPxTransfer
-import com.soul.volume.receiver.VolumeBroadReceiver
+import com.soul.receiver.VolumeBroadReceiver
 import com.soul.volume.model.VolumeViewModel
 import com.soul.volume.lrc.LrcRow
 import com.soul.volume.media.MediaStatus

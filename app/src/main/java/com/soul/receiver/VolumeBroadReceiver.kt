@@ -1,4 +1,4 @@
-package com.soul.volume.receiver
+package com.soul.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context

@@ -108,7 +108,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
                 setOnBufferingUpdateListener { mp, percent ->
                     mMusicCacheProgressLiveData.postValue((mp.duration * 1L * percent / 100).toInt())
                 }
-                setOnErrorListener { mp, what, extra ->
+                setOnErrorListener { _, what, extra ->
                     Log.e(
                         TAG,
                         "MediaPlayer onError: what = ${mediaErrorWhatToStr(what)}, extra = ${
@@ -447,5 +447,9 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         if (mMediaPlayerStatusLiveData.value != MediaStatus.MEDIA_PLAYER_STATUS_ERROR) {
             mMediaPlayer?.setVolume(volume, volume)
         }
+    }
+
+    fun clearMediaCache() {
+        CacheFile.clearCacheFile(mApplication)
     }
 }

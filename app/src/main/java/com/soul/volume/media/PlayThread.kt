@@ -1,4 +1,4 @@
-package com.soul.volume
+package com.soul.volume.media
 
 import android.app.Activity
 import android.media.AudioFormat

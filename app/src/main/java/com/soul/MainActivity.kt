@@ -48,6 +48,7 @@ import com.soul.selector.SelectorActivity
 import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
+import com.soul.util.DpToPxTransfer
 import com.soul.util.PermissionUtils
 import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
@@ -105,6 +106,15 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding?.btnActivitySlide?.setOnClickListener {
             val intent = Intent(mContext, EasySwipeMenuActivity::class.java)
             startActivity(intent)
+        }
+        mViewDataBinding?.cpv?.apply {
+            setProgress(20f)
+            setCircleBgColor(Color.RED)
+            setProgressColor(Color.BLACK)
+            setCenterText("哈哈哈哈")
+            setCenterTextColor(Color.GREEN)
+            setCenterTextSize(DpToPxTransfer.sp2px(mContext, 18).toFloat())
+            invalidate()
         }
 
         Log.d("haha", Build.VERSION.SDK_INT.toString())

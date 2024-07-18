@@ -8,9 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.gpstest.R
+import com.soul.util.PermissionUtils
 
 
 /**
@@ -33,22 +35,12 @@ class BleAdapter(bleDevices: MutableList<BluetoothDevice>): RecyclerView.Adapter
     override fun getItemCount(): Int = mBleDevices.size
 
     override fun onBindViewHolder(holder: BleAdapter.BleViewHolder, position: Int) {
-        if (ActivityCompat.checkSelfPermission(
-                mContext,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
+        if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            holder.itemTvBleName.text = mBleDevices[position].name
+            holder.itemTvBleMac.text = mBleDevices[position].address
+        } else {
+            Toast.makeText(mContext, "BLUETOOTH_CONNECT 没有授权", Toast.LENGTH_SHORT).show()
         }
-        holder.itemTvBleName.text = mBleDevices[position].name
-        holder.itemTvBleMac.text = mBleDevices[position].address
     }
 
     inner class BleViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

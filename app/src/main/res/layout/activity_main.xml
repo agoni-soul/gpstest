@@ -199,6 +199,20 @@
                     android:text="左滑删除测试"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_volume" />
 
+                <com.soul.CircleProgressView
+                    android:id="@+id/cpv"
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
+                    app:business_home_arcWidth="4dp"
+                    app:business_home_circleRadius="10dp"
+                    app:business_home_arcProgressColor="@color/yellow"
+                    app:business_home_arcCircleBgColor="@color/red"
+                    app:business_home_centerTextColor="@color/cyan"
+                    app:business_home_centerTextSize="24sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_slide"/>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>

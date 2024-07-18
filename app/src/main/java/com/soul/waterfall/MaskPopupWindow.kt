@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
 import com.soul.gpstest.R
-import com.soul.util.DpToPxTransfer
 
 
 /**

@@ -4,9 +4,8 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.content.ContextCompat
 import com.soul.gpstest.R
-import com.soul.util.DpToPxTransfer
+import com.soul.util.DpOrSpToPxTransfer
 
 
 /**
@@ -40,8 +39,8 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
     init {
         val typedArray =
             mContext.obtainStyledAttributes(attrs, R.styleable.business_home_CirclePercentBar, defStyleAttr, 0)
-        mArcWidth = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_arcWidth, DpToPxTransfer.dp2px(context, 4)).toFloat()
-        mCircleRadius = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_circleRadius, DpToPxTransfer.dp2px(context, 4))
+        mArcWidth = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_arcWidth, DpOrSpToPxTransfer.dp2px(context, 4)).toFloat()
+        mCircleRadius = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_circleRadius, DpOrSpToPxTransfer.dp2px(context, 4))
         mProgressColor = typedArray.getColor(
             R.styleable.business_home_CirclePercentBar_business_home_arcProgressColor,
             Color.BLUE
@@ -53,7 +52,7 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
 
         mCenterTextColor =
             typedArray.getColor(R.styleable.business_home_CirclePercentBar_business_home_centerTextColor, 0x0000ff)
-        mCenterTextSize = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_centerTextSize, DpToPxTransfer.sp2px(context, 24)).toFloat()
+        mCenterTextSize = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_centerTextSize, DpOrSpToPxTransfer.sp2px(context, 24)).toFloat()
         typedArray.recycle()
 
         progressPaint = Paint()

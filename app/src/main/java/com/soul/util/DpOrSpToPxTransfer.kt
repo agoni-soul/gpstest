@@ -10,7 +10,7 @@ import android.util.TypedValue
  *     desc   :
  *     version: 1.0
  */
-object DpToPxTransfer {
+object DpOrSpToPxTransfer {
 
     /**
      * 将dp转换成对用的px

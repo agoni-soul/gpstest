@@ -3,6 +3,7 @@ package com.soul
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import com.soul.gpstest.R
 import com.soul.util.DpOrSpToPxTransfer
@@ -15,6 +16,7 @@ import com.soul.util.DpOrSpToPxTransfer
  *     version: 1.0
  */
 class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: Int): View(context, attrs, defStyleAttr) {
+    private val TAG = this.javaClass.simpleName
     private val mContext = context
     private var progressPaint: Paint
     private var backgroundPaint: Paint
@@ -141,18 +143,25 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
         // 绘制进度圆环
         canvas.drawArc(rectF, -90f, progress, false, progressPaint)
 
-//        textBoundRect.set(
-//            (width / 2 - mCircleRadius + mArcWidth).toInt(),
-//            (height / 2 - mCircleRadius + mArcWidth).toInt(),
-//            (width / 2 + mCircleRadius - mArcWidth).toInt(),
-//            (height / 2 + mCircleRadius - mArcWidth).toInt()
-//        )
-        val data = mCenterText ?: "$progress%"
-        centerTextPaint.getTextBounds(data, 0, data.length, textBoundRect)
+        textBoundRect.set(
+            (mCircleRadius + mArcWidth).toInt(),
+            (mCircleRadius + mArcWidth).toInt(),
+            (mCircleRadius - mArcWidth).toInt(),
+            (mCircleRadius - mArcWidth).toInt()
+        )
+        val data = mCenterText ?: "${progress.toInt()}%"
+        var i = data.length + 1
+        var text: String
+        do {
+            i --
+            text = if (i == data.length) data else "${data.substring(0, i)}..."
+            val measureWidth = centerTextPaint.measureText(text)
+        } while (measureWidth > (mCircleRadius * 2) && i >= 0)
+        centerTextPaint.getTextBounds(text, 0, text.length, textBoundRect)
         canvas.drawText(
-            data,
-            width / 2f - textBoundRect.width() / 2f,
-            height / 2f + textBoundRect.height() / 2f,
+            text,
+            (width / 2f - textBoundRect.width() / 2f).coerceAtLeast(width/2f - mCircleRadius + mArcWidth),
+            (height / 2f + textBoundRect.height() / 2f),
             centerTextPaint
         )
     }

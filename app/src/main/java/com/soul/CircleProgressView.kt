@@ -38,21 +38,21 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
 
     init {
         val typedArray =
-            mContext.obtainStyledAttributes(attrs, R.styleable.business_home_CirclePercentBar, defStyleAttr, 0)
-        mArcWidth = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_arcWidth, DpOrSpToPxTransfer.dp2px(context, 4)).toFloat()
-        mCircleRadius = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_circleRadius, DpOrSpToPxTransfer.dp2px(context, 4))
+            mContext.obtainStyledAttributes(attrs, R.styleable.circlePercentBar, defStyleAttr, 0)
+        mArcWidth = typedArray.getDimensionPixelSize(R.styleable.circlePercentBar_arcWidth, DpOrSpToPxTransfer.dp2px(context, 4)).toFloat()
+        mCircleRadius = typedArray.getDimensionPixelSize(R.styleable.circlePercentBar_circleRadius, DpOrSpToPxTransfer.dp2px(context, 4))
         mProgressColor = typedArray.getColor(
-            R.styleable.business_home_CirclePercentBar_business_home_arcProgressColor,
+            R.styleable.circlePercentBar_arcProgressColor,
             Color.BLUE
         )
         mCircleBgColor = typedArray.getColor(
-            R.styleable.business_home_CirclePercentBar_business_home_arcCircleBgColor,
+            R.styleable.circlePercentBar_arcCircleBgColor,
             Color.LTGRAY
         )
 
         mCenterTextColor =
-            typedArray.getColor(R.styleable.business_home_CirclePercentBar_business_home_centerTextColor, 0x0000ff)
-        mCenterTextSize = typedArray.getDimensionPixelSize(R.styleable.business_home_CirclePercentBar_business_home_centerTextSize, DpOrSpToPxTransfer.sp2px(context, 24)).toFloat()
+            typedArray.getColor(R.styleable.circlePercentBar_centerTextColor, 0x0000ff)
+        mCenterTextSize = typedArray.getDimensionPixelSize(R.styleable.circlePercentBar_centerTextSize, DpOrSpToPxTransfer.sp2px(context, 24)).toFloat()
         typedArray.recycle()
 
         progressPaint = Paint()

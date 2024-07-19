@@ -10,13 +10,13 @@
         <attr name="fraction" format="float" />
     </declare-styleable>
 
-    <declare-styleable name="business_home_CirclePercentBar">
-        <attr name="business_home_arcColor" format="color" />
-        <attr name="business_home_arcWidth" format="dimension" />
-        <attr name="business_home_centerTextColor" format="color" />
-        <attr name="business_home_centerTextSize" format="dimension" />
-        <attr name="business_home_circleRadius" format="dimension" />
-        <attr name="business_home_arcProgressColor" format="color" />
-        <attr name="business_home_arcCircleBgColor" format="color" />
+    <declare-styleable name="circlePercentBar">
+        <attr name="arcColor" format="color" />
+        <attr name="arcWidth" format="dimension" />
+        <attr name="centerTextColor" format="color" />
+        <attr name="centerTextSize" format="dimension" />
+        <attr name="circleRadius" format="dimension" />
+        <attr name="arcProgressColor" format="color" />
+        <attr name="arcCircleBgColor" format="color" />
     </declare-styleable>
 </resources>

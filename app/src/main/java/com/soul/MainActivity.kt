@@ -36,6 +36,7 @@ import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.bean.SubDeviceResultBean
+import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
@@ -105,6 +106,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding?.btnActivityVolume?.setOnClickListener(this)
         mViewDataBinding?.btnActivitySlide?.setOnClickListener {
             val intent = Intent(mContext, EasySwipeMenuActivity::class.java)
+            startActivity(intent)
+        }
+        mViewDataBinding?.btnActivityBluetooth?.setOnClickListener {
+            val intent = Intent(mContext, BluetoothActivity::class.java)
             startActivity(intent)
         }
         mViewDataBinding?.cpv?.apply {

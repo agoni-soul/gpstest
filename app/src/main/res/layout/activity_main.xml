@@ -199,10 +199,19 @@
                     android:text="左滑删除测试"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_volume" />
 
+                <Button
+                    android:id="@+id/btn_activity_bluetooth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="蓝牙扫描"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_slide" />
+
                 <com.soul.CircleProgressView
                     android:id="@+id/cpv"
                     android:layout_width="88dp"
                     android:layout_height="88dp"
+                    android:visibility="gone"
                     app:arcWidth="4dp"
                     app:circleRadius="30dp"
                     app:arcProgressColor="@color/yellow"
@@ -211,7 +220,7 @@
                     app:centerTextSize="24sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_slide"/>
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_bluetooth"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

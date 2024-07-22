@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ll_ble_content"
     android:layout_width="match_parent"
@@ -9,28 +10,73 @@
 
     <TextView
         android:id="@+id/tv_ble_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginHorizontal="10dp"
         android:gravity="start|center_vertical"
         android:textColor="@color/black"
         android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="你好" />
 
     <TextView
         android:id="@+id/tv_ble_mac"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="end|center_vertical"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_ble_name"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="abcdefg" />
+
+    <TextView
+        android:id="@+id/tv_ble_bond_status"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_name"
+        tools:text="abcdefg" />
+
+    <TextView
+        android:id="@+id/tv_ble_connectable"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="end|center_vertical"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/tv_ble_bond_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_name"
+        tools:text="abcdefg" />
+
+    <TextView
+        android:id="@+id/tv_ble_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
-        android:gravity="end|center_vertical"
+        android:gravity="center_vertical"
+        android:paddingTop="10dp"
         android:paddingEnd="16dp"
         android:textColor="@color/gray_606060"
         android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_bond_status"
         tools:text="你好" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/black" />
+        android:layout_marginHorizontal="8dp"
+        android:background="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_data" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

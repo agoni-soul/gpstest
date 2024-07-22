@@ -15,6 +15,8 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
+import com.soul.bean.BleScanResult
+import com.soul.bean.toBleScanResult
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
 import com.soul.util.PermissionUtils
@@ -32,11 +34,9 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         private const val PERMISSION_REQUEST_CODE = 101
     }
 
-    private var mBluetoothReceiver: BluetoothReceiver? = null
-
     private var mBleAdapter: BleAdapter? = null
 
-    private var mBleDevices = mutableListOf<BluetoothDevice>()
+    private var mBleDevices = mutableListOf<BleScanResult>()
 
     override fun getViewModelClass(): Class<BleViewModel> = BleViewModel::class.java
 
@@ -65,10 +65,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     }
 
     override fun initData() {
-//        mBluetoothReceiver = BluetoothReceiver()
-//        val intentFilter = IntentFilter()
-//        intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
-//        registerReceiver(mBluetoothReceiver, intentFilter)
         mViewModel?.startDiscovery()
 
         if (ActivityCompat.checkSelfPermission(
@@ -92,10 +88,11 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     super.onScanResult(callbackType, result)
 //                    Log.d(TAG, "onScanResult: device: ${result?.device?.name}")
                     result?.device?.let {
+                        val bleScanResult = result.toBleScanResult()
                         if (!it.name.isNullOrBlank() && !it.address.isNullOrBlank() &&
-                            !mBleDevices.contains(it)
+                            !mBleDevices.contains(bleScanResult)
                         ) {
-                            mBleDevices.add(it)
+                            mBleDevices.add(bleScanResult)
                             mBleAdapter?.notifyItemChanged(mBleDevices.size)
                         }
                     }
@@ -158,29 +155,5 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     override fun onStop() {
         super.onStop()
         mViewModel?.stopDiscovery()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        unregisterReceiver(mBluetoothReceiver)
-    }
-
-    inner class BluetoothReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            context ?: return
-            intent ?: return
-            if (BluetoothDevice.ACTION_FOUND == intent.action) {
-                val device: BluetoothDevice? =
-                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                device?.let {
-                    if (!it.name.isNullOrBlank() && !it.address.isNullOrBlank() &&
-                        !mBleDevices.contains(it)
-                    ) {
-                        mBleDevices.add(it)
-                        mBleAdapter?.notifyItemChanged(mBleDevices.size)
-                    }
-                }
-            }
-        }
     }
 }

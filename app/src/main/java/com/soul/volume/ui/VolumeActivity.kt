@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityVolumeBinding
-import com.soul.util.DpToPxTransfer
+import com.soul.util.DpOrSpToPxTransfer
 import com.soul.receiver.VolumeBroadReceiver
 import com.soul.volume.model.VolumeViewModel
 import com.soul.volume.lrc.LrcRow
@@ -276,7 +276,7 @@ class VolumeActivity : BaseMvvmActivity<ActivityVolumeBinding, VolumeViewModel>(
                             ForegroundColorSpan(mContext.resources.getColor(R.color.blue))
                         }
                         spanStr.setSpan(fgdColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                        val sizeSpan = AbsoluteSizeSpan(DpToPxTransfer.sp2px(mContext, 18))
+                        val sizeSpan = AbsoluteSizeSpan(DpOrSpToPxTransfer.sp2px(mContext, 18))
                         spanStr.setSpan(sizeSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                         tvSongLrc.text = spanStr
 

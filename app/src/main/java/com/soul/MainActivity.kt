@@ -36,6 +36,7 @@ import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.bean.SubDeviceResultBean
+import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
@@ -48,6 +49,7 @@ import com.soul.selector.SelectorActivity
 import com.soul.service.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
+import com.soul.util.DpOrSpToPxTransfer
 import com.soul.util.PermissionUtils
 import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
@@ -105,6 +107,19 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding?.btnActivitySlide?.setOnClickListener {
             val intent = Intent(mContext, EasySwipeMenuActivity::class.java)
             startActivity(intent)
+        }
+        mViewDataBinding?.btnActivityBluetooth?.setOnClickListener {
+            val intent = Intent(mContext, BluetoothActivity::class.java)
+            startActivity(intent)
+        }
+        mViewDataBinding?.cpv?.apply {
+            setProgress(20f)
+            setCircleBgColor(Color.RED)
+            setProgressColor(Color.BLACK)
+            setCenterText("哈哈哈哈")
+            setCenterTextColor(Color.GREEN)
+            setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
+            invalidate()
         }
 
         Log.d("haha", Build.VERSION.SDK_INT.toString())

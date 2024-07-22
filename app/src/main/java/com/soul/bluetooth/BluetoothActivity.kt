@@ -65,10 +65,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     }
 
     override fun initData() {
-        mBluetoothReceiver = BluetoothReceiver()
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
-        registerReceiver(mBluetoothReceiver, intentFilter)
+//        mBluetoothReceiver = BluetoothReceiver()
+//        val intentFilter = IntentFilter()
+//        intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
+//        registerReceiver(mBluetoothReceiver, intentFilter)
         mViewModel?.startDiscovery()
 
         if (ActivityCompat.checkSelfPermission(
@@ -84,18 +84,26 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     super.onBatchScanResults(results)
                     results ?: return
                     for (result in results) {
-                        Log.d(TAG, "startScan: device: ${result.device?.name}")
+//                        Log.d(TAG, "onBatchScanResults: device: ${result.device?.name}")
                     }
                 }
 
                 override fun onScanResult(callbackType: Int, result: ScanResult?) {
                     super.onScanResult(callbackType, result)
-                    Log.d(TAG, "startScan: device: ${result?.device?.name}")
+//                    Log.d(TAG, "onScanResult: device: ${result?.device?.name}")
+                    result?.device?.let {
+                        if (!it.name.isNullOrBlank() && !it.address.isNullOrBlank() &&
+                            !mBleDevices.contains(it)
+                        ) {
+                            mBleDevices.add(it)
+                            mBleAdapter?.notifyItemChanged(mBleDevices.size)
+                        }
+                    }
                 }
 
                 override fun onScanFailed(errorCode: Int) {
                     super.onScanFailed(errorCode)
-                    Log.i(TAG, "startScan: errorCode: $errorCode")
+                    Log.i(TAG, "onScanFailed: errorCode: $errorCode")
                 }
             })
         }
@@ -150,6 +158,11 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     override fun onStop() {
         super.onStop()
         mViewModel?.stopDiscovery()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+//        unregisterReceiver(mBluetoothReceiver)
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {

@@ -2,7 +2,6 @@ package com.soul.bluetooth
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -46,10 +45,67 @@ class BleAdapter(bleDevices: MutableList<BluetoothDevice>) :
             val ble = mBleDevices[position]
             Log.d(
                 TAG,
-                "onBindViewHolder: BluetoothDevice: name = ${ble.name}, address = ${ble.address}, type = ${ble.type}, alias = ${ble.alias}, bondState = ${ble.bondState}, bluetoothClass = ${ble.bluetoothClass}"
+                "onBindViewHolder: BluetoothDevice: name = ${ble.name}, address = ${ble.address}, type = ${bleTypeStr(ble.type)}, typeDevice = ${bleTypeDeviceStr(ble.type)}, alias = ${ble.alias}, bondState = ${bleBoundState(ble.bondState)}, bluetoothClass = ${ble.bluetoothClass}"
             )
             if (BluetoothAdapter.checkBluetoothAddress(ble.address)) {
 //                ble.connectGatt()
+            }
+        }
+    }
+
+    private fun bleTypeDeviceStr(type: Int): String {
+        return when (type) {
+            0 -> {
+                "Unknown"
+            }
+            1 -> {
+                "Classic - BR/EDR devices"
+            }
+            2 -> {
+                "Low Energy - LE-only"
+            }
+            3 -> {
+                "Dual Mode - BR/EDR/LE"
+            }
+            else -> {
+                "Unknown"
+            }
+        }
+    }
+
+    private fun bleTypeStr(type: Int): String {
+        return when (type) {
+            0 -> {
+                "DEVICE_TYPE_UNKNOWN"
+            }
+            1 -> {
+                "DEVICE_TYPE_CLASSIC"
+            }
+            2 -> {
+                "DEVICE_TYPE_LE"
+            }
+            3 -> {
+                "DEVICE_TYPE_DUAL"
+            }
+            else -> {
+                "DEVICE_TYPE_UNKNOWN"
+            }
+        }
+    }
+
+    private fun bleBoundState(state: Int): String {
+        return when (state) {
+            10 -> {
+                "BOND_NONE"
+            }
+            11 -> {
+                "BOND_BONDING"
+            }
+            12 -> {
+                "BOND_BONDED"
+            }
+            else -> {
+                "BOND_NONE"
             }
         }
     }

@@ -53,7 +53,13 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                 Manifest.permission.BLUETOOTH_ADMIN
             )
         )
-        mBleAdapter = BleAdapter(mBleDevices)
+        mBleAdapter = BleAdapter(mBleDevices).apply {
+            setCallback(object: BleAdapter.ItemClickCallback {
+                override fun onClick(result: BleScanResult) {
+
+                }
+            })
+        }
         mViewDataBinding?.rvBluetooth?.let {
             it.adapter = mBleAdapter
             val layoutManager = LinearLayoutManager(mContext).apply {
@@ -66,14 +72,19 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
     override fun initData() {
         mViewModel?.startDiscovery()
+        BleHelp.getInstance().init(this, object: BleHelp.BleCallback {
+            override fun connectSuccess() {
+                Log.d(TAG, "connectSuccess")
+            }
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
+            override fun getDeviceReturnData(data: ByteArray?) {
+                Log.d(TAG, "getDeviceReturnData: data = ${data?.toString()}")
+            }
+
+            override fun error(e: Int) {
+                Log.e(TAG, "error: e = $e")
+            }
+        })
         if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             mViewModel?.bluetoothAdapter?.bluetoothLeScanner?.startScan(object : ScanCallback() {
                 override fun onBatchScanResults(results: MutableList<ScanResult>?) {

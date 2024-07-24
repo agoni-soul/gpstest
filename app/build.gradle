@@ -31,7 +31,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    lintOptions{
+    lintOptions {
         checkReleaseBuilds false
         abortOnError false
     }
@@ -78,7 +78,12 @@ dependencies {
     implementation 'com.blankj:utilcode:1.30.7'
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.core:core:1.5.0-alpha05'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'  // For Android Support Library
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
+    // For androidx
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'com.github.tbruyelle:rxpermissions:0.12'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
     testImplementation 'junit:junit:4.+'
@@ -89,6 +94,6 @@ dependencies {
 //    kapt 'com.alibaba:arouter-compiler:1.5.2'
 
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
-    implementation project(':starrysky')
+//    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
+//    implementation project(':starrysky')
 }

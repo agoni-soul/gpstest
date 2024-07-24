@@ -1,7 +1,6 @@
 package com.soul.bluetooth
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,13 +26,14 @@ class BleAdapter(bleDevices: MutableList<BleScanResult>) :
 
     private val mBleDevices = bleDevices
 
-    private val mBluetoothAdapter: BluetoothAdapter by lazy {
-        BluetoothAdapter.getDefaultAdapter()
-    }
+    private lateinit var mBleManager: BluetoothManager
+
+    private var mItemClickCallback: ItemClickCallback? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleAdapter.BleViewHolder {
         mContext = parent.context
-        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item_ble, null, false)
+        mBleManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item_ble, parent, false)
         return BleViewHolder(view)
     }
 
@@ -43,18 +43,21 @@ class BleAdapter(bleDevices: MutableList<BleScanResult>) :
         holder.itemTvBleName.text = mBleDevices[position].name
         holder.itemTvBleMac.text = mBleDevices[position].mac
         holder.itemTvBleDataByte.text = mBleDevices[position].dataHexDetail
-        holder.itemTvBleBondStatus.text = mContext.getString(R.string.ble_bond_status, mBleDevices[position].bondStateStr)
-        holder.itemTvBleConnectable.text = mContext.getString(R.string.ble_connectable, if (mBleDevices[position].isConnectable) "true" else "false")
+        holder.itemTvBleBondStatus.text =
+            mContext.getString(R.string.ble_bond_status, mBleDevices[position].bondStateStr)
+        holder.itemTvBleConnectable.text = mContext.getString(
+            R.string.ble_connectable,
+            if (mBleDevices[position].isConnectable) "true" else "false"
+        )
         holder.itemView.setOnClickListener {
             val result = mBleDevices[position]
-            val ble = result.device ?: return@setOnClickListener
             Log.d(TAG, "onBindViewHolder: result =\n$result")
-            if (BluetoothAdapter.checkBluetoothAddress(result.mac)) {
-                ble.connectGatt(mContext, true, object : BluetoothGattCallback() {
-
-                })
-            }
+            mItemClickCallback?.onClick(result)
         }
+    }
+
+    fun setCallback(itemClickCallback: ItemClickCallback?) {
+        mItemClickCallback = itemClickCallback
     }
 
     inner class BleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -71,5 +74,9 @@ class BleAdapter(bleDevices: MutableList<BleScanResult>) :
             itemTvBleBondStatus = itemView.findViewById(R.id.tv_ble_bond_status)
             itemTvBleConnectable = itemView.findViewById(R.id.tv_ble_connectable)
         }
+    }
+
+    interface ItemClickCallback {
+        fun onClick(result: BleScanResult)
     }
 }

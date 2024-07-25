@@ -24,5 +24,5 @@
     <string name="config_searching_subdevice">搜索到%s及其关联设备如下：</string>
 
     <string name="ble_bond_status">绑定状态:%s</string>
-    <string name="ble_connectable">是否连接:%1$s</string>
+    <string name="ble_connectable">是否可连接:%1$s</string>
 </resources>

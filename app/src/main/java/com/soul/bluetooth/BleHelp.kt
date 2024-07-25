@@ -498,7 +498,7 @@ class BleHelp private constructor() {
                 mBluetoothGatt?.setCharacteristicNotification(mReadGattCharacteristic, true)
                 //获取特征值其对应的通知Descriptor
                 val descriptor =
-                    mReadGattCharacteristic!!.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+                    mReadGattCharacteristic!!.getDescriptor(UUID.fromString(mReadCharacteristicUUID))
                 //写入你需要传递给外设的特征的描述值（即传递给外设的信息）
                 descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                 //通过GATT实体类将，特征值写入到外设中。在 onDescriptorWrite 回调里面发送握手

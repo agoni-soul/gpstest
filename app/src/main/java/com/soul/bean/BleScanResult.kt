@@ -33,7 +33,9 @@ data class BleScanResult(
     val bondStateStr: String = bondState(bondState)
     val dataStatusStr: String = dataStatus(dataStatus)
     val dataHex: String = byteToHex(dataBytes)
-    val dataHexDetail: String = dataByteDetailStr(dataHex)
+    var dataHexDetail: String? = null
+        private set
+    val dataDatailList: MutableList<BleScanRecordDetailBean> = dataByteDetail(dataHex)
 
     private fun typeDeviceStr(type: Int): String {
         return when (type) {
@@ -134,7 +136,7 @@ data class BleScanResult(
                 "scanRecord: $scanRecord, \n" +
                 "device: $device, \n" +
                 "bytes: 0x$dataHex, \n" +
-                "$dataHexDetail}]"
+                "$dataDatailList\n}]"
     }
 
     private fun hexStrToInt(hexStr: String): Int {
@@ -171,7 +173,8 @@ data class BleScanResult(
         return value
     }
 
-    private fun dataByteDetailStr(dataHex: String): String {
+    private fun dataByteDetail(dataHex: String): MutableList<BleScanRecordDetailBean> {
+        val detailBeanList = mutableListOf<BleScanRecordDetailBean>()
         val dataByteDetailSb = StringBuilder()
         dataByteDetailSb.append("LEN\t\tTYPE\t\tVALUE\n")
         var i = 0
@@ -200,9 +203,38 @@ data class BleScanResult(
                 i = length
             }
             dataByteDetailSb.append("$lenValue\t$type\t$value\n")
+            detailBeanList.add(BleScanRecordDetailBean(lenValue, type, value))
         }
-        return dataByteDetailSb.toString()
+        dataHexDetail = dataByteDetailSb.toString()
+        return detailBeanList
     }
+}
+
+data class BleScanRecordDetailBean(
+    val len: Int,
+    /**
+     * 0x01: Flags(蓝牙的特性)
+     * 0x0A: Tx Power Level(发射功率等级)
+     * 0xFF: Manufacturer Specific Data(制造商特定数据), 可以获取低功耗蓝牙设备的公司识别码，设备的UUID,Major,Minor，Rssi at 1m(广播校验值)在此处解析
+     * 0x16: ServiceData(响应包数据),可以获取ServiceData的UUID和附加数据等
+     */
+    val type: String? = null,
+    val value: String? = null,
+) {
+    override fun toString(): String {
+        return "\n[len: $len, type: $type, value: $value]"
+    }
+}
+
+fun MutableList<Any>.toString(): String {
+    if (this.isEmpty()) {
+        return this.toString()
+    }
+    val sb = StringBuilder()
+    for (any in this) {
+        sb.append(any.toString())
+    }
+    return sb.toString()
 }
 
 fun ScanResult.toBleScanResult(): BleScanResult {

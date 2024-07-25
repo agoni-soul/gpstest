@@ -56,7 +56,24 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         mBleAdapter = BleAdapter(mBleDevices).apply {
             setCallback(object: BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
-
+                    Log.d(TAG, "onClick: \ndevice = ${result.device}")
+                    var parcelUuid = result.scanRecord?.serviceUuids?.get(0)
+                    val serviceData = result.scanRecord?.serviceData
+                    Log.d(TAG, "onClick: \nserviceData = $serviceData")
+                    if (parcelUuid == null && !serviceData.isNullOrEmpty()) {
+                        for (key in serviceData.keys) {
+                            if (key != null) {
+                                parcelUuid = key
+                                break
+                            }
+                        }
+                    }
+                    val uuid = parcelUuid?.uuid
+                    Log.d(TAG, "onClick: \nuuid = ${uuid}")
+                    val serviceDataSingle = serviceData?.get(parcelUuid)
+                    Log.d(TAG, "onClick: \nserviceDataSingle = $serviceDataSingle")
+                    BleHelp.getInstance().setMacAndUuids(result.mac, uuid.toString(), uuid.toString(), uuid.toString())
+                    BleHelp.getInstance().start()
                 }
             })
         }

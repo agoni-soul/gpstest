@@ -29,7 +29,6 @@ import java.util.*
  */
 class BleHelp private constructor() {
     companion object {
-        private const val TAG = "BleHelp-->"
         private const val LINK_TIME_OUT = 1000
         private const val START_SCAN = 1001
         private const val STOP_SCAN = 1002
@@ -63,6 +62,8 @@ class BleHelp private constructor() {
         fun getInstance(): BleHelp = SingleInstance.instance
     }
 
+    private val TAG = javaClass.simpleName
+
     private var weakReference: WeakReference<FragmentActivity>? = null
 
     //UUID和Mac地址
@@ -82,7 +83,7 @@ class BleHelp private constructor() {
     private var mBluetoothGatt: BluetoothGatt? = null
 
     //子线程的HandlerThread，为子线程提供Looper
-    private lateinit var workHandlerThread: HandlerThread
+    private var workHandlerThread: HandlerThread? = null
 
     //子线程
     private var workHandler: Handler? = null
@@ -189,69 +190,70 @@ class BleHelp private constructor() {
     }
 
     private fun initWorkHandler() {
-        workHandlerThread = HandlerThread("BleWorkHandlerThread")
-        workHandlerThread.start()
-        workHandler = object : Handler(workHandlerThread.looper) {
-            override fun handleMessage(msg: Message) {
-                super.handleMessage(msg)
-                when (msg.what) {
-                    LINK_TIME_OUT -> {
-                        removeMessages(LINK_TIME_OUT)
-                        sendEmptyMessage(STOP_SCAN)
-                        val bluetoothLeScanner: BluetoothLeScanner =
-                            bluetoothAdapter.bluetoothLeScanner ?: return
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { //允许8.0以上退到后台能继续扫描
-                            if (isAllowSacnHomeSuperM) { //Android8.0以上退到后台或息屏后是否还要扫描。我们将其默认为false
-                                //doing....
-                                return
+        if (workHandlerThread == null || workHandlerThread?.isAlive == false) {
+            workHandlerThread = HandlerThread("BleWorkHandlerThread")
+            workHandlerThread?.start()
+        }
+        if (workHandler == null) {
+            workHandler = object : Handler(workHandlerThread!!.looper) {
+                override fun handleMessage(msg: Message) {
+                    super.handleMessage(msg)
+                    when (msg.what) {
+                        LINK_TIME_OUT -> {
+                            removeMessages(LINK_TIME_OUT)
+                            sendEmptyMessage(STOP_SCAN)
+                            val bluetoothLeScanner: BluetoothLeScanner =
+                                bluetoothAdapter.bluetoothLeScanner ?: return
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { //允许8.0以上退到后台能继续扫描
+                                if (isAllowSacnHomeSuperM) { //Android8.0以上退到后台或息屏后是否还要扫描。我们将其默认为false
+                                    //doing....
+                                    return
+                                }
+                            }
+                            bluetoothLeScanner.startScan(highScanCallback)
+                            return
+                        }
+                        START_SCAN -> {
+                            val bluetoothLeScanner: BluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner ?: return
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (isAllowSacnHomeSuperM) {
+                                    return
+                                }
+                            }
+                            bluetoothLeScanner.startScan(highScanCallback)
+                            return
+                        }
+                        STOP_SCAN -> {
+                            val bluetoothLeScanner: BluetoothLeScanner =
+                                bluetoothAdapter.bluetoothLeScanner
+                            bluetoothLeScanner.stopScan(highScanCallback)
+                            //停止搜索需要一定的时间来完成，建议加以100ms的延时，保证系统能够完全停止搜索蓝牙设备。
+                            sleep()
+                        }
+                        CONNECT_GATT -> {
+                            mBluetoothGatt = mBluetoothDevice?.connectGatt(weakReference?.get(), false, bluetoothGattCallback)
+                        }
+                        DISCOVER_SERVICES -> {
+                            mBluetoothGatt?.discoverServices()
+                        }
+                        DISCONNECT_GATT -> {
+                            val isRefreshSuccess = refreshDeviceCache(mBluetoothGatt)
+                            if (isRefreshSuccess) {
+                                mBluetoothGatt?.disconnect()
+                            } else {
+                                Log.e(
+                                    TAG, "bluetoothGatt断开连接失败：因清除bluetoothGatt缓存失败,故未调用disconnect()方法"
+                                )
                             }
                         }
-                        bluetoothLeScanner.startScan(highScanCallback)
-                        return
-                    }
-                    START_SCAN -> {
-                        val bluetoothLeScanner: BluetoothLeScanner =
-                            bluetoothAdapter.getBluetoothLeScanner() ?: return
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (isAllowSacnHomeSuperM) {
-                                return
-                            }
+                        CLOSE_GATT -> {
+                            mBluetoothGatt?.close()
+                            mBluetoothGatt = null
+                            Log.d(TAG, "bluetoothGatt关闭成功并置为null")
                         }
-                        bluetoothLeScanner.startScan(highScanCallback)
-                        return
-                    }
-                    STOP_SCAN -> {
-                        val bluetoothLeScanner: BluetoothLeScanner =
-                            bluetoothAdapter.bluetoothLeScanner
-                        bluetoothLeScanner.stopScan(highScanCallback)
-                        //停止搜索需要一定的时间来完成，建议加以100ms的延时，保证系统能够完全停止搜索蓝牙设备。
-                        sleep()
-                    }
-                    CONNECT_GATT -> {
-                        mBluetoothGatt = mBluetoothDevice?.connectGatt(
-                            weakReference?.get(), false, bluetoothGattCallback
-                        )
-                    }
-                    DISCOVER_SERVICES -> {
-                        mBluetoothGatt?.discoverServices()
-                    }
-                    DISCONNECT_GATT -> {
-                        val isRefreshSuccess = refreshDeviceCache(mBluetoothGatt)
-                        if (isRefreshSuccess) {
-                            mBluetoothGatt?.disconnect()
-                        } else {
-                            Log.e(
-                                TAG, "bluetoothGatt断开连接失败：因清除bluetoothGatt缓存失败,故未调用disconnect()方法"
-                            )
+                        SEND_DATA -> {
+                            sendData(msg.obj as ByteArray)
                         }
-                    }
-                    CLOSE_GATT -> {
-                        mBluetoothGatt?.close()
-                        mBluetoothGatt = null
-                        Log.d(TAG, "bluetoothGatt关闭成功并置为null")
-                    }
-                    SEND_DATA -> {
-                        sendData(msg.obj as ByteArray)
                     }
                 }
             }
@@ -456,7 +458,7 @@ class BleHelp private constructor() {
             for (i in gatt.services.indices) {
                 Log.d(
                     TAG,
-                    "onServicesDiscovered-->" + "status:" + status + "操作成功急啊急啊" + gatt.services[i].uuid
+                    "onServicesDiscovered-->" + "status:" + status + "操作成功\t急啊急啊: " + gatt.services[i].uuid
                 )
             }
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -508,8 +510,7 @@ class BleHelp private constructor() {
                     )
                 }
                 //通过Gatt对象读取特定特征（Characteristic）的特征值。从外设读取特征值，这个可有可无，一般远程设备的硬件工程师可能不会给该权限
-                val isSuccessReadCharacteristic =
-                    mBluetoothGatt?.readCharacteristic(mReadGattCharacteristic) ?: false
+                val isSuccessReadCharacteristic = mBluetoothGatt?.readCharacteristic(mReadGattCharacteristic) ?: false
                 if (!isSuccessReadCharacteristic) {
                     Log.e(
                         TAG,
@@ -529,6 +530,8 @@ class BleHelp private constructor() {
             gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
+//            mReadGattCharacteristic = characteristic
+//            mReadCharacteristicUUID = mReadGattCharacteristic?.uuid?.toString()
             Log.d(
                 TAG, "onCharacteristicRead-->" + characteristic.value.toString()
             )
@@ -539,13 +542,15 @@ class BleHelp private constructor() {
             gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
+//            mWriteGattCharacteristic = characteristic
+//            mWriteCharacteristicUUID = mWriteGattCharacteristic?.uuid?.toString()
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d(
-                    TAG, "onCharacteristicWrite:发送数据成功：" + binaryToHexString(
-                        characteristic.value
-                    )
+                    TAG, "onCharacteristicWrite:发送数据成功：" + binaryToHexString(characteristic.value)
                 )
-            } else Log.e(TAG, "onCharacteristicWrite:发送数据失败")
+            } else {
+                Log.e(TAG, "onCharacteristicWrite:发送数据失败")
+            }
         }
 
         //设备的值有变化时会主动返回

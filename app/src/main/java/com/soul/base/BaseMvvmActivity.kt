@@ -18,16 +18,16 @@ import com.soul.log.DOFLogUtil
  */
 abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActivity() {
 
-    protected var mViewDataBinding: V? = null
+    protected lateinit var mViewDataBinding: V
 
-    protected var mViewModel: VM? = null
+    protected lateinit var mViewModel: VM
 
     protected abstract fun getViewModelClass(): Class<VM>?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewDataBinding = DataBindingUtil.setContentView(this, getLayoutId())
-        mViewDataBinding?.root?.background =  ContextCompat.getDrawable(mContext, R.color.white)
+        mViewDataBinding.root.background =  ContextCompat.getDrawable(mContext, R.color.white)
         if (!isShowStatus()) {
             addStatusBarView()
         }
@@ -35,7 +35,7 @@ abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActi
         modelClass?.let {
             mViewModel = ViewModelProvider(this).get(it)
         }
-        mViewModel?.let {
+        mViewModel.let {
             lifecycle.addObserver(it)
         }
         initView()
@@ -44,9 +44,8 @@ abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActi
 
     override fun onDestroy() {
         super.onDestroy()
-        mViewDataBinding?.unbind()
-        mViewDataBinding = null
-        mViewModel?.let {
+        mViewDataBinding.unbind()
+        mViewModel.let {
             lifecycle.removeObserver(it)
         }
     }

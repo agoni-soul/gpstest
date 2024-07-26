@@ -25,4 +25,6 @@
 
     <string name="ble_bond_status">绑定状态:%s</string>
     <string name="ble_connectable">是否可连接:%1$s</string>
+    <string name="ble_service_uuids">ServiceUuids:\n%s</string>
+    <string name="ble_device_uuids">DeviceUuids:\n%s</string>
 </resources>

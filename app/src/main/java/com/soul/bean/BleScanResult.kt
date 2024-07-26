@@ -18,14 +18,15 @@ data class BleScanResult(
     val name: String? = null,
     val mac: String? = null,
     val type: Int = 0,
-    val bondState: Int = 0,
+    var bondState: Int = 0,
     val serviceUuids: List<ParcelUuid> = mutableListOf(),
+    val deviceUuids: List<ParcelUuid> = mutableListOf(),
     val isLegacy: Boolean = false,
     var isConnectable: Boolean = false,
     val dataStatus: Int = 0,
     val rssi: Int = 0,
     val scanRecord: ScanRecord? = null,
-    val device: BluetoothDevice? = null,
+    var device: BluetoothDevice? = null,
     val dataBytes: ByteArray = ByteArray(0),
 ) {
     val typeDeviceStr: String = typeDeviceStr(type)
@@ -208,6 +209,11 @@ data class BleScanResult(
         dataHexDetail = dataByteDetailSb.toString()
         return detailBeanList
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is BleScanResult) return false
+        return this.mac == other.mac
+    }
 }
 
 data class BleScanRecordDetailBean(
@@ -245,6 +251,7 @@ fun ScanResult.toBleScanResult(): BleScanResult {
         ble.type,
         ble.bondState,
         serviceUuids = this.scanRecord?.serviceUuids ?: mutableListOf(),
+        deviceUuids = ble.uuids?.toMutableList() ?: mutableListOf(),
         this.isLegacy,
         this.isConnectable,
         this.dataStatus,
@@ -252,5 +259,17 @@ fun ScanResult.toBleScanResult(): BleScanResult {
         this.scanRecord,
         this.device,
         dataBytes = this.scanRecord?.bytes ?: ByteArray(0)
+    )
+}
+
+fun BluetoothDevice.toBleScanResult(): BleScanResult {
+    val ble = this
+    return BleScanResult(
+        name = this.name ?: "",
+        this.address,
+        this.type,
+        ble.bondState,
+        deviceUuids = this.uuids?.toMutableList() ?: mutableListOf(),
+        device = this
     )
 }

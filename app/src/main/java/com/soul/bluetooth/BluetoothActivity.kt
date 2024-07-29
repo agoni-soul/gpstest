@@ -14,7 +14,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,8 +21,8 @@ import com.soul.base.BaseMvvmActivity
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.BleListener
+import com.soul.bleSDK.BleSDKManager
 import com.soul.bleSDK.interfaces.BaseBleListener
-import com.soul.bleSDK.threads.ConnectThread
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
 import com.soul.util.PermissionUtils
@@ -56,7 +55,38 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
     private var mResult: BleScanResult? = null
 
-    private var mConnectThread: ConnectThread? = null
+    private var mBleManager: BleSDKManager? = null
+    private val mReadListener: BleListener by lazy {
+        object : BleListener {
+            override fun onStart() {
+                Log.d(TAG, "onStart: 正在连接...")
+            }
+
+            override fun onReceiveData(socket: BluetoothSocket?, msg: String) {
+                Log.d(TAG, "onReceiveData: ${socket?.remoteDevice?.name + ": " + msg}")
+            }
+
+            override fun onConnected(msg: String) {
+                super.onConnected(msg)
+                Log.d(TAG, "onConnected: 已连接")
+            }
+
+            override fun onFail(error: String) {
+                Log.d(TAG, "onFail: 已配对 error = $error")
+            }
+        }
+    }
+    private val mWriteListener: BaseBleListener by lazy {
+        object : BaseBleListener {
+            override fun onSendMsg(socket: BluetoothSocket?, msg: String) {
+                Log.d(TAG, "onSendMsg: 我: $msg")
+            }
+
+            override fun onFail(error: String) {
+                Log.d(TAG, "write onFail: $error")
+            }
+        }
+    }
 
     override fun getViewModelClass(): Class<BleViewModel> = BleViewModel::class.java
 
@@ -74,7 +104,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             )
         )
         mBleAdapter = BleAdapter(mBleDevices).apply {
-            setCallback(object: BleAdapter.ItemClickCallback {
+            setCallback(object : BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
                     Log.d(TAG, "onClick: \ndevice = ${result.device}")
                     var parcelUuid = result.scanRecord?.serviceUuids?.get(0)
@@ -100,11 +130,15 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                             try {
                                 if (result.bondState != BluetoothDevice.BOND_BONDED) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                        val createSocket = BluetoothDevice::class.java.getMethod("createRfcommSocket", Int::class.java)
+                                        val createSocket = BluetoothDevice::class.java.getMethod(
+                                            "createRfcommSocket",
+                                            Int::class.java
+                                        )
                                         createSocket.isAccessible = true
 
                                         //找一个通道去连接即可，channel 1～30
-                                        socket = createSocket.invoke(result.device, 1) as BluetoothSocket
+                                        socket =
+                                            createSocket.invoke(result.device, 1) as BluetoothSocket
                                         //阻塞等待
                                         socket?.connect()
                                         //延时，以便于去连接
@@ -122,7 +156,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                             } catch (e: Exception) {
                                 Log.e(TAG, "initView: connect Error: msg = $e")
                             }
-                            retryCount ++
+                            retryCount++
                         }
                     }
                 }
@@ -137,7 +171,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         }
         mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
         mViewDataBinding.tvBluetooth.setOnClickListener {
-            sendMsg(it)
+            mBleManager?.sendMsg("蓝牙图标")
         }
 
         mViewModel.bluetoothAdapter?.bondedDevices?.let {
@@ -146,38 +180,13 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             }
         }
         mBondBleAdapter = BleAdapter(mBondBleDevices).apply {
-            setCallback(object: BleAdapter.ItemClickCallback {
+            setCallback(object : BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
-
-                    result.device ?: return
-                    mConnectThread = ConnectThread(result.device!!, object : BleListener {
-                        override fun onStart() {
-                            Log.d(TAG, "onStart: 正在连接...")
-                        }
-
-                        override fun onReceiveData(socket: BluetoothSocket?, msg: String) {
-                            Log.d(TAG, "onReceiveData: ${socket?.remoteDevice?.name + ": " + msg}")
-                        }
-
-                        override fun onConnected(msg: String) {
-                            super.onConnected(msg)
-                            Log.d(TAG, "onConnected: 已连接")
-                        }
-
-                        override fun onFail(error: String) {
-                            Log.d(TAG, "onFail: 已配对 error = $error")
-                        }
-                    }, object : BaseBleListener {
-
-                        override fun onSendMsg(socket: BluetoothSocket?, msg: String) {
-                            Log.d(TAG, "onSendMsg: 我: $msg")
-                        }
-                        override fun onFail(error: String) {
-                            Log.d(TAG, "write onFail: $error")
-                        }
-
-                    })
-                    mConnectThread!!.start()
+                    mBleManager = BleSDKManager().apply {
+                        setReadListener(mReadListener)
+                        setWriteListener(mWriteListener)
+                        start(result.device)
+                    }
                 }
             })
         }
@@ -190,12 +199,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         }
     }
 
-    fun sendMsg(view: View) {
-        mConnectThread?.handleSocket?.sendMsg("蓝牙图标")
-    }
-
-    private fun connectA2dp(device: BluetoothDevice?):Boolean{
-        device ?: return  false
+    private fun connectA2dp(device: BluetoothDevice?): Boolean {
+        device ?: return false
         //连接 a2dp
         val connect =
             BluetoothA2dp::class.java.getMethod("connect", BluetoothDevice::class.java)
@@ -210,7 +215,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         registerReceiver(mBluetoothReceiver, intentFilter)
-        BleHelp.getInstance().init(this, object: BleHelp.BleCallback {
+        BleHelp.getInstance().init(this, object : BleHelp.BleCallback {
             override fun connectSuccess() {
                 Log.d(TAG, "connectSuccess")
             }
@@ -235,12 +240,16 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
                 override fun onScanResult(callbackType: Int, result: ScanResult?) {
                     super.onScanResult(callbackType, result)
-                    result?.device?.let {bleDevice ->
-                        if (bleDevice.name?.startsWith("colmo", true) == true || bleDevice.name?.startsWith("midea", true) == true) {
+                    result?.device?.let { bleDevice ->
+                        if (bleDevice.name?.startsWith(
+                                "colmo",
+                                true
+                            ) == true || bleDevice.name?.startsWith("midea", true) == true
+                        ) {
                             return@let
                         }
                         val bleScanResult = result.toBleScanResult()
-                        if (!bleDevice.name.isNullOrBlank() && !bleDevice.address.isNullOrBlank()){
+                        if (!bleDevice.name.isNullOrBlank() && !bleDevice.address.isNullOrBlank()) {
                             if (mBleDevices.find { it.mac == bleDevice.address } == null) {
                                 mBleDevices.add(bleScanResult)
                                 mBleDevices.sortBy { it.name?.uppercase() }
@@ -328,6 +337,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        mBleManager?.close()
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {
@@ -336,16 +346,24 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             intent ?: return
             intent.action ?: return
             if (BluetoothDevice.ACTION_FOUND == intent.action) {
-                val bleDevice: BluetoothDevice? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
-                } else {
-                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                }
-                if (bleDevice?.name?.startsWith("colmo", true) == true || bleDevice?.name?.startsWith("midea", true) == true) {
+                val bleDevice: BluetoothDevice? =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(
+                            BluetoothDevice.EXTRA_DEVICE,
+                            BluetoothDevice::class.java
+                        )
+                    } else {
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    }
+                if (bleDevice?.name?.startsWith(
+                        "colmo",
+                        true
+                    ) == true || bleDevice?.name?.startsWith("midea", true) == true
+                ) {
                     return
                 }
                 val bleScanResult = bleDevice?.toBleScanResult()
-                if (!bleDevice?.name.isNullOrBlank() && !bleDevice?.address.isNullOrBlank()){
+                if (!bleDevice?.name.isNullOrBlank() && !bleDevice?.address.isNullOrBlank()) {
                     if (mBleDevices.find { it.mac == bleDevice!!.address } == null) {
                         mBleDevices.add(bleScanResult!!)
                         mBleDevices.sortBy { it.name?.uppercase() }
@@ -355,11 +373,15 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
                 mViewModel.viewModelScope.launch(Dispatchers.IO) {
                     mViewModel.bluetoothAdapter?.bondedDevices?.toMutableList()?.let {
-                        val bleDevice: BluetoothDevice = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
-                        } else {
-                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                        } ?: return@launch
+                        val bleDevice: BluetoothDevice =
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                intent.getParcelableExtra(
+                                    BluetoothDevice.EXTRA_DEVICE,
+                                    BluetoothDevice::class.java
+                                )
+                            } else {
+                                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                            } ?: return@launch
                         var isUpdate = false
                         val result = bleDevice.toBleScanResult()
                         if (result in mBleDevices) {
@@ -373,7 +395,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                         }
 
                         mBondBleDevices.clear()
-                        it.forEach {device ->
+                        it.forEach { device ->
                             mBondBleDevices.add(device.toBleScanResult())
                         }
                         withContext(Dispatchers.Main) {

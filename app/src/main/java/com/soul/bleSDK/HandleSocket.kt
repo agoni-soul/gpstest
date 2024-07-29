@@ -5,6 +5,7 @@ import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.threads.WriteThread
 import com.soul.bleSDK.utils.close
 import com.soul.bluetooth.ReadThread
+import java.io.Closeable
 
 
 /**
@@ -13,7 +14,7 @@ import com.soul.bluetooth.ReadThread
  *     desc   :
  *     version: 1.0
  */
-class HandleSocket(private val socket: BluetoothSocket?) {
+class HandleSocket(private val socket: BluetoothSocket?): Closeable {
     companion object {
         private val TAG = HandleSocket::class.java.simpleName
     }
@@ -22,7 +23,7 @@ class HandleSocket(private val socket: BluetoothSocket?) {
     private lateinit var mWriteThread: WriteThread
 
     fun start(
-        readListener: BleListener?,
+        readListener: BaseBleListener?,
         writeListener: BaseBleListener?
     ) {
         mReadThread = ReadThread(socket, readListener)
@@ -30,11 +31,11 @@ class HandleSocket(private val socket: BluetoothSocket?) {
         mWriteThread = WriteThread(socket, writeListener)
     }
 
-    fun sendMsg(msg: String) {
+    fun sendMsg(msg: String?) {
         mWriteThread.sendMsg(msg)
     }
 
-    fun cancel() {
+    override fun close() {
         mReadThread.cancel()
         mWriteThread.cancel()
         close(socket)

@@ -3,7 +3,6 @@ package com.soul.bluetooth
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothA2dp
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.bluetooth.le.ScanCallback
@@ -16,14 +15,15 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
+import com.soul.bleSDK.BleListener
+import com.soul.bleSDK.interfaces.BaseBleListener
+import com.soul.bleSDK.threads.ConnectThread
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
 import com.soul.util.PermissionUtils

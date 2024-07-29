@@ -1,6 +1,8 @@
-package com.soul.bluetooth
+package com.soul.bleSDK.threads
 
 import android.bluetooth.BluetoothSocket
+import com.soul.bleSDK.interfaces.BaseBleListener
+import com.soul.bleSDK.utils.close
 import kotlinx.coroutines.*
 import java.io.OutputStream
 

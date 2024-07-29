@@ -2,6 +2,9 @@ package com.soul.bluetooth
 
 import android.bluetooth.BluetoothSocket
 import android.util.Log
+import com.soul.bleSDK.BleListener
+import com.soul.bleSDK.interfaces.BaseBleListener
+import com.soul.bleSDK.utils.close
 import java.io.DataInputStream
 
 

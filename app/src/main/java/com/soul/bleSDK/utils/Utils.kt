@@ -1,6 +1,5 @@
-package com.soul.bluetooth
+package com.soul.bleSDK.utils
 
-import android.bluetooth.BluetoothSocket
 import java.io.Closeable
 
 
@@ -10,11 +9,6 @@ import java.io.Closeable
  *     desc   :
  *     version: 1.0
  */
-interface BaseBleListener {
-    open fun onSendMsg(socket: BluetoothSocket?, msg: String){}
-    fun onFail(error: String)
-}
-
 fun close(vararg closeable: Closeable?) {
     closeable?.forEach { obj -> obj?.close() }
 }

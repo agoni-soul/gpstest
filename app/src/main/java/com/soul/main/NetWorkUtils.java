@@ -1,4 +1,4 @@
-package com.soul;
+package com.soul.main;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

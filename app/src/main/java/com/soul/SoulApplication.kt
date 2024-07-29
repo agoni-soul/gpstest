@@ -14,9 +14,14 @@ import com.soul.log.DOFLogUtil
 class SoulApplication : Application() {
     private val TAG = javaClass.simpleName
 
+    companion object {
+        var application: Application? = null
+    }
+
     override fun onCreate() {
         Log.d(TAG, "onCreate")
         super.onCreate()
+        application = this
         initComponents()
         DOFLogUtil.init()
     }

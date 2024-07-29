@@ -15,7 +15,8 @@ import java.util.*
  *     version: 1.0
  */
 class ConnectThread(
-    val device: BluetoothDevice, val readListener: BleListener?,
+    val device: BluetoothDevice,
+    val readListener: BleListener?,
     val writeListener: BaseBleListener?
 ): Thread() {
     var handleSocket: HandleSocket? = null

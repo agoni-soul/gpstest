@@ -207,7 +207,7 @@
                     android:text="蓝牙扫描"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_slide" />
 
-                <com.soul.CircleProgressView
+                <com.soul.main.CircleProgressView
                     android:id="@+id/cpv"
                     android:layout_width="88dp"
                     android:layout_height="88dp"

@@ -15,6 +15,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -55,6 +56,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
     private var mResult: BleScanResult? = null
 
+    private var mConnectThread: ConnectThread? = null
+
     override fun getViewModelClass(): Class<BleViewModel> = BleViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_bluetooth
@@ -90,7 +93,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     val serviceDataSingle = serviceData?.get(parcelUuid)
                     Log.d(TAG, "onClick: \nserviceDataSingle = $serviceDataSingle")
                     mResult = result
-
                     mViewModel.viewModelScope.launch(Dispatchers.IO) {
                         val retryAmount = 10
                         var retryCount = 0
@@ -134,13 +136,51 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             it.layoutManager = layoutManager
         }
         mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
+        mViewDataBinding.tvBluetooth.setOnClickListener {
+            sendMsg(it)
+        }
 
         mViewModel.bluetoothAdapter?.bondedDevices?.let {
             for (device in it) {
                 mBondBleDevices.add(device.toBleScanResult())
             }
         }
-        mBondBleAdapter = BleAdapter(mBondBleDevices)
+        mBondBleAdapter = BleAdapter(mBondBleDevices).apply {
+            setCallback(object: BleAdapter.ItemClickCallback {
+                override fun onClick(result: BleScanResult) {
+
+                    result.device ?: return
+                    mConnectThread = ConnectThread(result.device!!, object : BleListener {
+                        override fun onStart() {
+                            Log.d(TAG, "onStart: 正在连接...")
+                        }
+
+                        override fun onReceiveData(socket: BluetoothSocket?, msg: String) {
+                            Log.d(TAG, "onReceiveData: ${socket?.remoteDevice?.name + ": " + msg}")
+                        }
+
+                        override fun onConnected(msg: String) {
+                            super.onConnected(msg)
+                            Log.d(TAG, "onConnected: 已连接")
+                        }
+
+                        override fun onFail(error: String) {
+                            Log.d(TAG, "onFail: 已配对 error = $error")
+                        }
+                    }, object : BaseBleListener {
+
+                        override fun onSendMsg(socket: BluetoothSocket?, msg: String) {
+                            Log.d(TAG, "onSendMsg: 我: $msg")
+                        }
+                        override fun onFail(error: String) {
+                            Log.d(TAG, "write onFail: $error")
+                        }
+
+                    })
+                    mConnectThread!!.start()
+                }
+            })
+        }
         mViewDataBinding.rvBondBle.let {
             it.adapter = mBondBleAdapter
             val layoutManager = LinearLayoutManager(mContext).apply {
@@ -148,6 +188,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             }
             it.layoutManager = layoutManager
         }
+    }
+
+    fun sendMsg(view: View) {
+        mConnectThread?.handleSocket?.sendMsg("蓝牙图标")
     }
 
     private fun connectA2dp(device: BluetoothDevice?):Boolean{

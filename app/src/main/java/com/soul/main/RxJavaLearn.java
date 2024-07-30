@@ -1,4 +1,4 @@
-package com.soul;
+package com.soul.main;
 
 import rx.Observable;
 import rx.Observer;

@@ -1,9 +1,8 @@
-package com.soul
+package com.soul.main
 
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import com.soul.gpstest.R
 import com.soul.util.DpOrSpToPxTransfer

@@ -1,6 +1,7 @@
-package com.soul.bluetooth
+package com.soul.bleSDK
 
 import android.bluetooth.BluetoothSocket
+import com.soul.bleSDK.interfaces.BaseBleListener
 
 
 /**

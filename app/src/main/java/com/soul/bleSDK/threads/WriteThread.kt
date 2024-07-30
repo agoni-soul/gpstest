@@ -1,6 +1,8 @@
-package com.soul.bluetooth
+package com.soul.bleSDK.threads
 
 import android.bluetooth.BluetoothSocket
+import com.soul.bleSDK.interfaces.BaseBleListener
+import com.soul.bleSDK.utils.close
 import kotlinx.coroutines.*
 import java.io.OutputStream
 
@@ -21,8 +23,8 @@ class WriteThread(
     private val job = Job()
     private val scope = CoroutineScope(job)
 
-    fun sendMsg(msg: String) {
-        if (isDone) return
+    fun sendMsg(msg: String?) {
+        if (isDone || msg == null) return
         scope.launch(Dispatchers.IO) {
             val result = withContext(Dispatchers.IO) {
                 sendScope(msg)

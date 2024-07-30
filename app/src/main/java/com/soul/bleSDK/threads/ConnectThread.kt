@@ -1,8 +1,12 @@
-package com.soul.bluetooth
+package com.soul.bleSDK.threads
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import com.soul.bleSDK.BleListener
+import com.soul.bleSDK.HandleSocket
+import com.soul.bleSDK.interfaces.BaseBleListener
 import java.util.*
+import com.soul.bleSDK.utils.close
 
 
 /**
@@ -12,14 +16,15 @@ import java.util.*
  *     version: 1.0
  */
 class ConnectThread(
-    val device: BluetoothDevice, val readListener: BleListener?,
+    val device: BluetoothDevice?,
+    val readListener: BleListener?,
     val writeListener: BaseBleListener?
 ): Thread() {
     var handleSocket: HandleSocket? = null
     private val socket: BluetoothSocket? by lazy {
         readListener?.onStart()
         //监听该 uuid
-        device.createRfcommSocketToServiceRecord(BLUE_UUID)
+        device?.createRfcommSocketToServiceRecord(BLUE_UUID)
     }
 
     override fun run() {
@@ -40,6 +45,10 @@ class ConnectThread(
         } catch (e: java.lang.Exception) {
             e.message?.let { readListener?.onFail(it) }
         }
+    }
+
+    fun close() {
+        close(handleSocket)
     }
 }
 

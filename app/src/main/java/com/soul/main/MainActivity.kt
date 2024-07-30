@@ -1,4 +1,4 @@
-package com.soul
+package com.soul.main
 
 import android.Manifest
 import android.annotation.SuppressLint

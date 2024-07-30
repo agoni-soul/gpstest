@@ -65,7 +65,7 @@
             android:name="com.soul.waterfall.WaterFallActivity"
             android:exported="true"></activity>
         <activity
-            android:name="com.soul.MainActivity"
+            android:name="com.soul.main.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.GPSTest.NoActionBar">

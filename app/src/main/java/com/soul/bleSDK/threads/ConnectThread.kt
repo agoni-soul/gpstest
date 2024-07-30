@@ -20,8 +20,8 @@ class ConnectThread(
     val readListener: BleListener?,
     val writeListener: BaseBleListener?
 ): Thread() {
-    var handleSocket: HandleSocket? = null
-    private val socket: BluetoothSocket? by lazy {
+    var mHandleSocket: HandleSocket? = null
+    private val mBleSocket: BluetoothSocket? by lazy {
         readListener?.onStart()
         //监听该 uuid
         device?.createRfcommSocketToServiceRecord(BLUE_UUID)
@@ -30,17 +30,17 @@ class ConnectThread(
     override fun run() {
         super.run()
         try {
-            socket.run {
+            mBleSocket?.run {
                 //阻塞等待
-                this?.connect()
+                this.connect()
                 //连接成功，拿到服务端设备名
-                socket?.remoteDevice?.let { bleDevice ->
+                this.remoteDevice?.let { bleDevice ->
                     readListener?.onConnected(bleDevice.name)
                 }
 
                 //处理 socket 读写
-                handleSocket = HandleSocket(this)
-                handleSocket?.start(readListener, writeListener)
+                mHandleSocket = HandleSocket(this)
+                mHandleSocket?.start(readListener, writeListener)
             }
         } catch (e: java.lang.Exception) {
             e.message?.let { readListener?.onFail(it) }
@@ -48,7 +48,7 @@ class ConnectThread(
     }
 
     fun close() {
-        close(handleSocket)
+        close(mHandleSocket)
     }
 }
 

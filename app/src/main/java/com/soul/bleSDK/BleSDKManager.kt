@@ -11,7 +11,7 @@ class BleSDKManager: IBleCallback {
     private var mWriteListener: BaseBleListener? = null
 
     override fun sendMsg(msg: String?) {
-        mConnectThread?.handleSocket?.sendMsg(msg)
+        mConnectThread?.mHandleSocket?.sendMsg(msg)
     }
 
     override fun close() {

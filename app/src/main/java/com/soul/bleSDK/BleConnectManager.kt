@@ -9,6 +9,7 @@ import android.util.Log
 import com.soul.appLike.SoulAppLike
 import com.soul.bean.BleScanResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
@@ -18,9 +19,9 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-class BleConnectManager: BleScanManager() {
+class BleConnectManager(): BleScanManager() {
     protected var mBleA2dp: BluetoothA2dp? = null
-    protected var socket: BluetoothSocket? = null
+    protected var mBleSocket: BluetoothSocket? = null
     protected var mBleResult: BleScanResult? = null
 
     init {
@@ -46,7 +47,7 @@ class BleConnectManager: BleScanManager() {
         close()
         result ?: return
         mBleResult = result
-        SoulAppLike.homeScope?.launch(Dispatchers.IO) {
+        MainScope().launch(Dispatchers.IO) {
             val retryAmount = 10
             var retryCount = 0
             while (retryCount <= retryAmount) {
@@ -60,10 +61,10 @@ class BleConnectManager: BleScanManager() {
                             createSocket.isAccessible = true
 
                             //找一个通道去连接即可，channel 1～30
-                            socket =
+                            mBleSocket =
                                 createSocket.invoke(mBleResult!!.device, 1) as BluetoothSocket
                             //阻塞等待
-                            socket?.connect()
+                            mBleSocket?.connect()
                             //延时，以便于去连接
                             Thread.sleep(2000)
                         } else {
@@ -94,7 +95,7 @@ class BleConnectManager: BleScanManager() {
 
     fun close() {
         try {
-            socket?.close()
+            mBleSocket?.close()
             try {
                 //通过反射获取BluetoothA2dp中connect方法（hide的），断开连接。
                 val connectMethod = BluetoothA2dp::class.java.getMethod(

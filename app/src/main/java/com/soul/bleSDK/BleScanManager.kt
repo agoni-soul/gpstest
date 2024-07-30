@@ -1,17 +1,13 @@
 package com.soul.bleSDK
 
 import android.Manifest
-import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import com.soul.appLike.SoulAppLike
+import com.soul.SoulApplication
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
@@ -24,8 +20,8 @@ open class BleScanManager() {
     protected var mBleAdapter: BluetoothAdapter? = null
 
     init {
-        Log.d(TAG, "application = ${SoulAppLike.application}")
-        mBleManager = SoulAppLike.application?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager?
+        Log.d(TAG, "application = ${SoulApplication.application}")
+        mBleManager = SoulApplication.application?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager?
         mBleAdapter =  mBleManager?.adapter
     }
 
@@ -77,7 +73,6 @@ open class BleScanManager() {
         }
         mBleAdapter?.bluetoothLeScanner?.startScan(object: ScanCallback() {
             override fun onBatchScanResults(results: MutableList<ScanResult>?) {
-                Log.d(TAG, "onBatchScanResults")
                 val mutableList = mutableListOf<BleScanResult>()
                 results?.forEach {
                     val bleScanResult = it.toBleScanResult()
@@ -87,12 +82,10 @@ open class BleScanManager() {
             }
 
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                Log.d(TAG, "onScanResult")
                 bleScanCallback?.onScanResult(callbackType, result?.toBleScanResult())
             }
 
             override fun onScanFailed(errorCode: Int) {
-                Log.d(TAG, "onScanFailed")
                 bleScanCallback?.onScanFailed(errorCode)
             }
         })

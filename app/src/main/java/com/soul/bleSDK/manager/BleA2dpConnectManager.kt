@@ -1,11 +1,14 @@
 package com.soul.bleSDK.manager
 
+import android.Manifest
 import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothSocket
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.soul.appLike.SoulAppLike
 import com.soul.bean.BleScanResult
 import kotlinx.coroutines.Dispatchers
@@ -19,13 +22,13 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-class BleA2dpConnectManager(): BleScanManager() {
+class BleA2dpConnectManager(): BaseConnectManager() {
     protected var mBleA2dp: BluetoothA2dp? = null
     protected var mBleSocket: BluetoothSocket? = null
     protected var mBleResult: BleScanResult? = null
 
     init {
-        mBleAdapter?.getProfileProxy(SoulAppLike.application, object: BluetoothProfile.ServiceListener {
+        BleScanManager.getBluetoothAdapter()?.getProfileProxy(SoulAppLike.application, object: BluetoothProfile.ServiceListener {
             override fun onServiceConnected(profile: Int, proxy: BluetoothProfile?) {
                 if (profile == BluetoothProfile.A2DP && proxy is BluetoothA2dp) {
                     mBleA2dp = proxy
@@ -43,45 +46,38 @@ class BleA2dpConnectManager(): BleScanManager() {
 
     fun getBluetoothA2dp(): BluetoothA2dp? = mBleA2dp
 
-    fun connect(result: BleScanResult?) {
+    override fun connect(bleScanResult: BleScanResult?) {
         close()
-        result ?: return
-        cancelDiscovery()
-        mBleResult = result
+        bleScanResult ?: return
+        BleScanManager.cancelDiscovery()
+        mBleResult = bleScanResult
         MainScope().launch(Dispatchers.IO) {
-            val retryAmount = 10
-            var retryCount = 0
-            while (retryCount <= retryAmount) {
-                try {
-                    if (result.bondState != BluetoothDevice.BOND_BONDED) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            val createSocket = BluetoothDevice::class.java.getMethod(
-                                "createRfcommSocket",
-                                Int::class.java
-                            )
-                            createSocket.isAccessible = true
-
-                            //找一个通道去连接即可，channel 1～30
-                            mBleSocket =
-                                createSocket.invoke(mBleResult!!.device, 1) as BluetoothSocket
-                            //阻塞等待
-                            mBleSocket?.connect()
-                            //延时，以便于去连接
-                            Thread.sleep(2000)
-                        } else {
-                            break
-                        }
-                    }
-
-                    if (connectA2dp(result.device)) {
-                        Log.d(TAG, "initView: connect success")
+            try {
+                if (bleScanResult.bondState != BluetoothDevice.BOND_BONDED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     } else {
-                        Log.d(TAG, "initView: connect fail")
+
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "initView: connect Error: msg = $e")
+                    val createSocket = BluetoothDevice::class.java.getMethod(
+                        "createRfcommSocket",
+                        Int::class.java
+                    )
+                    createSocket.isAccessible = true
+
+                    //找一个通道去连接即可，channel 1～30
+                    mBleSocket =
+                        createSocket.invoke(mBleResult!!.device, 1) as BluetoothSocket
+                    //阻塞等待
+                    mBleSocket?.connect()
                 }
-                retryCount++
+
+                if (connectA2dp(bleScanResult.device)) {
+                    Log.d(TAG, "initView: connect success")
+                } else {
+                    Log.d(TAG, "initView: connect fail")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "initView: connect Error: msg = $e")
             }
         }
     }
@@ -94,7 +90,7 @@ class BleA2dpConnectManager(): BleScanManager() {
         return connect.invoke(mBleA2dp, device) as Boolean
     }
 
-    fun close() {
+    override fun close() {
         try {
             mBleSocket?.close()
             try {

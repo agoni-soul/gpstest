@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class BleRfcommManager(): BleScanManager() {
+class BleRfcommManager(): BaseConnectManager() {
     private var mBleSocket: BluetoothSocket? = null
     private var mBleConnectCallback: IBleConnectCallback? = null
 
@@ -22,16 +22,16 @@ class BleRfcommManager(): BleScanManager() {
         mBleConnectCallback = bleConnectCallback
     }
 
-    fun connect(result: BleScanResult?) {
+    override fun connect(bleScanResult: BleScanResult?) {
         close()
-        result ?: return
-        cancelDiscovery()
+        bleScanResult ?: return
+        BleScanManager.cancelDiscovery()
         mBleConnectCallback?.onStart()
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
-            mBleConnectCallback?.onFail(BleErrorException("Manifest.permission.BLUETOOTH_CONNECT no grant"))
+            mBleConnectCallback?.onFail(BleErrorException("Manifest.permission.BLUETOOTH_CONNECT No Grant"))
             return
         }
-        mBleSocket = result.device?.createRfcommSocketToServiceRecord(BleConstants.BLUE_UUID)
+        mBleSocket = bleScanResult.device?.createRfcommSocketToServiceRecord(BleConstants.BLUE_UUID)
         MainScope().launch(Dispatchers.IO) {
             try {
                 mBleSocket?.run {
@@ -46,7 +46,7 @@ class BleRfcommManager(): BleScanManager() {
         }
     }
 
-    fun close() {
+    override fun close() {
         mBleSocket?.close()
     }
 }

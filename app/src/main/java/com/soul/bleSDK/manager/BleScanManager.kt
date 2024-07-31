@@ -14,16 +14,18 @@ import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
 
-open class BleScanManager() {
-    protected val TAG = this::class.java.simpleName
-    protected var mBleManager: BluetoothManager? = null
-    protected var mBleAdapter: BluetoothAdapter? = null
+object BleScanManager {
+    private val TAG = this::class.java.simpleName
+    private var mBleManager: BluetoothManager? = null
+    private var mBleAdapter: BluetoothAdapter? = null
 
     init {
         Log.d(TAG, "application = ${SoulApplication.application}")
         mBleManager = SoulApplication.application?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager?
         mBleAdapter =  mBleManager?.adapter
     }
+
+    fun getBluetoothManager(): BluetoothManager? = mBleManager
 
     fun getBluetoothAdapter(): BluetoothAdapter? = mBleAdapter
 

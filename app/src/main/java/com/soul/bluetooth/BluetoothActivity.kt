@@ -102,7 +102,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         mBondBleAdapter = BleAdapter(mBondBleDevices).apply {
             setCallback(object : BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
-                    mViewModel.mBleRfcommManager?.connect(result)
+                    mViewModel.mBleRfcommConnectManager?.connect(result)
                 }
             })
         }
@@ -211,7 +211,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         super.onDestroy()
         unregisterReceiver(mBluetoothReceiver)
         mViewModel.mBleA2dpConnectManager?.close()
-        mViewModel.mBleRfcommManager?.close()
+        mViewModel.mBleRfcommConnectManager?.close()
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {

@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class BleRfcommManager(): BaseConnectManager() {
+class BleRfcommConnectManager(): BaseConnectManager() {
     private var mBleSocket: BluetoothSocket? = null
     private var mBleConnectCallback: IBleConnectCallback? = null
 

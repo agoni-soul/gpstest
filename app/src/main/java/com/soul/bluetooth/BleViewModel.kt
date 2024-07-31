@@ -11,7 +11,7 @@ import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.interfaces.IBleConnectCallback
 import com.soul.bleSDK.manager.BleA2dpConnectManager
 import com.soul.bleSDK.manager.BleCommunicateManager
-import com.soul.bleSDK.manager.BleRfcommManager
+import com.soul.bleSDK.manager.BleRfcommConnectManager
 
 
 /**
@@ -21,7 +21,7 @@ import com.soul.bleSDK.manager.BleRfcommManager
  *     version: 1.0
  */
 class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
-    var mBleRfcommManager: BleRfcommManager? = null
+    var mBleRfcommConnectManager: BleRfcommConnectManager? = null
         private set
     private val mReadListener: BleListener by lazy {
         object : BleListener {
@@ -61,7 +61,7 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
     var mBleCommunicateManager: BleCommunicateManager? = null
 
     init {
-        mBleRfcommManager = BleRfcommManager().apply {
+        mBleRfcommConnectManager = BleRfcommConnectManager().apply {
             setConnectCallback(object: IBleConnectCallback {
                 override fun onStart() {
                     Log.d(TAG, "BleRfcommManager: onStart")
@@ -69,7 +69,7 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
 
                 override fun onConnected(bleScanResult: BleScanResult?) {
                     mBleCommunicateManager = BleCommunicateManager(
-                        mBleRfcommManager?.getBluetoothSocket(),
+                        mBleRfcommConnectManager?.getBluetoothSocket(),
                         mReadListener,
                         mWriteListener
                     ).apply {

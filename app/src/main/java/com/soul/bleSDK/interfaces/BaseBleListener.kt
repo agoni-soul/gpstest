@@ -1,7 +1,6 @@
 package com.soul.bleSDK.interfaces
 
 import android.bluetooth.BluetoothSocket
-import java.io.Closeable
 
 
 /**
@@ -11,6 +10,6 @@ import java.io.Closeable
  *     version: 1.0
  */
 interface BaseBleListener {
-    open fun onSendMsg(socket: BluetoothSocket?, msg: String){}
-    fun onFail(error: String)
+    fun onSendMsg(socket: BluetoothSocket?, msg: String?){}
+    fun onFail(error: String?)
 }

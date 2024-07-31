@@ -1,14 +1,17 @@
 package com.soul.bluetooth
 
 import android.app.Application
-import android.bluetooth.*
-import android.content.Context
+import android.bluetooth.BluetoothSocket
 import android.util.Log
 import com.soul.base.BaseViewModel
-import com.soul.bleSDK.BleConnectManager
+import com.soul.bean.BleScanResult
 import com.soul.bleSDK.BleListener
-import com.soul.bleSDK.BleSDKManager
+import com.soul.bleSDK.exceptions.BleErrorException
 import com.soul.bleSDK.interfaces.BaseBleListener
+import com.soul.bleSDK.interfaces.IBleConnectCallback
+import com.soul.bleSDK.manager.BleA2dpConnectManager
+import com.soul.bleSDK.manager.BleCommunicateManager
+import com.soul.bleSDK.manager.BleRfcommManager
 
 
 /**
@@ -18,7 +21,7 @@ import com.soul.bleSDK.interfaces.BaseBleListener
  *     version: 1.0
  */
 class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
-    var mBleSDKManager: BleSDKManager? = null
+    var mBleRfcommManager: BleRfcommManager? = null
         private set
     private val mReadListener: BleListener by lazy {
         object : BleListener {
@@ -26,41 +29,65 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
                 Log.d(TAG, "onStart: 正在连接...")
             }
 
-            override fun onReceiveData(socket: BluetoothSocket?, msg: String) {
+            override fun onReceiveData(socket: BluetoothSocket?, msg: String?) {
                 Log.d(TAG, "onReceiveData: ${socket?.remoteDevice?.name + ": " + msg}")
             }
 
-            override fun onConnected(msg: String) {
+            override fun onConnected(msg: String?) {
                 super.onConnected(msg)
                 Log.d(TAG, "onConnected: 已连接")
             }
 
-            override fun onFail(error: String) {
+            override fun onFail(error: String?) {
                 Log.d(TAG, "onFail: 已配对 error = $error")
             }
         }
     }
     private val mWriteListener: BaseBleListener by lazy {
         object : BaseBleListener {
-            override fun onSendMsg(socket: BluetoothSocket?, msg: String) {
+            override fun onSendMsg(socket: BluetoothSocket?, msg: String?) {
                 Log.d(TAG, "onSendMsg: 我: $msg")
             }
 
-            override fun onFail(error: String) {
+            override fun onFail(error: String?) {
                 Log.d(TAG, "write onFail: $error")
             }
         }
     }
 
-    var mBleConnectManager: BleConnectManager? = null
+    var mBleA2dpConnectManager: BleA2dpConnectManager? = null
         private set
 
+    var mBleCommunicateManager: BleCommunicateManager? = null
+
     init {
-        mBleSDKManager = BleSDKManager().apply {
-            setReadListener(mReadListener)
-            setWriteListener(mWriteListener)
+        mBleRfcommManager = BleRfcommManager().apply {
+            setConnectCallback(object: IBleConnectCallback {
+                override fun onStart() {
+                    Log.d(TAG, "BleRfcommManager: onStart")
+                }
+
+                override fun onConnected(bleScanResult: BleScanResult?) {
+                    mBleCommunicateManager = BleCommunicateManager(
+                        mBleRfcommManager?.getBluetoothSocket(),
+                        mReadListener,
+                        mWriteListener
+                    ).apply {
+                        init()
+                    }
+                }
+
+                override fun onFail(e: BleErrorException?) {
+                    Log.e(TAG, "BleRfcommManager: onFail: errorMessage = ${e?.message}")
+                }
+
+                override fun close() {
+                    Log.e(TAG, "BleRfcommManager: close")
+
+                }
+            })
         }
-        mBleConnectManager = BleConnectManager()
+        mBleA2dpConnectManager = BleA2dpConnectManager()
     }
 
 }

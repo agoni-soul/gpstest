@@ -2,11 +2,7 @@ package com.soul.bluetooth
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothSocket
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,11 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
-import com.soul.bleSDK.BleConnectManager
-import com.soul.bleSDK.BleListener
-import com.soul.bleSDK.BleSDKManager
-import com.soul.bleSDK.BleScanManager
-import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
@@ -86,7 +77,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     Log.d(TAG, "onClick: \nuuid = ${uuid}")
                     val serviceDataSingle = serviceData?.get(parcelUuid)
                     Log.d(TAG, "onClick: \nserviceDataSingle = $serviceDataSingle")
-                    mViewModel.mBleConnectManager?.connect(result)
+                    mViewModel.mBleA2dpConnectManager?.connect(result)
                 }
             })
         }
@@ -99,10 +90,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         }
         mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
         mViewDataBinding.tvBluetooth.setOnClickListener {
-            mViewModel.mBleSDKManager?.sendMsg("蓝牙图标")
+            mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
         }
 
-        mViewModel.mBleConnectManager?.getBluetoothAdapter()?.bondedDevices?.let {
+        mViewModel.mBleA2dpConnectManager?.getBluetoothAdapter()?.bondedDevices?.let {
             for (device in it) {
                 mBondBleDevices.add(device.toBleScanResult())
             }
@@ -110,7 +101,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         mBondBleAdapter = BleAdapter(mBondBleDevices).apply {
             setCallback(object : BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
-                    mViewModel.mBleSDKManager?.start(result.device)
+                    mViewModel.mBleRfcommManager?.connect(result)
                 }
             })
         }
@@ -124,10 +115,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     }
 
     override fun initData() {
-        mViewModel.mBleConnectManager?.startDiscovery()
+        mViewModel.mBleA2dpConnectManager?.startDiscovery()
         registerBleReceiver()
         if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            mViewModel.mBleConnectManager?.startScan(object: IBleScanCallback {
+            mViewModel.mBleA2dpConnectManager?.startScan(object: IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
                     results ?: return
                 }
@@ -212,14 +203,14 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
     override fun onStop() {
         super.onStop()
-        mViewModel.mBleConnectManager?.cancelDiscovery()
+        mViewModel.mBleA2dpConnectManager?.cancelDiscovery()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mBluetoothReceiver)
-        mViewModel.mBleConnectManager?.close()
-        mViewModel.mBleSDKManager?.close()
+        mViewModel.mBleA2dpConnectManager?.close()
+        mViewModel.mBleRfcommManager?.close()
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {
@@ -254,7 +245,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                 }
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
                 mViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    mViewModel.mBleConnectManager?.getBluetoothAdapter()?.bondedDevices?.toMutableList()?.let {
+                    mViewModel.mBleA2dpConnectManager?.getBluetoothAdapter()?.bondedDevices?.toMutableList()?.let {
                         val bleDevice: BluetoothDevice =
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 intent.getParcelableExtra(

@@ -1,4 +1,4 @@
-package com.soul.bleSDK
+package com.soul.bleSDK.manager
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter

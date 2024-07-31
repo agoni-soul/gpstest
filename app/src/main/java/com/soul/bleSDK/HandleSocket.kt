@@ -14,7 +14,7 @@ import java.io.Closeable
  *     desc   :
  *     version: 1.0
  */
-class HandleSocket(private val socket: BluetoothSocket?): Closeable {
+class HandleSocket(private val bleSocket: BluetoothSocket?): Closeable {
     companion object {
         private val TAG = HandleSocket::class.java.simpleName
     }
@@ -26,19 +26,19 @@ class HandleSocket(private val socket: BluetoothSocket?): Closeable {
         readListener: BaseBleListener?,
         writeListener: BaseBleListener?
     ) {
-        mReadThread = ReadThread(socket, readListener)
+        mReadThread = ReadThread(bleSocket, readListener)
         mReadThread.start()
-        mWriteThread = WriteThread(socket, writeListener)
+        mWriteThread = WriteThread(bleSocket, writeListener)
     }
 
-    fun sendMsg(msg: String?) {
-        mWriteThread.sendMsg(msg)
+    fun sendMessage(msg: String?) {
+        mWriteThread.sendMessage(msg)
     }
 
     override fun close() {
         mReadThread.cancel()
         mWriteThread.cancel()
-        close(socket)
+        close(bleSocket)
     }
 }
 

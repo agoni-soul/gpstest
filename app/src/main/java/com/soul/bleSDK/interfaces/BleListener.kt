@@ -12,6 +12,6 @@ import com.soul.bleSDK.interfaces.BaseBleListener
  */
 interface BleListener: BaseBleListener {
     fun onStart()
-    fun onReceiveData(socket: BluetoothSocket?, msg: String)
-    open fun onConnected(msg: String) {}
+    fun onReceiveData(socket: BluetoothSocket?, msg: String?)
+    fun onConnected(msg: String?) {}
 }

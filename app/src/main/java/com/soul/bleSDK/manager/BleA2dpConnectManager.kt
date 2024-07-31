@@ -1,4 +1,4 @@
-package com.soul.bleSDK
+package com.soul.bleSDK.manager
 
 import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothDevice
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-class BleConnectManager(): BleScanManager() {
+class BleA2dpConnectManager(): BleScanManager() {
     protected var mBleA2dp: BluetoothA2dp? = null
     protected var mBleSocket: BluetoothSocket? = null
     protected var mBleResult: BleScanResult? = null
@@ -46,6 +46,7 @@ class BleConnectManager(): BleScanManager() {
     fun connect(result: BleScanResult?) {
         close()
         result ?: return
+        cancelDiscovery()
         mBleResult = result
         MainScope().launch(Dispatchers.IO) {
             val retryAmount = 10

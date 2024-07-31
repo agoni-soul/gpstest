@@ -14,16 +14,16 @@ import java.io.OutputStream
  *     version: 1.0
  */
 class WriteThread(
-    private val socket: BluetoothSocket?,
+    private val bleSocket: BluetoothSocket?,
     val listener: BaseBleListener?
 ) {
     private var isDone = false
-    private val dataOutput: OutputStream? = socket?.outputStream
+    private val dataOutput: OutputStream? = bleSocket?.outputStream
 
     private val job = Job()
     private val scope = CoroutineScope(job)
 
-    fun sendMsg(msg: String?) {
+    fun sendMessage(msg: String?) {
         if (isDone || msg == null) return
         scope.launch(Dispatchers.IO) {
             val result = withContext(Dispatchers.IO) {
@@ -32,7 +32,7 @@ class WriteThread(
             if (result != null) {
                 listener?.onFail(result)
             } else {
-                listener?.onSendMsg(socket, msg)
+                listener?.onSendMsg(bleSocket, msg)
             }
         }
     }
@@ -50,7 +50,7 @@ class WriteThread(
 
     fun cancel() {
         isDone = true
-        socket?.close()
+        bleSocket?.close()
         close(dataOutput)
         job.cancel()
     }

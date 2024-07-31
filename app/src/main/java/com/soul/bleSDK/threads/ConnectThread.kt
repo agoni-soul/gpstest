@@ -20,12 +20,14 @@ class ConnectThread(
     val readListener: BleListener?,
     val writeListener: BaseBleListener?
 ): Thread() {
-    var mHandleSocket: HandleSocket? = null
+    private var mHandleSocket: HandleSocket? = null
     private val mBleSocket: BluetoothSocket? by lazy {
         readListener?.onStart()
         //监听该 uuid
         device?.createRfcommSocketToServiceRecord(BLUE_UUID)
     }
+
+    fun getHandleSocket(): HandleSocket? = mHandleSocket
 
     override fun run() {
         super.run()

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
 //    configurations {
@@ -25,7 +25,7 @@ android {
         applicationId "com.soul.gpstest"
         minSdkVersion 21
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 33
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 

@@ -15,8 +15,8 @@ import com.soul.bleSDK.utils.close
  */
 class BleCommunicateManager(
     private val mBleSocket: BluetoothSocket?,
-    val readListener: BleListener? = null,
-    val writeListener: BaseBleListener? = null
+    private val readListener: BleListener? = null,
+    private val writeListener: BaseBleListener? = null
 ) {
     private var mHandleSocket: HandleSocket? = null
 

@@ -48,43 +48,49 @@ class BleA2dpConnectManager(): BaseConnectManager() {
     fun getBluetoothA2dp(): BluetoothA2dp? = mBleA2dp
 
     override fun connect(bleScanResult: BleScanResult?) {
-        close()
         bleScanResult ?: return
-        BleScanManager.cancelDiscovery()
-        mBleResult = bleScanResult
-        MainScope().launch(Dispatchers.IO) {
-            try {
-                if (bleScanResult.bondState != BluetoothDevice.BOND_BONDED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
-                            Log.e(TAG, "BLUETOOTH_CONNECT permission is no grant")
-                            return@launch
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+                bleScanResult.device?.createBond()
+            }
+        } else {
+            close()
+            BleScanManager.cancelDiscovery()
+            mBleResult = bleScanResult
+            MainScope().launch(Dispatchers.IO) {
+                try {
+                    if (bleScanResult.bondState != BluetoothDevice.BOND_BONDED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+                                Log.e(TAG, "BLUETOOTH_CONNECT permission is no grant")
+                                return@launch
+                            }
+                        } else {
+                            if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_ADMIN)) {
+                                Log.e(TAG, "BLUETOOTH_ADMIN permission is no grant")
+                                return@launch
+                            }
                         }
-                    } else {
-                        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_ADMIN)) {
-                            Log.e(TAG, "BLUETOOTH_ADMIN permission is no grant")
-                            return@launch
-                        }
+                        val createSocket = BluetoothDevice::class.java.getMethod(
+                            "createRfcommSocket",
+                            Int::class.java
+                        )
+                        createSocket.isAccessible = true
+
+                        //找一个通道去连接即可，channel 1～30
+                        mBleSocket = createSocket.invoke(mBleResult!!.device, 1) as BluetoothSocket
+                        //阻塞等待
+                        mBleSocket?.connect()
                     }
-                    val createSocket = BluetoothDevice::class.java.getMethod(
-                        "createRfcommSocket",
-                        Int::class.java
-                    )
-                    createSocket.isAccessible = true
 
-                    //找一个通道去连接即可，channel 1～30
-                    mBleSocket = createSocket.invoke(mBleResult!!.device, 1) as BluetoothSocket
-                    //阻塞等待
-                    mBleSocket?.connect()
+                    if (connectA2dp(bleScanResult.device)) {
+                        Log.d(TAG, "initView: connect success")
+                    } else {
+                        Log.d(TAG, "initView: connect fail")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "initView: connect Error: msg = $e")
                 }
-
-                if (connectA2dp(bleScanResult.device)) {
-                    Log.d(TAG, "initView: connect success")
-                } else {
-                    Log.d(TAG, "initView: connect fail")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "initView: connect Error: msg = $e")
             }
         }
     }

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_ble_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_ble_name"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="10dp"
+        android:ellipsize="end"
+        android:gravity="start|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_ble_mac"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="你好" />
+
+    <TextView
+        android:id="@+id/tv_ble_mac"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="10dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="abcdefg" />
+
+    <TextView
+        android:id="@+id/tv_ble_bond_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/gray_606060"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_ble_connectable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_name"
+        tools:text="abcdefg" />
+
+    <TextView
+        android:id="@+id/tv_ble_connectable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="end|center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/gray_606060"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_name"
+        tools:text="abcdefg" />
+
+    <TextView
+        android:id="@+id/tv_service_uuids"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/gray_606060"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_bond_status"
+        tools:text="你好" />
+
+    <TextView
+        android:id="@+id/tv_device_uuids"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/gray_606060"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_service_uuids"
+        tools:text="你好" />
+
+    <TextView
+        android:id="@+id/tv_ble_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/gray_606060"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_device_uuids"
+        tools:text="你好" />
+
+    <Button
+        android:id="@+id/btn_ble_unbind"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:text="@string/ble_unbind"
+        android:background="@color/white"
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_data"
+        app:layout_constraintEnd_toStartOf="@+id/btn_ble_communicate"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/btn_ble_communicate"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:text="@string/ble_communicate"
+        android:background="@color/white"
+        android:layout_marginHorizontal="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ble_data"
+        app:layout_constraintStart_toEndOf="@+id/btn_ble_unbind"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginHorizontal="8dp"
+        android:background="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/btn_ble_unbind" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

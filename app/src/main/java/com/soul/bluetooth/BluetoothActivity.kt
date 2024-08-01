@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,7 +52,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     override fun getLayoutId(): Int = R.layout.activity_bluetooth
 
     override fun initView() {
-        checkSelfPermission(mutableListOf(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            checkSelfPermission(mutableListOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.BLUETOOTH_CONNECT,
@@ -59,6 +61,14 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN
             ))
+        } else {
+            checkSelfPermission(mutableListOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,t
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN
+            ))
+        }
         mBleAdapter = BleAdapter(mBleDevices).apply {
             setCallback(object : BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
@@ -126,12 +136,12 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
                 override fun onScanResult(callbackType: Int, result: BleScanResult?) {
                     result?.device?.let { bleDevice ->
-                        if (bleDevice.name?.startsWith("colmo", true) == true ||
-                            bleDevice.name?.startsWith("midea", true) == true
+                        if (result.name?.startsWith("colmo", true) == true ||
+                            result.name?.startsWith("midea", true) == true
                         ) {
                             return@let
                         }
-                        if (!bleDevice.name.isNullOrBlank() && !bleDevice.address.isNullOrBlank()) {
+                        if (!result.name.isNullOrBlank() && !bleDevice.address.isNullOrBlank()) {
                             if (mBleDevices.find { it.mac == bleDevice.address } == null) {
                                 mBleDevices.add(result)
                                 mBleDevices.sortBy { it.name?.uppercase() }
@@ -237,7 +247,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     return
                 }
                 val bleScanResult = bleDevice?.toBleScanResult()
-                if (!bleDevice?.name.isNullOrBlank() && !bleDevice?.address.isNullOrBlank()) {
+                if (!bleScanResult?.name.isNullOrBlank() && !bleDevice?.address.isNullOrBlank()) {
                     if (mBleDevices.find { it.mac == bleDevice!!.address } == null) {
                         mBleDevices.add(bleScanResult!!)
                         mBleDevices.sortBy { it.name?.uppercase() }

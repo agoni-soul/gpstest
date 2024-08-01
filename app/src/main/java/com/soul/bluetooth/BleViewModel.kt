@@ -74,6 +74,7 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
                         mWriteListener
                     ).apply {
                         init()
+                        startReadMessage()
                     }
                 }
 

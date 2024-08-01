@@ -22,8 +22,14 @@ class BleCommunicateManager(
 
     fun init() {
         //处理 socket 读写
-        mHandleSocket = HandleSocket(mBleSocket)
-        mHandleSocket?.start(readListener, writeListener)
+        mHandleSocket = HandleSocket(mBleSocket).apply {
+            initReadThread(readListener)
+            initWriteThread(writeListener)
+        }
+    }
+
+    fun startReadMessage() {
+        mHandleSocket?.startReadMessage()
     }
 
     fun sendMessage(message: String?) {
@@ -31,6 +37,6 @@ class BleCommunicateManager(
     }
 
     fun close() {
-        close(mHandleSocket)
+        mHandleSocket?.close()
     }
 }

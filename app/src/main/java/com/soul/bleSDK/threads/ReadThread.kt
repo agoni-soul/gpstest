@@ -1,10 +1,11 @@
-package com.soul.bluetooth
+package com.soul.bleSDK.threads
 
 import android.bluetooth.BluetoothSocket
 import android.util.Log
 import com.soul.bleSDK.BleListener
 import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.utils.close
+import kotlinx.coroutines.*
 import java.io.DataInputStream
 
 
@@ -14,47 +15,47 @@ import java.io.DataInputStream
  *     desc   :
  *     version: 1.0
  */
-class ReadThread(val socket: BluetoothSocket?, bleListener: BaseBleListener?): Thread() {
-    companion object {
-        private val TAG = ReadThread::class.java.simpleName
-    }
+class ReadThread(
+    bleSocket: BluetoothSocket?,
+    bleListener: BaseBleListener?
+): BaseCommunicateThread(bleSocket) {
 
-    private val mInputStream: DataInputStream? = socket?.inputStream?.let { DataInputStream(it) }
-    private var isDone = false
-    private val listener: BleListener? = bleListener as? BleListener
+    private val mInputStream: DataInputStream? = bleSocket?.inputStream?.let { DataInputStream(it) }
+    private val mBleListener: BleListener? = bleListener as? BleListener
     //TODO 目前简单数据，暂时使用这种
     private val mByteBuffer: ByteArray = ByteArray(1024)
 
-    override fun run() {
-        super.run()
-        var size: Int? = null
-        while (!isDone) {
-            try {
-                //拿到读的数据和大小
-                size = mInputStream?.read(mByteBuffer)
-            } catch (e: java.lang.Exception) {
-                isDone = false
-                e.message?.let {
-                    listener?.onFail(it)
+    fun startReadMessage() {
+        scope.launch(Dispatchers.IO) {
+            var size: Int?
+            while (!isDone) {
+                if (isDone) return@launch
+                try {
+                    //拿到读的数据和大小
+                    size = mInputStream?.read(mByteBuffer)
+                } catch (e: java.lang.Exception) {
+                    isDone = false
+                    e.message?.let {
+                        mBleListener?.onFail(it)
+                    }
+                    return@launch
                 }
-                return
-            }
 
-            Log.d(TAG, "run: size = $size")
-            if (size != null && size > 0) {
-                // 把结果公布出去
-                listener?.onReceiveData(socket, String(mByteBuffer, 0, size))
-            } else {
-                //如果接收不到数据，则证明已经断开了
-                listener?.onFail("断开连接")
-                isDone = false
+                Log.d(TAG, "startReadMessage: size = $size")
+                if (size != null && size > 0) {
+                    // 把结果公布出去
+                    mBleListener?.onReceiveData(mBleSocket, String(mByteBuffer, 0, size))
+                } else {
+                    //如果接收不到数据，则证明已经断开了
+                    mBleListener?.onFail("断开连接")
+                    return@launch
+                }
             }
         }
     }
 
-    fun cancel() {
-        isDone = false
-        socket?.close()
-        close(mInputStream)
+    override fun close() {
+        super.close()
+        close(mBleSocket, mInputStream)
     }
 }

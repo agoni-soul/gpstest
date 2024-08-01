@@ -3,8 +3,8 @@ package com.soul.bleSDK
 import android.bluetooth.BluetoothSocket
 import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.threads.WriteThread
+import com.soul.bleSDK.threads.ReadThread
 import com.soul.bleSDK.utils.close
-import com.soul.bluetooth.ReadThread
 import java.io.Closeable
 
 
@@ -19,26 +19,27 @@ class HandleSocket(private val bleSocket: BluetoothSocket?): Closeable {
         private val TAG = HandleSocket::class.java.simpleName
     }
 
-    private lateinit var mReadThread: ReadThread
-    private lateinit var mWriteThread: WriteThread
+    private var mReadThread: ReadThread? = null
+    private var mWriteThread: WriteThread? = null
 
-    fun start(
-        readListener: BaseBleListener?,
-        writeListener: BaseBleListener?
-    ) {
+    fun initReadThread(readListener: BaseBleListener?) {
         mReadThread = ReadThread(bleSocket, readListener)
-        mReadThread.start()
+    }
+
+    fun initWriteThread(writeListener: BaseBleListener?) {
         mWriteThread = WriteThread(bleSocket, writeListener)
     }
 
+    fun startReadMessage() {
+        mReadThread?.startReadMessage()
+    }
+
     fun sendMessage(msg: String?) {
-        mWriteThread.sendMessage(msg)
+        mWriteThread?.sendMessage(msg)
     }
 
     override fun close() {
-        mReadThread.cancel()
-        mWriteThread.cancel()
-        close(bleSocket)
+        close(mReadThread, mWriteThread, bleSocket)
     }
 }
 

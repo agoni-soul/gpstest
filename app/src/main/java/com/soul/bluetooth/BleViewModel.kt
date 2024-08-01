@@ -3,10 +3,7 @@ package com.soul.bluetooth
 import android.Manifest
 import android.app.Application
 import android.bluetooth.BluetoothSocket
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import com.soul.animation.PermissionUtil
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
 import com.soul.bleSDK.BleListener
@@ -16,6 +13,7 @@ import com.soul.bleSDK.interfaces.IBleConnectCallback
 import com.soul.bleSDK.manager.BleA2dpConnectManager
 import com.soul.bleSDK.manager.BleCommunicateManager
 import com.soul.bleSDK.manager.BleRfcommConnectManager
+import com.soul.bleSDK.utils.close
 import com.soul.util.PermissionUtils
 
 
@@ -25,7 +23,7 @@ import com.soul.util.PermissionUtils
  *     desc   :
  *     version: 1.0
  */
-class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
+class BleViewModel(mApplication: Application) : BaseViewModel(mApplication) {
     var mBleRfcommConnectManager: BleRfcommConnectManager? = null
         private set
     private val mReadListener: BleListener by lazy {
@@ -71,7 +69,7 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
 
     init {
         mBleRfcommConnectManager = BleRfcommConnectManager().apply {
-            setConnectCallback(object: IBleConnectCallback {
+            setConnectCallback(object : IBleConnectCallback {
                 override fun onStart() {
                     Log.d(TAG, "BleRfcommManager: onStart")
                 }
@@ -100,4 +98,7 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
         mBleA2dpConnectManager = BleA2dpConnectManager()
     }
 
+    fun close() {
+        close(mBleA2dpConnectManager, mBleRfcommConnectManager, mBleRfcommConnectManager)
+    }
 }

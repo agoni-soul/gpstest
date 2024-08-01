@@ -10,7 +10,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -132,6 +131,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             BleScanManager.startScan(object: IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
                     results ?: return
+                    results.toString()
                 }
 
                 override fun onScanResult(callbackType: Int, result: BleScanResult?) {
@@ -220,8 +220,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(mBluetoothReceiver)
-        mViewModel.mBleA2dpConnectManager?.close()
-        mViewModel.mBleRfcommConnectManager?.close()
+        mViewModel.close()
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {
@@ -239,11 +238,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     } else {
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
-                if (bleDevice?.name?.startsWith(
-                        "colmo",
-                        true
-                    ) == true || bleDevice?.name?.startsWith("midea", true) == true
-                ) {
+                if (bleDevice?.name?.startsWith("colmo", true) == true ||
+                    bleDevice?.name?.startsWith("midea", true) == true) {
                     return
                 }
                 val bleScanResult = bleDevice?.toBleScanResult()

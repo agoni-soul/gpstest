@@ -5,6 +5,7 @@ import com.soul.bleSDK.BleListener
 import com.soul.bleSDK.HandleSocket
 import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.utils.close
+import java.io.Closeable
 
 
 /**
@@ -17,7 +18,7 @@ class BleCommunicateManager(
     private val mBleSocket: BluetoothSocket?,
     private val readListener: BleListener? = null,
     private val writeListener: BaseBleListener? = null
-) {
+): Closeable {
     private var mHandleSocket: HandleSocket? = null
 
     fun init() {
@@ -36,7 +37,7 @@ class BleCommunicateManager(
         mHandleSocket?.sendMessage(message)
     }
 
-    fun close() {
+    override fun close() {
         mHandleSocket?.close()
     }
 }

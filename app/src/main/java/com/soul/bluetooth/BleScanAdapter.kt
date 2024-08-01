@@ -2,7 +2,6 @@ package com.soul.bluetooth
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import android.os.ParcelUuid
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.bean.BleScanResult
 import com.soul.gpstest.R
-import java.util.UUID
 
 
 /**
@@ -20,8 +18,8 @@ import java.util.UUID
  *     desc   :
  *     version: 1.0
  */
-class BleAdapter(bleDevices: MutableList<BleScanResult>) :
-    RecyclerView.Adapter<BleAdapter.BleViewHolder>() {
+class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
+    RecyclerView.Adapter<BleScanAdapter.BleViewHolder>() {
     private val TAG = this.javaClass::class.simpleName
 
     private lateinit var mContext: Context
@@ -32,16 +30,16 @@ class BleAdapter(bleDevices: MutableList<BleScanResult>) :
 
     private var mItemClickCallback: ItemClickCallback? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleAdapter.BleViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleScanAdapter.BleViewHolder {
         mContext = parent.context
         mBleManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item_ble, parent, false)
+        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item_ble_scan, parent, false)
         return BleViewHolder(view)
     }
 
     override fun getItemCount(): Int = mBleDevices.size
 
-    override fun onBindViewHolder(holder: BleAdapter.BleViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BleScanAdapter.BleViewHolder, position: Int) {
         val bleScanResult = mBleDevices[position]
         holder.itemTvBleName.text = bleScanResult.name
         holder.itemTvBleMac.text = bleScanResult.mac

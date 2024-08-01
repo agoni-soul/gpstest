@@ -27,4 +27,6 @@
     <string name="ble_connectable">是否可连接:%1$s</string>
     <string name="ble_service_uuids">ServiceUuids:\n%s</string>
     <string name="ble_device_uuids">DeviceUuids:\n%s</string>
+    <string name="ble_unbind">解绑</string>
+    <string name="ble_communicate">通信</string>
 </resources>

@@ -41,10 +41,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
 
-    private var mBleAdapter: BleAdapter? = null
+    private var mBleScanAdapter: BleScanAdapter? = null
     private var mBleDevices = mutableListOf<BleScanResult>()
 
-    private var mBondBleAdapter: BleAdapter? = null
+    private var mBondBleScanAdapter: BleBondedAdapter? = null
     private var mBondBleDevices = mutableListOf<BleScanResult>()
 
     override fun getViewModelClass(): Class<BleViewModel> = BleViewModel::class.java
@@ -69,8 +69,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                 Manifest.permission.BLUETOOTH_ADMIN
             ))
         }
-        mBleAdapter = BleAdapter(mBleDevices).apply {
-            setCallback(object : BleAdapter.ItemClickCallback {
+        mBleScanAdapter = BleScanAdapter(mBleDevices).apply {
+            setCallback(object : BleScanAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
                     Log.d(TAG, "onClick: \ndevice = ${result.device}")
                     var parcelUuid = result.scanRecord?.serviceUuids?.get(0)
@@ -93,7 +93,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             })
         }
         mViewDataBinding.rvDeviceBle.let {
-            it.adapter = mBleAdapter
+            it.adapter = mBleScanAdapter
             val layoutManager = LinearLayoutManager(mContext).apply {
                 orientation = LinearLayoutManager.VERTICAL
             }
@@ -104,15 +104,27 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
         }
 
-        mBondBleAdapter = BleAdapter(mBondBleDevices).apply {
-            setCallback(object : BleAdapter.ItemClickCallback {
-                override fun onClick(result: BleScanResult) {
+        mBondBleScanAdapter = BleBondedAdapter(mBondBleDevices, R.layout.adapter_item_ble_bonded).apply {
+            setCallback(object : BleBondedAdapter.ItemClickCallback {
+
+                override fun onClickUnbind(result: BleScanResult) {
+                    val device = result.device ?: return
+                    try {
+                        val m = BluetoothDevice::class.java.getMethod("removeBond")
+                        m.invoke(device)
+                    } catch (e: java.lang.Exception) {
+                        Log.e(TAG, "onClickUnbind: errorMessage = ${e.message}")
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onClickCommunicate(result: BleScanResult) {
                     mViewModel.mBleRfcommConnectManager?.connect(result)
                 }
             })
         }
         mViewDataBinding.rvBondBle.let {
-            it.adapter = mBondBleAdapter
+            it.adapter = mBondBleScanAdapter
             val layoutManager = LinearLayoutManager(mContext).apply {
                 orientation = LinearLayoutManager.VERTICAL
             }
@@ -141,7 +153,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                             if (mBleDevices.find { it.mac == result.mac } == null) {
                                 mBleDevices.add(result)
                                 mBleDevices.sortBy { it.name?.uppercase() }
-                                mBleAdapter?.notifyDataSetChanged()
+                                mBleScanAdapter?.notifyDataSetChanged()
                             }
                         }
                     }
@@ -249,7 +261,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     if (mBleDevices.find { it.mac == bleDevice!!.address } == null) {
                         mBleDevices.add(bleScanResult!!)
                         mBleDevices.sortBy { it.name?.uppercase() }
-                        mBleAdapter?.notifyDataSetChanged()
+                        mBleScanAdapter?.notifyDataSetChanged()
                     }
                 }
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
@@ -268,7 +280,9 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                         (preState == BluetoothDevice.BOND_NONE || preState == BluetoothDevice.BOND_BONDING)) {
                         if (bondedDevices.find { it.address == bleDevice.address } != null) {
                             mBondBleDevices.add(bleDevice.toBleScanResult())
-                            mBondBleAdapter?.notifyItemChanged(mBondBleDevices.size)
+                            withContext(Dispatchers.Main) {
+                                mBondBleScanAdapter?.notifyItemChanged(mBondBleDevices.size)
+                            }
                             BleScanManager.startDiscovery()
                         }
                     } else if (state == BluetoothDevice.BOND_NONE &&
@@ -283,7 +297,9 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                         }
                         if (i < mBondBleDevices.size) {
                             mBondBleDevices.removeAt(i)
-                            mBondBleAdapter?.notifyItemRemoved(i)
+                            withContext(Dispatchers.Main) {
+                                mBondBleScanAdapter?.notifyItemRemoved(i)
+                            }
                             BleScanManager.startDiscovery()
                         }
                     }

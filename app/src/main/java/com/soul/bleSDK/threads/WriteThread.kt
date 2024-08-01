@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothSocket
 import com.soul.bleSDK.interfaces.BaseBleListener
 import com.soul.bleSDK.utils.close
 import kotlinx.coroutines.*
+import java.io.Closeable
 import java.io.OutputStream
 
 
@@ -14,14 +15,10 @@ import java.io.OutputStream
  *     version: 1.0
  */
 class WriteThread(
-    private val bleSocket: BluetoothSocket?,
-    val listener: BaseBleListener?
-) {
-    private var isDone = false
-    private val dataOutput: OutputStream? = bleSocket?.outputStream
-
-    private val job = Job()
-    private val scope = CoroutineScope(job)
+    bleSocket: BluetoothSocket?,
+    private val mBleListener: BaseBleListener?
+): BaseCommunicateThread(bleSocket) {
+    private val dataOutput: OutputStream? = mBleSocket?.outputStream
 
     fun sendMessage(msg: String?) {
         if (isDone || msg == null) return
@@ -30,9 +27,9 @@ class WriteThread(
                 sendScope(msg)
             }
             if (result != null) {
-                listener?.onFail(result)
+                mBleListener?.onFail(result)
             } else {
-                listener?.onSendMsg(bleSocket, msg)
+                mBleListener?.onSendMsg(mBleSocket, msg)
             }
         }
     }
@@ -48,10 +45,8 @@ class WriteThread(
         }
     }
 
-    fun cancel() {
-        isDone = true
-        bleSocket?.close()
-        close(dataOutput)
-        job.cancel()
+    override fun close() {
+        super.close()
+        close(mBleSocket, dataOutput)
     }
 }

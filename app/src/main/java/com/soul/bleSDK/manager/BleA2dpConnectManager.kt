@@ -24,9 +24,9 @@ import kotlinx.coroutines.launch
  *     version: 1.0
  */
 class BleA2dpConnectManager(): BaseConnectManager() {
-    protected var mBleA2dp: BluetoothA2dp? = null
-    protected var mBleSocket: BluetoothSocket? = null
-    protected var mBleResult: BleScanResult? = null
+    private var mBleA2dp: BluetoothA2dp? = null
+    private var mBleSocket: BluetoothSocket? = null
+    private var mBleResult: BleScanResult? = null
 
     init {
         BleScanManager.getBluetoothAdapter()?.getProfileProxy(SoulAppLike.application, object: BluetoothProfile.ServiceListener {

@@ -1,8 +1,12 @@
 package com.soul.bluetooth
 
+import android.Manifest
 import android.app.Application
 import android.bluetooth.BluetoothSocket
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import com.soul.animation.PermissionUtil
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
 import com.soul.bleSDK.BleListener
@@ -12,6 +16,7 @@ import com.soul.bleSDK.interfaces.IBleConnectCallback
 import com.soul.bleSDK.manager.BleA2dpConnectManager
 import com.soul.bleSDK.manager.BleCommunicateManager
 import com.soul.bleSDK.manager.BleRfcommConnectManager
+import com.soul.util.PermissionUtils
 
 
 /**
@@ -30,6 +35,10 @@ class BleViewModel(mApplication: Application): BaseViewModel(mApplication) {
             }
 
             override fun onReceiveData(socket: BluetoothSocket?, msg: String?) {
+                if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+                    Log.e(TAG, "BLUETOOTH_CONNECT permission is no granted")
+                    return
+                }
                 Log.d(TAG, "onReceiveData: ${socket?.remoteDevice?.name + ": " + msg}")
             }
 

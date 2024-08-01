@@ -214,6 +214,10 @@ data class BleScanResult(
         if (other !is BleScanResult) return false
         return this.mac == other.mac
     }
+
+    override fun hashCode(): Int {
+        return mac?.hashCode() ?: 0
+    }
 }
 
 data class BleScanRecordDetailBean(

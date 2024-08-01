@@ -2,11 +2,14 @@ package com.soul.bleSDK.manager
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.soul.SoulApplication
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
@@ -28,6 +31,14 @@ object BleScanManager {
     fun getBluetoothManager(): BluetoothManager? = mBleManager
 
     fun getBluetoothAdapter(): BluetoothAdapter? = mBleAdapter
+
+    fun getBondedDevices(): MutableSet<BluetoothDevice>? {
+        return if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            mBleAdapter?.bondedDevices
+        } else {
+            null
+        }
+    }
 
     fun startDiscovery() {
         Log.d(TAG, "startDiscovery")

@@ -1,6 +1,7 @@
 package com.soul.bluetooth
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -103,11 +104,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
         }
 
-        BleScanManager.getBluetoothAdapter()?.bondedDevices?.let {
-            for (device in it) {
-                mBondBleDevices.add(device.toBleScanResult())
-            }
-        }
         mBondBleAdapter = BleAdapter(mBondBleDevices).apply {
             setCallback(object : BleAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
@@ -134,15 +130,15 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     results.toString()
                 }
 
-                override fun onScanResult(callbackType: Int, result: BleScanResult?) {
-                    result?.device?.let { bleDevice ->
+                override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                    bleScanResult?.let { result ->
                         if (result.name?.startsWith("colmo", true) == true ||
                             result.name?.startsWith("midea", true) == true
                         ) {
                             return@let
                         }
-                        if (!result.name.isNullOrBlank() && !bleDevice.address.isNullOrBlank()) {
-                            if (mBleDevices.find { it.mac == bleDevice.address } == null) {
+                        if (!result.name.isNullOrBlank() && !result.mac.isNullOrBlank()) {
+                            if (mBleDevices.find { it.mac == result.mac } == null) {
                                 mBleDevices.add(result)
                                 mBleDevices.sortBy { it.name?.uppercase() }
                                 mBleAdapter?.notifyDataSetChanged()
@@ -155,6 +151,11 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                     Log.i(TAG, "onScanFailed: errorCode: $errorCode")
                 }
             })
+        }
+        BleScanManager.getBondedDevices()?.let {
+            for (device in it) {
+                mBondBleDevices.add(device.toBleScanResult())
+            }
         }
     }
 
@@ -224,6 +225,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
             context ?: return
             intent ?: return
@@ -252,68 +254,38 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                 }
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
                 mViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    BleScanManager.getBluetoothAdapter()?.bondedDevices?.toMutableList()?.let {
-                        val bleDevice: BluetoothDevice =
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                intent.getParcelableExtra(
-                                    BluetoothDevice.EXTRA_DEVICE,
-                                    BluetoothDevice::class.java
-                                )
+                    val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
+                    val preState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR)
+                    val bleDevice: BluetoothDevice =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+                        } else {
+                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        } ?: return@launch
+                    Log.d(TAG, "BluetoothReceiver: state = $state, preState = $preState, device.name = ${bleDevice.name}, device.mac = ${bleDevice.address}")
+                    val bondedDevices = BleScanManager.getBondedDevices() ?: return@launch
+                    if (state == BluetoothDevice.BOND_BONDED &&
+                        (preState == BluetoothDevice.BOND_NONE || preState == BluetoothDevice.BOND_BONDING)) {
+                        if (bondedDevices.find { it.address == bleDevice.address } != null) {
+                            mBondBleDevices.add(bleDevice.toBleScanResult())
+                            mBondBleAdapter?.notifyItemChanged(mBondBleDevices.size)
+                            BleScanManager.startDiscovery()
+                        }
+                    } else if (state == BluetoothDevice.BOND_NONE &&
+                        (preState == BluetoothDevice.BOND_BONDED || preState == BluetoothDevice.BOND_BONDING)) {
+                        var i = 0
+                        while (i < mBondBleDevices.size) {
+                            if (mBondBleDevices[i].mac == bleDevice.address) {
+                                break
                             } else {
-                                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                            } ?: return@launch
-                        var isUpdate = false
-                        val result = bleDevice.toBleScanResult()
-                        if (result in mBleDevices) {
-                            mBleDevices.find { bleScanResult ->
-                                result == bleScanResult
-                            }?.apply {
-                                bondState = result.bondState
-                                device = result.device
-                            }
-                            isUpdate = true
-                        }
-
-                        mBondBleDevices.clear()
-                        it.forEach { device ->
-                            mBondBleDevices.add(device.toBleScanResult())
-                        }
-                        withContext(Dispatchers.Main) {
-                            mBondBleAdapter?.notifyDataSetChanged()
-                            if (isUpdate) {
-                                mBleAdapter?.notifyDataSetChanged()
+                                i ++
                             }
                         }
-                        // TODO 逻辑有问题，后续修复
-//                        Log.d(TAG, "BluetoothReceiver#onReceive: bondedDevices = $it")
-//                        var isUpdate = false
-//                        for (device in it) {
-//                            val newResult = device.toBleScanResult()
-//                            var isRemove = false
-//                            var isEqual = false
-//                            val iter = mBondBleDevices.iterator()
-//                            while (iter.hasNext()) {
-//                                val result = iter.next()
-//                                if (result == newResult) {
-//                                    isEqual = true
-//                                    if (newResult.bondState != BluetoothDevice.BOND_BONDED) {
-//                                        mBondBleDevices.remove(result)
-//                                        isRemove = true
-//                                    }
-//                                }
-//                            }
-//                            if (isRemove) {
-//                                isUpdate = true
-//                            } else if (!isEqual) {
-//                                mBondBleDevices.add(newResult)
-//                                isUpdate = true
-//                            }
-//                        }
-//                        if (isUpdate) {
-//                            withContext(Dispatchers.Main) {
-//                                mBondBleAdapter?.notifyDataSetChanged()
-//                            }
-//                        }
+                        if (i < mBondBleDevices.size) {
+                            mBondBleDevices.removeAt(i)
+                            mBondBleAdapter?.notifyItemRemoved(i)
+                            BleScanManager.startDiscovery()
+                        }
                     }
                 }
             }

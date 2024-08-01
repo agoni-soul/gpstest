@@ -94,8 +94,8 @@ object BleScanManager {
                 bleScanCallback?.onBatchScanResults(mutableList)
             }
 
-            override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                bleScanCallback?.onScanResult(callbackType, result?.toBleScanResult())
+            override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
+                bleScanCallback?.onScanResult(callbackType, bleScanResult?.toBleScanResult())
             }
 
             override fun onScanFailed(errorCode: Int) {

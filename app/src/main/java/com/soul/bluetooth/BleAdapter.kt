@@ -22,7 +22,7 @@ import java.util.UUID
  */
 class BleAdapter(bleDevices: MutableList<BleScanResult>) :
     RecyclerView.Adapter<BleAdapter.BleViewHolder>() {
-    private val TAG = javaClass.simpleName
+    private val TAG = this.javaClass::class.simpleName
 
     private lateinit var mContext: Context
 
@@ -61,9 +61,6 @@ class BleAdapter(bleDevices: MutableList<BleScanResult>) :
             holder.itemTvBleDeviceUuids.visibility = View.GONE
         } else {
             holder.itemTvBleDeviceUuids.visibility = View.VISIBLE
-//            val mutableList = mutableListOf<ParcelUuid>()
-//            mutableList.addAll(bleScanResult.deviceUuids)
-//            mutableList.toString()
             holder.itemTvBleDeviceUuids.text = mContext.getString(R.string.ble_device_uuids, bleScanResult.deviceUuids.toString())
         }
         if (bleScanResult.dataHexDetail.isNullOrEmpty()) {

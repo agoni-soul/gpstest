@@ -1,6 +1,7 @@
 package com.soul.bleSDK.manager
 
 import com.soul.bean.BleScanResult
+import java.io.Closeable
 
 
 /**
@@ -9,10 +10,8 @@ import com.soul.bean.BleScanResult
  *     desc   :
  *     version: 1.0
  */
-abstract class BaseConnectManager {
+abstract class BaseConnectManager: Closeable {
     protected val TAG = this.javaClass::class.simpleName
 
     abstract fun connect(bleScanResult: BleScanResult?)
-
-    abstract fun close()
 }

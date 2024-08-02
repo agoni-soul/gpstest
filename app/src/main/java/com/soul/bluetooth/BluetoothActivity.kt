@@ -72,7 +72,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         mBleScanAdapter = BleScanAdapter(mBleDevices).apply {
             setCallback(object : BleScanAdapter.ItemClickCallback {
                 override fun onClick(result: BleScanResult) {
-                    mViewModel.mBleA2dpConnectManager?.connect(result)
+                    BleBondManager.createBond(result)
                 }
             })
         }
@@ -92,14 +92,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             setCallback(object : BleBondedAdapter.ItemClickCallback {
 
                 override fun onClickUnbind(result: BleScanResult) {
-                    val device = result.device ?: return
-                    try {
-                        val m = BluetoothDevice::class.java.getMethod("removeBond")
-                        m.invoke(device)
-                    } catch (e: java.lang.Exception) {
-                        Log.e(TAG, "onClickUnbind: errorMessage = ${e.message}")
-                        e.printStackTrace()
-                    }
+                    BleBondManager.removeBond(result)
                 }
 
                 override fun onClickCommunicate(result: BleScanResult) {

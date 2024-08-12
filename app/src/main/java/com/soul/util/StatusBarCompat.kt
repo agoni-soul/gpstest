@@ -1,115 +1,78 @@
-package com.soul.base
+package com.soul.util
 
-import android.R
-import android.annotation.TargetApi
-import android.app.ActionBar
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import android.os.Bundle
-import android.view.*
-import android.widget.FrameLayout
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowInsetsController
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.soul.log.DOFLogUtil
 
 
 /**
  *     author : yangzy33
- *     time   : 2024-05-11
+ *     time   : 2024-08-12
  *     desc   :
  *     version: 1.0
  */
-abstract class BaseActivity : AppCompatActivity() {
-    protected open val TAG = javaClass.simpleName
+object StatusBarCompat {
+    val TAG = javaClass.simpleName
 
-    protected lateinit var mContext: Context
-
-    protected var mUseThemeStatusBarColor = false
-
-    protected var mUseStatusBarColor = true
-
-    protected abstract fun getLayoutId(): Int
-
-    protected abstract fun initView()
-
-    protected abstract fun initData()
-
-    /**
-     * 隐藏标题栏[ActionBar]
-     */
-    protected open fun hideTitleAndActionBar() {
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-        supportActionBar?.hide()
-    }
-
-    protected open fun getNavigationBarColor(): Int = R.color.transparent
-
-    /**
-     * 顶部状态栏不展示时，背景颜色需要设置为透明色
-     */
-    protected open fun getStatusBarColor(): Int = R.color.transparent
-
-    protected open fun isShowNavigation(): Boolean = true
-
-    protected open fun isBlackStatusText(): Boolean = true
-
-    protected open fun isShowStatus(): Boolean = true
-
-    protected open fun getRootViewId(): Int = 0
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mContext = this
-        hideTitleAndActionBar()
-        setContentView(getLayoutId())
-        setStatusBarColor(getStatusBarColor())
-        setNavigationBarColor(getNavigationBarColor())
-        handleNavigationVAndStatusVisibility()
-    }
-
-    /**
-     * 设置导航栏背景颜色
-     *
-     * @param 背景颜色
-     */
-    private fun setNavigationBarColor(color: Int) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.navigationBarColor = resources.getColor(color)
-    }
-
-    /**
-     * 设置状态栏背景颜色
-     *
-     * @param color 背景颜色
-     */
-    private fun setStatusBarColor(color: Int) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = resources.getColor(color)
-    }
-
-    private fun handleNavigationVAndStatusVisibility() {
+    fun handleNavigationVAndStatusVisibility(
+        activity: Activity,
+        isShowNavigation: Boolean,
+        isShowStatus: Boolean,
+        isBlackStatusText: Boolean,
+        rootViewId: Int,
+        statusBarColor: Int
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            handleAdvancedSystemNavigationAndStatus()
+            handleAdvancedSystemNavigationAndStatus(
+                activity,
+                isShowNavigation,
+                isShowStatus,
+                isBlackStatusText,
+                rootViewId,
+                statusBarColor
+            )
         } else {
-            handleNormalSystemNavigationAndStatus()
+            handleNormalSystemNavigationAndStatus(
+                activity,
+                isShowNavigation,
+                isShowStatus,
+                isBlackStatusText,
+                rootViewId,
+                statusBarColor
+            )
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun handleAdvancedSystemNavigationAndStatus() {
+    private fun handleAdvancedSystemNavigationAndStatus(
+        activity: Activity,
+        isShowNavigation: Boolean,
+        isShowStatus: Boolean,
+        isBlackStatusText: Boolean,
+        rootViewId: Int,
+        statusBarColor: Int
+    ) {
+        val window = activity.window
         if (window.insetsController == null) {
-            handleNormalSystemNavigationAndStatus()
+            handleNormalSystemNavigationAndStatus(
+                activity,
+                isShowNavigation,
+                isShowStatus,
+                isBlackStatusText,
+                rootViewId,
+                statusBarColor
+            )
             return
         }
         DOFLogUtil.d(TAG, "handleAdvancedSystemNavigationAndStatus")
-        val isShowNavigation = isShowNavigation()
-        val isShowStatus = isShowStatus()
-        val isBlackStatusText = isBlackStatusText()
         window.insetsController!!.apply {
             // TODO 隐藏导航栏，上滑仍会会显示，后续再研究
             if (isShowNavigation) {
@@ -123,11 +86,12 @@ abstract class BaseActivity : AppCompatActivity() {
                 // TODO 顶部有黑边，暂时不生效，后续再研究
 //                hide(WindowInsetsCompat.Type.statusBars())
 //                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                val uiOption = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+                val uiOption =
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
                 window.decorView.systemUiVisibility = uiOption
                 Color.TRANSPARENT
-                window.statusBarColor = resources.getColor(getStatusBarColor())
-                addStatusBarView()
+                window.statusBarColor = window.context.resources.getColor(statusBarColor)
+                addStatusBarView(activity, rootViewId, statusBarColor)
             }
             if (isBlackStatusText) {
                 setSystemBarsAppearance(
@@ -140,12 +104,17 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleNormalSystemNavigationAndStatus() {
+    private fun handleNormalSystemNavigationAndStatus(
+        activity: Activity,
+        isShowNavigation: Boolean,
+        isShowStatus: Boolean,
+        isBlackStatusText: Boolean,
+        rootViewId: Int,
+        statusBarColor: Int
+    ) {
         DOFLogUtil.d(TAG, "handleNormalSystemNavigationAndStatus")
-        val isShowNavigation = isShowNavigation()
-        val isShowStatus = isShowStatus()
-        val isBlackStatusText = isBlackStatusText()
         var uiOption = View.SYSTEM_UI_FLAG_VISIBLE
+        val window = activity.window
         DOFLogUtil.d(TAG, "uiOption = $uiOption")
         // 设置隐藏导航栏
         if (!isShowNavigation) {
@@ -163,8 +132,8 @@ abstract class BaseActivity : AppCompatActivity() {
             uiOption = uiOption.or(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
                 .or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
             Color.TRANSPARENT
-            window.statusBarColor = resources.getColor(getStatusBarColor())
-            addStatusBarView()
+            window.statusBarColor = window.context.resources.getColor(statusBarColor)
+            addStatusBarView(activity, rootViewId, statusBarColor)
             DOFLogUtil.d(TAG, "uiOption = $uiOption, isShowStatus = $isShowStatus")
         }
         DOFLogUtil.d(TAG, "uiOption = $uiOption")
@@ -174,16 +143,19 @@ abstract class BaseActivity : AppCompatActivity() {
     /**
      * 把创建的StatusBar添加到布局中
      */
-    protected fun addStatusBarView() {
-        if (getRootViewId() != 0) {
-            val rootView = findViewById<ViewGroup>(getRootViewId())
+    private fun addStatusBarView(activity: Activity, rootViewId: Int, statusBarColor: Int) {
+        if (rootViewId != 0) {
+            val rootView = activity.findViewById<ViewGroup>(rootViewId)
             DOFLogUtil.d(TAG, "rootView = $rootView")
             if (rootView != null) {
                 rootView.fitsSystemWindows = true
                 // 在原来的位置上添加一个状态栏
-                val statusBarView = createStatusBarView(this)
+                val statusBarView = createStatusBarView(activity, statusBarColor)
                 statusBarView.fitsSystemWindows = true
-                DOFLogUtil.d(TAG, "statusBarView = $statusBarView, height = ${statusBarView.height}")
+                DOFLogUtil.d(
+                    TAG,
+                    "statusBarView = $statusBarView, height = ${statusBarView.height}"
+                )
                 rootView.addView(statusBarView, 0)
                 rootView.requestLayout()
             }
@@ -193,9 +165,10 @@ abstract class BaseActivity : AppCompatActivity() {
     /**
      * 创建一个需要填充statusBarView
      */
-    private fun createStatusBarView(activity: Activity): View {
+    private fun createStatusBarView(activity: Activity, statusBarColor: Int): View {
         val statusBarView = View(activity)
-        statusBarView.background = ResourcesCompat.getDrawable(resources, getStatusBarColor(), null)
+        statusBarView.background =
+            ResourcesCompat.getDrawable(activity.resources, statusBarColor, null)
         val statusBarParams: ViewGroup.LayoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, getStatusBarHeight(activity)
         )

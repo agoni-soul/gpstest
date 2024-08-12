@@ -3,7 +3,6 @@ package com.soul.bluetooth
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,11 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
-import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
-import com.soul.util.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +28,6 @@ import kotlinx.coroutines.withContext
 /**
  *     author : yangzy33
  *     time   : 2024-07-04
- *     desc   :
  *     version: 1.0
  */
 class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewModel>() {
@@ -42,9 +38,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     }
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
-
-    private var mBleScanAdapter: BleScanAdapter? = null
-    private var mBleDevices = mutableListOf<BleScanResult>()
 
     private var mBondBleScanAdapter: BleBondedAdapter? = null
     private var mBondBleDevices = mutableListOf<BleScanResult>()
@@ -70,20 +63,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN
             ))
-        }
-        mBleScanAdapter = BleScanAdapter(mBleDevices).apply {
-            setCallback(object : BleScanAdapter.ItemClickCallback {
-                override fun onClick(result: BleScanResult) {
-                    BleBondManager.createBond(result)
-                }
-            })
-        }
-        mViewDataBinding.rvDeviceBle.let {
-            it.adapter = mBleScanAdapter
-            val layoutManager = LinearLayoutManager(mContext).apply {
-                orientation = LinearLayoutManager.VERTICAL
-            }
-            it.layoutManager = layoutManager
         }
         mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
         mViewDataBinding.tvBluetooth.setOnClickListener {
@@ -138,38 +117,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     }
 
     override fun initData() {
-        BleScanManager.startDiscovery()
-        registerBleReceiver()
-        requestDiscoverable(300)
-        if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            BleScanManager.startScan(object: IBleScanCallback {
-                override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
-                    results ?: return
-                    results.toString()
-                }
-
-                override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
-                    bleScanResult?.let { result ->
-                        if (result.name?.startsWith("colmo", true) == true ||
-                            result.name?.startsWith("midea", true) == true
-                        ) {
-                            return@let
-                        }
-                        if (!result.name.isNullOrBlank() && !result.mac.isNullOrBlank()) {
-                            if (mBleDevices.find { it.mac == result.mac } == null) {
-                                mBleDevices.add(result)
-                                mBleDevices.sortBy { it.name?.uppercase() }
-                                mBleScanAdapter?.notifyDataSetChanged()
-                            }
-                        }
-                    }
-                }
-
-                override fun onScanFailed(errorCode: Int) {
-                    Log.i(TAG, "onScanFailed: errorCode: $errorCode")
-                }
-            })
-        }
         BleScanManager.getBondedDevices()?.let {
             for (device in it) {
                 mBondBleDevices.add(device.toBleScanResult())
@@ -183,13 +130,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         registerReceiver(mBluetoothReceiver, intentFilter)
-    }
-
-    private fun requestDiscoverable(time: Long) {
-        val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, time)
-        }
-        startActivityForResult(discoverableIntent, REQUEST_CODE_BLUETOOTH_DISCOVERABLE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -236,29 +176,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
             context ?: return
             intent ?: return
             intent.action ?: return
-            if (BluetoothDevice.ACTION_FOUND == intent.action) {
-                val bleDevice: BluetoothDevice? =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(
-                            BluetoothDevice.EXTRA_DEVICE,
-                            BluetoothDevice::class.java
-                        )
-                    } else {
-                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    }
-                if (bleDevice?.name?.startsWith("colmo", true) == true ||
-                    bleDevice?.name?.startsWith("midea", true) == true) {
-                    return
-                }
-                val bleScanResult = bleDevice?.toBleScanResult()
-                if (!bleScanResult?.name.isNullOrBlank() && !bleDevice?.address.isNullOrBlank()) {
-                    if (mBleDevices.find { it.mac == bleDevice!!.address } == null) {
-                        mBleDevices.add(bleScanResult!!)
-                        mBleDevices.sortBy { it.name?.uppercase() }
-                        mBleScanAdapter?.notifyDataSetChanged()
-                    }
-                }
-            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
+            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
                 mViewModel.viewModelScope.launch(Dispatchers.IO) {
                     val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
                     val preState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR)

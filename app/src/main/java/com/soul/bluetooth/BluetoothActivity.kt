@@ -3,6 +3,7 @@ package com.soul.bluetooth
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -36,7 +37,8 @@ import kotlinx.coroutines.withContext
 class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewModel>() {
 
     companion object {
-        private const val PERMISSION_REQUEST_CODE = 101
+        private const val REQUEST_CODE_PERMISSION = 101
+        private const val REQUEST_CODE_BLUETOOTH_DISCOVERABLE = 102
     }
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
@@ -109,9 +111,36 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         }
     }
 
+    private fun checkSelfPermission(permissions: MutableList<String>) {
+        val denyPermissionList = mutableListOf<String>()
+        for (permission in permissions) {
+            val permissionValue =
+                ActivityCompat.checkSelfPermission(mContext as Activity, permission)
+            if (permissionValue == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "checkSelfPermission: checkSelfPermission, permission = $permission")
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                Log.d(
+                    TAG,
+                    "checkSelfPermission: shouldShowRequestPermissionRationale, permission = $permission"
+                )
+            } else {
+                denyPermissionList.add(permission)
+                Log.d(TAG, "checkSelfPermission: $permission")
+            }
+        }
+        if (denyPermissionList.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                mContext as Activity,
+                denyPermissionList.toTypedArray(),
+                REQUEST_CODE_PERMISSION
+            )
+        }
+    }
+
     override fun initData() {
         BleScanManager.startDiscovery()
         registerBleReceiver()
+        requestDiscoverable(300)
         if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             BleScanManager.startScan(object: IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
@@ -148,38 +177,26 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
         }
     }
 
-    private fun checkSelfPermission(permissions: MutableList<String>) {
-        val denyPermissionList = mutableListOf<String>()
-        for (permission in permissions) {
-            val permissionValue =
-                ActivityCompat.checkSelfPermission(mContext as Activity, permission)
-            if (permissionValue == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "checkSelfPermission: checkSelfPermission, permission = $permission")
-            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-                Log.d(
-                    TAG,
-                    "checkSelfPermission: shouldShowRequestPermissionRationale, permission = $permission"
-                )
-            } else {
-                denyPermissionList.add(permission)
-                Log.d(TAG, "checkSelfPermission: $permission")
-            }
-        }
-        if (denyPermissionList.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                mContext as Activity,
-                denyPermissionList.toTypedArray(),
-                PERMISSION_REQUEST_CODE
-            )
-        }
-    }
-
     private fun registerBleReceiver() {
         mBluetoothReceiver = BluetoothReceiver()
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         registerReceiver(mBluetoothReceiver, intentFilter)
+    }
+
+    private fun requestDiscoverable(time: Long) {
+        val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, time)
+        }
+        startActivityForResult(discoverableIntent, REQUEST_CODE_BLUETOOTH_DISCOVERABLE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_BLUETOOTH_DISCOVERABLE) {
+            Log.d(TAG, "resultCode = ${resultCode}")
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -189,7 +206,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BleViewMode
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            PERMISSION_REQUEST_CODE -> {
+            REQUEST_CODE_PERMISSION -> {
                 for (i in permissions.indices) {
                     if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                         Log.d(

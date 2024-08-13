@@ -65,6 +65,7 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mContext = this
+        ActivityCollector.addActivity(this)
         hideTitleAndActionBar()
         setContentView(getLayoutId())
         setStatusBarColor(getStatusBarColor())
@@ -214,5 +215,10 @@ abstract class BaseActivity : AppCompatActivity() {
         }
         DOFLogUtil.d(TAG, "getStatusBarHeight = $result")
         return result
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ActivityCollector.removeActivity(this)
     }
 }

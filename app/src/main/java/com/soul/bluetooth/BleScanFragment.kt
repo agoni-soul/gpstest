@@ -21,6 +21,8 @@ import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
+import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
+import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_PERMISSION
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleScanBinding
 import com.soul.util.PermissionUtils
@@ -36,11 +38,6 @@ import kotlinx.coroutines.withContext
  *     version: 1.0
  */
 class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
-
-    companion object {
-        private const val REQUEST_CODE_PERMISSION = 101
-        private const val REQUEST_CODE_BLUETOOTH_DISCOVERABLE = 102
-    }
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
 
@@ -167,6 +164,7 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().unregisterReceiver(mBluetoothReceiver)
+        BleScanManager.cancelDiscovery()
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {

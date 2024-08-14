@@ -1,8 +1,6 @@
 package com.soul.bluetooth
 
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.soul.base.BaseFragment
 
@@ -13,10 +11,7 @@ import com.soul.base.BaseFragment
  *     desc   :
  *     version: 1.0
  */
-class ViewPagerFragmentStateAdapter(
-    fragmentManager: FragmentManager,
-    lifecycle: Lifecycle
-): FragmentStateAdapter(fragmentManager, lifecycle) {
+class ViewPagerFragmentStateAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter(fragmentActivity) {
     private val mDataList = mutableListOf<BaseFragment>()
 
     override fun getItemCount(): Int = mDataList.size

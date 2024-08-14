@@ -12,6 +12,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -74,6 +75,7 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
             })
         }
         mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
+        mViewDataBinding.tvBluetooth.visibility = View.GONE
         mViewDataBinding.rvDeviceBle.let {
             it.adapter = mBleScanAdapter
             val layoutManager = LinearLayoutManager(mContext).apply {

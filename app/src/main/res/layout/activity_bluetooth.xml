@@ -6,23 +6,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/ble_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/ble_tab_layout"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/cyan"
-            app:tabIndicatorColor="@null"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/black"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/ble_view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/ble_tab_layout"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            android:background="@color/cyan"
+            app:tabMode="fixed"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tabSelectedTextColor="@color/black" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

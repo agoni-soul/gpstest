@@ -3,12 +3,15 @@ package com.soul.bluetooth
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
+import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.soul.base.BaseFragment
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
@@ -30,6 +33,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
 
     private lateinit var mBleViewPager: ViewPager2
     private lateinit var mTabLayout: TabLayout
+    private val mTabTitleList = mutableListOf<String>()
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
@@ -38,14 +42,30 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
     override fun initView() {
         mBleViewPager = mViewDataBinding.bleViewPager
         mTabLayout = mViewDataBinding.bleTabLayout
-        val fragmentList = mutableListOf<BaseFragment>()
-        fragmentList.add(BleScanFragment())
-        fragmentList.add(BleScanFragment())
-//        fragmentList.add(BleBoundFragment())
-        val pagerAdapter = ViewPagerFragmentStateAdapter(supportFragmentManager, this)
-        mBleViewPager.adapter = pagerAdapter
+        val pagerAdapter = ViewPagerFragmentStateAdapter(this@BluetoothActivity).apply {
+            addFragment(BleScanFragment())
+            addFragment(BleBoundFragment())
+        }
+        mBleViewPager.apply {
+            adapter = pagerAdapter
+            isUserInputEnabled = false
+            orientation = ViewPager2.ORIENTATION_VERTICAL
+            currentItem = 0
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    mTabLayout.getTabAt(position)?.select()
+                }
+            })
+        }
+        mTabTitleList.add("蓝牙扫描")
+        mTabTitleList.add("蓝牙绑定")
         mTabLayout.apply {
-            setupWithViewPager(mViewDataBinding.bleViewPager)
+            mTabTitleList.forEach {
+                val tab = mTabLayout.newTab()
+                tab.text = it
+                addTab(tab)
+            }
             addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     tab?.apply {
@@ -59,6 +79,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
                             Spanned.SPAN_INCLUSIVE_INCLUSIVE
                         )
                         tab.text = spannableStr
+                        mBleViewPager.currentItem = position
                     }
                 }
 
@@ -81,6 +102,9 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
                 }
             })
         }
+        TabLayoutMediator(mTabLayout, mBleViewPager) { tab, position ->
+            tab.text = mTabTitleList[position]
+        }.attach()
 
     }
 

@@ -12,9 +12,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
@@ -62,12 +64,6 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 Manifest.permission.BLUETOOTH_ADMIN
             ))
         }
-        mViewDataBinding.tvBluetooth.text = "蓝牙绑定"
-        mViewDataBinding.tvBluetooth.visibility = View.GONE
-        mViewDataBinding.tvBluetooth.setOnClickListener {
-            mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
-        }
-
         mBondBleScanAdapter = BleBondedAdapter(mBondBleDevices, R.layout.adapter_item_ble_bonded).apply {
             setCallback(object : BleBondedAdapter.ItemClickCallback {
 
@@ -80,12 +76,19 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 }
             })
         }
-        mViewDataBinding.rvBoundBle.let {
-            it.adapter = mBondBleScanAdapter
-            val layoutManager = LinearLayoutManager(mContext).apply {
-                orientation = LinearLayoutManager.VERTICAL
+        requireActivity().apply {
+            val tvBluetooth = findViewById<TextView>(R.id.tv_bluetooth)
+            tvBluetooth.text = "蓝牙绑定"
+            tvBluetooth.setOnClickListener {
+                mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
             }
-            it.layoutManager = layoutManager
+            findViewById<RecyclerView>(R.id.rv_bound_ble).let {
+                it.adapter = mBondBleScanAdapter
+                val layoutManager = LinearLayoutManager(mContext).apply {
+                    orientation = LinearLayoutManager.VERTICAL
+                }
+                it.layoutManager = layoutManager
+            }
         }
     }
 

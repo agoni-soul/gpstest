@@ -9,11 +9,13 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.FragmentTransaction
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.soul.base.BaseFragment
 import com.soul.base.BaseMvvmActivity
+import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
@@ -31,81 +33,60 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         const val REQUEST_CODE_BLUETOOTH_DISCOVERABLE = 102
     }
 
-    private lateinit var mBleViewPager: ViewPager2
-    private lateinit var mTabLayout: TabLayout
-    private val mTabTitleList = mutableListOf<String>()
+    private val mScanFragment: BaseFragment by lazy {
+        BleScanFragment()
+    }
+
+    private var isInitScanFragment = false
+
+    private val mBoundFragment: BaseFragment by lazy {
+        BleBoundFragment()
+    }
+
+    private var isInitBoundFragment = false
+
+    private lateinit var mLastFragment: BaseFragment
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_bluetooth
 
     override fun initView() {
-        mBleViewPager = mViewDataBinding.bleViewPager
-        mTabLayout = mViewDataBinding.bleTabLayout
-        val pagerAdapter = ViewPagerFragmentStateAdapter(this@BluetoothActivity).apply {
-            addFragment(BleScanFragment())
-            addFragment(BleBoundFragment())
+        mViewDataBinding.tvBleScan.setOnClickListener {
+            switchScanFragment()
         }
-        mBleViewPager.apply {
-            adapter = pagerAdapter
-            isUserInputEnabled = false
-            orientation = ViewPager2.ORIENTATION_VERTICAL
-            currentItem = 0
-            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    mTabLayout.getTabAt(position)?.select()
-                }
-            })
+        mViewDataBinding.tvBleBound.setOnClickListener {
+            switchBoundFragment()
         }
-        mTabTitleList.add("蓝牙扫描")
-        mTabTitleList.add("蓝牙绑定")
-        mTabLayout.apply {
-            mTabTitleList.forEach {
-                val tab = mTabLayout.newTab()
-                tab.text = it
-                addTab(tab)
-            }
-            addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    tab?.apply {
-                        val selectTab = text.toString().trim()
-                        val spannableStr = SpannableString(selectTab)
-                        val styleSpan = StyleSpan(Typeface.BOLD)
-                        spannableStr.setSpan(
-                            styleSpan,
-                            0,
-                            selectTab.length,
-                            Spanned.SPAN_INCLUSIVE_INCLUSIVE
-                        )
-                        tab.text = spannableStr
-                        mBleViewPager.currentItem = position
-                    }
-                }
+        switchScanFragment()
+    }
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                    tab?.apply {
-                        val unSelectTab = text.toString().trim()
-                        val spannableStr = SpannableString(unSelectTab)
-                        val styleSpan = StyleSpan(Typeface.NORMAL)
-                        spannableStr.setSpan(
-                            styleSpan,
-                            0,
-                            unSelectTab.length,
-                            Spanned.SPAN_INCLUSIVE_INCLUSIVE
-                        )
-                        tab.text = spannableStr
-                    }
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                }
-            })
+    private fun switchScanFragment() {
+        val transaction = supportFragmentManager.beginTransaction()
+        if (!isInitScanFragment) {
+            transaction.add(R.id.fl_container, mScanFragment)
+            isInitScanFragment = true
+        } else if (mLastFragment != mScanFragment) {
+            transaction.hide(mLastFragment)
+            transaction.show(mScanFragment)
         }
-        TabLayoutMediator(mTabLayout, mBleViewPager) { tab, position ->
-            tab.text = mTabTitleList[position]
-        }.attach()
+        transaction.addToBackStack(null)
+        transaction.commit()
+        mLastFragment = mScanFragment
+    }
 
+    private fun switchBoundFragment() {
+        val transaction = supportFragmentManager.beginTransaction()
+        if (!isInitBoundFragment) {
+            transaction.add(R.id.fl_container, mBoundFragment)
+            isInitBoundFragment = true
+        } else if (mLastFragment != mBoundFragment) {
+            transaction.hide(mLastFragment)
+            transaction.show(mBoundFragment)
+        }
+        transaction.addToBackStack(null)
+        transaction.commit()
+        mLastFragment = mBoundFragment
     }
 
     override fun initData() {

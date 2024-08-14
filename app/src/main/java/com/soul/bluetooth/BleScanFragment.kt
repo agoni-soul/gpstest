@@ -13,9 +13,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
@@ -74,14 +76,16 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
                 }
             })
         }
-        mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
-        mViewDataBinding.tvBluetooth.visibility = View.GONE
-        mViewDataBinding.rvDeviceBle.let {
-            it.adapter = mBleScanAdapter
-            val layoutManager = LinearLayoutManager(mContext).apply {
-                orientation = LinearLayoutManager.VERTICAL
+        requireActivity().apply {
+            val tvBluetooth = findViewById<TextView>(R.id.tv_bluetooth)
+            tvBluetooth.text = "蓝牙扫描"
+            findViewById<RecyclerView>(R.id.rv_device_ble).let {
+                it.adapter = mBleScanAdapter
+                val layoutManager = LinearLayoutManager(mContext).apply {
+                    orientation = LinearLayoutManager.VERTICAL
+                }
+                it.layoutManager = layoutManager
             }
-            it.layoutManager = layoutManager
         }
     }
 

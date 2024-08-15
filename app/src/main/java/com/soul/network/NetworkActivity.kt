@@ -1,19 +1,13 @@
 package com.soul.network
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
-import com.soul.base.BaseActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityNetworkBinding
-import java.lang.Exception
 
 class NetworkActivity : BaseMvvmActivity<ActivityNetworkBinding, BaseViewModel>() {
     private val mWebView: WebView by lazy {

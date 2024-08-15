@@ -1,15 +1,12 @@
 package com.soul.scene
 
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.transition.Scene
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
-import com.soul.base.BaseActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R

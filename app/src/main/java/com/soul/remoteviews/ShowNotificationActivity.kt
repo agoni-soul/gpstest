@@ -1,8 +1,5 @@
 package com.soul.remoteviews
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.soul.base.BaseActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R

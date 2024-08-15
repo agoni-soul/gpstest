@@ -1,8 +1,5 @@
 package com.soul.scene
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.soul.base.BaseActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R

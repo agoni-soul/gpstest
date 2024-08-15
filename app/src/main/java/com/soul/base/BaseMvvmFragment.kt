@@ -1,7 +1,9 @@
 package com.soul.base
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -23,19 +25,29 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
 
     protected abstract fun getViewModelClass(): Class<VM>?
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        mViewDataBinding = DataBindingUtil.setContentView(requireActivity(), getLayoutId())
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
+        mViewDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
         mViewDataBinding.root.background =  ContextCompat.getDrawable(mContext, R.color.white)
-        if (!isShowStatus()) {
-            addStatusBarView()
-        }
         val modelClass: Class<VM>? = getViewModelClass()
         modelClass?.let {
             mViewModel = ViewModelProvider(this).get(it)
         }
         mViewModel.let {
             lifecycle.addObserver(it)
+        }
+        mRootView = mViewDataBinding.root
+        return mViewDataBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (!isShowStatus()) {
+            addStatusBarView()
         }
         initView()
         initData()

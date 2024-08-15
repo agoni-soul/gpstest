@@ -76,16 +76,13 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
                 }
             })
         }
-        requireActivity().apply {
-            val tvBluetooth = findViewById<TextView>(R.id.tv_bluetooth)
-            tvBluetooth.text = "蓝牙扫描"
-            findViewById<RecyclerView>(R.id.rv_device_ble).let {
-                it.adapter = mBleScanAdapter
-                val layoutManager = LinearLayoutManager(mContext).apply {
-                    orientation = LinearLayoutManager.VERTICAL
-                }
-                it.layoutManager = layoutManager
+        mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
+        mViewDataBinding.rvDeviceBle.let {
+            it.adapter = mBleScanAdapter
+            val layoutManager = LinearLayoutManager(mContext).apply {
+                orientation = LinearLayoutManager.VERTICAL
             }
+            it.layoutManager = layoutManager
         }
     }
 

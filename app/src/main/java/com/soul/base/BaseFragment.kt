@@ -57,7 +57,7 @@ abstract class BaseFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         mContext = requireContext()
-        mRootView = LayoutInflater.from(mContext).inflate(getLayoutId(), container, false)
+        mRootView = inflater.inflate(getLayoutId(), container, false)
         return mRootView
     }
 

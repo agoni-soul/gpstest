@@ -76,19 +76,19 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 }
             })
         }
-        requireActivity().apply {
+        mViewDataBinding.tvBluetooth.apply {
             val tvBluetooth = findViewById<TextView>(R.id.tv_bluetooth)
             tvBluetooth.text = "蓝牙绑定"
             tvBluetooth.setOnClickListener {
                 mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
             }
-            findViewById<RecyclerView>(R.id.rv_bound_ble).let {
-                it.adapter = mBondBleScanAdapter
-                val layoutManager = LinearLayoutManager(mContext).apply {
-                    orientation = LinearLayoutManager.VERTICAL
-                }
-                it.layoutManager = layoutManager
+        }
+        mViewDataBinding.rvBoundBle.let {
+            it.adapter = mBondBleScanAdapter
+            val layoutManager = LinearLayoutManager(mContext).apply {
+                orientation = LinearLayoutManager.VERTICAL
             }
+            it.layoutManager = layoutManager
         }
     }
 

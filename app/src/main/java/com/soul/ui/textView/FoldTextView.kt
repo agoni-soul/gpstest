@@ -1,12 +1,18 @@
 package com.soul.ui.textView
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Rect
-import android.text.Layout
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
+import android.graphics.Typeface
+import android.os.Build
+import android.text.*
+import android.text.style.AlignmentSpan
+import android.text.style.ClickableSpan
+import android.text.style.StyleSpan
 import android.util.AttributeSet
+import android.view.View
 import android.view.animation.Animation
+import android.view.animation.Transformation
 import androidx.appcompat.widget.AppCompatTextView
 import com.soul.ui.movementMethod.OverLinkMovementMethod
 
@@ -50,6 +56,12 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
     private var mCloseInNewLine = false
     private var mOpenSuffixSpan: SpannableString? = null
     private var mCloseSuffixSpan: SpannableString? = null
+    private var mOpenSuffixStr: String? = DEFAULT_OPEN_SUFFIX
+    private var mCloseSuffixStr: String? = DEFAULT_CLOSE_SUFFIX
+    private var mOpenSuffixColor = 0
+    private var mCloseSuffixColor = 0
+    private var mOnClickListener: OnClickListener? = null
+    private var mCharSequenceToSpannableHandler: CharSequenceToSpannableHandler? = null
 
     private var mFoldMaxLine = 1
 
@@ -57,6 +69,8 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
     constructor(context: Context, attributeSet: AttributeSet?):this(context, attributeSet, 0)
 
     init {
+        mOpenSuffixColor = Color.parseColor("#F23030")
+        mCloseSuffixColor = Color.parseColor("#F23030")
         movementMethod = OverLinkMovementMethod.getInstance()
         includeFontPadding = false
         updateOpenSuffixSpan()
@@ -75,6 +89,67 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
 
         if (maxLines != -1) {
             val layout = createStaticLayout(tempText)
+            mExpandable = layout.lineCount > maxLines
+            if (mExpandable) {
+                // 拼接展开内容
+                if (mCloseInNewLine) {
+                    mOpenSpannableStr?.append("\n")
+                }
+                if (mCloseSuffixSpan != null) {
+                    mOpenSpannableStr?.append(mCloseSuffixSpan)
+                }
+                // 计算原文截取位置
+                val endPos = layout.getLineEnd(maxLines - 1)
+                if ((originalText?.length ?: 0) <= endPos) {
+                    mCloseSpannableStr = charSequenceToSpannable(originalText)
+                } else {
+                    mCloseSpannableStr = charSequenceToSpannable(originalText!!.subSequence(0, endPos))
+                }
+                var tempText2 = charSequenceToSpannable(mCloseSpannableStr).append(ELLIPSIS_STRING)
+                if (mOpenSuffixSpan != null) {
+                    tempText2.append(mOpenSuffixSpan)
+                }
+                // 循环判断，收起内容添加展开后缀后的内容
+                var tempLayout = createStaticLayout(tempText2)
+                while (tempLayout.lineCount > maxLines) {
+                    val lastSpace = (mCloseSpannableStr?.length ?: 0) - 1
+                    if (lastSpace == -1) {
+                        break
+                    }
+                    if ((originalText?.length ?: 0) <= lastSpace) {
+                        mCloseSpannableStr = charSequenceToSpannable(originalText)
+                    } else {
+                        mCloseSpannableStr = charSequenceToSpannable(originalText!!.subSequence(0, lastSpace))
+                    }
+                    tempText2 = charSequenceToSpannable(mCloseSpannableStr).append(ELLIPSIS_STRING)
+                    if (mOpenSuffixSpan != null) {
+                        tempText2.append(mOpenSuffixSpan)
+                    }
+                    tempLayout = createStaticLayout(tempText2)
+                }
+                var lastSpace = (mCloseSpannableStr?.length ?: 0) - (mOpenSuffixSpan?.length ?: 0)
+                if (lastSpace >= 0 && (originalText?.length ?: 0) > lastSpace) {
+                    val redundantChar = originalText?.subSequence(lastSpace, lastSpace + (mOpenSuffixSpan?.length ?: 0))
+                    val offset = hasEnCharCount(redundantChar) - hasEnCharCount(mOpenSuffixSpan) + 1
+                    lastSpace = if (offset <= 0) lastSpace else lastSpace - offset
+                    mCloseSpannableStr = charSequenceToSpannable(originalText?.subSequence(0, lastSpace))
+                }
+                mCLoseHeight = tempLayout.height + paddingTop + paddingBottom
+                mCloseSpannableStr?.append(ELLIPSIS_STRING)
+                if (mOpenSuffixSpan != null) {
+                    mCloseSpannableStr?.append(mOpenSuffixSpan)
+                }
+            }
+        }
+        isClosed = mExpandable
+        if (mExpandable) {
+            text = mCloseSpannableStr
+            super.setOnClickListener { v ->
+                switchOpenClose()
+                mOnClickListener?.onClick(v)
+            }
+        } else {
+            text = mOpenSpannableStr
         }
     }
 
@@ -108,17 +183,214 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
 
     private fun open() {
         if (hasAnimation) {
-            val layout = createStaticLayout(mOpenSpannableStr)
-            mOpenHeight = layout.
+            if (mOpenSpannableStr == null) return
+            val layout = createStaticLayout(mOpenSpannableStr!!)
+            mOpenHeight = layout.height + paddingTop + paddingBottom
+            executeOpenAnim()
+        } else {
+            super.setMaxLines(Int.MAX_VALUE)
+            text = mOpenSpannableStr
+            mOpenCloseCallback?.onOpen()
         }
+    }
+
+    private fun executeOpenAnim() {
+        // 创建展开动画
+        if (mOpenAnim == null) {
+            mOpenAnim = ExpandCollapseAnimation(this, mCLoseHeight, mOpenHeight)
+            mOpenAnim!!.fillAfter = true
+            mOpenAnim!!.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {
+//                    this@FoldTextView.super.setMaxLines(Int.MAX_VALUE)
+                    this@FoldTextView.text = mOpenSpannableStr
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    // 动画结束后textView设置展开的状态
+                    this@FoldTextView.layoutParams.height = mOpenHeight
+                    requestLayout()
+                    animating = false
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {
+                }
+
+            })
+        }
+        if (animating) {
+            return
+        }
+        animating = true
+        clearAnimation()
+        // 执行动画
+        startAnimation(mOpenAnim)
+    }
+
+    private fun close() {
+        if (hasAnimation) {
+            executeCloseAnim()
+        } else {
+            super.setMaxLines(mMaxLines)
+            text = mCloseSpannableStr
+            mOpenCloseCallback?.onClose()
+        }
+    }
+
+    private fun executeCloseAnim() {
+        // 创建收起动画
+        if (mCloseAnim == null) {
+            mCloseAnim = ExpandCollapseAnimation(this, mOpenHeight, mCLoseHeight)
+            mCloseAnim!!.fillAfter = true
+            mCloseAnim!!.setAnimationListener(object: Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {
+
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    animating = false
+                    this@FoldTextView.setMaxLines(mMaxLines)
+                    text = mCloseSpannableStr
+                    this@FoldTextView.layoutParams.height = mCLoseHeight
+                    requestLayout()
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {
+                }
+
+            })
+        }
+        if (animating) return
+        animating = true
+        clearAnimation()
+        startAnimation(mCloseAnim)
     }
 
     private fun createStaticLayout(spannable: SpannableStringBuilder): Layout {
         val contentWidth = initWidth - paddingLeft - paddingRight
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val builder = StaticLayout.Builder.obtain(spannable, 0, spannable.length, paint, contentWidth)
+            builder.setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setIncludePad(includeFontPadding)
+                .setLineSpacing(lineSpacingExtra, lineSpacingMultiplier)
+            builder.build()
+        } else
+            StaticLayout(
+                spannable, paint, contentWidth, Layout.Alignment.ALIGN_NORMAL,
+                getFloatField("mSpacingMult", 1f), getFloatField("mSpacingAdd", 0f), includeFontPadding
+            )
     }
 
-    private fun charSequenceToSpannable(originalText: CharSequence?): SpannableStringBuilder {
-        return SpannableStringBuilder()
+    private fun getFloatField(fieldName: String?, defaultValue: Float): Float {
+        var value = defaultValue
+        if (fieldName.isNullOrEmpty()) {
+            return value
+        }
+        try {
+            // 获取该类的所有属性值域
+            val fields = this.javaClass.declaredFields
+            for (field in fields) {
+                if (fieldName == field.name) {
+                    value = field.getFloat(this)
+                    break
+                }
+            }
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+        }
+        return value
+    }
+
+
+    private fun charSequenceToSpannable(charSequence: CharSequence?): SpannableStringBuilder {
+        var spannableStringBuilder: SpannableStringBuilder? = null
+        if (!charSequence.isNullOrEmpty()) {
+            spannableStringBuilder = mCharSequenceToSpannableHandler?.charSequenceToSpannable(charSequence)
+        }
+        return spannableStringBuilder ?: SpannableStringBuilder()
+    }
+
+    fun initWidth(width: Int) {
+        initWidth = width
+    }
+
+    override fun setMaxLines(maxLines: Int) {
+        mMaxLines = maxLines
+        super.setMaxLines(maxLines)
+    }
+
+    fun setOpenSuffix(openSuffix: String?) {
+        mOpenSuffixStr = openSuffix
+        updateOpenSuffixSpan()
+    }
+
+    fun setOpenSuffixColor(openSuffixColor: Int) {
+        mOpenSuffixColor = openSuffixColor
+        updateOpenSuffixSpan()
+    }
+
+    private fun updateOpenSuffixSpan() {
+        if (mOpenSuffixStr.isNullOrEmpty()) {
+            mOpenSuffixSpan = null
+            return
+        }
+        mOpenSuffixSpan = SpannableString(mOpenSuffixStr).apply {
+            setSpan(StyleSpan(Typeface.BOLD), 0, mOpenSuffixStr!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    switchOpenClose()
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = mOpenSuffixColor
+                    ds.isUnderlineText = false
+                }
+
+            }, 0, mOpenSuffixStr!!.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    fun setCloseSuffix(closeSuffix: String) {
+        mCloseSuffixStr = closeSuffix
+        updateCloseSuffixSpan()
+    }
+
+    fun setCloseSuffixColor(closeSuffixColor: Int) {
+        mCloseSuffixColor = closeSuffixColor
+        updateCloseSuffixSpan()
+    }
+
+    fun setCloseInNewLine(closeInNewLine: Boolean) {
+        mCloseInNewLine = closeInNewLine
+        updateCloseSuffixSpan()
+    }
+
+    private fun updateCloseSuffixSpan() {
+        if (mCloseSuffixStr.isNullOrEmpty()) {
+            mCloseSuffixSpan = null
+            return
+        }
+        mCloseSuffixSpan = SpannableString(mCloseSuffixStr).apply {
+            if (mCloseInNewLine) {
+                val alignmentSpan = AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)
+                setSpan(alignmentSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            setSpan(object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    switchOpenClose()
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = mCloseSuffixColor
+                    ds.isUnderlineText = false
+                }
+            }, 1, mCloseSuffixStr!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    override fun setOnClickListener(l: OnClickListener?) {
+        mOnClickListener = l
     }
 
     fun setFoldMaxLine(foldMaxLine: Int) {
@@ -145,5 +417,41 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
         if (mFoldMaxLine < neededHeight) {
         }
         return neededHeight
+    }
+
+    var mOpenCloseCallback: OpenAndCloseCallback? = null
+        private set
+
+    fun setOpenAndCloseCallback(callback: OpenAndCloseCallback?) {
+        mOpenCloseCallback = callback
+    }
+
+    fun setCharSequenceToSpannableHandler(handler: CharSequenceToSpannableHandler?) {
+        mCharSequenceToSpannableHandler = handler
+    }
+
+    interface OpenAndCloseCallback {
+        fun onOpen()
+        fun onClose()
+    }
+
+    interface CharSequenceToSpannableHandler {
+        fun charSequenceToSpannable(charSequence: CharSequence): SpannableStringBuilder
+    }
+
+    inner class ExpandCollapseAnimation(target: View, startHeight: Int, endHeight: Int): Animation() {
+        private val mTargetView: View = target
+        private val mStartHeight = startHeight
+        private val mEndHeight = endHeight
+
+        init {
+            duration = 400
+        }
+
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+            mTargetView.scaleY = 0F
+            mTargetView.layoutParams.height = ((mEndHeight - mStartHeight) * interpolatedTime + mStartHeight).toInt()
+            mTargetView.requestLayout()
+        }
     }
 }

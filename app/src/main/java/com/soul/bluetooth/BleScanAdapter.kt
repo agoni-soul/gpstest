@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.bean.BleScanResult
 import com.soul.gpstest.R
+import com.soul.ui.textView.FoldTextView
 
 
 /**
@@ -81,7 +82,7 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
     inner class BleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var itemTvBleName: TextView
         var itemTvBleMac: TextView
-        var itemTvBleDataByte: TextView
+        var itemTvBleDataByte: FoldTextView
         var itemTvBleBondStatus: TextView
         var itemTvBleConnectable: TextView
         var itemTvBleServiceUuids: TextView
@@ -90,7 +91,8 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
         init {
             itemTvBleName = itemView.findViewById(R.id.tv_ble_name)
             itemTvBleMac = itemView.findViewById(R.id.tv_ble_mac)
-            itemTvBleDataByte = itemView.findViewById(R.id.tv_ble_data)
+            itemTvBleDataByte = itemView.findViewById<FoldTextView>(R.id.tv_ble_data).apply {
+            }
             itemTvBleBondStatus = itemView.findViewById(R.id.tv_ble_bond_status)
             itemTvBleConnectable = itemView.findViewById(R.id.tv_ble_connectable)
             itemTvBleServiceUuids = itemView.findViewById(R.id.tv_service_uuids)

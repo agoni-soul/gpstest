@@ -51,7 +51,7 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
     private var mOpenAnim : Animation? = null
     private var mCloseAnim: Animation? = null
     private var mOpenHeight: Int = 0
-    private var mCLoseHeight: Int = 0
+    private var mCloseHeight: Int = 0
     private var mExpandable = false
     private var mCloseInNewLine = false
     private var mOpenSuffixSpan: SpannableString? = null
@@ -86,7 +86,6 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
         val maxLines = mMaxLines
         val tempText = charSequenceToSpannable(originalText)
         mOpenSpannableStr = charSequenceToSpannable(originalText)
-
         if (maxLines != -1) {
             val layout = createStaticLayout(tempText)
             mExpandable = layout.lineCount > maxLines
@@ -100,10 +99,10 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
                 }
                 // 计算原文截取位置
                 val endPos = layout.getLineEnd(maxLines - 1)
-                if ((originalText?.length ?: 0) <= endPos) {
-                    mCloseSpannableStr = charSequenceToSpannable(originalText)
+                mCloseSpannableStr = if ((originalText?.length ?: 0) <= endPos) {
+                    charSequenceToSpannable(originalText)
                 } else {
-                    mCloseSpannableStr = charSequenceToSpannable(originalText!!.subSequence(0, endPos))
+                    charSequenceToSpannable(originalText!!.subSequence(0, endPos))
                 }
                 var tempText2 = charSequenceToSpannable(mCloseSpannableStr).append(ELLIPSIS_STRING)
                 if (mOpenSuffixSpan != null) {
@@ -116,10 +115,10 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
                     if (lastSpace == -1) {
                         break
                     }
-                    if ((originalText?.length ?: 0) <= lastSpace) {
-                        mCloseSpannableStr = charSequenceToSpannable(originalText)
+                    mCloseSpannableStr = if ((originalText?.length ?: 0) <= lastSpace) {
+                        charSequenceToSpannable(originalText)
                     } else {
-                        mCloseSpannableStr = charSequenceToSpannable(originalText!!.subSequence(0, lastSpace))
+                        charSequenceToSpannable(originalText!!.subSequence(0, lastSpace))
                     }
                     tempText2 = charSequenceToSpannable(mCloseSpannableStr).append(ELLIPSIS_STRING)
                     if (mOpenSuffixSpan != null) {
@@ -134,7 +133,7 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
                     lastSpace = if (offset <= 0) lastSpace else lastSpace - offset
                     mCloseSpannableStr = charSequenceToSpannable(originalText?.subSequence(0, lastSpace))
                 }
-                mCLoseHeight = tempLayout.height + paddingTop + paddingBottom
+                mCloseHeight = tempLayout.height + paddingTop + paddingBottom
                 mCloseSpannableStr?.append(ELLIPSIS_STRING)
                 if (mOpenSuffixSpan != null) {
                     mCloseSpannableStr?.append(mOpenSuffixSpan)
@@ -188,7 +187,7 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
             mOpenHeight = layout.height + paddingTop + paddingBottom
             executeOpenAnim()
         } else {
-            super.setMaxLines(Int.MAX_VALUE)
+            super@FoldTextView.setMaxLines(Int.MAX_VALUE)
             text = mOpenSpannableStr
             mOpenCloseCallback?.onOpen()
         }
@@ -197,11 +196,11 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
     private fun executeOpenAnim() {
         // 创建展开动画
         if (mOpenAnim == null) {
-            mOpenAnim = ExpandCollapseAnimation(this, mCLoseHeight, mOpenHeight)
+            mOpenAnim = ExpandCollapseAnimation(this, mCloseHeight, mOpenHeight)
             mOpenAnim!!.fillAfter = true
             mOpenAnim!!.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {
-//                    this@FoldTextView.super.setMaxLines(Int.MAX_VALUE)
+                    super@FoldTextView.setMaxLines(Int.MAX_VALUE)
                     this@FoldTextView.text = mOpenSpannableStr
                 }
 
@@ -212,8 +211,7 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
                     animating = false
                 }
 
-                override fun onAnimationRepeat(animation: Animation?) {
-                }
+                override fun onAnimationRepeat(animation: Animation?) {}
 
             })
         }
@@ -230,7 +228,7 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
         if (hasAnimation) {
             executeCloseAnim()
         } else {
-            super.setMaxLines(mMaxLines)
+            super@FoldTextView.setMaxLines(mMaxLines)
             text = mCloseSpannableStr
             mOpenCloseCallback?.onClose()
         }
@@ -239,24 +237,20 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
     private fun executeCloseAnim() {
         // 创建收起动画
         if (mCloseAnim == null) {
-            mCloseAnim = ExpandCollapseAnimation(this, mOpenHeight, mCLoseHeight)
+            mCloseAnim = ExpandCollapseAnimation(this, mOpenHeight, mCloseHeight)
             mCloseAnim!!.fillAfter = true
             mCloseAnim!!.setAnimationListener(object: Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation?) {
-
-                }
+                override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
                     animating = false
-                    this@FoldTextView.setMaxLines(mMaxLines)
+                    super@FoldTextView.setMaxLines(mMaxLines)
                     text = mCloseSpannableStr
-                    this@FoldTextView.layoutParams.height = mCLoseHeight
+                    this@FoldTextView.layoutParams.height = mCloseHeight
                     requestLayout()
                 }
 
-                override fun onAnimationRepeat(animation: Animation?) {
-                }
-
+                override fun onAnimationRepeat(animation: Animation?) {}
             })
         }
         if (animating) return
@@ -276,37 +270,16 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
         } else
             StaticLayout(
                 spannable, paint, contentWidth, Layout.Alignment.ALIGN_NORMAL,
-                getFloatField("mSpacingMult", 1f), getFloatField("mSpacingAdd", 0f), includeFontPadding
+                lineSpacingMultiplier, lineSpacingExtra, includeFontPadding
             )
     }
 
-    private fun getFloatField(fieldName: String?, defaultValue: Float): Float {
-        var value = defaultValue
-        if (fieldName.isNullOrEmpty()) {
-            return value
-        }
-        try {
-            // 获取该类的所有属性值域
-            val fields = this.javaClass.declaredFields
-            for (field in fields) {
-                if (fieldName == field.name) {
-                    value = field.getFloat(this)
-                    break
-                }
-            }
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        }
-        return value
-    }
-
-
     private fun charSequenceToSpannable(charSequence: CharSequence?): SpannableStringBuilder {
         var spannableStringBuilder: SpannableStringBuilder? = null
-        if (!charSequence.isNullOrEmpty()) {
+        if (mCharSequenceToSpannableHandler != null && !charSequence.isNullOrEmpty()) {
             spannableStringBuilder = mCharSequenceToSpannableHandler?.charSequenceToSpannable(charSequence)
         }
-        return spannableStringBuilder ?: SpannableStringBuilder()
+        return spannableStringBuilder ?: SpannableStringBuilder(charSequence)
     }
 
     fun initWidth(width: Int) {
@@ -334,7 +307,11 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
             return
         }
         mOpenSuffixSpan = SpannableString(mOpenSuffixStr).apply {
-            setSpan(StyleSpan(Typeface.BOLD), 0, mOpenSuffixStr!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD),
+                0,
+                mOpenSuffixStr!!.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             setSpan(object : ClickableSpan() {
                 override fun onClick(widget: View) {
                     switchOpenClose()
@@ -369,6 +346,18 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
         if (mCloseSuffixStr.isNullOrEmpty()) {
             mCloseSuffixSpan = null
             return
+        }
+        mCloseSuffixSpan = SpannableString(mCloseSuffixStr)
+        mCloseSuffixSpan!!.setSpan(
+            StyleSpan(Typeface.BOLD),
+            0,
+            mCloseSuffixStr!!.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        if (mCloseInNewLine) {
+            val alignmentSpan: AlignmentSpan =
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)
+            mCloseSuffixSpan!!.setSpan(alignmentSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         mCloseSuffixSpan = SpannableString(mCloseSuffixStr).apply {
             if (mCloseInNewLine) {

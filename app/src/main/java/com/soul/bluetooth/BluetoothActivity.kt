@@ -49,7 +49,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         mBleViewPager.apply {
             adapter = pagerAdapter
             isUserInputEnabled = false
-            orientation = ViewPager2.ORIENTATION_VERTICAL
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
             currentItem = 0
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {

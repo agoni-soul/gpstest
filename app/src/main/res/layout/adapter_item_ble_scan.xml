@@ -68,7 +68,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_ble_name"
         tools:text="abcdefg" />
 
-    <TextView
+    <com.soul.ui.textView.FoldTextView
         android:id="@+id/tv_service_uuids"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_ble_bond_status"
         tools:text="你好" />
 
-    <TextView
+    <com.soul.ui.textView.FoldTextView
         android:id="@+id/tv_device_uuids"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_service_uuids"
         tools:text="你好" />
 
-    <TextView
+    <com.soul.ui.textView.FoldTextView
         android:id="@+id/tv_ble_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

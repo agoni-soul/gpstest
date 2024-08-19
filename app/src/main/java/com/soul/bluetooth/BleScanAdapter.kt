@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.soul.bean.BleScanResult
 import com.soul.gpstest.R
 import com.soul.ui.textView.FoldTextView
-import com.soul.util.DpOrSpToPxTransfer
 
 
 /**
@@ -76,6 +75,15 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
             Log.d(TAG, "onBindViewHolder: result =\n$result")
             mItemClickCallback?.onClick(result)
         }
+        holder.itemTvBleDeviceUuids.setOnClickListener {
+            this@BleScanAdapter.notifyItemChanged(position)
+        }
+        holder.itemTvBleServiceUuids.setOnClickListener {
+            this@BleScanAdapter.notifyItemChanged(position)
+        }
+        holder.itemTvBleDataByte.setOnClickListener {
+            this@BleScanAdapter.notifyItemChanged(position)
+        }
     }
 
     fun setCallback(itemClickCallback: ItemClickCallback?) {
@@ -106,7 +114,7 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
         fun onClick(result: BleScanResult)
     }
 
-    fun FoldTextView.init(): FoldTextView {
+    private fun FoldTextView.init(): FoldTextView {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val width: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             context.display?.width ?: 0
@@ -115,7 +123,7 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
         }
         initWidth(width)
         maxLines = 3
-        setHasAnimation(false)
+        setHasAnimation(true)
         setCloseInNewLine(true)
         setOpenSuffixColor(context.resources.getColor(R.color.cyan))
         setCloseSuffixColor(context.resources.getColor(R.color.yellow))

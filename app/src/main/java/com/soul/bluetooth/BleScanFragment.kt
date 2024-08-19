@@ -12,12 +12,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import android.view.View
-import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
@@ -29,9 +25,6 @@ import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_PERMISSION
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleScanBinding
 import com.soul.util.PermissionUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 /**
@@ -44,7 +37,7 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
 
-    private var mBleScanAdapter: BleScanAdapter? = null
+    private var mBleScanAdapter: BleScanAdapterV2? = null
     private var mBleDevices = mutableListOf<BleScanResult>()
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
@@ -69,12 +62,20 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
                 Manifest.permission.BLUETOOTH_ADMIN
             ))
         }
-        mBleScanAdapter = BleScanAdapter(mBleDevices).apply {
-            setCallback(object : BleScanAdapter.ItemClickCallback {
-                override fun onClick(result: BleScanResult) {
-                    BleBondManager.createBond(result)
+        mBleScanAdapter = BleScanAdapterV2(mBleDevices, R.layout.adapter_item_ble_scan).apply {
+            setOnItemChildClickListener { _, view, position ->
+                when (view.id) {
+                    R.id.tv_service_uuids, R.id.tv_device_uuids, R.id.tv_ble_data -> {
+                        Log.d(TAG, "convert itemTvBleDataByte: adapterPosition = ${adapterAnimation}, position = $position")
+//                        this.notifyItemChanged(position)
+                    }
                 }
-            })
+            }
+            setOnItemClickListener { _, _, position ->
+                val result = getItem(position)
+                Log.d(TAG, "setOnItemClickListener: result =\n$result")
+                BleBondManager.createBond(result)
+            }
         }
         mViewDataBinding.tvBluetooth.text = "蓝牙扫描"
         mViewDataBinding.rvDeviceBle.let {
@@ -115,7 +116,7 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
     override fun initData() {
         BleScanManager.startDiscovery()
         registerBleReceiver()
-        requestDiscoverable(300)
+//        requestDiscoverable(300)
         if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             BleScanManager.startScan(object: IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {

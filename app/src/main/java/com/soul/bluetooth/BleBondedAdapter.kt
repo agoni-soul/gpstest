@@ -35,48 +35,26 @@ class BleBondedAdapter(bleBondedDevices: MutableList<BleScanResult>, layoutResId
             R.string.ble_connectable,
             if (item.isConnectable) "true" else "false"
         ))
-        val itemTvBleServiceUuids = holder.getView<FoldTextView>(R.id.tv_service_uuids).apply {
-            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val width = windowManager.defaultDisplay.width
-            initWidth(width)
-            maxLines = 3
-            setHasAnimation(false)
-            setCloseInNewLine(true)
-            setOpenSuffixColor(context.resources.getColor(R.color.cyan))
-            setCloseSuffixColor(context.resources.getColor(R.color.yellow))
-        }
+        val itemTvBleServiceUuids = holder.getView<FoldTextView>(R.id.tv_service_uuids).init()
         if (item.serviceUuids.isEmpty()) {
             itemTvBleServiceUuids.visibility = View.GONE
         } else {
             itemTvBleServiceUuids.visibility = View.VISIBLE
             itemTvBleServiceUuids.setOriginalText(context.getString(R.string.ble_service_uuids, item.serviceUuids.toString()))
         }
-        val itemTvBleDeviceUuids = holder.getView<FoldTextView>(R.id.tv_device_uuids).apply {
-            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            val width: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                context.display?.width ?: 0
-            } else {
-                windowManager.defaultDisplay.width
-            }
-            initWidth(width)
-            maxLines = 3
-            setHasAnimation(false)
-            setCloseInNewLine(true)
-            setOpenSuffixColor(context.resources.getColor(R.color.cyan))
-            setCloseSuffixColor(context.resources.getColor(R.color.yellow))
-        }
+        val itemTvBleDeviceUuids = holder.getView<FoldTextView>(R.id.tv_device_uuids).init()
         if (item.deviceUuids.isEmpty()) {
             itemTvBleDeviceUuids.visibility = View.GONE
         } else {
             itemTvBleDeviceUuids.visibility = View.VISIBLE
             itemTvBleDeviceUuids.setOriginalText(context.getString(R.string.ble_device_uuids, item.deviceUuids.toString()))
         }
-        val itemTvBleDataByte = holder.getView<TextView>(R.id.tv_ble_data)
+        val itemTvBleDataByte = holder.getView<FoldTextView>(R.id.tv_ble_data).init()
         if (item.dataHexDetail.isNullOrEmpty()) {
             itemTvBleDataByte.visibility = View.GONE
         } else {
             itemTvBleDataByte.visibility = View.VISIBLE
-            itemTvBleDataByte.text = item.dataHexDetail
+            itemTvBleDataByte.setOriginalText(item.dataHexDetail)
         }
         holder.getView<Button>(R.id.btn_ble_unbind).setOnClickListener {
             mItemClickCallback?.onClickUnbind(item)
@@ -89,5 +67,21 @@ class BleBondedAdapter(bleBondedDevices: MutableList<BleScanResult>, layoutResId
     interface ItemClickCallback {
         fun onClickUnbind(result: BleScanResult)
         fun onClickCommunicate(result: BleScanResult)
+    }
+
+    private fun FoldTextView.init(): FoldTextView {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val width: Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            context.display?.width ?: 0
+        } else {
+            windowManager.defaultDisplay.width
+        }
+        initWidth(width)
+        maxLines = 3
+        setHasAnimation(false)
+        setCloseInNewLine(true)
+        setOpenSuffixColor(context.resources.getColor(R.color.cyan))
+        setCloseSuffixColor(context.resources.getColor(R.color.yellow))
+        return this
     }
 }

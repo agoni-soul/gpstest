@@ -63,8 +63,6 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
     private var mOnClickListener: OnClickListener? = null
     private var mCharSequenceToSpannableHandler: CharSequenceToSpannableHandler? = null
 
-    private var mFoldMaxLine = 1
-
     constructor(context: Context): this(context, null, 0)
     constructor(context: Context, attributeSet: AttributeSet?):this(context, attributeSet, 0)
 
@@ -380,32 +378,6 @@ class FoldTextView(context: Context, attributeSet: AttributeSet? = null, defStyl
 
     override fun setOnClickListener(l: OnClickListener?) {
         mOnClickListener = l
-    }
-
-    fun setFoldMaxLine(foldMaxLine: Int) {
-        mFoldMaxLine = foldMaxLine
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = MeasureSpec.getSize(widthMeasureSpec)
-        val estimatedHeight = calculateNeededHeight(width)
-        setMeasuredDimension(width, estimatedHeight)
-    }
-
-    private fun calculateNeededHeight(width: Int): Int {
-        val paint = paint
-        val text = text.toString()
-        val bounds = Rect()
-        paint.getTextBounds(text, 0, text.length, bounds)
-        val textHeight = bounds.height()
-
-        var neededHeight = textHeight + paddingTop + paddingBottom
-        if (lineCount > 0) {
-            neededHeight *= lineCount
-        }
-        if (mFoldMaxLine < neededHeight) {
-        }
-        return neededHeight
     }
 
     var mOpenCloseCallback: OpenAndCloseCallback? = null

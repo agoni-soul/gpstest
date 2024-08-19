@@ -22,7 +22,7 @@ import com.soul.log.DOFLogUtil
  *     version: 1.0
  */
 abstract class BaseFragment: Fragment() {
-    protected open val TAG = this.javaClass::class.java.simpleName
+    protected open val TAG = javaClass.simpleName
     protected lateinit var mRootView: View
     protected lateinit var mContext: Context
 

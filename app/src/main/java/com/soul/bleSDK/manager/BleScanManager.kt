@@ -19,7 +19,7 @@ import com.soul.util.PermissionUtils
 
 object BleScanManager {
     const val REQUEST_ENABLE_BLE = 1000
-    private val TAG = this::class.java.simpleName
+    private val TAG = javaClass.simpleName
     private var mBleManager: BluetoothManager? = null
     private var mBleAdapter: BluetoothAdapter? = null
 

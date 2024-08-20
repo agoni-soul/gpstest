@@ -40,6 +40,8 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
     private var mBleScanAdapter: BleScanAdapterV2? = null
     private var mBleDevices = mutableListOf<BleScanResult>()
 
+    private var mBleScanCallback: IBleScanCallback? = null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.fragment_ble_scan
@@ -114,11 +116,10 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
     }
 
     override fun initData() {
-        BleScanManager.startDiscovery()
         registerBleReceiver()
 //        requestDiscoverable(300)
         if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            BleScanManager.startScan(object: IBleScanCallback {
+            mBleScanCallback = object: IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
                     results ?: return
                     results.toString()
@@ -144,7 +145,8 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
                 override fun onScanFailed(errorCode: Int) {
                     Log.i(TAG, "onScanFailed: errorCode: $errorCode")
                 }
-            })
+            }
+            BleScanManager.startScan(mBleScanCallback)
         }
     }
 
@@ -168,7 +170,7 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().unregisterReceiver(mBluetoothReceiver)
-        BleScanManager.cancelDiscovery()
+        BleScanManager.stopScan(mBleScanCallback)
     }
 
     inner class BluetoothReceiver : BroadcastReceiver() {

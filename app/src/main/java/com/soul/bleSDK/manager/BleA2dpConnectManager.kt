@@ -48,7 +48,11 @@ class BleA2dpConnectManager(): BaseConnectManager() {
     override fun connect(bleScanResult: BleScanResult?) {
         bleScanResult ?: return
         close()
-        BleScanManager.cancelDiscovery()
+        BleScanManager.apply {
+            if (isScanning()) {
+                stopScan()
+            }
+        }
         mBleResult = bleScanResult
         MainScope().launch(Dispatchers.IO) {
             try {

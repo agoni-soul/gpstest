@@ -166,7 +166,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                             withContext(Dispatchers.Main) {
                                 mBondBleScanAdapter?.notifyItemChanged(mBondBleDevices.size)
                             }
-                            BleScanManager.startDiscovery()
+//                            BleScanManager.startDiscovery()
                         }
                     } else if (state == BluetoothDevice.BOND_NONE &&
                         (preState == BluetoothDevice.BOND_BONDED || preState == BluetoothDevice.BOND_BONDING)) {
@@ -183,7 +183,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                             withContext(Dispatchers.Main) {
                                 mBondBleScanAdapter?.notifyItemRemoved(i)
                             }
-                            BleScanManager.startDiscovery()
+//                            BleScanManager.startDiscovery()
                         }
                     }
                 }

@@ -22,12 +22,17 @@ object BleScanManager {
     private val TAG = javaClass.simpleName
     private var mBleManager: BluetoothManager? = null
     private var mBleAdapter: BluetoothAdapter? = null
+    private var mIsScanning = false
+    private var mBleScanCallbacks = mutableSetOf<IBleScanCallback>()
+    private var mScanCallback: ScanCallback? = null
 
     init {
         Log.d(TAG, "application = ${SoulApplication.application}")
         mBleManager = SoulApplication.application?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager?
         mBleAdapter =  mBleManager?.adapter
     }
+
+    fun isScanning(): Boolean = mIsScanning
 
     fun getBluetoothManager(): BluetoothManager? = mBleManager
 
@@ -41,6 +46,10 @@ object BleScanManager {
         }
     }
 
+    /**
+     * 经典蓝牙扫码
+     */
+//    @Deprecated("recommend to use startScan()", ReplaceWith("startScan(IBleScanCallback)"))
     fun startDiscovery() {
         Log.d(TAG, "startDiscovery")
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
@@ -50,6 +59,11 @@ object BleScanManager {
         mBleAdapter?.startDiscovery()
     }
 
+
+    /**
+     * 经典蓝牙扫码
+     */
+//    @Deprecated("recommend to use stopScan()", ReplaceWith("stopScan(IBleScanCallback)"))
     fun cancelDiscovery() {
         Log.d(TAG, "cancelDiscovery")
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
@@ -89,53 +103,65 @@ object BleScanManager {
         }
     }
 
+    /**
+     * 低功耗蓝牙扫描
+     */
     fun startScan(bleScanCallback: IBleScanCallback?) {
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
+            mIsScanning = false
             return
         }
-        mBleAdapter?.bluetoothLeScanner?.startScan(object: ScanCallback() {
-            override fun onBatchScanResults(results: MutableList<ScanResult>?) {
-                val mutableList = mutableListOf<BleScanResult>()
-                results?.forEach {
-                    val bleScanResult = it.toBleScanResult()
-                    mutableList.add(bleScanResult)
+        mIsScanning = true
+        if (mScanCallback == null) {
+            mScanCallback = object: ScanCallback() {
+                override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+                    val mutableList = mutableListOf<BleScanResult>()
+                    results?.forEach {
+                        val bleScanResult = it.toBleScanResult()
+                        mutableList.add(bleScanResult)
+                    }
+                    mBleScanCallbacks.forEach {
+                        it.onBatchScanResults(mutableList)
+                    }
                 }
-                bleScanCallback?.onBatchScanResults(mutableList)
-            }
 
-            override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
-                bleScanCallback?.onScanResult(callbackType, bleScanResult?.toBleScanResult())
-            }
+                override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
+                    mBleScanCallbacks.forEach {
+                        it.onScanResult(callbackType, bleScanResult?.toBleScanResult())
+                    }
+                }
 
-            override fun onScanFailed(errorCode: Int) {
-                bleScanCallback?.onScanFailed(errorCode)
+                override fun onScanFailed(errorCode: Int) {
+                    mBleScanCallbacks.forEach {
+                        it.onScanFailed(errorCode)
+                    }
+                }
             }
-        })
+            mBleAdapter?.bluetoothLeScanner?.startScan(mScanCallback)
+        }
+        bleScanCallback?.let {
+            mBleScanCallbacks.add(it)
+        }
     }
 
+    /**
+     * 低功耗蓝牙扫描
+     */
     fun stopScan(bleScanCallback: IBleScanCallback?) {
+        mIsScanning = false
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             return
         }
-        mBleAdapter?.bluetoothLeScanner?.stopScan(object: ScanCallback() {
-            override fun onBatchScanResults(results: MutableList<ScanResult>?) {
-                val mutableList = mutableListOf<BleScanResult>()
-                results?.forEach {
-                    val bleScanResult = it.toBleScanResult()
-                    mutableList.add(bleScanResult)
-                }
-                bleScanCallback?.onBatchScanResults(mutableList)
-            }
+        mBleScanCallbacks.remove(bleScanCallback)
+        if (mScanCallback != null && mBleScanCallbacks.isEmpty()) {
+            mBleAdapter?.bluetoothLeScanner?.stopScan(mScanCallback)
+            mScanCallback = null
+        }
+    }
 
-            override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
-                bleScanCallback?.onScanResult(callbackType, bleScanResult?.toBleScanResult())
-            }
-
-            override fun onScanFailed(errorCode: Int) {
-                bleScanCallback?.onScanFailed(errorCode)
-            }
-        })
+    fun stopScan() {
+        stopScan(null)
     }
 }

@@ -25,7 +25,11 @@ class BleRfcommConnectManager(): BaseConnectManager() {
     override fun connect(bleScanResult: BleScanResult?) {
         close()
         bleScanResult ?: return
-        BleScanManager.cancelDiscovery()
+        BleScanManager.apply {
+            if (isScanning()) {
+                stopScan()
+            }
+        }
         mBleConnectCallback?.onStart()
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
             mBleConnectCallback?.onFail(BleErrorException("Manifest.permission.BLUETOOTH_CONNECT No Grant"))

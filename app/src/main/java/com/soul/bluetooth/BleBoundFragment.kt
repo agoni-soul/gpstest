@@ -11,16 +11,16 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
+import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
+import com.soul.bleSDK.scan.BluetoothReceiver
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_PERMISSION
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleBoundBinding
@@ -128,7 +128,20 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
     }
 
     private fun registerBleReceiver() {
-        mBluetoothReceiver = BluetoothReceiver()
+        mBluetoothReceiver = BluetoothReceiver().apply {
+            setBleBoundCallback(object : IBleScanCallback {
+                override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+
+                }
+
+                override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                }
+
+                override fun onScanFailed(errorCode: Int) {
+                }
+
+            })
+        }
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
@@ -141,7 +154,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
         mViewModel.close()
     }
 
-    inner class BluetoothReceiver : BroadcastReceiver() {
+    inner class BluetoothReceiver1 : BroadcastReceiver() {
         @SuppressLint("MissingPermission")
         override fun onReceive(context: Context?, intent: Intent?) {
             context ?: return

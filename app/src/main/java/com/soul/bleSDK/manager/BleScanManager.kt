@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.blankj.utilcode.util.NotificationUtils.Importance
 import com.soul.SoulApplication
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
@@ -22,12 +23,15 @@ object BleScanManager {
     private val TAG = javaClass.simpleName
     private var mBleManager: BluetoothManager? = null
     private var mBleAdapter: BluetoothAdapter? = null
+    private var mIsScanning = false
 
     init {
         Log.d(TAG, "application = ${SoulApplication.application}")
         mBleManager = SoulApplication.application?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager?
         mBleAdapter =  mBleManager?.adapter
     }
+
+    fun isScanning(): Boolean = mIsScanning
 
     fun getBluetoothManager(): BluetoothManager? = mBleManager
 
@@ -41,6 +45,10 @@ object BleScanManager {
         }
     }
 
+    /**
+     * 推荐使用 [startScan()]
+     */
+    @Deprecated("recommend to use startScan()", ReplaceWith("startScan(IBleScanCallback)"))
     fun startDiscovery() {
         Log.d(TAG, "startDiscovery")
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
@@ -50,6 +58,11 @@ object BleScanManager {
         mBleAdapter?.startDiscovery()
     }
 
+
+    /**
+     * 推荐使用 [stopScan()]
+     */
+    @Deprecated("recommend to use stopScan()", ReplaceWith("stopScan(IBleScanCallback)"))
     fun cancelDiscovery() {
         Log.d(TAG, "cancelDiscovery")
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
@@ -92,8 +105,10 @@ object BleScanManager {
     fun startScan(bleScanCallback: IBleScanCallback?) {
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
+            mIsScanning = false
             return
         }
+        mIsScanning = true
         mBleAdapter?.bluetoothLeScanner?.startScan(object: ScanCallback() {
             override fun onBatchScanResults(results: MutableList<ScanResult>?) {
                 val mutableList = mutableListOf<BleScanResult>()
@@ -115,6 +130,7 @@ object BleScanManager {
     }
 
     fun stopScan(bleScanCallback: IBleScanCallback?) {
+        mIsScanning = false
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             return
@@ -137,5 +153,9 @@ object BleScanManager {
                 bleScanCallback?.onScanFailed(errorCode)
             }
         })
+    }
+
+    fun stopScan() {
+        stopScan(null)
     }
 }

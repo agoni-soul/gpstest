@@ -29,7 +29,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
         viewModel
     }
 
-    protected var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+    private var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
     protected abstract fun getViewModelClass(): Class<VM>
 

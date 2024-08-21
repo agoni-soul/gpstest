@@ -30,7 +30,7 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
         viewModel
     }
 
-    protected var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+    private var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
     protected abstract fun getViewModelClass(): Class<VM>
 

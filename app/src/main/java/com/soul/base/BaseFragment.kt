@@ -32,10 +32,6 @@ abstract class BaseFragment: Fragment() {
 
     protected abstract fun getLayoutId(): Int
 
-    abstract fun initView()
-
-    abstract fun initData()
-
     protected open fun getNavigationBarColor(): Int = R.color.transparent
 
     /**

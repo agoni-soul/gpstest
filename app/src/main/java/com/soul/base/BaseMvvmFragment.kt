@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -21,9 +23,28 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
 
     protected lateinit var mViewDataBinding: V
 
-    protected lateinit var mViewModel: VM
+    protected val mViewModel: VM by lazy {
+        val modelClass: Class<VM> = getViewModelClass()
+        val viewModel = ViewModelProvider(this)[modelClass]
+        lifecycle.addObserver(viewModel)
+        viewModel
+    }
 
-    protected abstract fun getViewModelClass(): Class<VM>?
+    protected var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+
+    protected abstract fun getViewModelClass(): Class<VM>
+
+    abstract fun initView()
+
+    abstract fun initData()
+
+    protected open fun isUsedEncapsulatedPermissions(): Boolean = false
+
+    protected open fun requestPermissionArray(): Array<String> = emptyArray()
+
+    protected open fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,13 +54,6 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
         super.onCreateView(inflater, container, savedInstanceState)
         mViewDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
         mViewDataBinding.root.background =  ContextCompat.getDrawable(mContext, R.color.white)
-        val modelClass: Class<VM>? = getViewModelClass()
-        modelClass?.let {
-            mViewModel = ViewModelProvider(this).get(it)
-        }
-        mViewModel.let {
-            lifecycle.addObserver(it)
-        }
         mRootView = mViewDataBinding.root
         return mViewDataBinding.root
     }
@@ -49,6 +63,13 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
         if (!isShowStatus()) {
             addStatusBarView()
         }
+        if (isUsedEncapsulatedPermissions()) {
+            mRequestPermissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionResultMap ->
+                    handlePermissionResult(permissionResultMap)
+                }
+        }
+        mRequestPermissionLauncher?.launch(requestPermissionArray())
         initView()
         initData()
     }

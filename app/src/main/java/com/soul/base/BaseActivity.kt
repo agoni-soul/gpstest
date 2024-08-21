@@ -35,10 +35,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected abstract fun getLayoutId(): Int
 
-    protected abstract fun initView()
-
-    protected abstract fun initData()
-
     /**
      * 隐藏标题栏[ActionBar]
      */

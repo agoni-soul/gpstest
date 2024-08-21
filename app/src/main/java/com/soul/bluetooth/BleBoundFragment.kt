@@ -47,24 +47,35 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
 
     override fun getLayoutId(): Int = R.layout.fragment_ble_bound
 
-    override fun initView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            checkSelfPermission(mutableListOf(
+    override fun isUsedEncapsulatedPermissions(): Boolean = true
+
+    override fun requestPermissionArray(): Array<String> {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN
-            ))
+            )
         } else {
-            checkSelfPermission(mutableListOf(
+            arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN
-            ))
+            )
         }
+    }
+
+    override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+        permissionResultMap.forEach { (k, v) ->
+            Log.d(TAG, "$k ----->>>>>  $v")
+        }
+    }
+
+    override fun initView() {
         mBondBleScanAdapter = BleBondedAdapter(mBondBleDevices, R.layout.adapter_item_ble_bonded).apply {
             setCallback(object : BleBondedAdapter.ItemClickCallback {
 
@@ -90,32 +101,6 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 orientation = LinearLayoutManager.VERTICAL
             }
             it.layoutManager = layoutManager
-        }
-    }
-
-    private fun checkSelfPermission(permissions: MutableList<String>) {
-        val denyPermissionList = mutableListOf<String>()
-        for (permission in permissions) {
-            val permissionValue =
-                ActivityCompat.checkSelfPermission(mContext as Activity, permission)
-            if (permissionValue == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "checkSelfPermission: checkSelfPermission, permission = $permission")
-            } else if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission)) {
-                Log.d(
-                    TAG,
-                    "checkSelfPermission: shouldShowRequestPermissionRationale, permission = $permission"
-                )
-            } else {
-                denyPermissionList.add(permission)
-                Log.d(TAG, "checkSelfPermission: $permission")
-            }
-        }
-        if (denyPermissionList.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                mContext as Activity,
-                denyPermissionList.toTypedArray(),
-                REQUEST_CODE_PERMISSION
-            )
         }
     }
 

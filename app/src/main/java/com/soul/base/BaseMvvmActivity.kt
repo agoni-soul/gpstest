@@ -1,13 +1,13 @@
 package com.soul.base
 
 import android.os.Bundle
-import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import com.soul.gpstest.R
-import com.soul.log.DOFLogUtil
 
 
 /**
@@ -16,28 +16,48 @@ import com.soul.log.DOFLogUtil
  *     desc   :
  *     version: 1.0
  */
-abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActivity() {
+abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseActivity() {
 
-    protected lateinit var mViewDataBinding: V
+    protected val mViewDataBinding: V by lazy {
+        DataBindingUtil.setContentView(this, getLayoutId())
+    }
 
-    protected lateinit var mViewModel: VM
+    protected val mViewModel: VM by lazy {
+        val modelClass: Class<VM> = getViewModelClass()
+        val viewModel = ViewModelProvider(this)[modelClass]
+        lifecycle.addObserver(viewModel)
+        viewModel
+    }
 
-    protected abstract fun getViewModelClass(): Class<VM>?
+    protected var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+
+    protected abstract fun getViewModelClass(): Class<VM>
+
+    protected abstract fun initView()
+
+    protected abstract fun initData()
+
+    protected open fun isUsedEncapsulatedPermissions(): Boolean = false
+
+    protected open fun requestPermissionArray(): Array<String> = emptyArray()
+
+    protected open fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mViewDataBinding = DataBindingUtil.setContentView(this, getLayoutId())
-        mViewDataBinding.root.background =  ContextCompat.getDrawable(mContext, R.color.white)
+        mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, R.color.white)
         if (!isShowStatus()) {
             addStatusBarView()
         }
-        val modelClass: Class<VM>? = getViewModelClass()
-        modelClass?.let {
-            mViewModel = ViewModelProvider(this).get(it)
+        if (isUsedEncapsulatedPermissions()) {
+            mRequestPermissionLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionResultMap ->
+                    handlePermissionResult(permissionResultMap)
+                }
         }
-        mViewModel.let {
-            lifecycle.addObserver(it)
-        }
+        mRequestPermissionLauncher?.launch(requestPermissionArray())
         initView()
         initData()
     }
@@ -45,8 +65,6 @@ abstract class BaseMvvmActivity<V: ViewDataBinding, VM: BaseViewModel>: BaseActi
     override fun onDestroy() {
         super.onDestroy()
         mViewDataBinding.unbind()
-        mViewModel.let {
-            lifecycle.removeObserver(it)
-        }
+        lifecycle.removeObserver(mViewModel)
     }
 }

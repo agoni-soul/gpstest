@@ -1,24 +1,23 @@
 package com.soul.bluetooth
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
-import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
@@ -37,7 +36,8 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
+@RequiresApi(Build.VERSION_CODES.N)
+class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
     private var mBleScanReceiverCallback: IBleScanCallback? = null
@@ -51,29 +51,43 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
 
     override fun getLayoutId(): Int = R.layout.fragment_ble_scan
 
-    override fun initView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            checkSelfPermission(mutableListOf(
+    override fun isUsedEncapsulatedPermissions(): Boolean = true
+
+    override fun requestPermissionArray(): Array<String> {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.BLUETOOTH_CONNECT,
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN
-            ))
+            )
         } else {
-            checkSelfPermission(mutableListOf(
+            arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN
-            ))
+            )
         }
+    }
+
+    override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+        permissionResultMap.forEach { (k, v) ->
+            Log.d(TAG, "$k ----->>>>>  $v")
+        }
+    }
+
+    override fun initView() {
         mBleScanAdapter = BleScanAdapterV2(mBleDevices, R.layout.adapter_item_ble_scan).apply {
             setOnItemChildClickListener { _, view, position ->
                 when (view.id) {
                     R.id.tv_service_uuids, R.id.tv_device_uuids, R.id.tv_ble_data -> {
-                        Log.d(TAG, "convert itemTvBleDataByte: adapterPosition = ${adapterAnimation}, position = $position")
+                        Log.d(
+                            TAG,
+                            "convert itemTvBleDataByte: adapterPosition = ${adapterAnimation}, position = $position"
+                        )
 //                        this.notifyItemChanged(position)
                     }
                 }
@@ -101,7 +115,11 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
                 ActivityCompat.checkSelfPermission(mContext as Activity, permission)
             if (permissionValue == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "checkSelfPermission: checkSelfPermission, permission = $permission")
-            } else if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), permission)) {
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    requireActivity(),
+                    permission
+                )
+            ) {
                 Log.d(
                     TAG,
                     "checkSelfPermission: shouldShowRequestPermissionRationale, permission = $permission"
@@ -124,7 +142,7 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
         registerBleReceiver()
 //        requestDiscoverable(300)
         if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            mBleScanCallback = object: IBleScanCallback {
+            mBleScanCallback = object : IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
                     results ?: return
                     results.toString()
@@ -164,7 +182,8 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
 
             override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
                 if (bleScanResult?.name?.startsWith("colmo", true) == true ||
-                    bleScanResult?.name?.startsWith("midea", true) == true) {
+                    bleScanResult?.name?.startsWith("midea", true) == true
+                ) {
                     return
                 }
                 if (!bleScanResult?.name.isNullOrBlank()) {
@@ -193,7 +212,8 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
         val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
             putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, time)
         }
-        startActivityForResult(discoverableIntent,
+        startActivityForResult(
+            discoverableIntent,
             REQUEST_CODE_BLUETOOTH_DISCOVERABLE
         )
     }

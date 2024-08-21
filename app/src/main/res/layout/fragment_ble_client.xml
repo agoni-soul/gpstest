@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/scan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="扫描设备" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
+
+        <Button
+            android:id="@+id/readData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="读取数据" />
+
+        <EditText
+            android:id="@+id/edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="不要超过20个字节" />
+
+        <Button
+            android:id="@+id/writeData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="写数据" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/info_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

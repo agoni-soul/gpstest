@@ -7,7 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.soul.gpstest.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -25,7 +28,9 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     protected val mViewModel: VM by lazy {
         val modelClass: Class<VM> = getViewModelClass()
         val viewModel = ViewModelProvider(this)[modelClass]
-        lifecycle.addObserver(viewModel)
+        viewModel.viewModelScope.launch(Dispatchers.Main) {
+            lifecycle.addObserver(viewModel)
+        }
         viewModel
     }
 

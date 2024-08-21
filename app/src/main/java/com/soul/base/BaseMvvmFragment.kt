@@ -10,7 +10,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.soul.gpstest.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -26,7 +29,9 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
     protected val mViewModel: VM by lazy {
         val modelClass: Class<VM> = getViewModelClass()
         val viewModel = ViewModelProvider(this)[modelClass]
-        lifecycle.addObserver(viewModel)
+        viewModel.viewModelScope.launch(Dispatchers.Main) {
+            lifecycle.addObserver(viewModel)
+        }
         viewModel
     }
 
@@ -77,8 +82,6 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
     override fun onDestroyView() {
         super.onDestroyView()
         mViewDataBinding.unbind()
-        mViewModel.let {
-            lifecycle.removeObserver(it)
-        }
+        lifecycle.removeObserver(mViewModel)
     }
 }

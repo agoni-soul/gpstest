@@ -13,6 +13,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
@@ -20,11 +21,14 @@ import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
+import com.soul.bleSDK.scan.BluetoothReceiver
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_PERMISSION
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleScanBinding
 import com.soul.util.PermissionUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -36,6 +40,7 @@ import com.soul.util.PermissionUtils
 class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
 
     private var mBluetoothReceiver: BluetoothReceiver? = null
+    private var mBleScanReceiverCallback: IBleScanCallback? = null
 
     private var mBleScanAdapter: BleScanAdapterV2? = null
     private var mBleDevices = mutableListOf<BleScanResult>()
@@ -152,6 +157,32 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
 
     private fun registerBleReceiver() {
         mBluetoothReceiver = BluetoothReceiver()
+        mBleScanReceiverCallback = object : IBleScanCallback {
+            override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+
+            }
+
+            override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                if (bleScanResult?.name?.startsWith("colmo", true) == true ||
+                    bleScanResult?.name?.startsWith("midea", true) == true) {
+                    return
+                }
+                if (!bleScanResult?.name.isNullOrBlank()) {
+                    if (mBleDevices.find { it.mac == bleScanResult!!.mac } == null) {
+                        mBleDevices.add(bleScanResult!!)
+                        mBleDevices.sortBy { it.name?.uppercase() }
+                        mViewModel.viewModelScope.launch(Dispatchers.Main) {
+                            mBleScanAdapter?.notifyDataSetChanged()
+                        }
+                    }
+                }
+            }
+
+            override fun onScanFailed(errorCode: Int) {
+            }
+
+        }
+        mBluetoothReceiver!!.setBleScanCallback(mBleScanReceiverCallback)
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
         intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
@@ -171,37 +202,5 @@ class BleScanFragment: BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>()
         super.onDestroyView()
         requireActivity().unregisterReceiver(mBluetoothReceiver)
         BleScanManager.stopScan(mBleScanCallback)
-    }
-
-    inner class BluetoothReceiver : BroadcastReceiver() {
-        @SuppressLint("MissingPermission")
-        override fun onReceive(context: Context?, intent: Intent?) {
-            context ?: return
-            intent ?: return
-            intent.action ?: return
-            if (BluetoothDevice.ACTION_FOUND == intent.action) {
-                val bleDevice: BluetoothDevice? =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(
-                            BluetoothDevice.EXTRA_DEVICE,
-                            BluetoothDevice::class.java
-                        )
-                    } else {
-                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    }
-                if (bleDevice?.name?.startsWith("colmo", true) == true ||
-                    bleDevice?.name?.startsWith("midea", true) == true) {
-                    return
-                }
-                val bleScanResult = bleDevice?.toBleScanResult()
-                if (!bleScanResult?.name.isNullOrBlank() && !bleDevice?.address.isNullOrBlank()) {
-                    if (mBleDevices.find { it.mac == bleDevice!!.address } == null) {
-                        mBleDevices.add(bleScanResult!!)
-                        mBleDevices.sortBy { it.name?.uppercase() }
-                        mBleScanAdapter?.notifyDataSetChanged()
-                    }
-                }
-            }
-        }
     }
 }

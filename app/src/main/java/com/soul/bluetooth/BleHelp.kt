@@ -27,6 +27,7 @@ import java.util.*
  *     desc   :
  *     version: 1.0
  */
+@SuppressWarnings("missingPermission")
 class BleHelp private constructor() {
     companion object {
         private const val LINK_TIME_OUT = 1000

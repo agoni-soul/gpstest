@@ -1,18 +1,11 @@
 package com.soul.bluetooth
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
@@ -22,12 +15,10 @@ import com.soul.bleSDK.constants.ScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
-import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_PERMISSION
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleBoundBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 /**

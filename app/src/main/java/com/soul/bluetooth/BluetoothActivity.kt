@@ -3,21 +3,17 @@ package com.soul.bluetooth
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
-import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.soul.base.BaseFragment
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
-
 
 /**
  *     author : yangzy33
@@ -45,6 +41,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         val pagerAdapter = ViewPagerFragmentStateAdapter(this@BluetoothActivity).apply {
             addFragment(BleScanFragment())
             addFragment(BleBoundFragment())
+            addFragment(BleServerFragment())
+            addFragment(BleClientFragment())
         }
         mBleViewPager.apply {
             adapter = pagerAdapter
@@ -60,6 +58,8 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         }
         mTabTitleList.add("蓝牙扫描")
         mTabTitleList.add("蓝牙绑定")
+        mTabTitleList.add("蓝牙服务端")
+        mTabTitleList.add("蓝牙客户端")
         mTabLayout.apply {
             mTabTitleList.forEach {
                 val tab = mTabLayout.newTab()

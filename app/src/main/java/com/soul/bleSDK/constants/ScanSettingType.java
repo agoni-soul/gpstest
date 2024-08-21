@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
  * desc   :
  * version: 1.0
  */
-@Target({ElementType.TYPE, ElementType.METHOD, ElementType.LOCAL_VARIABLE})
+@Target({ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})
 @Retention(RetentionPolicy.SOURCE)
-public @interface ScanSettings {
+public @interface ScanSettingType {
     int value() default 0;
 }

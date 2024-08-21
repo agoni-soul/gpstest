@@ -13,6 +13,7 @@ import android.util.Log
 import com.soul.SoulApplication
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
+import com.soul.bleSDK.constants.toScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
@@ -127,8 +128,9 @@ object BleScanManager {
                 }
 
                 override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
+                    val type =callbackType.toScanSettings()
                     mBleScanCallbacks.forEach {
-                        it.onScanResult(callbackType, bleScanResult?.toBleScanResult())
+                        it.onScanResult(type.callbackType, bleScanResult?.toBleScanResult())
                     }
                 }
 

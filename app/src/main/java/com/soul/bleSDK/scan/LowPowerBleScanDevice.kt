@@ -5,6 +5,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
+import com.soul.bleSDK.constants.toScanSettings
 import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
 
@@ -38,8 +39,9 @@ class LowPowerBleScanDevice: BaseBleScanDevice() {
                 }
 
                 override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
+                    val type = callbackType.toScanSettings().callbackType
                     mBleScanCallbacks.forEach {
-                        it.onScanResult(callbackType, bleScanResult?.toBleScanResult())
+                        it.onScanResult(type, bleScanResult?.toBleScanResult())
                     }
                 }
 

@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-@RequiresApi(Build.VERSION_CODES.N)
 class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
 
     private var mBluetoothReceiver: BluetoothReceiver? = null

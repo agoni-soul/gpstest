@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
+import com.soul.bleSDK.constants.ScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
@@ -135,6 +136,30 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 }
 
                 override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                    bleScanResult ?: return
+                    if (callbackType == ScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType) {
+                        var i = 0
+                        while (i < mBondBleDevices.size) {
+                            if (mBondBleDevices[i].mac == bleScanResult.mac) {
+                                break
+                            } else {
+                                i ++
+                            }
+                        }
+                        if (i < mBondBleDevices.size) {
+                            mBondBleDevices.removeAt(i)
+                            mViewModel.viewModelScope.launch(Dispatchers.Main) {
+                                mBondBleScanAdapter?.notifyItemRemoved(i)
+                            }
+//                            BleScanManager.startDiscovery()
+                        }
+                    } else {
+
+                        mBondBleDevices.add(bleScanResult)
+                        mViewModel.viewModelScope.launch(Dispatchers.Main) {
+                            mBondBleScanAdapter?.notifyItemChanged(mBondBleDevices.size)
+                        }
+                    }
                 }
 
                 override fun onScanFailed(errorCode: Int) {
@@ -152,55 +177,5 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
         super.onDestroyView()
         requireActivity().unregisterReceiver(mBluetoothReceiver)
         mViewModel.close()
-    }
-
-    inner class BluetoothReceiver1 : BroadcastReceiver() {
-        @SuppressLint("MissingPermission")
-        override fun onReceive(context: Context?, intent: Intent?) {
-            context ?: return
-            intent ?: return
-            intent.action ?: return
-            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent.action) {
-                mViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
-                    val preState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, BluetoothDevice.ERROR)
-                    val bleDevice: BluetoothDevice =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
-                        } else {
-                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                        } ?: return@launch
-                    Log.d(TAG, "BluetoothReceiver: state = $state, preState = $preState, device.name = ${bleDevice.name}, device.mac = ${bleDevice.address}")
-                    val bondedDevices = BleScanManager.getBondedDevices() ?: return@launch
-                    if (state == BluetoothDevice.BOND_BONDED &&
-                        (preState == BluetoothDevice.BOND_NONE || preState == BluetoothDevice.BOND_BONDING)) {
-                        if (bondedDevices.find { it.address == bleDevice.address } != null) {
-                            mBondBleDevices.add(bleDevice.toBleScanResult())
-                            withContext(Dispatchers.Main) {
-                                mBondBleScanAdapter?.notifyItemChanged(mBondBleDevices.size)
-                            }
-//                            BleScanManager.startDiscovery()
-                        }
-                    } else if (state == BluetoothDevice.BOND_NONE &&
-                        (preState == BluetoothDevice.BOND_BONDED || preState == BluetoothDevice.BOND_BONDING)) {
-                        var i = 0
-                        while (i < mBondBleDevices.size) {
-                            if (mBondBleDevices[i].mac == bleDevice.address) {
-                                break
-                            } else {
-                                i ++
-                            }
-                        }
-                        if (i < mBondBleDevices.size) {
-                            mBondBleDevices.removeAt(i)
-                            withContext(Dispatchers.Main) {
-                                mBondBleScanAdapter?.notifyItemRemoved(i)
-                            }
-//                            BleScanManager.startDiscovery()
-                        }
-                    }
-                }
-            }
-        }
     }
 }

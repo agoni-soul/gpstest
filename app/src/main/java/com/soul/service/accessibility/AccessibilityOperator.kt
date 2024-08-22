@@ -1,4 +1,4 @@
-package com.soul.service
+package com.soul.service.accessibility
 
 import android.accessibilityservice.AccessibilityService
 import android.text.TextUtils

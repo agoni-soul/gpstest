@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bleSDK.constants.BleBlueImpl
@@ -17,6 +18,8 @@ import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleServerBinding
 import com.soul.util.PermissionUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -324,6 +327,9 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
 
     private fun logInfo(msg: String) {
         Log.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
+        mViewModel.viewModelScope.launch(Dispatchers.Main) {
+            mViewDataBinding.info.text = mSb.toString()
+        }
     }
 
     @SuppressWarnings("missingPermission")

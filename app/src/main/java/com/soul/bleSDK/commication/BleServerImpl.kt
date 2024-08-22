@@ -5,6 +5,7 @@ import android.bluetooth.*
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,6 +24,8 @@ class BleServerImpl(
     private val mBleAdapter: BluetoothAdapter,
     bleManager: BluetoothManager
 ) {
+    private val TAG = javaClass.simpleName
+
     private var mBleGattServer: BluetoothGattServer? = null
     private var mGattService: BluetoothGattService? = null
     private val mGattServerCallbackMap = mutableMapOf<String, BluetoothGattServerCallback>()
@@ -33,6 +36,7 @@ class BleServerImpl(
                 status: Int,
                 newState: Int
             ) {
+                Log.d(TAG, "onConnectionStateChange")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onConnectionStateChange(device, status, newState)
                 }
@@ -45,6 +49,7 @@ class BleServerImpl(
                 offset: Int,
                 characteristic: BluetoothGattCharacteristic?
             ) {
+                Log.d(TAG, "onCharacteristicReadRequest")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onCharacteristicReadRequest(device, requestId, offset, characteristic)
                 }
@@ -59,6 +64,7 @@ class BleServerImpl(
                 offset: Int,
                 value: ByteArray?
             ) {
+                Log.d(TAG, "onCharacteristicWriteRequest")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onCharacteristicWriteRequest(
                         device,
@@ -78,6 +84,7 @@ class BleServerImpl(
                 offset: Int,
                 descriptor: BluetoothGattDescriptor?
             ) {
+                Log.d(TAG, "onDescriptorReadRequest")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onDescriptorReadRequest(device, requestId, offset, descriptor)
                 }
@@ -92,6 +99,7 @@ class BleServerImpl(
                 offset: Int,
                 value: ByteArray?
             ) {
+                Log.d(TAG, "onDescriptorWriteRequest")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onDescriptorWriteRequest(
                         device,
@@ -110,18 +118,21 @@ class BleServerImpl(
                 requestId: Int,
                 execute: Boolean
             ) {
+                Log.d(TAG, "onExecuteWrite")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onExecuteWrite(device, requestId, execute)
                 }
             }
 
             override fun onNotificationSent(device: BluetoothDevice?, status: Int) {
+                Log.d(TAG, "onNotificationSent")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onNotificationSent(device, status)
                 }
             }
 
             override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
+                Log.d(TAG, "onMtuChanged")
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                         callback.onMtuChanged(device, mtu)
@@ -136,6 +147,7 @@ class BleServerImpl(
         if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_CONNECT) ==
             PackageManager.PERMISSION_DENIED
         ) {
+            Log.d(TAG, "init")
             mBleGattServer = bleManager.openGattServer(mContext, mGattServiceCallback)
         }
     }
@@ -154,10 +166,12 @@ class BleServerImpl(
         writeUuid: UUID,
         describeUuid: UUID? = null
     ) {
+        Log.d(TAG, "createAndAddBleService")
         mIsAddAdvertising = isAddAdvertising
         if (mIsAddAdvertising &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_ADVERTISE)) {
+            Log.d(TAG, "createAndAddBleService: launchAdvertising")
             BleServerManager.launchAdvertising(mBleAdapter)
         }
         mGattService = createBleGattService(serviceUuid, serviceType).apply {
@@ -165,16 +179,19 @@ class BleServerImpl(
             createWriteGattCharacteristic(writeUuid, describeUuid)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+                Log.d(TAG, "createAndAddBleService: addService")
                 BleServerManager.addService(mBleGattServer, this)
             }
         }
     }
 
     private fun createBleGattService(serviceUuid: UUID, serviceType: Int): BluetoothGattService {
+        Log.d(TAG, "createBleGattService")
         return BleServerManager.getBleGattService(serviceUuid, serviceType)
     }
 
     private fun createReadGattCharacteristic(readUuid: UUID): BluetoothGattCharacteristic {
+        Log.d(TAG, "createReadGattCharacteristic")
         return BleServerManager.createReadGattCharacteristic(mGattService, readUuid)
     }
 
@@ -182,17 +199,21 @@ class BleServerImpl(
         writeUuid: UUID,
         describeUuid: UUID?
     ): BluetoothGattCharacteristic {
+        Log.d(TAG, "createWriteGattCharacteristic")
         return BleServerManager.createWriteGattCharacteristic(mGattService, writeUuid, describeUuid)
     }
 
     fun close(tag: String) {
+        Log.d(TAG, "close")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_ADVERTISE)) {
+            Log.d(TAG, "close: stopAdvertising")
             BleServerManager.stopAdvertising(mBleAdapter)
         }
         mGattServerCallbackMap.remove(tag)
         if (mGattServerCallbackMap.isEmpty() &&
             PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            Log.d(TAG, "close: close")
             mBleGattServer?.close()
         }
     }

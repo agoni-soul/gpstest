@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -166,7 +167,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
 
     override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
         permissionResultMap.forEach { (k, v) ->
-            DOFLogUtil.d(TAG, "$k ----->>>>>  $v")
+            Log.d(TAG, "$k ----->>>>>  $v")
         }
     }
 
@@ -240,7 +241,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 //连接之前先关闭连接
                 closeConnect()
                 val bleData = mData[position]
-                DOFLogUtil.d(TAG, "setOnItemClickListener: bleData =\n$bleData")
+                Log.d(TAG, "setOnItemClickListener: bleData =\n$bleData")
                 blueGatt = bleData.device?.connectGatt(requireContext(), false, blueGattListener)
                 logInfo("开始与 ${bleData.name} 连接.... $blueGatt")
             }
@@ -269,7 +270,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     }
 
     private fun logInfo(msg: String) {
-        DOFLogUtil.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
+        Log.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
     }
 
     // 获取Gatt服务

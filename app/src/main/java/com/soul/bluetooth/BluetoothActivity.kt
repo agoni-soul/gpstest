@@ -39,10 +39,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         mBleViewPager = mViewDataBinding.bleViewPager
         mTabLayout = mViewDataBinding.bleTabLayout
         val pagerAdapter = ViewPagerFragmentStateAdapter(this@BluetoothActivity).apply {
+            addFragment(BleClientFragment())
             addFragment(BleScanFragment())
             addFragment(BleBoundFragment())
             addFragment(BleServerFragment())
-            addFragment(BleClientFragment())
         }
         mBleViewPager.apply {
             adapter = pagerAdapter
@@ -56,10 +56,10 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
                 }
             })
         }
+        mTabTitleList.add("蓝牙客户端")
         mTabTitleList.add("蓝牙扫描")
         mTabTitleList.add("蓝牙绑定")
         mTabTitleList.add("蓝牙服务端")
-        mTabTitleList.add("蓝牙客户端")
         mTabLayout.apply {
             mTabTitleList.forEach {
                 val tab = mTabLayout.newTab()

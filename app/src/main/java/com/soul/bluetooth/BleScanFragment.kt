@@ -107,68 +107,35 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
         }
     }
 
-    private fun checkSelfPermission(permissions: MutableList<String>) {
-        val denyPermissionList = mutableListOf<String>()
-        for (permission in permissions) {
-            val permissionValue =
-                ActivityCompat.checkSelfPermission(mContext as Activity, permission)
-            if (permissionValue == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "checkSelfPermission: checkSelfPermission, permission = $permission")
-            } else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    requireActivity(),
-                    permission
-                )
-            ) {
-                Log.d(
-                    TAG,
-                    "checkSelfPermission: shouldShowRequestPermissionRationale, permission = $permission"
-                )
-            } else {
-                denyPermissionList.add(permission)
-                Log.d(TAG, "checkSelfPermission: $permission")
-            }
-        }
-        if (denyPermissionList.isNotEmpty()) {
-            ActivityCompat.requestPermissions(
-                mContext as Activity,
-                denyPermissionList.toTypedArray(),
-                REQUEST_CODE_PERMISSION
-            )
-        }
-    }
-
     override fun initData() {
         registerBleReceiver()
 //        requestDiscoverable(300)
-        if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            mBleScanCallback = object : IBleScanCallback {
-                override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
-                    results ?: return
-                    results.toString()
-                }
+        mBleScanCallback = object : IBleScanCallback {
+            override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+                results ?: return
+                results.toString()
+            }
 
-                override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
-                    bleScanResult?.let { result ->
-                        if (result.name?.startsWith("colmo", true) == true ||
-                            result.name?.startsWith("midea", true) == true
-                        ) {
-                            return@let
-                        }
-                        if (!result.name.isNullOrBlank() && !result.mac.isNullOrBlank()) {
-                            if (mBleDevices.find { it.mac == result.mac } == null) {
-                                mBleDevices.add(result)
-                                mBleDevices.sortBy { it.name?.uppercase() }
-                                mBleScanAdapter?.notifyDataSetChanged()
-                            }
+            override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                bleScanResult?.let { result ->
+                    if (result.name?.startsWith("colmo", true) == true ||
+                        result.name?.startsWith("midea", true) == true
+                    ) {
+                        return@let
+                    }
+                    if (!result.name.isNullOrBlank() && !result.mac.isNullOrBlank()) {
+                        if (mBleDevices.find { it.mac == result.mac } == null) {
+                            mBleDevices.add(result)
+                            mBleDevices.sortBy { it.name?.uppercase() }
+                            mBleScanAdapter?.notifyDataSetChanged()
                         }
                     }
                 }
-
-                override fun onScanFailed(errorCode: Int) {
-                    Log.i(TAG, "onScanFailed: errorCode: $errorCode")
-                }
             }
-            BleScanManager.startScan(mBleScanCallback)
+
+            override fun onScanFailed(errorCode: Int) {
+                Log.i(TAG, "onScanFailed: errorCode: $errorCode")
+            }
         }
     }
 
@@ -217,9 +184,20 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
+            BleScanManager.startScan(mBleScanCallback)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        BleScanManager.stopScan(mBleScanCallback)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().unregisterReceiver(mBluetoothReceiver)
-        BleScanManager.stopScan(mBleScanCallback)
     }
 }

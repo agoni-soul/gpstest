@@ -6,18 +6,17 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
-import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleClientBinding
+import com.soul.log.DOFLogUtil
 import java.util.*
 
 
@@ -59,7 +58,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
-            // Log.d(TAG, "zsr onServicesDiscovered: ${gatt?.device?.name}")
             val service = gatt?.getService(BleBlueImpl.UUID_SERVICE)
             mBluetoothGatt = gatt
             logInfo("已连接上 GATT 服务，可以通信! ")
@@ -168,7 +166,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
 
     override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
         permissionResultMap.forEach { (k, v) ->
-            Log.d(TAG, "$k ----->>>>>  $v")
+            DOFLogUtil.d(TAG, "$k ----->>>>>  $v")
         }
     }
 
@@ -186,15 +184,14 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         mData.clear()
         mBleAdapter?.notifyDataSetChanged()
         BleBlueImpl.scanDev { dev ->
-            dev.dev.name?.let {
+            dev.name?.let {
                 if (it.startsWith("colmo", true) ||
                     it.startsWith("midea", true)
                 ) {
                     return@let
                 }
-                val scanResult = dev.dev.toBleScanResult()
-                if (scanResult !in mData) {
-                    mData.add(scanResult)
+                if (dev !in mData) {
+                    mData.add(dev)
                     mBleAdapter?.notifyItemInserted(mData.size)
                 }
             }
@@ -243,7 +240,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 //连接之前先关闭连接
                 closeConnect()
                 val bleData = mData[position]
-                Log.d(TAG, "setOnItemClickListener: bleData =\n$bleData")
+                DOFLogUtil.d(TAG, "setOnItemClickListener: bleData =\n$bleData")
                 blueGatt = bleData.device?.connectGatt(requireContext(), false, blueGattListener)
                 logInfo("开始与 ${bleData.name} 连接.... $blueGatt")
             }
@@ -272,7 +269,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     }
 
     private fun logInfo(msg: String) {
-        Log.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
+        DOFLogUtil.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
     }
 
     // 获取Gatt服务

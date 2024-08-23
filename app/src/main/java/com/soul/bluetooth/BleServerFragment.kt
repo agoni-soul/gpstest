@@ -220,8 +220,8 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             BleServerManager.launchAdvertising(bluetoothAdapter)
         }
         BleServerManager.getBleGattService(
-            BleBlueImpl.UUID_DESCRIBE,
-            BluetoothGattDescriptor.PERMISSION_WRITE
+            BleBlueImpl.UUID_SERVICE,
+            BluetoothGattService.SERVICE_TYPE_PRIMARY
         ).apply {
             BleServerManager.createReadGattCharacteristic(this, BleBlueImpl.UUID_READ_NOTIFY)
             BleServerManager.createWriteGattCharacteristic(

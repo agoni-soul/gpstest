@@ -6,6 +6,7 @@ import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseSettings
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
@@ -35,13 +36,12 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     @SuppressWarnings("missingPermission")
     private val gattServiceCallback = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
-            super.onConnectionStateChange(device, status, newState)
             device ?: return
             Log.d(TAG, "zsr onConnectionStateChange: ")
             if (status == BluetoothGatt.GATT_SUCCESS && newState == 2) {
-                logInfo("连接到中心设备: ${device?.name}")
+                logInfo("连接到中心设备: ${device.name}")
             } else {
-                logInfo("与: ${device?.name} 断开连接失败！")
+                logInfo("与: ${device.name} 断开连接失败！")
             }
         }
 
@@ -52,8 +52,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             offset: Int,
             characteristic: BluetoothGattCharacteristic?
         ) {
-            super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-
             /**
              * 中心设备read时，回调
              */
@@ -74,15 +72,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             offset: Int,
             value: ByteArray?
         ) {
-            super.onCharacteristicWriteRequest(
-                device,
-                requestId,
-                characteristic,
-                preparedWrite,
-                responseNeeded,
-                offset,
-                value
-            )
             mBluetoothGattServer?.sendResponse(
                 device, requestId, BluetoothGatt.GATT_SUCCESS,
                 offset, value
@@ -98,7 +87,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             offset: Int,
             descriptor: BluetoothGattDescriptor?
         ) {
-            super.onDescriptorReadRequest(device, requestId, offset, descriptor)
             val data = "this is a test"
             mBluetoothGattServer?.sendResponse(
                 device, requestId, BluetoothGatt.GATT_SUCCESS,
@@ -116,54 +104,23 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             offset: Int,
             value: ByteArray?
         ) {
-            super.onDescriptorWriteRequest(
-                device,
-                requestId,
-                descriptor,
-                preparedWrite,
-                responseNeeded,
-                offset,
-                value
-            )
-
             value?.let {
                 logInfo("客户端写入 [descriptor ${descriptor?.uuid}] ${String(it)}")
                 // 简单模拟通知客户端Characteristic变化
                 Log.d(TAG, "zsr onDescriptorWriteRequest: $value")
             }
-
-
         }
 
         override fun onExecuteWrite(device: BluetoothDevice?, requestId: Int, execute: Boolean) {
-            super.onExecuteWrite(device, requestId, execute)
             Log.d(TAG, "zsr onExecuteWrite: ")
         }
 
         override fun onNotificationSent(device: BluetoothDevice?, status: Int) {
-            super.onNotificationSent(device, status)
             Log.d(TAG, "zsr onNotificationSent: ")
         }
 
         override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
-            super.onMtuChanged(device, mtu)
             Log.d(TAG, "zsr onMtuChanged: ")
-        }
-    }
-
-    private val advertiseCallback = object : AdvertiseCallback() {
-        override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-            super.onStartSuccess(settingsInEffect)
-            logInfo("服务准备就绪，请搜索广播")
-        }
-
-        override fun onStartFailure(errorCode: Int) {
-            super.onStartFailure(errorCode)
-            if (errorCode == ADVERTISE_FAILED_DATA_TOO_LARGE) {
-                logInfo("广播数据超过31个字节了 !")
-            } else {
-                logInfo("服务启动失败: $errorCode")
-            }
         }
     }
 
@@ -199,8 +156,13 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     }
 
     override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+        var isAllGrant = true
         permissionResultMap.forEach { (k, v) ->
             Log.d(TAG, "$k ----->>>>>  $v")
+            isAllGrant = isAllGrant.and(v)
+        }
+        if (isAllGrant) {
+            initBle()
         }
     }
 
@@ -208,15 +170,10 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     }
 
     override fun initData() {
-        initBle()
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun initBle() {
-        if (!PermissionUtils.checkMultiPermission(
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.BLUETOOTH_ADVERTISE
-            )
-        ) return
         bluetoothAdapter = BleScanManager.getBluetoothAdapter()
         bluetoothAdapter?.name = "k20"
         val bleManager = BleScanManager.getBluetoothManager()

@@ -1,6 +1,7 @@
 package com.soul.bluetooth
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseSettings
@@ -155,6 +156,7 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
         var isAllGrant = true
         permissionResultMap.forEach { (k, v) ->

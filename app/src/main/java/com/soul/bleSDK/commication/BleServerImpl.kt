@@ -20,7 +20,7 @@ class BleServerImpl(
     private val mBleAdapter: BluetoothAdapter,
     private val mBleManager: BluetoothManager
 ) {
-    private val TAG = javaClass.simpleName
+    private val TAG = "BleServerImpl"
 
     private var mBleGattServer: BluetoothGattServer? = null
     private var mGattService: BluetoothGattService? = null
@@ -161,10 +161,11 @@ class BleServerImpl(
             Log.d(TAG, "createAndAddBleService: launchAdvertising")
             BleServerManager.launchAdvertising(mBleAdapter)
         }
-        mGattService = createBleGattService(serviceUuid, serviceType).apply {
+        mGattService = createBleGattService(serviceUuid, serviceType)
+        mGattService.apply {
             createReadGattCharacteristic(readUuid)
             createWriteGattCharacteristic(writeUuid, describeUuid)
-            Log.d(TAG, "init")
+            Log.d(TAG, "createAndAddBleService: openGattServer")
             mBleGattServer = mBleManager.openGattServer(mContext, mGattServiceCallback)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                 PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {

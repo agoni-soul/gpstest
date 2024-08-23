@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
+import com.soul.bleSDK.commication.BleServerImpl
 import com.soul.bleSDK.commication.BleServerManager
 import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.manager.BleScanManager
@@ -166,6 +167,8 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
         }
     }
 
+    private var mBleServerImpl: BleServerImpl? = null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.fragment_ble_server
@@ -216,26 +219,20 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
         ) return
         bluetoothAdapter = BleScanManager.getBluetoothAdapter()
         bluetoothAdapter?.name = "k20"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            BleServerManager.launchAdvertising(bluetoothAdapter)
+        val bleManager = BleScanManager.getBluetoothManager()
+        if (bluetoothAdapter != null && bleManager != null) {
+            mBleServerImpl = BleServerImpl(requireContext(), bluetoothAdapter!!, bleManager)
         }
-        BleServerManager.getBleGattService(
-            BleBlueImpl.UUID_SERVICE,
-            BluetoothGattService.SERVICE_TYPE_PRIMARY
-        ).apply {
-            BleServerManager.createReadGattCharacteristic(this, BleBlueImpl.UUID_READ_NOTIFY)
-            BleServerManager.createWriteGattCharacteristic(
-                this,
+        mBleServerImpl?.apply {
+            setGattServiceCallback(TAG, gattServiceCallback)
+            createAndAddBleService(
+                true,
+                BleBlueImpl.UUID_SERVICE,
+                BluetoothGattService.SERVICE_TYPE_PRIMARY,
+                BleBlueImpl.UUID_READ_NOTIFY,
                 BleBlueImpl.UUID_WRITE,
                 BleBlueImpl.UUID_DESCRIBE
             )
-            val bluetoothManager = BleScanManager.getBluetoothManager()
-            //打开 GATT 服务，方便客户端连接
-            mBluetoothGattServer =
-                bluetoothManager?.openGattServer(requireContext(), gattServiceCallback)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                BleServerManager.addService(mBluetoothGattServer, this)
-            }
         }
     }
 
@@ -249,9 +246,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     @SuppressWarnings("missingPermission")
     override fun onDestroy() {
         super.onDestroy()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            BleServerManager.stopAdvertising(bluetoothAdapter)
-        }
-        mBluetoothGattServer?.close()
+        mBleServerImpl?.close(TAG)
     }
 }

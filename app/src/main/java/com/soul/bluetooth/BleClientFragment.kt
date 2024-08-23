@@ -209,7 +209,11 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         val service = getGattService(BleBlueImpl.UUID_SERVICE)
         if (service != null) {
             val characteristic =
-                service.getCharacteristic(BleBlueImpl.UUID_READ_NOTIFY) //通过UUID获取可读的Characteristic
+                service.getCharacteristic(BleBlueImpl.UUID_READ_NOTIFY)
+            if (characteristic == null) {
+                Log.d(TAG, "readData: characteristic is Null")
+                return
+            }
             mBluetoothGatt?.readCharacteristic(characteristic)
         }
     }
@@ -217,9 +221,13 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     private fun writeData() {
         val msg = mViewDataBinding.edit.text.toString()
         val service = getGattService(BleBlueImpl.UUID_SERVICE)
-        if (service != null) {
+        if (service != null && msg.isNotEmpty()) {
             val characteristic =
                 service.getCharacteristic(BleBlueImpl.UUID_WRITE) //通过UUID获取可读的Characteristic
+            if (characteristic == null) {
+                Log.d(TAG, "writeData: characteristic is Null")
+                return
+            }
             characteristic.value = msg.toByteArray()
             mBluetoothGatt?.writeCharacteristic(characteristic)
         }

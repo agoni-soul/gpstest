@@ -6,10 +6,10 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.os.Build
 import android.os.ParcelUuid
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import com.soul.bleSDK.constants.BleBlueImpl
-import com.soul.log.DOFLogUtil
 import java.util.*
 
 
@@ -25,15 +25,15 @@ object BleServerManager {
     private val advertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             super.onStartSuccess(settingsInEffect)
-            DOFLogUtil.d(TAG, "服务准备就绪，请搜索广播")
+            Log.d(TAG, "服务准备就绪，请搜索广播")
         }
 
         override fun onStartFailure(errorCode: Int) {
             super.onStartFailure(errorCode)
             if (errorCode == ADVERTISE_FAILED_DATA_TOO_LARGE) {
-                DOFLogUtil.d(TAG, "广播数据超过31个字节了 !")
+                Log.d(TAG, "广播数据超过31个字节了 !")
             } else {
-                DOFLogUtil.d(TAG, "服务启动失败: $errorCode")
+                Log.d(TAG, "服务启动失败: $errorCode")
             }
         }
     }

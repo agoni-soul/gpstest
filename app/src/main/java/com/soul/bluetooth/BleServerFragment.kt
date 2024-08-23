@@ -1,8 +1,12 @@
 package com.soul.bluetooth
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.*
+import android.bluetooth.le.AdvertiseCallback
+import android.bluetooth.le.AdvertiseSettings
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
@@ -13,7 +17,6 @@ import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleServerBinding
-import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,14 +31,13 @@ import kotlinx.coroutines.launch
 class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewModel>() {
 
     private val mSb = StringBuilder()
-    private var mBluetoothGattServer: BluetoothGattServer? = null
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     @SuppressWarnings("missingPermission")
     private val gattServiceCallback = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
             device ?: return
-            DOFLogUtil.d(TAG, "zsr onConnectionStateChange: ")
+            Log.d(TAG, "zsr onConnectionStateChange: ")
             if (status == BluetoothGatt.GATT_SUCCESS && newState == 2) {
                 logInfo("连接到中心设备: ${device.name}")
             } else {
@@ -54,10 +56,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
              * 中心设备read时，回调
              */
             val data = "this is a test from ble server"
-            mBluetoothGattServer?.sendResponse(
-                device, requestId, BluetoothGatt.GATT_SUCCESS,
-                offset, data.toByteArray()
-            )
             logInfo("客户端读取 [characteristic ${characteristic?.uuid}] $data")
         }
 
@@ -70,10 +68,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             offset: Int,
             value: ByteArray?
         ) {
-            mBluetoothGattServer?.sendResponse(
-                device, requestId, BluetoothGatt.GATT_SUCCESS,
-                offset, value
-            )
             value?.let {
                 logInfo("客户端写入 [characteristic ${characteristic?.uuid}] ${String(it)}")
             }
@@ -86,10 +80,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             descriptor: BluetoothGattDescriptor?
         ) {
             val data = "this is a test"
-            mBluetoothGattServer?.sendResponse(
-                device, requestId, BluetoothGatt.GATT_SUCCESS,
-                offset, data.toByteArray()
-            )
             logInfo("客户端读取 [descriptor ${descriptor?.uuid}] $data")
         }
 
@@ -105,20 +95,20 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             value?.let {
                 logInfo("客户端写入 [descriptor ${descriptor?.uuid}] ${String(it)}")
                 // 简单模拟通知客户端Characteristic变化
-                DOFLogUtil.d(TAG, "zsr onDescriptorWriteRequest: $value")
+                Log.d(TAG, "zsr onDescriptorWriteRequest: $value")
             }
         }
 
         override fun onExecuteWrite(device: BluetoothDevice?, requestId: Int, execute: Boolean) {
-            DOFLogUtil.d(TAG, "zsr onExecuteWrite: ")
+            Log.d(TAG, "zsr onExecuteWrite: ")
         }
 
         override fun onNotificationSent(device: BluetoothDevice?, status: Int) {
-            DOFLogUtil.d(TAG, "zsr onNotificationSent: ")
+            Log.d(TAG, "zsr onNotificationSent: ")
         }
 
         override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
-            DOFLogUtil.d(TAG, "zsr onMtuChanged: ")
+            Log.d(TAG, "zsr onMtuChanged: ")
         }
     }
 
@@ -153,17 +143,26 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+        var isAllGrant = true
         permissionResultMap.forEach { (k, v) ->
-            DOFLogUtil.d(TAG, "$k ----->>>>>  $v")
+            Log.d(TAG, "$k ----->>>>>  $v")
+            isAllGrant = isAllGrant.and(v)
+        }
+        if (isAllGrant) {
+            initBle()
         }
     }
 
     override fun initView() {
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun initData() {
+    }
+
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    private fun initBle() {
         bluetoothAdapter = BleScanManager.getBluetoothAdapter()
         bluetoothAdapter?.name = "k20"
         val bleManager = BleScanManager.getBluetoothManager()
@@ -184,7 +183,7 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     }
 
     private fun logInfo(msg: String) {
-        DOFLogUtil.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
+        Log.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
         mViewModel.viewModelScope.launch(Dispatchers.Main) {
             mViewDataBinding.info.text = mSb.toString()
         }

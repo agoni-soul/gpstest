@@ -1,6 +1,7 @@
 package com.soul.bleSDK.commication
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
 import android.os.Build
@@ -27,6 +28,7 @@ class BleServerImpl(
     private val mGattServerCallbackMap = mutableMapOf<String, BluetoothGattServerCallback>()
     private val mGattServiceCallback: BluetoothGattServerCallback by lazy {
         object : BluetoothGattServerCallback() {
+            @SuppressLint("MissingPermission")
             override fun onConnectionStateChange(
                 device: BluetoothDevice?,
                 status: Int,
@@ -38,7 +40,7 @@ class BleServerImpl(
                 }
             }
 
-
+            @SuppressLint("MissingPermission")
             override fun onCharacteristicReadRequest(
                 device: BluetoothDevice?,
                 requestId: Int,
@@ -46,11 +48,20 @@ class BleServerImpl(
                 characteristic: BluetoothGattCharacteristic?
             ) {
                 Log.d(TAG, "onCharacteristicReadRequest")
+                /**
+                 * 中心设备read时，回调
+                 */
+                val data = "this is a test from ble server"
+                mBleGattServer?.sendResponse(
+                    device, requestId, BluetoothGatt.GATT_SUCCESS,
+                    offset, data.toByteArray()
+                )
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onCharacteristicReadRequest(device, requestId, offset, characteristic)
                 }
             }
 
+            @SuppressLint("MissingPermission")
             override fun onCharacteristicWriteRequest(
                 device: BluetoothDevice?,
                 requestId: Int,
@@ -61,6 +72,10 @@ class BleServerImpl(
                 value: ByteArray?
             ) {
                 Log.d(TAG, "onCharacteristicWriteRequest")
+                mBleGattServer?.sendResponse(
+                    device, requestId, BluetoothGatt.GATT_SUCCESS,
+                    offset, value
+                )
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onCharacteristicWriteRequest(
                         device,
@@ -74,6 +89,7 @@ class BleServerImpl(
                 }
             }
 
+            @SuppressLint("MissingPermission")
             override fun onDescriptorReadRequest(
                 device: BluetoothDevice?,
                 requestId: Int,
@@ -81,6 +97,11 @@ class BleServerImpl(
                 descriptor: BluetoothGattDescriptor?
             ) {
                 Log.d(TAG, "onDescriptorReadRequest")
+                val data = "this is a test"
+                mBleGattServer?.sendResponse(
+                    device, requestId, BluetoothGatt.GATT_SUCCESS,
+                    offset, data.toByteArray()
+                )
                 mGattServerCallbackMap.forEach { (_, callback) ->
                     callback.onDescriptorReadRequest(device, requestId, offset, descriptor)
                 }

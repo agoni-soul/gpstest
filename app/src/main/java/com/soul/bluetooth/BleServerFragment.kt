@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewModel>() {
 
     private val mSb = StringBuilder()
-    private var mBluetoothGattServer: BluetoothGattServer? = null
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     @SuppressWarnings("missingPermission")
@@ -57,10 +56,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
              * 中心设备read时，回调
              */
             val data = "this is a test from ble server"
-            mBluetoothGattServer?.sendResponse(
-                device, requestId, BluetoothGatt.GATT_SUCCESS,
-                offset, data.toByteArray()
-            )
             logInfo("客户端读取 [characteristic ${characteristic?.uuid}] $data")
         }
 
@@ -73,10 +68,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             offset: Int,
             value: ByteArray?
         ) {
-            mBluetoothGattServer?.sendResponse(
-                device, requestId, BluetoothGatt.GATT_SUCCESS,
-                offset, value
-            )
             value?.let {
                 logInfo("客户端写入 [characteristic ${characteristic?.uuid}] ${String(it)}")
             }
@@ -89,10 +80,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             descriptor: BluetoothGattDescriptor?
         ) {
             val data = "this is a test"
-            mBluetoothGattServer?.sendResponse(
-                device, requestId, BluetoothGatt.GATT_SUCCESS,
-                offset, data.toByteArray()
-            )
             logInfo("客户端读取 [descriptor ${descriptor?.uuid}] $data")
         }
 

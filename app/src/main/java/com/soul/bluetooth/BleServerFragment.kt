@@ -38,7 +38,7 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
             device ?: return
             Log.d(TAG, "zsr onConnectionStateChange: ")
-            if (status == BluetoothGatt.GATT_SUCCESS && newState == 2) {
+            if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
                 logInfo("连接到中心设备: ${device.name}")
             } else {
                 logInfo("与: ${device.name} 断开连接失败！")

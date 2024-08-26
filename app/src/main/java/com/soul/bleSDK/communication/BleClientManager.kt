@@ -5,11 +5,10 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
 import android.content.Context
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import com.soul.SoulApplication
-import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.constants.BleConstants
+import com.soul.bleSDK.exceptions.BleErrorException
 import com.soul.bleSDK.interfaces.BleGattCallback
 import java.util.UUID
 
@@ -36,6 +35,8 @@ class BleClientManager {
         mBleGatt = bleDevice.connectGatt(tempContext, autoConnect, mBleGattCallback)
     }
 
+    fun isConnected(): Boolean = mIsConnect
+
     // 获取Gatt服务
     private fun getGattService(uuid: UUID): BluetoothGattService? {
         if (!mIsConnect) {
@@ -57,7 +58,7 @@ class BleClientManager {
             val characteristic =
                 service.getCharacteristic(BleConstants.UUID_READ_NOTIFY)
             if (characteristic == null) {
-                Log.d(TAG, "readData: characteristic is Null")
+                mBleGattCallback?.onReadOrWriteException(mBleGatt, BleErrorException("UUID_READ_NOTIFY: characteristic is Null"))
                 return
             }
             mBleGatt?.readCharacteristic(characteristic)
@@ -71,9 +72,9 @@ class BleClientManager {
         val service = getGattService(BleConstants.UUID_SERVICE)
         if (service != null) {
             val characteristic =
-                service.getCharacteristic(BleConstants.UUID_WRITE) //通过UUID获取可读的Characteristic
+                service.getCharacteristic(BleConstants.UUID_WRITE)
             if (characteristic == null) {
-                Log.d(TAG, "writeData: characteristic is Null")
+                mBleGattCallback?.onReadOrWriteException(mBleGatt, BleErrorException("UUID_WRITE: characteristic is Null"))
                 return
             }
             characteristic.value = message.toByteArray()
@@ -83,6 +84,7 @@ class BleClientManager {
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun closeConnect() {
+        mIsConnect = false
         mBleGatt?.apply {
             disconnect()
             close()

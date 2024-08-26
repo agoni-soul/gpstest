@@ -1,7 +1,11 @@
 package com.soul.bluetooth
 
 import android.Manifest
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothProfile
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
@@ -13,12 +17,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
-import com.soul.bean.toBleScanResult
+import com.soul.bleSDK.communication.BleClientManager
 import com.soul.bleSDK.constants.BleBlueImpl
+import com.soul.bleSDK.constants.BleConstants
+import com.soul.bleSDK.exceptions.BleErrorException
+import com.soul.bleSDK.interfaces.BleGattCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleClientBinding
-import java.util.*
 
 
 /**
@@ -38,7 +44,18 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var blueGatt: BluetoothGatt? = null
     private var isConnected = false
-    private val blueGattListener = object : BluetoothGattCallback() {
+    private val blueGattListener = object : BleGattCallback() {
+        override fun onObtainGattServiceStatus(gatt: BluetoothGatt?, status: Int) {
+            Log.d(TAG, "onObtainGattServiceStatus: status = $status")
+        }
+
+        override fun onReadOrWriteException(
+            gatt: BluetoothGatt?,
+            bleException: BleErrorException?
+        ) {
+            Log.d(TAG, "onReadOrWriteException: bleException = ${bleException?.message}")
+        }
+
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             val device = gatt?.device
@@ -60,7 +77,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
             // Log.d(TAG, "zsr onServicesDiscovered: ${gatt?.device?.name}")
-            val service = gatt?.getService(BleBlueImpl.UUID_SERVICE)
+            val service = gatt?.getService(BleConstants.UUID_SERVICE)
             mBluetoothGatt = gatt
             logInfo("已连接上 GATT 服务，可以通信! ")
 
@@ -137,6 +154,8 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         }
     }
 
+    private var mBleClientManager: BleClientManager? = null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.fragment_ble_client
@@ -174,8 +193,11 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
 
     override fun initView() {
         mViewDataBinding.scan.setOnClickListener { scan() }
-        mViewDataBinding.readData.setOnClickListener { readData() }
-        mViewDataBinding.writeData.setOnClickListener { writeData() }
+        mViewDataBinding.readData.setOnClickListener { mBleClientManager?.readBleMessage() }
+        mViewDataBinding.writeData.setOnClickListener {
+            val message = mViewDataBinding.edit.text.toString()
+            mBleClientManager?.writeBleMessage(message)
+        }
         initRecyclerView()
     }
 
@@ -200,42 +222,11 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         }
     }
 
-    /**
-     * 读数据
-     */
-    private fun readData() {
-        //找到 gatt 服务
-        val service = getGattService(BleBlueImpl.UUID_SERVICE)
-        if (service != null) {
-            val characteristic =
-                service.getCharacteristic(BleBlueImpl.UUID_READ_NOTIFY)
-            if (characteristic == null) {
-                Log.d(TAG, "readData: characteristic is Null")
-                return
-            }
-            mBluetoothGatt?.readCharacteristic(characteristic)
-        }
-    }
-
-    private fun writeData() {
-        val msg = mViewDataBinding.edit.text.toString()
-        val service = getGattService(BleBlueImpl.UUID_SERVICE)
-        if (service != null && msg.isNotEmpty()) {
-            val characteristic =
-                service.getCharacteristic(BleBlueImpl.UUID_WRITE) //通过UUID获取可读的Characteristic
-            if (characteristic == null) {
-                Log.d(TAG, "writeData: characteristic is Null")
-                return
-            }
-            characteristic.value = msg.toByteArray()
-            mBluetoothGatt?.writeCharacteristic(characteristic)
-        }
-    }
-
     override fun initData() {
         //是否支持低功耗蓝牙
         initBluetooth()
         bluetoothAdapter = BleScanManager.getBluetoothAdapter()
+        mBleClientManager = BleClientManager()
     }
 
     /**
@@ -251,7 +242,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 closeConnect()
                 val bleData = mData[position]
                 Log.d(TAG, "setOnItemClickListener: bleData =\n$bleData")
-                blueGatt = bleData.device?.connectGatt(requireContext(), false, blueGattListener)
+                mBleClientManager?.connect(bleData.device, requireContext(), false, blueGattListener)
                 logInfo("开始与 ${bleData.name} 连接.... $blueGatt")
             }
         }
@@ -272,27 +263,11 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
      */
     private fun closeConnect() {
         BleBlueImpl.stopScan()
-        blueGatt?.let {
-            it.disconnect()
-            it.close()
-        }
+        mBleClientManager?.closeConnect()
     }
 
     private fun logInfo(msg: String) {
         Log.d(TAG, "logInfo = ${mSb.apply { append(msg).append("\n") }}")
-    }
-
-    // 获取Gatt服务
-    private fun getGattService(uuid: UUID): BluetoothGattService? {
-        if (!isConnected) {
-            Toast.makeText(requireContext(), "没有连接", Toast.LENGTH_SHORT).show()
-            return null
-        }
-        val service = mBluetoothGatt?.getService(uuid)
-        if (service == null) {
-            Toast.makeText(requireContext(), "没有找到服务", Toast.LENGTH_SHORT).show()
-        }
-        return service
     }
 
     override fun onDestroy() {

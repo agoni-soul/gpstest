@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import com.soul.bleSDK.constants.BleBlueImpl
+import com.soul.bleSDK.constants.BleConstants
 import java.util.*
 
 
@@ -63,7 +64,7 @@ object BleServerManager {
         val advData = AdvertiseData.Builder()
             .setIncludeDeviceName(true) //显示名字
             .setIncludeTxPowerLevel(true)//设置功率
-            .addServiceUuid(ParcelUuid(BleBlueImpl.UUID_SERVICE)) //设置 UUID 服务的 uuid
+            .addServiceUuid(ParcelUuid(BleConstants.UUID_SERVICE)) //设置 UUID 服务的 uuid
             .build()
 
 

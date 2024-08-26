@@ -186,15 +186,14 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         mData.clear()
         mBleAdapter?.notifyDataSetChanged()
         BleBlueImpl.scanDev { dev ->
-            dev.dev.name?.let {
+            dev.name?.let {
                 if (it.startsWith("colmo", true) ||
                     it.startsWith("midea", true)
                 ) {
                     return@let
                 }
-                val scanResult = dev.dev.toBleScanResult()
-                if (scanResult !in mData) {
-                    mData.add(scanResult)
+                if (dev !in mData) {
+                    mData.add(dev)
                     mBleAdapter?.notifyItemInserted(mData.size)
                 }
             }

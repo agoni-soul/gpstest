@@ -1,4 +1,4 @@
-package com.soul.bleSDK.commication
+package com.soul.bleSDK.communication
 
 import android.Manifest
 import android.annotation.SuppressLint

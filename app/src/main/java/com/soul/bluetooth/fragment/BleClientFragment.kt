@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bluetooth.fragment
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -23,6 +23,7 @@ import com.soul.bleSDK.constants.BleConstants
 import com.soul.bleSDK.exceptions.BleErrorException
 import com.soul.bleSDK.interfaces.BleGattCallback
 import com.soul.bleSDK.manager.BleScanManager
+import com.soul.bluetooth.adapter.BleScanAdapterV2
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleClientBinding
 

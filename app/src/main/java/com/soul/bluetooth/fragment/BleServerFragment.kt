@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bluetooth.fragment
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -17,7 +17,6 @@ import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bleSDK.communication.BleServerImpl
-import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.constants.BleConstants
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R

@@ -12,6 +12,11 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
+import com.soul.bluetooth.adapter.ViewPagerFragmentStateAdapter
+import com.soul.bluetooth.fragment.BleBoundFragment
+import com.soul.bluetooth.fragment.BleClientFragment
+import com.soul.bluetooth.fragment.BleScanFragment
+import com.soul.bluetooth.fragment.BleServerFragment
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
 

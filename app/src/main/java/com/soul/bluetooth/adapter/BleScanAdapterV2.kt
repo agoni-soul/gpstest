@@ -1,31 +1,25 @@
-package com.soul.bluetooth
+package com.soul.bluetooth.adapter
 
 import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.soul.bean.BleScanResult
 import com.soul.gpstest.R
 import com.soul.ui.textView.FoldTextView
 
+
 /**
  *     author : yangzy33
- *     time   : 2024-08-01
+ *     time   : 2024-08-19
  *     desc   :
  *     version: 1.0
  */
-class BleBondedAdapter(bleBondedDevices: MutableList<BleScanResult>, layoutResId: Int) :
-    BaseQuickAdapter<BleScanResult, BaseViewHolder>(layoutResId, bleBondedDevices) {
-
-    private var mItemClickCallback:ItemClickCallback? = null
-
-    fun setCallback(itemClickCallback: ItemClickCallback?) {
-        mItemClickCallback = itemClickCallback
-    }
+class BleScanAdapterV2(bleDevices: MutableList<BleScanResult>, layoutResId: Int) :
+    BaseQuickAdapter<BleScanResult, BaseViewHolder>(layoutResId, bleDevices) {
+    private val TAG = javaClass.simpleName
 
     override fun convert(holder: BaseViewHolder, item: BleScanResult) {
         holder.setText(R.id.tv_ble_name, item.name)
@@ -56,17 +50,7 @@ class BleBondedAdapter(bleBondedDevices: MutableList<BleScanResult>, layoutResId
             itemTvBleDataByte.visibility = View.VISIBLE
             itemTvBleDataByte.setOriginalText(item.dataHexDetail)
         }
-        holder.getView<Button>(R.id.btn_ble_unbind).setOnClickListener {
-            mItemClickCallback?.onClickUnbind(item)
-        }
-        holder.getView<Button>(R.id.btn_ble_communicate).setOnClickListener {
-            mItemClickCallback?.onClickCommunicate(item)
-        }
-    }
-
-    interface ItemClickCallback {
-        fun onClickUnbind(result: BleScanResult)
-        fun onClickCommunicate(result: BleScanResult)
+        addChildClickViewIds(R.id.tv_service_uuids, R.id.tv_device_uuids, R.id.tv_ble_data)
     }
 
     private fun FoldTextView.init(): FoldTextView {
@@ -78,7 +62,7 @@ class BleBondedAdapter(bleBondedDevices: MutableList<BleScanResult>, layoutResId
         }
         initWidth(width)
         maxLines = 3
-        setHasAnimation(false)
+        setHasAnimation(true)
         setCloseInNewLine(true)
         setOpenSuffixColor(context.resources.getColor(R.color.cyan))
         setCloseSuffixColor(context.resources.getColor(R.color.yellow))

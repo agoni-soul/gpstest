@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bleSDK
 
 import android.os.Handler
 import android.os.HandlerThread

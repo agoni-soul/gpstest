@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bleSDK
 
 import android.Manifest
 import android.annotation.SuppressLint

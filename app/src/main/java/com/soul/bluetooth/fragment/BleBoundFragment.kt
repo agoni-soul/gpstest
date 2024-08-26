@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bluetooth.fragment
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
@@ -15,6 +15,9 @@ import com.soul.bleSDK.constants.ScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
+import com.soul.bleSDK.BleBondManager
+import com.soul.bluetooth.adapter.BleBondedAdapter
+import com.soul.bluetooth.BleViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleBoundBinding
 import kotlinx.coroutines.Dispatchers

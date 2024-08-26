@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bluetooth.adapter
 
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter

@@ -1,6 +1,5 @@
-package com.soul.bluetooth
+package com.soul.bleSDK
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.*
 import android.content.BroadcastReceiver;
@@ -13,7 +12,6 @@ import android.os.Message
 import android.provider.ContactsContract
 import android.util.Log
 import com.soul.bleSDK.manager.BleScanManager
-import java.util.Set;
 
 /**
  *     author : yangzy33

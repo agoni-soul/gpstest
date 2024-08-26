@@ -1,4 +1,4 @@
-package com.soul.bluetooth
+package com.soul.bluetooth.adapter
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -33,7 +33,7 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
 
     private var mItemClickCallback: ItemClickCallback? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleScanAdapter.BleViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleViewHolder {
         mContext = parent.context
         mBleManager = mContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_item_ble_scan, parent, false)
@@ -42,7 +42,7 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
 
     override fun getItemCount(): Int = mBleDevices.size
 
-    override fun onBindViewHolder(holder: BleScanAdapter.BleViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BleViewHolder, position: Int) {
         val bleScanResult = mBleDevices[position]
         holder.itemTvBleName.text = bleScanResult.name
         holder.itemTvBleMac.text = bleScanResult.mac

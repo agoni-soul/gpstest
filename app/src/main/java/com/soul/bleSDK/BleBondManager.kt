@@ -1,10 +1,8 @@
-package com.soul.bluetooth
+package com.soul.bleSDK
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import com.soul.bean.BleScanResult
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.util.PermissionUtils

@@ -14,5 +14,5 @@
 //}
 rootProject.name = "GPSTest"
 include ':app'
+include ':blesdk'
 //include ':starrysky'
-

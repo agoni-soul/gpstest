@@ -94,7 +94,7 @@
         </activity>
 
         <service
-            android:name="com.soul.service.accessibility.CustomAccessibilityService"
+            android:name="com.soul.service.CustomAccessibilityService"
             android:enabled="true"
             android:exported="true"
             android:label="@string/accessibility_service"
@@ -109,7 +109,7 @@
                 android:resource="@xml/accessibility" />
         </service>
         <service
-            android:name="com.soul.service.accessibility.AccessService"
+            android:name="com.soul.service.AccessService"
             android:exported="true"
             android:label="暗黑魔心的无障碍服务"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

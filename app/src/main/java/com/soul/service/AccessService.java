@@ -1,9 +1,8 @@
-package com.soul.service.accessibility;
+package com.soul.service;
 
 import android.view.accessibility.AccessibilityEvent;
 import android.graphics.Rect;
 import android.view.accessibility.AccessibilityNodeInfo;
-
 import java.util.List;
 
 /**

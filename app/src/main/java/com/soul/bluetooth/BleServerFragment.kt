@@ -18,6 +18,7 @@ import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bleSDK.communication.BleServerImpl
 import com.soul.bleSDK.constants.BleBlueImpl
+import com.soul.bleSDK.constants.BleConstants
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleServerBinding
@@ -176,11 +177,11 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
             setGattServiceCallback(TAG, gattServiceCallback)
             createAndAddBleService(
                 true,
-                BleBlueImpl.UUID_SERVICE,
+                BleConstants.UUID_SERVICE,
                 BluetoothGattService.SERVICE_TYPE_PRIMARY,
-                BleBlueImpl.UUID_READ_NOTIFY,
-                BleBlueImpl.UUID_WRITE,
-                BleBlueImpl.UUID_DESCRIBE
+                BleConstants.UUID_READ_NOTIFY,
+                BleConstants.UUID_WRITE,
+                BleConstants.UUID_DESCRIBE
             )
         }
     }

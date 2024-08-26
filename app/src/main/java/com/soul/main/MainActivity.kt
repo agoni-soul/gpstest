@@ -46,7 +46,7 @@ import com.soul.log.DOFLogUtil
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
 import com.soul.selector.SelectorActivity
-import com.soul.service.CustomAccessibilityService
+import com.soul.service.accessibility.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
 import com.soul.ui.dialog.CustomDialog
 import com.soul.util.DpOrSpToPxTransfer

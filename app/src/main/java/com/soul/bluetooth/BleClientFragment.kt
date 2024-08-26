@@ -57,7 +57,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         }
 
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            super.onConnectionStateChange(gatt, status, newState)
             val device = gatt?.device
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 isConnected = true
@@ -75,8 +74,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-            // Log.d(TAG, "zsr onServicesDiscovered: ${gatt?.device?.name}")
             val service = gatt?.getService(BleConstants.UUID_SERVICE)
             mBluetoothGatt = gatt
             logInfo("已连接上 GATT 服务，可以通信! ")
@@ -99,7 +96,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
             characteristic?.let {
                 val data = String(it.value)
                 logInfo("CharacteristicRead 数据: $data")
@@ -111,7 +107,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            super.onCharacteristicWrite(gatt, characteristic, status)
             characteristic?.let {
                 val data = String(it.value)
                 logInfo("CharacteristicWrite 数据: $data")
@@ -122,7 +117,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             gatt: BluetoothGatt?,
             characteristic: BluetoothGattCharacteristic?
         ) {
-            super.onCharacteristicChanged(gatt, characteristic)
             characteristic?.let {
                 val data = String(it.value)
                 logInfo("CharacteristicChanged 数据: $data")
@@ -134,7 +128,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             descriptor: BluetoothGattDescriptor?,
             status: Int
         ) {
-            super.onDescriptorRead(gatt, descriptor, status)
             descriptor?.let {
                 val data = String(it.value)
                 logInfo("DescriptorRead 数据: $data")
@@ -146,7 +139,6 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             descriptor: BluetoothGattDescriptor?,
             status: Int
         ) {
-            super.onDescriptorWrite(gatt, descriptor, status)
             descriptor?.let {
                 val data = String(it.value)
                 logInfo("DescriptorWrite 数据: $data")

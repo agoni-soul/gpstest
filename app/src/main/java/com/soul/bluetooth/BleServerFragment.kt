@@ -2,22 +2,25 @@ package com.soul.bluetooth
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.*
-import android.bluetooth.le.AdvertiseCallback
-import android.bluetooth.le.AdvertiseSettings
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothProfile
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
-import com.soul.bleSDK.commication.BleServerImpl
-import com.soul.bleSDK.commication.BleServerManager
+import com.soul.bleSDK.communication.BleServerImpl
 import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleServerBinding
-import com.soul.util.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

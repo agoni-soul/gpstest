@@ -20,7 +20,7 @@ typealias BleDevListener = (BleScanResult) -> Unit
 object BleBlueImpl {
     val handler = Handler(Looper.getMainLooper())
     private var isScanning = false
-    private var bluetoothAdapter = BleScanManager.getBluetoothAdapter()
+    private var bluetoothAdapter = BleScanManager.getInstance()?.getBluetoothAdapter()
     private var devCallback: BleDevListener? = null
 
     @SuppressWarnings("missingPermission")

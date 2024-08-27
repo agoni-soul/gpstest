@@ -53,7 +53,7 @@ public class BluetoothHelper(context: Context) {
     }
 
     init {
-        BleScanManager.getBluetoothAdapter()
+        BleScanManager.getInstance()?.getBluetoothAdapter()
             ?.getProfileProxy(context, object : BluetoothProfile.ServiceListener {
 
                 override fun onServiceConnected(profile: Int, proxy: BluetoothProfile?) {

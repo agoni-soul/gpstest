@@ -15,7 +15,7 @@ import com.soul.bean.BleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
-import com.soul.bleSDK.BleBondManager
+import com.soul.bleSDK.manager.BleBondManager
 import com.soul.bluetooth.adapter.BleScanAdapterV2
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
 import com.soul.gpstest.R
@@ -181,14 +181,12 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
 
     override fun onResume() {
         super.onResume()
-        if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            BleScanManager.startScan(mBleScanCallback)
-        }
+        BleScanManager.getInstance()?.startScan(mBleScanCallback)
     }
 
     override fun onPause() {
         super.onPause()
-        BleScanManager.stopScan(mBleScanCallback)
+        BleScanManager.getInstance()?.stopScan(mBleScanCallback)
     }
 
     override fun onDestroyView() {

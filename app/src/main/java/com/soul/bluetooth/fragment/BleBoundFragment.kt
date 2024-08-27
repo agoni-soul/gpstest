@@ -15,7 +15,7 @@ import com.soul.bleSDK.constants.ScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
-import com.soul.bleSDK.BleBondManager
+import com.soul.bleSDK.manager.BleBondManager
 import com.soul.bluetooth.adapter.BleBondedAdapter
 import com.soul.bluetooth.BleViewModel
 import com.soul.gpstest.R
@@ -100,7 +100,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
 
     override fun initData() {
         registerBleReceiver()
-        BleScanManager.getBondedDevices()?.let {
+        BleScanManager.getInstance()?.getBondedDevices()?.let {
             for (device in it) {
                 mBondBleDevices.add(device.toBleScanResult())
             }

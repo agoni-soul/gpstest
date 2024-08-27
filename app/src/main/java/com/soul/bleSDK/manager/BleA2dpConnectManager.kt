@@ -1,6 +1,7 @@
 package com.soul.bleSDK.manager
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothA2dp
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
@@ -9,6 +10,7 @@ import android.os.Build
 import android.util.Log
 import com.soul.appLike.SoulAppLike
 import com.soul.bean.BleScanResult
+import com.soul.bleSDK.permissions.BleSDkPermissionManager
 import com.soul.util.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -21,13 +23,13 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-class BleA2dpConnectManager(): BaseConnectManager() {
+class BleA2dpConnectManager: BaseConnectManager() {
     private var mBleA2dp: BluetoothA2dp? = null
     private var mBleSocket: BluetoothSocket? = null
     private var mBleResult: BleScanResult? = null
 
     init {
-        BleScanManager.getBluetoothAdapter()?.getProfileProxy(SoulAppLike.application, object: BluetoothProfile.ServiceListener {
+        mBleAdapter?.getProfileProxy(SoulAppLike.application, object: BluetoothProfile.ServiceListener {
             override fun onServiceConnected(profile: Int, proxy: BluetoothProfile?) {
                 if (profile == BluetoothProfile.A2DP && proxy is BluetoothA2dp) {
                     mBleA2dp = proxy
@@ -45,10 +47,11 @@ class BleA2dpConnectManager(): BaseConnectManager() {
 
     fun getBluetoothA2dp(): BluetoothA2dp? = mBleA2dp
 
+    @SuppressLint("MissingPermission")
     override fun connect(bleScanResult: BleScanResult?) {
         bleScanResult ?: return
         close()
-        BleScanManager.apply {
+        BleScanManager.getInstance()?.apply {
             if (isScanning()) {
                 stopScan()
             }
@@ -56,18 +59,8 @@ class BleA2dpConnectManager(): BaseConnectManager() {
         mBleResult = bleScanResult
         MainScope().launch(Dispatchers.IO) {
             try {
-                if (bleScanResult.bondState != BluetoothDevice.BOND_BONDED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
-                            Log.e(TAG, "BLUETOOTH_CONNECT permission is no grant")
-                            return@launch
-                        }
-                    } else {
-                        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_ADMIN)) {
-                            Log.e(TAG, "BLUETOOTH_ADMIN permission is no grant")
-                            return@launch
-                        }
-                    }
+                if (bleScanResult.bondState != BluetoothDevice.BOND_BONDED &&
+                    BleSDkPermissionManager.isGrantConnectRelatedPermissions()) {
                     val createSocket = BluetoothDevice::class.java.getMethod(
                         "createRfcommSocket",
                         Int::class.java

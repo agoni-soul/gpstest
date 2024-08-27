@@ -110,7 +110,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         TabLayoutMediator(mTabLayout, mBleViewPager) { tab, position ->
             tab.text = mTabTitleList[position]
         }.attach()
-
     }
 
     override fun initData() {

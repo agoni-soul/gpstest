@@ -164,11 +164,11 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     override fun initData() {
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    @SuppressLint("MissingPermission")
     private fun initBle() {
-        bluetoothAdapter = BleScanManager.getBluetoothAdapter()
+        bluetoothAdapter = BleScanManager.getInstance()?.getBluetoothAdapter()
         bluetoothAdapter?.name = "k20"
-        val bleManager = BleScanManager.getBluetoothManager()
+        val bleManager = BleScanManager.getInstance()?.getBluetoothManager()
         if (bluetoothAdapter != null && bleManager != null) {
             mBleServerImpl = BleServerImpl(requireContext(), bluetoothAdapter!!, bleManager)
         }

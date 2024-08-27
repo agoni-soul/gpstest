@@ -1,43 +1,45 @@
 package com.soul.bleSDK.manager
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.soul.SoulApplication
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.toScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
+import com.soul.bleSDK.permissions.BleSDkPermissionManager
 import com.soul.log.DOFLogUtil
 import com.soul.util.PermissionUtils
 
-object BleScanManager {
-    const val REQUEST_ENABLE_BLE = 1000
-    private val TAG = javaClass.simpleName
-    private var mBleManager: BluetoothManager? = null
-    private var mBleAdapter: BluetoothAdapter? = null
+class BleScanManager private constructor(): BaseBleManager() {
+
+    companion object {
+        const val REQUEST_ENABLE_BLE = 1000
+
+        @Volatile
+        private var mInstance: BleScanManager? = null
+
+        fun getInstance(): BleScanManager? {
+            return if (BleSDkPermissionManager.isGrantScanAllPermissions()) {
+                mInstance ?: synchronized(this) {
+                    mInstance ?: BleScanManager().also { mInstance = it }
+                }
+            } else {
+                null
+            }
+        }
+    }
     private var mIsScanning = false
     private var mBleScanCallbacks = mutableSetOf<IBleScanCallback>()
     private var mScanCallback: ScanCallback? = null
 
-    init {
-        Log.d(TAG, "application = ${SoulApplication.application}")
-        mBleManager = SoulApplication.application?.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager?
-        mBleAdapter =  mBleManager?.adapter
-    }
-
     fun isScanning(): Boolean = mIsScanning
-
-    fun getBluetoothManager(): BluetoothManager? = mBleManager
-
-    fun getBluetoothAdapter(): BluetoothAdapter? = mBleAdapter
 
     fun getBondedDevices(): MutableSet<BluetoothDevice>? {
         return if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
@@ -51,54 +53,34 @@ object BleScanManager {
      * 经典蓝牙扫码
      */
 //    @Deprecated("recommend to use startScan()", ReplaceWith("startScan(IBleScanCallback)"))
+    @SuppressLint("MissingPermission")
     fun startDiscovery() {
         Log.d(TAG, "startDiscovery")
-        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
+        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             return
         }
         mBleAdapter?.startDiscovery()
     }
 
-
     /**
      * 经典蓝牙扫码
      */
 //    @Deprecated("recommend to use stopScan()", ReplaceWith("stopScan(IBleScanCallback)"))
+    @SuppressLint("MissingPermission")
     fun cancelDiscovery() {
         Log.d(TAG, "cancelDiscovery")
-        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
+        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             return
         }
         mBleAdapter?.cancelDiscovery()
     }
 
-    /**
-     * 打开手机蓝牙
-     *
-     * @return true 表示打开成功
-     */
-    fun isEnableBle(): Boolean {
-        if (mBleAdapter?.isEnabled == false) {
-            if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
-                DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_CONNECT: PERMISSION_DENIED")
-                return false
-            }
-            //若未打开手机蓝牙，则会弹出一个系统的是否打开/关闭蓝牙的对话框，禁止或者未处理返回false，允许返回true
-            //若已打开手机蓝牙，直接返回true
-            val enableState: Boolean = mBleAdapter!!.enable()
-            Log.d(TAG, "（用户操作）手机蓝牙是否打开成功：$enableState")
-            return enableState
-        } else {
-            return true
-        }
-    }
-
+    @SuppressLint("MissingPermission")
     fun requestBluetoothPermission(activity: Activity?) {
-        if (!isEnableBle()) {
+        if (!BleSDkPermissionManager.isBleEnabled()) {
             val enableBleIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+            if (BleSDkPermissionManager.isGrantBleConnect()) {
                 activity?.startActivityForResult(enableBleIntent, REQUEST_ENABLE_BLE)
             }
         }
@@ -107,8 +89,9 @@ object BleScanManager {
     /**
      * 低功耗蓝牙扫描
      */
+    @SuppressLint("MissingPermission")
     fun startScan(bleScanCallback: IBleScanCallback?) {
-        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
+        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             mIsScanning = false
             return
@@ -150,9 +133,10 @@ object BleScanManager {
     /**
      * 低功耗蓝牙扫描
      */
+    @SuppressLint("MissingPermission")
     fun stopScan(bleScanCallback: IBleScanCallback?) {
         mIsScanning = false
-        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
+        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             return
         }

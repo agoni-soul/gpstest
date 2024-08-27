@@ -218,7 +218,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     override fun initData() {
         //是否支持低功耗蓝牙
         initBluetooth()
-        bluetoothAdapter = BleScanManager.getBluetoothAdapter()
+        bluetoothAdapter = BleScanManager.getInstance()?.getBluetoothAdapter()
         mBleClientManager = BleClientManager()
     }
 
@@ -248,7 +248,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 Toast.makeText(requireContext(), "您的设备没有低功耗蓝牙驱动！", Toast.LENGTH_SHORT).show()
                 requireActivity().finish()
             }
-        bluetoothAdapter = BleScanManager.getBluetoothAdapter()
+        bluetoothAdapter = BleScanManager.getInstance()?.getBluetoothAdapter()
     }
 
     /**

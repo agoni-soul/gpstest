@@ -1,38 +1,33 @@
 package com.soul.bleSDK.manager
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothSocket
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.BleConstants
 import com.soul.bleSDK.exceptions.BleErrorException
-import com.soul.bleSDK.interfaces.IBleConnectCallback
-import com.soul.util.PermissionUtils
+import com.soul.bleSDK.permissions.BleSDkPermissionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class BleRfcommConnectManager(): BaseConnectManager() {
+class BleRfcommConnectManager : BaseConnectManager() {
     private var mBleSocket: BluetoothSocket? = null
-    private var mBleConnectCallback: IBleConnectCallback? = null
 
     fun getBluetoothSocket(): BluetoothSocket? = mBleSocket
 
-    fun setConnectCallback(bleConnectCallback: IBleConnectCallback?) {
-        mBleConnectCallback = bleConnectCallback
-    }
-
+    @SuppressLint("MissingPermission")
     override fun connect(bleScanResult: BleScanResult?) {
         close()
         bleScanResult ?: return
-        BleScanManager.apply {
+        BleScanManager.getInstance()?.apply {
             if (isScanning()) {
-                stopScan()
+                stopScan(TAG)
             }
         }
         mBleConnectCallback?.onStart()
-        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
-            mBleConnectCallback?.onFail(BleErrorException("Manifest.permission.BLUETOOTH_CONNECT No Grant"))
+        if (!BleSDkPermissionManager.isGrantConnectRelatedPermissions()) {
+            mBleConnectCallback?.onFail(BleErrorException("Lack Necessary Permissions"))
             return
         }
         mBleSocket = bleScanResult.device?.createRfcommSocketToServiceRecord(BleConstants.BLUE_UUID)

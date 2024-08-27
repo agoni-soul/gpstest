@@ -52,7 +52,7 @@ class BluetoothReceiver: BroadcastReceiver() {
                             intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                         } ?: return@launch
                     Log.d(TAG, "BluetoothReceiver: state = $state, preState = $preState, device.name = ${bleDevice.name}, device.mac = ${bleDevice.address}")
-                    val bondedDevices = BleScanManager.getBondedDevices() ?: return@launch
+                    val bondedDevices = BleScanManager.getInstance()?.getBondedDevices() ?: return@launch
                     if (state == BluetoothDevice.BOND_BONDED &&
                         (preState == BluetoothDevice.BOND_NONE || preState == BluetoothDevice.BOND_BONDING)) {
                         if (bondedDevices.find { it.address == bleDevice.address } != null) {

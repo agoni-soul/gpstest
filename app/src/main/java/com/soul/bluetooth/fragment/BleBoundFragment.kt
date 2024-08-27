@@ -1,8 +1,8 @@
 package com.soul.bluetooth.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
-import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import android.widget.TextView
@@ -13,11 +13,12 @@ import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.ScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
-import com.soul.bleSDK.manager.BleScanManager
-import com.soul.bleSDK.scan.BluetoothReceiver
-import com.soul.bleSDK.BleBondManager
-import com.soul.bluetooth.adapter.BleBondedAdapter
+import com.soul.bleSDK.manager.BleBondManager
+import com.soul.bleSDK.permissions.BleSDkPermissionManager
+import com.soul.bleSDK.scan.BaseBleScanDevice
+import com.soul.bleSDK.scan.ClassicBleScanDevice
 import com.soul.bluetooth.BleViewModel
+import com.soul.bluetooth.adapter.BleBondedAdapter
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleBoundBinding
 import kotlinx.coroutines.Dispatchers
@@ -25,17 +26,16 @@ import kotlinx.coroutines.launch
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-08-13
  *     desc   :
  *     version: 1.0
  */
 class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>() {
 
-    private var mBluetoothReceiver: BluetoothReceiver? = null
-
     private var mBondBleScanAdapter: BleBondedAdapter? = null
     private var mBondBleDevices = mutableListOf<BleScanResult>()
+    private var mBleScanDevice: BaseBleScanDevice? = null
 
     override fun getViewModelClass(): Class<BleViewModel> = BleViewModel::class.java
 
@@ -99,17 +99,11 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
     }
 
     override fun initData() {
-        registerBleReceiver()
-        BleScanManager.getBondedDevices()?.let {
-            for (device in it) {
-                mBondBleDevices.add(device.toBleScanResult())
-            }
-        }
-    }
-
-    private fun registerBleReceiver() {
-        mBluetoothReceiver = BluetoothReceiver().apply {
-            setBleBoundCallback(object : IBleScanCallback {
+        mBleScanDevice = ClassicBleScanDevice()
+        mBleScanDevice!!.apply {
+            addFilter(BluetoothDevice.ACTION_FOUND)
+            addFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+            getBluetoothReceiver()?.setBleBoundCallback(object : IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
 
                 }
@@ -130,7 +124,6 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                             mViewModel.viewModelScope.launch(Dispatchers.Main) {
                                 mBondBleScanAdapter?.notifyItemRemoved(i)
                             }
-//                            BleScanManager.startDiscovery()
                         }
                     } else {
 
@@ -145,16 +138,25 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 }
 
             })
+            registerBleReceiver(requireActivity())
         }
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
-        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-        requireActivity().registerReceiver(mBluetoothReceiver, intentFilter)
+        obtainBondedDevices()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun obtainBondedDevices() {
+        if (BleSDkPermissionManager.isGrantConnectRelatedPermissions()) {
+            mBleScanDevice?.getBleBondedDevices()?.let {
+                for (device in it) {
+                    mBondBleDevices.add(device.toBleScanResult())
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        requireActivity().unregisterReceiver(mBluetoothReceiver)
+        mBleScanDevice?.unregisterBleReceiver(requireActivity())
         mViewModel.close()
     }
 }

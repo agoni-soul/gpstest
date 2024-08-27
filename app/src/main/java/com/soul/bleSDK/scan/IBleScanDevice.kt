@@ -1,6 +1,7 @@
 package com.soul.bleSDK.scan
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import com.soul.bleSDK.interfaces.IBleScanCallback
 
@@ -14,8 +15,9 @@ import com.soul.bleSDK.interfaces.IBleScanCallback
 interface IBleScanDevice {
     fun getBluetoothManager(): BluetoothManager?
     fun getBluetoothAdapter(): BluetoothAdapter?
-    fun startScan()
-    fun stopScan()
-    fun isScanning(): Boolean
-    fun setCallback(callback: IBleScanCallback)
+    fun getBleBondedDevices(): Set<BluetoothDevice>?
+    fun startScan(tag: String? = null)
+    fun stopScan(tag: String? = null)
+    fun isScanning(tag: String? = null): Boolean
+    fun setCallback(tag: String, callback: IBleScanCallback?)
 }

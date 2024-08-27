@@ -91,7 +91,6 @@ class BleViewModel(mApplication: Application) : BaseViewModel(mApplication) {
 
                 override fun close() {
                     Log.e(TAG, "BleRfcommManager: close")
-
                 }
             })
         }

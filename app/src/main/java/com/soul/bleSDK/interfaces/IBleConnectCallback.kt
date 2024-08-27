@@ -5,7 +5,7 @@ import com.soul.bleSDK.exceptions.BleErrorException
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-07-31
  *     desc   :
  *     version: 1.0

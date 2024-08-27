@@ -4,7 +4,6 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -13,14 +12,13 @@ import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
-import com.soul.bleSDK.manager.BleScanManager
-import com.soul.bleSDK.scan.BluetoothReceiver
-import com.soul.bleSDK.BleBondManager
-import com.soul.bluetooth.adapter.BleScanAdapterV2
+import com.soul.bleSDK.manager.BleBondManager
+import com.soul.bleSDK.scan.BaseBleScanDevice
+import com.soul.bleSDK.scan.LowPowerBleScanDevice
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
+import com.soul.bluetooth.adapter.BleScanAdapterV2
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleScanBinding
-import com.soul.util.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -33,8 +31,9 @@ import kotlinx.coroutines.launch
  */
 class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
 
-    private var mBluetoothReceiver: BluetoothReceiver? = null
     private var mBleScanReceiverCallback: IBleScanCallback? = null
+
+    private var mBleScanDevice: BaseBleScanDevice? = null
 
     private var mBleScanAdapter: BleScanAdapterV2? = null
     private var mBleDevices = mutableListOf<BleScanResult>()
@@ -103,8 +102,34 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
     }
 
     override fun initData() {
-        registerBleReceiver()
 //        requestDiscoverable(300)
+        mBleScanDevice = LowPowerBleScanDevice()
+        mBleScanReceiverCallback = object : IBleScanCallback {
+            override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+
+            }
+
+            override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                if (bleScanResult?.name?.startsWith("colmo", true) == true ||
+                    bleScanResult?.name?.startsWith("midea", true) == true
+                ) {
+                    return
+                }
+                if (!bleScanResult?.name.isNullOrBlank()) {
+                    if (mBleDevices.find { it.mac == bleScanResult!!.mac } == null) {
+                        mBleDevices.add(bleScanResult!!)
+                        mBleDevices.sortBy { it.name?.uppercase() }
+                        mViewModel.viewModelScope.launch(Dispatchers.Main) {
+                            mBleScanAdapter?.notifyDataSetChanged()
+                        }
+                    }
+                }
+            }
+
+            override fun onScanFailed(errorCode: Int) {
+            }
+
+        }
         mBleScanCallback = object : IBleScanCallback {
             override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
                 results ?: return
@@ -132,41 +157,13 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
                 Log.i(TAG, "onScanFailed: errorCode: $errorCode")
             }
         }
-    }
-
-    private fun registerBleReceiver() {
-        mBluetoothReceiver = BluetoothReceiver()
-        mBleScanReceiverCallback = object : IBleScanCallback {
-            override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
-
-            }
-
-            override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
-                if (bleScanResult?.name?.startsWith("colmo", true) == true ||
-                    bleScanResult?.name?.startsWith("midea", true) == true
-                ) {
-                    return
-                }
-                if (!bleScanResult?.name.isNullOrBlank()) {
-                    if (mBleDevices.find { it.mac == bleScanResult!!.mac } == null) {
-                        mBleDevices.add(bleScanResult!!)
-                        mBleDevices.sortBy { it.name?.uppercase() }
-                        mViewModel.viewModelScope.launch(Dispatchers.Main) {
-                            mBleScanAdapter?.notifyDataSetChanged()
-                        }
-                    }
-                }
-            }
-
-            override fun onScanFailed(errorCode: Int) {
-            }
-
+        mBleScanDevice?.apply {
+            addFilter(BluetoothDevice.ACTION_FOUND)
+            addFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+            getBluetoothReceiver()?.setBleScanCallback(mBleScanReceiverCallback)
+            registerBleReceiver(requireActivity())
+            setCallback(TAG, mBleScanCallback)
         }
-        mBluetoothReceiver!!.setBleScanCallback(mBleScanReceiverCallback)
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(BluetoothDevice.ACTION_FOUND)
-        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-        requireActivity().registerReceiver(mBluetoothReceiver, intentFilter)
     }
 
     private fun requestDiscoverable(time: Long) {
@@ -181,18 +178,16 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
 
     override fun onResume() {
         super.onResume()
-        if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_SCAN)) {
-            BleScanManager.startScan(mBleScanCallback)
-        }
+        mBleScanDevice?.startScan(TAG)
     }
 
     override fun onPause() {
         super.onPause()
-        BleScanManager.stopScan(mBleScanCallback)
+        mBleScanDevice?.stopScan(TAG)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        requireActivity().unregisterReceiver(mBluetoothReceiver)
+        mBleScanDevice?.unregisterBleReceiver(requireActivity())
     }
 }

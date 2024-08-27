@@ -15,9 +15,7 @@ import java.io.Closeable
  *     version: 1.0
  */
 class HandleSocket(private val bleSocket: BluetoothSocket?): Closeable {
-    companion object {
-        private val TAG = HandleSocket::class.java.simpleName
-    }
+    private val TAG: String = javaClass.simpleName
 
     private var mReadThread: ReadThread? = null
     private var mWriteThread: WriteThread? = null

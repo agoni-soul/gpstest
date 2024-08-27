@@ -20,7 +20,7 @@ typealias BleDevListener = (BleScanResult) -> Unit
 object BleBlueImpl {
     val handler = Handler(Looper.getMainLooper())
     private var isScanning = false
-    private var bluetoothAdapter = BleScanManager.getBluetoothAdapter()
+    private var bluetoothAdapter = BleScanManager.getInstance()?.getBluetoothAdapter()
     private var devCallback: BleDevListener? = null
 
     @SuppressWarnings("missingPermission")
@@ -32,7 +32,6 @@ object BleBlueImpl {
         }
 
         //扫描设置
-
         val builder = ScanSettings.Builder()
             /**
              * 三种模式

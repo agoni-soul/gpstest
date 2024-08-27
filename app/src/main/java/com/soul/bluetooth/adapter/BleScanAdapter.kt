@@ -91,23 +91,15 @@ class BleScanAdapter(bleDevices: MutableList<BleScanResult>) :
     }
 
     inner class BleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var itemTvBleName: TextView
-        var itemTvBleMac: TextView
-        var itemTvBleDataByte: FoldTextView
-        var itemTvBleBondStatus: TextView
-        var itemTvBleConnectable: TextView
-        var itemTvBleServiceUuids: FoldTextView
-        var itemTvBleDeviceUuids: FoldTextView
-
-        init {
-            itemTvBleName = itemView.findViewById(R.id.tv_ble_name)
-            itemTvBleMac = itemView.findViewById(R.id.tv_ble_mac)
-            itemTvBleDataByte = itemView.findViewById<FoldTextView>(R.id.tv_ble_data).init()
-            itemTvBleBondStatus = itemView.findViewById(R.id.tv_ble_bond_status)
-            itemTvBleConnectable = itemView.findViewById(R.id.tv_ble_connectable)
-            itemTvBleServiceUuids = itemView.findViewById<FoldTextView>(R.id.tv_service_uuids).init()
-            itemTvBleDeviceUuids = itemView.findViewById<FoldTextView>(R.id.tv_device_uuids).init()
-        }
+        var itemTvBleName: TextView = itemView.findViewById(R.id.tv_ble_name)
+        var itemTvBleMac: TextView = itemView.findViewById(R.id.tv_ble_mac)
+        var itemTvBleDataByte: FoldTextView = itemView.findViewById<FoldTextView>(R.id.tv_ble_data).init()
+        var itemTvBleBondStatus: TextView = itemView.findViewById(R.id.tv_ble_bond_status)
+        var itemTvBleConnectable: TextView = itemView.findViewById(R.id.tv_ble_connectable)
+        var itemTvBleServiceUuids: FoldTextView =
+            itemView.findViewById<FoldTextView>(R.id.tv_service_uuids).init()
+        var itemTvBleDeviceUuids: FoldTextView =
+            itemView.findViewById<FoldTextView>(R.id.tv_device_uuids).init()
     }
 
     interface ItemClickCallback {

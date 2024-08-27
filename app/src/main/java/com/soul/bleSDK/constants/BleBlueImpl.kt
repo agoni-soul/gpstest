@@ -32,7 +32,6 @@ object BleBlueImpl {
         }
 
         //扫描设置
-
         val builder = ScanSettings.Builder()
             /**
              * 三种模式

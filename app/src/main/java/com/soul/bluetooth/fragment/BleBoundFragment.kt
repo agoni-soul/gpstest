@@ -16,7 +16,6 @@ import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleBondManager
 import com.soul.bleSDK.permissions.BleSDkPermissionManager
 import com.soul.bleSDK.scan.BaseBleScanDevice
-import com.soul.bleSDK.scan.BluetoothReceiver
 import com.soul.bleSDK.scan.ClassicBleScanDevice
 import com.soul.bluetooth.BleViewModel
 import com.soul.bluetooth.adapter.BleBondedAdapter
@@ -27,14 +26,12 @@ import kotlinx.coroutines.launch
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-08-13
  *     desc   :
  *     version: 1.0
  */
 class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>() {
-
-    private var mBluetoothReceiver: BluetoothReceiver? = null
 
     private var mBondBleScanAdapter: BleBondedAdapter? = null
     private var mBondBleDevices = mutableListOf<BleScanResult>()
@@ -143,6 +140,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
             })
             registerBleReceiver(requireActivity())
         }
+        obtainBondedDevices()
     }
 
     @SuppressLint("MissingPermission")

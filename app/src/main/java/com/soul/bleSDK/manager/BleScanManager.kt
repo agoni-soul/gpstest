@@ -5,7 +5,9 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Intent
 import android.util.Log
 import com.soul.bean.BleScanResult
@@ -32,10 +34,15 @@ class BleScanManager private constructor(): BaseBleManager() {
             }
         }
     }
+
     private var mIsScanning = false
     private val mBleScanCallbackMap = mutableMapOf<String, IBleScanCallback?>()
     private val mScanningMap = mutableMapOf<String, Boolean>()
     private var mScanCallback: ScanCallback? = null
+    private val mScanBuilder: ScanSettings.Builder by lazy {
+        ScanSettings.Builder()
+    }
+    private val mScanFilters = mutableListOf<ScanFilter>()
 
     fun isScanning(): Boolean = mIsScanning
 
@@ -96,6 +103,8 @@ class BleScanManager private constructor(): BaseBleManager() {
             return
         }
         mIsScanning = true
+        if (mScanFilters.isEmpty()) {
+        }
         if (mScanCallback == null) {
             mScanCallback = object: ScanCallback() {
                 override fun onBatchScanResults(results: MutableList<ScanResult>?) {
@@ -122,7 +131,7 @@ class BleScanManager private constructor(): BaseBleManager() {
                     }
                 }
             }
-            mBleAdapter?.bluetoothLeScanner?.startScan(mScanCallback)
+            mBleAdapter?.bluetoothLeScanner?.startScan(mScanFilters, mScanBuilder.build(), mScanCallback)
         }
         mBleScanCallbackMap[tag] = bleScanCallback
         mScanningMap[tag] = true

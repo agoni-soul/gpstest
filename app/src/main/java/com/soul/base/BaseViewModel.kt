@@ -18,6 +18,7 @@ open class BaseViewModel(application: Application): AndroidViewModel(application
     protected val mApplication = application
 
     var mCompositeDisposable: CompositeDisposable? = null
+        private set
 
     init {
         mCompositeDisposable = CompositeDisposable()

@@ -1,6 +1,5 @@
 package com.soul.bleSDK.manager
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -15,7 +14,7 @@ import com.soul.bleSDK.constants.toScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.permissions.BleSDkPermissionManager
 import com.soul.log.DOFLogUtil
-import com.soul.util.PermissionUtils
+import kotlin.math.tan
 
 class BleScanManager private constructor(): BaseBleManager() {
 
@@ -36,13 +35,17 @@ class BleScanManager private constructor(): BaseBleManager() {
         }
     }
     private var mIsScanning = false
-    private var mBleScanCallbacks = mutableSetOf<IBleScanCallback>()
+    private val mBleScanCallbackMap = mutableMapOf<String, IBleScanCallback?>()
+    private val mScanningMap = mutableMapOf<String, Boolean>()
     private var mScanCallback: ScanCallback? = null
 
     fun isScanning(): Boolean = mIsScanning
 
+    fun isSubScanning(tag: String?): Boolean = mScanningMap[tag] ?: false
+
+    @SuppressLint("MissingPermission")
     fun getBondedDevices(): MutableSet<BluetoothDevice>? {
-        return if (PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
+        return if (BleSDkPermissionManager.isGrantConnectRelatedPermissions()) {
             mBleAdapter?.bondedDevices
         } else {
             null
@@ -70,7 +73,6 @@ class BleScanManager private constructor(): BaseBleManager() {
     fun cancelDiscovery() {
         Log.d(TAG, "cancelDiscovery")
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
-            DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             return
         }
         mBleAdapter?.cancelDiscovery()
@@ -90,9 +92,8 @@ class BleScanManager private constructor(): BaseBleManager() {
      * 低功耗蓝牙扫描
      */
     @SuppressLint("MissingPermission")
-    fun startScan(bleScanCallback: IBleScanCallback?) {
+    fun startScan(tag: String, bleScanCallback: IBleScanCallback?) {
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
-            DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             mIsScanning = false
             return
         }
@@ -105,49 +106,55 @@ class BleScanManager private constructor(): BaseBleManager() {
                         val bleScanResult = it.toBleScanResult()
                         mutableList.add(bleScanResult)
                     }
-                    mBleScanCallbacks.forEach {
-                        it.onBatchScanResults(mutableList)
+                    mBleScanCallbackMap.forEach { (_, scanCallback) ->
+                        scanCallback?.onBatchScanResults(mutableList)
                     }
                 }
 
                 override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
                     val type =callbackType.toScanSettings()
-                    mBleScanCallbacks.forEach {
-                        it.onScanResult(type.callbackType, bleScanResult?.toBleScanResult())
+                    mBleScanCallbackMap.forEach { (_, scanCallback) ->
+                        scanCallback?.onScanResult(type.callbackType, bleScanResult?.toBleScanResult())
                     }
                 }
 
                 override fun onScanFailed(errorCode: Int) {
-                    mBleScanCallbacks.forEach {
-                        it.onScanFailed(errorCode)
+                    mBleScanCallbackMap.forEach { (_, scanCallback) ->
+                        scanCallback?.onScanFailed(errorCode)
                     }
                 }
             }
             mBleAdapter?.bluetoothLeScanner?.startScan(mScanCallback)
         }
-        bleScanCallback?.let {
-            mBleScanCallbacks.add(it)
-        }
+        mBleScanCallbackMap[tag] = bleScanCallback
+        mScanningMap[tag] = true
     }
 
     /**
      * 低功耗蓝牙扫描
      */
     @SuppressLint("MissingPermission")
-    fun stopScan(bleScanCallback: IBleScanCallback?) {
+    fun stopScan(tag: String?) {
         mIsScanning = false
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
-            DOFLogUtil.d(TAG, "Manifest.permission.BLUETOOTH_SCAN: PERMISSION_DENIED")
             return
         }
-        mBleScanCallbacks.remove(bleScanCallback)
-        if (mScanCallback != null && mBleScanCallbacks.isEmpty()) {
+        mBleScanCallbackMap.remove(tag)
+        mScanningMap.remove(tag)
+        if (mScanCallback != null && mBleScanCallbackMap.isEmpty()) {
             mBleAdapter?.bluetoothLeScanner?.stopScan(mScanCallback)
             mScanCallback = null
         }
     }
 
-    fun stopScan() {
-        stopScan(null)
+    fun stopScan(bleScanCallback: IBleScanCallback?) {
+        var tag: String? = null
+        mBleScanCallbackMap.forEach { (key, callback) ->
+            if (bleScanCallback == callback) {
+                tag = key
+                return@forEach
+            }
+        }
+        stopScan(tag)
     }
 }

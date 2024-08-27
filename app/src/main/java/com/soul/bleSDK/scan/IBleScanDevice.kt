@@ -14,8 +14,8 @@ import com.soul.bleSDK.interfaces.IBleScanCallback
 interface IBleScanDevice {
     fun getBluetoothManager(): BluetoothManager?
     fun getBluetoothAdapter(): BluetoothAdapter?
-    fun startScan()
-    fun stopScan()
-    fun isScanning(): Boolean
-    fun setCallback(callback: IBleScanCallback)
+    fun startScan(tag: String? = null)
+    fun stopScan(tag: String? = null)
+    fun isScanning(tag: String? = null): Boolean
+    fun setCallback(tag: String, callback: IBleScanCallback?)
 }

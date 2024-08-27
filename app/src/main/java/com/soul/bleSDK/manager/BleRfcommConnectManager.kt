@@ -30,7 +30,7 @@ class BleRfcommConnectManager : BaseConnectManager() {
         bleScanResult ?: return
         BleScanManager.getInstance()?.apply {
             if (isScanning()) {
-                stopScan()
+                stopScan(TAG)
             }
         }
         mBleConnectCallback?.onStart()

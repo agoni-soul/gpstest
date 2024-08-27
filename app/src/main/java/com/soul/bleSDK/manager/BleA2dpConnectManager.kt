@@ -53,7 +53,7 @@ class BleA2dpConnectManager: BaseConnectManager() {
         close()
         BleScanManager.getInstance()?.apply {
             if (isScanning()) {
-                stopScan()
+                stopScan(TAG)
             }
         }
         mBleResult = bleScanResult

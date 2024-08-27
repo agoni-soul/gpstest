@@ -13,8 +13,6 @@ import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.toScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.permissions.BleSDkPermissionManager
-import com.soul.log.DOFLogUtil
-import kotlin.math.tan
 
 class BleScanManager private constructor(): BaseBleManager() {
 

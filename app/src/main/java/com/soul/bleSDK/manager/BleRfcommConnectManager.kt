@@ -1,28 +1,20 @@
 package com.soul.bleSDK.manager
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothSocket
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.BleConstants
 import com.soul.bleSDK.exceptions.BleErrorException
-import com.soul.bleSDK.interfaces.IBleConnectCallback
 import com.soul.bleSDK.permissions.BleSDkPermissionManager
-import com.soul.util.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class BleRfcommConnectManager : BaseConnectManager() {
     private var mBleSocket: BluetoothSocket? = null
-    private var mBleConnectCallback: IBleConnectCallback? = null
 
     fun getBluetoothSocket(): BluetoothSocket? = mBleSocket
-
-    fun setConnectCallback(bleConnectCallback: IBleConnectCallback?) {
-        mBleConnectCallback = bleConnectCallback
-    }
 
     @SuppressLint("MissingPermission")
     override fun connect(bleScanResult: BleScanResult?) {

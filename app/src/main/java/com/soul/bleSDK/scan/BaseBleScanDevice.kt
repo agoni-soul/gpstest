@@ -1,19 +1,12 @@
 package com.soul.bleSDK.scan
 
-import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
-import android.content.Context
 import android.content.IntentFilter
-import android.util.Log
-import com.soul.SoulApplication
-import com.soul.base.BaseActivity
 import com.soul.bleSDK.interfaces.IBleScanCallback
-import com.soul.bleSDK.manager.BaseBleManager
 import com.soul.bleSDK.manager.BleScanManager
-import com.soul.log.DOFLogUtil
-import com.soul.util.PermissionUtils
 
 
 /**
@@ -34,6 +27,9 @@ open class BaseBleScanDevice: IBleScanDevice {
 
     override fun getBluetoothAdapter(): BluetoothAdapter? =
         BleScanManager.getInstance()?.getBluetoothAdapter()
+
+    override fun getBleBondedDevices(): Set<BluetoothDevice>? =
+        BleScanManager.getInstance()?.getBondedDevices()
 
     override fun startScan(tag: String?) {
     }

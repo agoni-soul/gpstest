@@ -4,7 +4,6 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -14,9 +13,7 @@ import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleBondManager
-import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BaseBleScanDevice
-import com.soul.bleSDK.scan.BluetoothReceiver
 import com.soul.bleSDK.scan.LowPowerBleScanDevice
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
 import com.soul.bluetooth.adapter.BleScanAdapterV2
@@ -34,7 +31,6 @@ import kotlinx.coroutines.launch
  */
 class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>() {
 
-    private var mBluetoothReceiver: BluetoothReceiver? = null
     private var mBleScanReceiverCallback: IBleScanCallback? = null
 
     private var mBleScanDevice: BaseBleScanDevice? = null

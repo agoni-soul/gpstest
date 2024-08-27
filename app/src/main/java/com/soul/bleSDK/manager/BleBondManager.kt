@@ -1,11 +1,12 @@
 package com.soul.bleSDK.manager
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.soul.bean.BleScanResult
-import com.soul.bleSDK.permissions.BleSDkPermissionManager
+import com.soul.bleSDK.manager.BleScanManager
 import com.soul.util.PermissionUtils
 
 
@@ -16,9 +17,9 @@ import com.soul.util.PermissionUtils
  *     version: 1.0
  */
 object BleBondManager: BaseBleManager() {
-    @SuppressLint("MissingPermission")
+
     fun createBond(bleScanResult: BleScanResult?) {
-        if (!BleSDkPermissionManager.isGrantConnectRelatedPermissions()) {
+        if (!PermissionUtils.checkSinglePermission(Manifest.permission.BLUETOOTH_CONNECT)) {
             return
         }
         mBleAdapter?.getRemoteDevice(bleScanResult?.device?.address)

@@ -13,11 +13,11 @@ import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
 import com.soul.bleSDK.constants.ScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
+import com.soul.bleSDK.manager.BleBondManager
 import com.soul.bleSDK.manager.BleScanManager
 import com.soul.bleSDK.scan.BluetoothReceiver
-import com.soul.bleSDK.manager.BleBondManager
-import com.soul.bluetooth.adapter.BleBondedAdapter
 import com.soul.bluetooth.BleViewModel
+import com.soul.bluetooth.adapter.BleBondedAdapter
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleBoundBinding
 import kotlinx.coroutines.Dispatchers

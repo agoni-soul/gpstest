@@ -242,14 +242,15 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                     }
 
                     override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
-                        bleScanResult?.name?.let {
-                            if (it.startsWith("colmo", true) ||
-                                it.startsWith("midea", true)
+                        bleScanResult?.let {
+                            it.name ?: return
+                            if (it.name.startsWith("colmo", true) ||
+                                it.name.startsWith("midea", true)
                             ) {
                                 return@let
                             }
-                            if (bleScanResult !in mData) {
-                                mData.add(bleScanResult)
+                            if (it !in mData) {
+                                mData.add(it)
                                 mBleAdapter?.notifyItemInserted(mData.size)
                             }
                         }

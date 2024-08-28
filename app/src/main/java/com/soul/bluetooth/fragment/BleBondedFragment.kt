@@ -20,7 +20,7 @@ import com.soul.bleSDK.scan.ClassicBleScanDevice
 import com.soul.bluetooth.BleViewModel
 import com.soul.bluetooth.adapter.BleBondedAdapter
 import com.soul.gpstest.R
-import com.soul.gpstest.databinding.FragmentBleBoundBinding
+import com.soul.gpstest.databinding.FragmentBleBondedBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>() {
+class BleBondedFragment: BaseMvvmFragment<FragmentBleBondedBinding, BleViewModel>() {
 
     private var mBondBleScanAdapter: BleBondedAdapter? = null
     private var mBondBleDevices = mutableListOf<BleScanResult>()
@@ -39,7 +39,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
 
     override fun getViewModelClass(): Class<BleViewModel> = BleViewModel::class.java
 
-    override fun getLayoutId(): Int = R.layout.fragment_ble_bound
+    override fun getLayoutId(): Int = R.layout.fragment_ble_bonded
 
     override fun isUsedEncapsulatedPermissions(): Boolean = true
 
@@ -89,7 +89,7 @@ class BleBoundFragment: BaseMvvmFragment<FragmentBleBoundBinding, BleViewModel>(
                 mViewModel.mBleCommunicateManager?.sendMessage("蓝牙图标")
             }
         }
-        mViewDataBinding.rvBoundBle.let {
+        mViewDataBinding.rvBondedBle.let {
             it.adapter = mBondBleScanAdapter
             val layoutManager = LinearLayoutManager(mContext).apply {
                 orientation = LinearLayoutManager.VERTICAL

@@ -2,13 +2,13 @@ package com.soul.bleSDK.constants
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-08-20
  *     desc   :
  *     version: 1.0
  */
 
-enum class ScanSettings(val callbackType: Int) {
+enum class BleScanSettings(val callbackType: Int) {
     /**
      * 默认值
      */
@@ -38,25 +38,25 @@ enum class ScanSettings(val callbackType: Int) {
     CALLBACK_TYPE_REMOVE_BOUND_DEVICE(100);
 }
 
-fun Int.toScanSettings(): ScanSettings {
+fun Int.toScanSettings(): BleScanSettings {
     return when (this) {
-        ScanSettings.CALLBACK_TYPE_DEFAULT.callbackType -> {
-            ScanSettings.CALLBACK_TYPE_DEFAULT
+        BleScanSettings.CALLBACK_TYPE_DEFAULT.callbackType -> {
+            BleScanSettings.CALLBACK_TYPE_DEFAULT
         }
-        ScanSettings.CALLBACK_TYPE_ALL_MATCHES.callbackType -> {
-            ScanSettings.CALLBACK_TYPE_ALL_MATCHES
+        BleScanSettings.CALLBACK_TYPE_ALL_MATCHES.callbackType -> {
+            BleScanSettings.CALLBACK_TYPE_ALL_MATCHES
         }
-        ScanSettings.CALLBACK_TYPE_FIRST_MATCH.callbackType -> {
-            ScanSettings.CALLBACK_TYPE_FIRST_MATCH
+        BleScanSettings.CALLBACK_TYPE_FIRST_MATCH.callbackType -> {
+            BleScanSettings.CALLBACK_TYPE_FIRST_MATCH
         }
-        ScanSettings.CALLBACK_TYPE_MATCH_LOST.callbackType -> {
-            ScanSettings.CALLBACK_TYPE_MATCH_LOST
+        BleScanSettings.CALLBACK_TYPE_MATCH_LOST.callbackType -> {
+            BleScanSettings.CALLBACK_TYPE_MATCH_LOST
         }
-        ScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType -> {
-            ScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE
+        BleScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType -> {
+            BleScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE
         }
         else -> {
-            ScanSettings.CALLBACK_TYPE_DEFAULT
+            BleScanSettings.CALLBACK_TYPE_DEFAULT
         }
     }
 }

@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.le.ScanSettings
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
@@ -18,18 +19,20 @@ import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
 import com.soul.bean.BleScanResult
 import com.soul.bleSDK.communication.BleClientManager
-import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.constants.BleConstants
 import com.soul.bleSDK.exceptions.BleErrorException
 import com.soul.bleSDK.interfaces.BleGattCallback
+import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
+import com.soul.bleSDK.scan.BaseBleScanDevice
+import com.soul.bleSDK.scan.LowPowerBleScanDevice
 import com.soul.bluetooth.adapter.BleScanAdapterV2
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleClientBinding
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-08-21
  *     desc   :
  *     version: 1.0
@@ -146,6 +149,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             }
         }
     }
+    private var mScanBleDevice: BaseBleScanDevice? = null
 
     private var mBleClientManager: BleClientManager? = null
 
@@ -200,18 +204,61 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     private fun scan() {
         mData.clear()
         mBleAdapter?.notifyDataSetChanged()
-        BleBlueImpl.scanDev { dev ->
-            dev.name?.let {
-                if (it.startsWith("colmo", true) ||
-                    it.startsWith("midea", true)
-                ) {
-                    return@let
-                }
-                if (dev !in mData) {
-                    mData.add(dev)
-                    mBleAdapter?.notifyItemInserted(mData.size)
-                }
+        mScanBleDevice = LowPowerBleScanDevice()
+        mScanBleDevice!!.apply {
+            //扫描设置
+            val scanSettings = ScanSettings.Builder()
+                /**
+                 * 三种模式
+                 * - SCAN_MODE_LOW_POWER : 低功耗模式，默认此模式，如果应用不在前台，则强制此模式
+                 * - SCAN_MODE_BALANCED ： 平衡模式，一定频率下返回结果
+                 * - SCAN_MODE_LOW_LATENCY 高功耗模式，建议应用在前台才使用此模式
+                 */
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)//高功耗，应用在前台
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                /**
+                 * 三种回调模式
+                 * - CALLBACK_TYPE_ALL_MATCHED : 寻找符合过滤条件的广播，如果没有，则返回全部广播
+                 * - CALLBACK_TYPE_FIRST_MATCH : 仅筛选匹配第一个广播包出发结果回调的
+                 * - CALLBACK_TYPE_MATCH_LOST : 这个看英文文档吧，不满足第一个条件的时候，不好解释
+                 */
+                scanSettings.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             }
+
+            //判断手机蓝牙芯片是否支持皮批处理扫描
+            if (getBluetoothAdapter()?.isOffloadedFilteringSupported == true) {
+                scanSettings.setReportDelay(0L)
+            }
+
+            (this as LowPowerBleScanDevice).startScan(
+                TAG,
+                3000L,
+                null,
+                scanSettings.build(),
+                object : IBleScanCallback {
+                    override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+
+                    }
+
+                    override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                        bleScanResult?.name?.let {
+                            if (it.startsWith("colmo", true) ||
+                                it.startsWith("midea", true)
+                            ) {
+                                return@let
+                            }
+                            if (bleScanResult !in mData) {
+                                mData.add(bleScanResult)
+                                mBleAdapter?.notifyItemInserted(mData.size)
+                            }
+                        }
+                    }
+
+                    override fun onScanFailed(errorCode: Int) {
+                    }
+
+                })
         }
     }
 
@@ -235,7 +282,12 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 closeConnect()
                 val bleData = mData[position]
                 Log.d(TAG, "setOnItemClickListener: bleData =\n$bleData")
-                mBleClientManager?.connect(bleData.device, requireContext(), false, blueGattListener)
+                mBleClientManager?.connect(
+                    bleData.device,
+                    requireContext(),
+                    false,
+                    blueGattListener
+                )
                 logInfo("开始与 ${bleData.name} 连接.... $blueGatt")
             }
         }
@@ -245,7 +297,8 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     private fun initBluetooth() {
         requireActivity().packageManager.takeIf { !it.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE) }
             ?.let {
-                Toast.makeText(requireContext(), "您的设备没有低功耗蓝牙驱动！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "您的设备没有低功耗蓝牙驱动！", Toast.LENGTH_SHORT)
+                    .show()
                 requireActivity().finish()
             }
         bluetoothAdapter = BleScanManager.getInstance()?.getBluetoothAdapter()
@@ -255,7 +308,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
      * 断开连接
      */
     private fun closeConnect() {
-        BleBlueImpl.stopScan()
+        mScanBleDevice?.stopScan(TAG)
         mBleClientManager?.closeConnect()
     }
 

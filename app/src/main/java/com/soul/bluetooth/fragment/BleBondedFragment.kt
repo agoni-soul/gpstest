@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
 import com.soul.bean.BleScanResult
 import com.soul.bean.toBleScanResult
-import com.soul.bleSDK.constants.ScanSettings
+import com.soul.bleSDK.constants.BleScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleBondManager
 import com.soul.bleSDK.permissions.BleSDkPermissionManager
@@ -110,7 +110,7 @@ class BleBondedFragment: BaseMvvmFragment<FragmentBleBondedBinding, BleViewModel
 
                 override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
                     bleScanResult ?: return
-                    if (callbackType == ScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType) {
+                    if (callbackType == BleScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType) {
                         var i = 0
                         while (i < mBondBleDevices.size) {
                             if (mBondBleDevices[i].mac == bleScanResult.mac) {

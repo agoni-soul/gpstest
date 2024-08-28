@@ -13,7 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.bluetooth.adapter.ViewPagerFragmentStateAdapter
-import com.soul.bluetooth.fragment.BleBoundFragment
+import com.soul.bluetooth.fragment.BleBondedFragment
 import com.soul.bluetooth.fragment.BleClientFragment
 import com.soul.bluetooth.fragment.BleScanFragment
 import com.soul.bluetooth.fragment.BleServerFragment
@@ -46,7 +46,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         val pagerAdapter = ViewPagerFragmentStateAdapter(this@BluetoothActivity).apply {
             addFragment(BleClientFragment())
             addFragment(BleScanFragment())
-            addFragment(BleBoundFragment())
+            addFragment(BleBondedFragment())
             addFragment(BleServerFragment())
         }
         mBleViewPager.apply {

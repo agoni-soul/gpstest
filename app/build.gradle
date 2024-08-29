@@ -87,7 +87,6 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.github.tbruyelle:rxpermissions:0.12'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
-    implementation project(':blesdk')
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
     testImplementation 'junit:junit:4.13'
@@ -100,5 +99,5 @@ dependencies {
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
 //    implementation project(':starrysky')
-    implementation project(":blesdk")
+    implementation project(':blesdk')
 }

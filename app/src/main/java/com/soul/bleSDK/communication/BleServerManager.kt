@@ -1,6 +1,10 @@
 package com.soul.bleSDK.communication
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothGattServer
+import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
@@ -9,13 +13,12 @@ import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
-import com.soul.bleSDK.constants.BleBlueImpl
 import com.soul.bleSDK.constants.BleConstants
-import java.util.*
+import java.util.UUID
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-08-22
  *     desc   :
  *     version: 1.0

@@ -10,7 +10,7 @@ import com.soul.bleSDK.manager.BleScanManager
 
 
 /**
- *     author : yangzy33
+ *     author : haha
  *     time   : 2024-08-20
  *     desc   :
  *     version: 1.0

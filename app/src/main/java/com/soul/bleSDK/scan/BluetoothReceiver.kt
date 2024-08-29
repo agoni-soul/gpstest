@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import com.soul.bean.toBleScanResult
-import com.soul.bleSDK.constants.ScanSettings
+import com.soul.bleSDK.constants.BleScanSettings
 import com.soul.bleSDK.interfaces.IBleScanCallback
 import com.soul.bleSDK.manager.BleScanManager
 import kotlinx.coroutines.Dispatchers
@@ -56,11 +56,11 @@ class BluetoothReceiver: BroadcastReceiver() {
                     if (state == BluetoothDevice.BOND_BONDED &&
                         (preState == BluetoothDevice.BOND_NONE || preState == BluetoothDevice.BOND_BONDING)) {
                         if (bondedDevices.find { it.address == bleDevice.address } != null) {
-                            mBleBoundCallback?.onScanResult(ScanSettings.CALLBACK_TYPE_ALL_MATCHES.callbackType, bleDevice.toBleScanResult())
+                            mBleBoundCallback?.onScanResult(BleScanSettings.CALLBACK_TYPE_ALL_MATCHES.callbackType, bleDevice.toBleScanResult())
                         }
                     } else if (state == BluetoothDevice.BOND_NONE &&
                         (preState == BluetoothDevice.BOND_BONDED || preState == BluetoothDevice.BOND_BONDING)) {
-                        mBleBoundCallback?.onScanResult(ScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType, bleDevice.toBleScanResult())
+                        mBleBoundCallback?.onScanResult(BleScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType, bleDevice.toBleScanResult())
                     }
                 }
             }
@@ -76,7 +76,7 @@ class BluetoothReceiver: BroadcastReceiver() {
                             intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                         } ?: return@launch
                     Log.d(TAG, "BluetoothReceiver: device.name = ${bleDevice.name}, device.mac = ${bleDevice.address}")
-                    mBleScanCallback?.onScanResult(ScanSettings.CALLBACK_TYPE_ALL_MATCHES.callbackType, bleDevice.toBleScanResult())
+                    mBleScanCallback?.onScanResult(BleScanSettings.CALLBACK_TYPE_ALL_MATCHES.callbackType, bleDevice.toBleScanResult())
                 }
             }
         }

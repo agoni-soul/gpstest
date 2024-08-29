@@ -15,7 +15,7 @@ import com.soul.BleSDKApplication
  * @version 1.0
  *
  */
-open class BaseBleManager() {
+open class BaseBleManager {
     protected val TAG: String = javaClass.simpleName
     protected var mBleManager: BluetoothManager? = null
     protected var mBleAdapter: BluetoothAdapter? = null

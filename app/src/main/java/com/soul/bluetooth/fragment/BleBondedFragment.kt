@@ -9,14 +9,14 @@ import android.widget.TextView
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
-import com.soul.bean.BleScanResult
-import com.soul.bean.toBleScanResult
-import com.soul.bleSDK.constants.BleScanSettings
-import com.soul.bleSDK.interfaces.IBleScanCallback
-import com.soul.bleSDK.manager.BleBondManager
-import com.soul.bleSDK.permissions.BleSDkPermissionManager
-import com.soul.bleSDK.scan.BaseBleScanDevice
-import com.soul.bleSDK.scan.ClassicBleScanDevice
+import com.soul.blesdk.bean.BleScanResult
+import com.soul.blesdk.bean.toBleScanResult
+import com.soul.blesdk.constants.BleScanSettings
+import com.soul.blesdk.interfaces.IBleScanCallback
+import com.soul.blesdk.manager.BleBondManager
+import com.soul.blesdk.permissions.BleSDkPermissionManager
+import com.soul.blesdk.scan.BaseBleScanDevice
+import com.soul.blesdk.scan.ClassicBleScanDevice
 import com.soul.bluetooth.BleViewModel
 import com.soul.bluetooth.adapter.BleBondedAdapter
 import com.soul.gpstest.R
@@ -78,6 +78,7 @@ class BleBondedFragment: BaseMvvmFragment<FragmentBleBondedBinding, BleViewModel
                 }
 
                 override fun onClickCommunicate(result: BleScanResult) {
+                    mBleScanDevice?.stopScan(TAG)
                     mViewModel.mBleRfcommConnectManager?.connect(result)
                 }
             })

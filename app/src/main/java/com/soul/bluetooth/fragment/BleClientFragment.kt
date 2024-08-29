@@ -17,15 +17,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
-import com.soul.bean.BleScanResult
-import com.soul.bleSDK.communication.BleClientManager
-import com.soul.bleSDK.constants.BleConstants
-import com.soul.bleSDK.exceptions.BleErrorException
-import com.soul.bleSDK.interfaces.BleGattCallback
-import com.soul.bleSDK.interfaces.IBleScanCallback
-import com.soul.bleSDK.manager.BleScanManager
-import com.soul.bleSDK.scan.BaseBleScanDevice
-import com.soul.bleSDK.scan.LowPowerBleScanDevice
+import com.soul.blesdk.bean.BleScanResult
+import com.soul.blesdk.communication.BleClientManager
+import com.soul.blesdk.constants.BleConstants
+import com.soul.blesdk.exceptions.BleErrorException
+import com.soul.blesdk.interfaces.BleGattCallback
+import com.soul.blesdk.interfaces.IBleScanCallback
+import com.soul.blesdk.manager.BleScanManager
+import com.soul.blesdk.scan.BaseBleScanDevice
+import com.soul.blesdk.scan.LowPowerBleScanDevice
 import com.soul.bluetooth.adapter.BleScanAdapterV2
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleClientBinding
@@ -231,35 +231,31 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 scanSettings.setReportDelay(0L)
             }
 
-            (this as LowPowerBleScanDevice).startScan(
-                TAG,
-                3000L,
-                null,
-                scanSettings.build(),
-                object : IBleScanCallback {
-                    override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+            setCallback(TAG, object : IBleScanCallback {
+                override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
 
-                    }
+                }
 
-                    override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
-                        bleScanResult?.let {
-                            it.name ?: return
-                            if (it.name.startsWith("colmo", true) ||
-                                it.name.startsWith("midea", true)
-                            ) {
-                                return@let
-                            }
-                            if (it !in mData) {
-                                mData.add(it)
-                                mBleAdapter?.notifyItemInserted(mData.size)
-                            }
+                override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                    bleScanResult?.let {
+                        it.name ?: return
+                        if (it.name!!.startsWith("colmo", true) ||
+                            it.name!!.startsWith("midea", true)
+                        ) {
+                            return@let
+                        }
+                        if (it !in mData) {
+                            mData.add(it)
+                            mBleAdapter?.notifyItemInserted(mData.size)
                         }
                     }
+                }
 
-                    override fun onScanFailed(errorCode: Int) {
-                    }
+                override fun onScanFailed(errorCode: Int) {
+                }
 
-                })
+            })
+            (this as? LowPowerBleScanDevice)?.startScan(TAG, 3000L, null, scanSettings.build())
         }
     }
 

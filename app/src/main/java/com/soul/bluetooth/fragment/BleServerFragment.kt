@@ -12,13 +12,12 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresPermission
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
-import com.soul.bleSDK.communication.BleServerImpl
-import com.soul.bleSDK.constants.BleConstants
-import com.soul.bleSDK.manager.BleScanManager
+import com.soul.blesdk.communication.BleServerImpl
+import com.soul.blesdk.constants.BleConstants
+import com.soul.blesdk.manager.BleScanManager
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.FragmentBleServerBinding
 import kotlinx.coroutines.Dispatchers

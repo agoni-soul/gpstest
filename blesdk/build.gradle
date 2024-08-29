@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'kotlin-android'
     id 'org.jetbrains.kotlin.android'
 }
@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.soul.blesdk"
+//        applicationId "com.soul.blesdk"
         minSdkVersion 21
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 33
@@ -97,8 +97,4 @@ dependencies {
 
     implementation 'com.alibaba:arouter-api:1.5.2'
 //    kapt 'com.alibaba:arouter-compiler:1.5.2'
-
-//    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
-//    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
-//    implementation project(':starrysky')
 }

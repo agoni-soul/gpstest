@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothManager
 import android.content.IntentFilter
 import com.soul.blesdk.interfaces.IBleScanCallback
 import com.soul.blesdk.manager.BleScanManager
+import java.util.Collections.synchronizedMap
 
 
 /**
@@ -18,7 +19,7 @@ import com.soul.blesdk.manager.BleScanManager
 open class BaseBleScanDevice: IBleScanDevice {
     protected val TAG = javaClass.simpleName
     protected var mIsScanning = false
-    protected var mBleScanCallbackMap = mutableMapOf<String, IBleScanCallback?>()
+    protected var mBleScanCallbackMap = synchronizedMap(HashMap<String, IBleScanCallback?>())
     private var mBluetoothReceiver: BluetoothReceiver? = null
     private val mIntentFilterList = mutableListOf<String>()
 

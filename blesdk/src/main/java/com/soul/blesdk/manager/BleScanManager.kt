@@ -17,6 +17,7 @@ import com.soul.blesdk.bean.toBleScanResult
 import com.soul.blesdk.constants.toScanSettings
 import com.soul.blesdk.interfaces.IBleScanCallback
 import com.soul.blesdk.permissions.BleSDkPermissionManager
+import java.util.Collections.synchronizedMap
 
 
 /**
@@ -47,9 +48,9 @@ class BleScanManager private constructor() : BaseBleManager() {
 
     private var mIsScanning = false
     private var mIsClassicScanning = false
-    private val mBleScanCallbackMap = mutableMapOf<String, IBleScanCallback?>()
-    private val mScanCallbackMap = mutableMapOf<String, ScanCallback?>()
-    private val mScanningMap = mutableMapOf<String, Boolean>()
+    private val mBleScanCallbackMap = synchronizedMap(HashMap<String, IBleScanCallback?>())
+    private val mScanCallbackMap = synchronizedMap(HashMap<String, ScanCallback?>())
+    private val mScanningMap = synchronizedMap(HashMap<String, Boolean>())
     private var mScanCallback: ScanCallback? = null
 
     fun isScanning(): Boolean = mIsScanning

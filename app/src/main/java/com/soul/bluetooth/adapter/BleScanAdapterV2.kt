@@ -6,7 +6,7 @@ import android.view.View
 import android.view.WindowManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import com.soul.bean.BleScanResult
+import com.soul.blesdk.bean.BleScanResult
 import com.soul.gpstest.R
 import com.soul.ui.textView.FoldTextView
 

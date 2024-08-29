@@ -10,11 +10,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmFragment
 import com.soul.base.BaseViewModel
-import com.soul.bean.BleScanResult
-import com.soul.bleSDK.interfaces.IBleScanCallback
-import com.soul.bleSDK.manager.BleBondManager
-import com.soul.bleSDK.scan.BaseBleScanDevice
-import com.soul.bleSDK.scan.LowPowerBleScanDevice
+import com.soul.blesdk.bean.BleScanResult
+import com.soul.blesdk.interfaces.IBleScanCallback
+import com.soul.blesdk.manager.BleBondManager
+import com.soul.blesdk.scan.BaseBleScanDevice
+import com.soul.blesdk.scan.LowPowerBleScanDevice
 import com.soul.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
 import com.soul.bluetooth.adapter.BleScanAdapterV2
 import com.soul.gpstest.R

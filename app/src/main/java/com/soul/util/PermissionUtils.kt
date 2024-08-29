@@ -2,20 +2,16 @@ package com.soul.util
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.blankj.utilcode.util.Utils
 import com.soul.SoulApplication
-import com.soul.bleSDK.permissions.BleSDkPermissionManager
 
 /**
  * <pre>
- *     author : yangzy33
- *     e-mail : yangzy33@midea.com
+ *     author : haha
  *     time   : 2023/04/03
  *     desc   :
  *     version: 1.0

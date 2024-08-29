@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothSocket
 import android.util.Log
-import com.soul.BleSDKApplication
 import com.soul.blesdk.bean.BleScanResult
 import com.soul.blesdk.permissions.BleSDkPermissionManager
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +25,7 @@ class BleA2dpConnectManager: BaseConnectManager() {
     private var mBleResult: BleScanResult? = null
 
     init {
-        mBleAdapter?.getProfileProxy(BleSDKApplication.application, object: BluetoothProfile.ServiceListener {
+        mBleAdapter?.getProfileProxy(mApplication, object: BluetoothProfile.ServiceListener {
             override fun onServiceConnected(profile: Int, proxy: BluetoothProfile?) {
                 if (profile == BluetoothProfile.A2DP && proxy is BluetoothA2dp) {
                     mBleA2dp = proxy

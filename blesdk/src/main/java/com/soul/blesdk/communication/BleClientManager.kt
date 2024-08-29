@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
 import android.content.Context
 import androidx.annotation.RequiresPermission
+import com.blankj.utilcode.util.Utils
 import com.soul.BleSDKApplication
 import com.soul.blesdk.constants.BleConstants
 import com.soul.blesdk.exceptions.BleErrorException
@@ -28,8 +29,7 @@ class BleClientManager {
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun connect(bleDevice: BluetoothDevice?, context: Context?, autoConnect: Boolean, bleGattCallback: BleGattCallback?) {
         bleDevice ?: return
-        context ?: BleSDKApplication.application ?: return
-        val tempContext = context ?: BleSDKApplication.application
+        val tempContext = context ?: BleSDKApplication.application ?: Utils.getApp() ?: return
         mBleGattCallback = bleGattCallback
         mIsConnect = true
         mBleGatt = bleDevice.connectGatt(tempContext, autoConnect, mBleGattCallback)

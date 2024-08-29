@@ -60,10 +60,9 @@ object BleSDkPermissionManager: BaseBleManager() {
      * 获取Gps开启或关闭状态
      */
     fun isGpsEnabled(): Boolean {
-        val context = BleSDKApplication.application ?: return false
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val isGps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        val isNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        val locationManager = mApplication?.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+        val isGps = locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) ?: false
+        val isNetwork = locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ?: false
         Log.d(TAG, "isGpsEnabled: isGps = $isGps, isNetwork = $isNetwork")
         return isGps.or(isNetwork)
     }

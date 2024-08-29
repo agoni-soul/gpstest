@@ -73,7 +73,8 @@ class BleScanManager private constructor() : BaseBleManager() {
 //    @Deprecated("recommend to use startScan()", ReplaceWith("startScan(IBleScanCallback)"))
     @SuppressLint("MissingPermission")
     fun startDiscovery() {
-        Log.d(TAG, "startDiscovery")
+        Log.d(TAG, "startDiscovery: mIsClassicScanning = ${isClassicScanning()}")
+        if(isClassicScanning()) return
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             mIsClassicScanning = false
             return
@@ -88,7 +89,8 @@ class BleScanManager private constructor() : BaseBleManager() {
 //    @Deprecated("recommend to use stopScan()", ReplaceWith("stopScan(IBleScanCallback)"))
     @SuppressLint("MissingPermission")
     fun cancelDiscovery() {
-        Log.d(TAG, "cancelDiscovery")
+        Log.d(TAG, "cancelDiscovery: mIsClassicScanning = ${isClassicScanning()}")
+        if (!isClassicScanning()) return
         mIsClassicScanning = false
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             return
@@ -113,11 +115,15 @@ class BleScanManager private constructor() : BaseBleManager() {
      */
     @SuppressLint("MissingPermission")
     fun startScan(tag: String, bleScanCallback: IBleScanCallback?) {
+        Log.d(TAG, "startScan: mIsSubScanning = ${isSubScanning(tag)}")
+        if (isSubScanning(tag)) return
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             mIsScanning = false
             return
         }
-        mIsScanning = true
+        if (!mIsScanning) {
+            mIsScanning = true
+        }
         if (mScanCallback == null) {
             mScanCallback = object : ScanCallback() {
                 override fun onBatchScanResults(results: MutableList<ScanResult>?) {
@@ -172,8 +178,12 @@ class BleScanManager private constructor() : BaseBleManager() {
         scanSettings: ScanSettings = ScanSettings.Builder().build(),
         bleScanCallback: IBleScanCallback?
     ) {
+        Log.d(TAG, "startScan: mIsSubScanning = ${isSubScanning(tag)}")
+        if (isSubScanning(tag)) return
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
-            mIsScanning = false
+            mBleScanCallbackMap.remove(tag)
+            mScanningMap.remove(tag)
+            mScanCallbackMap.remove(tag)
             return
         }
         val scanCallback = object : ScanCallback() {
@@ -214,12 +224,14 @@ class BleScanManager private constructor() : BaseBleManager() {
      */
     @SuppressLint("MissingPermission")
     fun stopScan(tag: String?) {
-        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
-            return
-        }
+        Log.d(TAG, "stopScan: mIsSubScanning = ${isSubScanning(tag)}")
+        if (!isSubScanning(tag)) return
         mBleScanCallbackMap.remove(tag)
         mScanningMap.remove(tag)
         val scanCallback = mScanCallbackMap.remove(tag)
+        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
+            return
+        }
         if (scanCallback != null) {
             mBleAdapter?.bluetoothLeScanner?.stopScan(scanCallback)
         }
@@ -231,6 +243,7 @@ class BleScanManager private constructor() : BaseBleManager() {
     }
 
     fun stopScan(bleScanCallback: IBleScanCallback?) {
+        Log.d(TAG, "stopScan#IBleScanCallback}")
         var tag: String? = null
         mBleScanCallbackMap.forEach { (key, callback) ->
             if (bleScanCallback == callback) {

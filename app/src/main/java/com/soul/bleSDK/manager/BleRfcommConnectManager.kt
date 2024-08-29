@@ -20,11 +20,6 @@ class BleRfcommConnectManager : BaseConnectManager() {
     override fun connect(bleScanResult: BleScanResult?) {
         close()
         bleScanResult ?: return
-        BleScanManager.getInstance()?.apply {
-            if (isScanning()) {
-                stopScan(TAG)
-            }
-        }
         mBleConnectCallback?.onStart()
         if (!BleSDkPermissionManager.isGrantConnectRelatedPermissions()) {
             mBleConnectCallback?.onFail(BleErrorException("Lack Necessary Permissions"))

@@ -35,6 +35,7 @@ open class BaseBleScanDevice: IBleScanDevice {
     }
 
     override fun stopScan(tag: String?) {
+        mBleScanCallbackMap.remove(tag)
     }
 
     override fun isScanning(tag: String?): Boolean = mIsScanning

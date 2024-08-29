@@ -231,35 +231,31 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 scanSettings.setReportDelay(0L)
             }
 
-            (this as LowPowerBleScanDevice).startScan(
-                TAG,
-                3000L,
-                null,
-                scanSettings.build(),
-                object : IBleScanCallback {
-                    override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
+            setCallback(TAG, object : IBleScanCallback {
+                override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
 
-                    }
+                }
 
-                    override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
-                        bleScanResult?.let {
-                            it.name ?: return
-                            if (it.name.startsWith("colmo", true) ||
-                                it.name.startsWith("midea", true)
-                            ) {
-                                return@let
-                            }
-                            if (it !in mData) {
-                                mData.add(it)
-                                mBleAdapter?.notifyItemInserted(mData.size)
-                            }
+                override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                    bleScanResult?.let {
+                        it.name ?: return
+                        if (it.name.startsWith("colmo", true) ||
+                            it.name.startsWith("midea", true)
+                        ) {
+                            return@let
+                        }
+                        if (it !in mData) {
+                            mData.add(it)
+                            mBleAdapter?.notifyItemInserted(mData.size)
                         }
                     }
+                }
 
-                    override fun onScanFailed(errorCode: Int) {
-                    }
+                override fun onScanFailed(errorCode: Int) {
+                }
 
-                })
+            })
+            (this as? LowPowerBleScanDevice)?.startScan(TAG, 3000L, null, scanSettings.build())
         }
     }
 

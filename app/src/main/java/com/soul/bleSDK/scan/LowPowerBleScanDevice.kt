@@ -22,18 +22,22 @@ class LowPowerBleScanDevice : BaseBleScanDevice() {
         tag: String,
         scanDurationTime: Long,
         scanFilters: MutableList<ScanFilter>? = null,
-        scanSettings: ScanSettings = ScanSettings.Builder().build(),
-        bleScanCallback: IBleScanCallback?
+        scanSettings: ScanSettings = ScanSettings.Builder().build()
     ) {
         mIsScanning = true
         BleScanManager.getInstance()
-            ?.startScan(tag, scanDurationTime, scanFilters, scanSettings, bleScanCallback)
+            ?.startScan(tag, scanDurationTime, scanFilters, scanSettings, mBleScanCallbackMap[tag])
     }
 
-    override fun isScanning(tag: String?): Boolean =
-        BleScanManager.getInstance()?.isSubScanning(tag) ?: false
+    override fun isScanning(tag: String?): Boolean {
+        mIsScanning = BleScanManager.getInstance()?.isSubScanning(tag) ?: false
+        return mIsScanning
+    }
 
     override fun stopScan(tag: String?) {
-        BleScanManager.getInstance()?.stopScan(tag)
+        super.stopScan(tag)
+        if (isScanning(tag)) {
+            BleScanManager.getInstance()?.stopScan(tag)
+        }
     }
 }

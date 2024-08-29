@@ -46,12 +46,15 @@ class BleScanManager private constructor() : BaseBleManager() {
     }
 
     private var mIsScanning = false
+    private var mIsClassicScanning = false
     private val mBleScanCallbackMap = mutableMapOf<String, IBleScanCallback?>()
     private val mScanCallbackMap = mutableMapOf<String, ScanCallback?>()
     private val mScanningMap = mutableMapOf<String, Boolean>()
     private var mScanCallback: ScanCallback? = null
 
     fun isScanning(): Boolean = mIsScanning
+
+    fun isClassicScanning(): Boolean = mIsClassicScanning
 
     fun isSubScanning(tag: String?): Boolean = mScanningMap[tag] ?: false
 
@@ -72,8 +75,10 @@ class BleScanManager private constructor() : BaseBleManager() {
     fun startDiscovery() {
         Log.d(TAG, "startDiscovery")
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
+            mIsClassicScanning = false
             return
         }
+        mIsClassicScanning = true
         mBleAdapter?.startDiscovery()
     }
 
@@ -84,6 +89,7 @@ class BleScanManager private constructor() : BaseBleManager() {
     @SuppressLint("MissingPermission")
     fun cancelDiscovery() {
         Log.d(TAG, "cancelDiscovery")
+        mIsClassicScanning = false
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             return
         }

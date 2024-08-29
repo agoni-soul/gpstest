@@ -78,6 +78,7 @@ class BleBondedFragment: BaseMvvmFragment<FragmentBleBondedBinding, BleViewModel
                 }
 
                 override fun onClickCommunicate(result: BleScanResult) {
+                    mBleScanDevice?.stopScan(TAG)
                     mViewModel.mBleRfcommConnectManager?.connect(result)
                 }
             })

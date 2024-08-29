@@ -12,12 +12,18 @@ import com.soul.bleSDK.manager.BleScanManager
 class ClassicBleScanDevice: BaseBleScanDevice() {
 
     override fun startScan(tag: String?) {
-        mIsScanning = true
         BleScanManager.getInstance()?.startDiscovery()
     }
 
+    override fun isScanning(tag: String?): Boolean {
+        mIsScanning = BleScanManager.getInstance()?.isClassicScanning() ?: false
+        return mIsScanning
+    }
+
     override fun stopScan(tag: String?) {
-        mIsScanning = false
-        BleScanManager.getInstance()?.cancelDiscovery()
+        super.stopScan(tag)
+        if (isScanning(tag)) {
+            BleScanManager.getInstance()?.cancelDiscovery()
+        }
     }
 }

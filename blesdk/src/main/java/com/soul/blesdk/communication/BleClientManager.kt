@@ -1,6 +1,7 @@
 package com.soul.blesdk.communication
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
@@ -11,6 +12,7 @@ import com.soul.BleSDKApplication
 import com.soul.blesdk.constants.BleConstants
 import com.soul.blesdk.exceptions.BleErrorException
 import com.soul.blesdk.interfaces.BleGattCallback
+import com.soul.blesdk.permissions.BleSDkPermissionManager
 import java.util.UUID
 
 /**
@@ -26,8 +28,9 @@ class BleClientManager {
     private var mBleGatt: BluetoothGatt? = null
     private var mBleGattCallback: BleGattCallback? = null
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    @SuppressLint("MissingPermission")
     fun connect(bleDevice: BluetoothDevice?, context: Context?, autoConnect: Boolean, bleGattCallback: BleGattCallback?) {
+        if (!BleSDkPermissionManager.isGrantBleConnect()) return
         bleDevice ?: return
         val tempContext = context ?: BleSDKApplication.application ?: Utils.getApp() ?: return
         mBleGattCallback = bleGattCallback
@@ -50,8 +53,9 @@ class BleClientManager {
         return service
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    @SuppressLint("MissingPermission")
     fun readBleMessage() {
+        if (!BleSDkPermissionManager.isGrantBleConnect()) return
         //找到 gatt 服务
         val service = getGattService(BleConstants.UUID_SERVICE)
         if (service != null) {
@@ -65,9 +69,10 @@ class BleClientManager {
         }
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    @SuppressLint("MissingPermission")
     fun writeBleMessage(message: String) {
         if (message.isEmpty()) return
+        if (!BleSDkPermissionManager.isGrantBleConnect()) return
 
         val service = getGattService(BleConstants.UUID_SERVICE)
         if (service != null) {
@@ -82,9 +87,10 @@ class BleClientManager {
         }
     }
 
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    @SuppressLint("MissingPermission")
     fun closeConnect() {
         mIsConnect = false
+        if (!BleSDkPermissionManager.isGrantBleConnect()) return
         mBleGatt?.apply {
             disconnect()
             close()

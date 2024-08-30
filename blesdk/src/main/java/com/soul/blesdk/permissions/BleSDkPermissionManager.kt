@@ -21,12 +21,17 @@ import com.soul.blesdk.manager.BaseBleManager
 object BleSDkPermissionManager: BaseBleManager() {
 
     /**
-     * 打开手机蓝牙
+     * 蓝牙开关是否打开, [getBluetoothAdapter]为空则不支持蓝牙
      *
      * @return true 表示打开成功
      */
     @SuppressLint("MissingPermission")
     fun isBleEnabled(): Boolean {
+        return mBleAdapter?.isEnabled ?: false
+    }
+
+    @SuppressLint("MissingPermission")
+    fun enableBle(): Boolean {
         if (mBleAdapter == null) { // 不支持蓝牙
             return false
         } else if (!mBleAdapter!!.isEnabled) {

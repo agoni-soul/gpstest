@@ -7,11 +7,11 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.blankj.utilcode.util.Utils
+import com.soul.SoulApplication
 
 /**
  * <pre>
- *     author : yangzy33
- *     e-mail : yangzy33@midea.com
+ *     author : haha
  *     time   : 2023/04/03
  *     desc   :
  *     version: 1.0
@@ -29,11 +29,16 @@ object PermissionUtils {
      * @param permission 权限名
      */
     fun checkSinglePermission(permission: String): Boolean {
-        permissionDenyList.clear()
-        val isGrant = ActivityCompat.checkSelfPermission(Utils.getApp(), permission) == PackageManager.PERMISSION_GRANTED
+        synchronized(permissionDenyList) {
+            permissionDenyList.clear()
+        }
+        val context = SoulApplication.application ?: Utils.getApp()
+        val isGrant = ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         Log.d(TAG, "checkSinglePermission: ${permission}: isGrant = $isGrant")
         if (!isGrant) {
-            permissionDenyList.add(permission)
+            synchronized(permissionDenyList) {
+                permissionDenyList.add(permission)
+            }
         }
         return isGrant
     }
@@ -44,14 +49,19 @@ object PermissionUtils {
      * @param permissions 权限名
      */
     fun checkMultiPermission(vararg permissions: String): Boolean {
-        permissionDenyList.clear()
+        synchronized(permissionDenyList) {
+            permissionDenyList.clear()
+        }
         var areGrantAllPermissions = true
-        for (permission in permissions) {
-            val isGrant = ActivityCompat.checkSelfPermission(Utils.getApp(), permission) == PackageManager.PERMISSION_GRANTED
-            if (!isGrant) {
-                permissionDenyList.add(permission)
+        synchronized(permissionDenyList) {
+            for (permission in permissions) {
+                val context = SoulApplication.application ?: Utils.getApp()
+                val isGrant = ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                if (!isGrant) {
+                    permissionDenyList.add(permission)
+                }
+                areGrantAllPermissions = areGrantAllPermissions.and(isGrant)
             }
-            areGrantAllPermissions = areGrantAllPermissions.and(isGrant)
         }
         return areGrantAllPermissions
     }

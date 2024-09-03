@@ -24,7 +24,6 @@ android {
     defaultConfig {
         applicationId "com.soul.gpstest"
         minSdkVersion 21
-        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
@@ -90,7 +89,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
@@ -100,4 +99,5 @@ dependencies {
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
 //    implementation project(':starrysky')
+    implementation project(':blesdk')
 }

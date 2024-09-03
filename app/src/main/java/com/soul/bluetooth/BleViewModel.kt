@@ -5,15 +5,15 @@ import android.app.Application
 import android.bluetooth.BluetoothSocket
 import android.util.Log
 import com.soul.base.BaseViewModel
-import com.soul.bean.BleScanResult
-import com.soul.bleSDK.BleListener
-import com.soul.bleSDK.exceptions.BleErrorException
-import com.soul.bleSDK.interfaces.BaseBleListener
-import com.soul.bleSDK.interfaces.IBleConnectCallback
-import com.soul.bleSDK.manager.BleA2dpConnectManager
-import com.soul.bleSDK.manager.BleCommunicateManager
-import com.soul.bleSDK.manager.BleRfcommConnectManager
-import com.soul.bleSDK.utils.close
+import com.soul.blesdk.bean.BleScanResult
+import com.soul.blesdk.exceptions.BleErrorException
+import com.soul.blesdk.interfaces.BaseBleListener
+import com.soul.blesdk.interfaces.BleListener
+import com.soul.blesdk.interfaces.IBleConnectCallback
+import com.soul.blesdk.manager.BleA2dpConnectManager
+import com.soul.blesdk.manager.BleCommunicateManager
+import com.soul.blesdk.manager.BleRfcommConnectManager
+import com.soul.blesdk.utils.close
 import com.soul.util.PermissionUtils
 
 
@@ -91,7 +91,6 @@ class BleViewModel(mApplication: Application) : BaseViewModel(mApplication) {
 
                 override fun close() {
                     Log.e(TAG, "BleRfcommManager: close")
-
                 }
             })
         }

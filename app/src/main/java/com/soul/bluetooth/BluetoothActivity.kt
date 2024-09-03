@@ -12,6 +12,11 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
+import com.soul.bluetooth.adapter.ViewPagerFragmentStateAdapter
+import com.soul.bluetooth.fragment.BleBondedFragment
+import com.soul.bluetooth.fragment.BleClientFragment
+import com.soul.bluetooth.fragment.BleScanFragment
+import com.soul.bluetooth.fragment.BleServerFragment
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityBluetoothBinding
 
@@ -41,7 +46,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         val pagerAdapter = ViewPagerFragmentStateAdapter(this@BluetoothActivity).apply {
             addFragment(BleClientFragment())
             addFragment(BleScanFragment())
-            addFragment(BleBoundFragment())
+            addFragment(BleBondedFragment())
             addFragment(BleServerFragment())
         }
         mBleViewPager.apply {
@@ -105,7 +110,6 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
         TabLayoutMediator(mTabLayout, mBleViewPager) { tab, position ->
             tab.text = mTabTitleList[position]
         }.attach()
-
     }
 
     override fun initData() {

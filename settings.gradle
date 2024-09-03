@@ -16,3 +16,5 @@ rootProject.name = "GPSTest"
 include ':app'
 include ':blesdk'
 //include ':starrysky'
+include ':compiler'
+include ':annotation'

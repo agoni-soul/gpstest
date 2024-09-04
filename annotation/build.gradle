@@ -85,5 +85,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     implementation 'com.alibaba:arouter-api:1.5.2'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0'
+    implementation 'com.google.auto.service:auto-service-annotations:1.0.1'
 //    kapt 'com.alibaba:arouter-compiler:1.5.2'
 }

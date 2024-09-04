@@ -1,5 +1,8 @@
 package com.haha.api
 
+import com.google.auto.service.AutoService
+
+
 /**
  *
  * @author : haha
@@ -8,6 +11,7 @@ package com.haha.api
  * @version: 1.0
  *
  */
+@AutoService(value = [IUserService::class])
 class UserService: IUserService {
     override fun getUserName(): String {
         return "hahanihao"

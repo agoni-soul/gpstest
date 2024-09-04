@@ -246,7 +246,14 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
-        ServiceLoader.load(IUserService::class.java)
+        val loaders = ServiceLoader.load(IUserService::class.java)
+        Log.d(TAG, "loaders = ${loaders == null}, $loaders")
+        var i = 0
+        for (service in loaders) {
+            i ++
+            Log.d(TAG, service.getUserName() ?: "haha")
+        }
+        Log.d(TAG, "i = $i")
     }
 
     override fun getStatusBarColor(): Int {

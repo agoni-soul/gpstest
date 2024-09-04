@@ -32,6 +32,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
+import com.haha.api.IUserService
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
@@ -59,6 +60,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
+import java.util.ServiceLoader
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -244,6 +246,14 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
+        val loaders = ServiceLoader.load(IUserService::class.java)
+        Log.d(TAG, "loaders = ${loaders == null}, $loaders")
+        var i = 0
+        for (service in loaders) {
+            i ++
+            Log.d(TAG, service.getUserName() ?: "haha")
+        }
+        Log.d(TAG, "i = $i")
     }
 
     override fun getStatusBarColor(): Int {

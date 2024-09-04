@@ -35,7 +35,12 @@ enum class BleScanSettings(val callbackType: Int) {
     /**
      * 移除已绑定的设备
      */
-    CALLBACK_TYPE_REMOVE_BOUND_DEVICE(100);
+    CALLBACK_TYPE_REMOVE_BOUND_DEVICE(100),
+
+    /**
+     * 低版本扫描的设备信息
+     */
+    CALLBACK_TYPE_LE_SCAN_DEVICE(101);
 }
 
 fun Int.toScanSettings(): BleScanSettings {
@@ -54,6 +59,9 @@ fun Int.toScanSettings(): BleScanSettings {
         }
         BleScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE.callbackType -> {
             BleScanSettings.CALLBACK_TYPE_REMOVE_BOUND_DEVICE
+        }
+        BleScanSettings.CALLBACK_TYPE_LE_SCAN_DEVICE.callbackType -> {
+            BleScanSettings.CALLBACK_TYPE_LE_SCAN_DEVICE
         }
         else -> {
             BleScanSettings.CALLBACK_TYPE_DEFAULT

@@ -1,0 +1,60 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.haha.compiler'
+    compileSdkVersion 33
+    buildToolsVersion "30.0.3"
+
+    viewBinding {
+        enabled = true
+    }
+
+    buildFeatures {
+        dataBinding = true
+    }
+
+    defaultConfig {
+//        applicationId "com.haha.compiler"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    annotationProcessor 'com.google.auto.service:auto-service:1.0'
+    implementation 'com.google.auto.service:auto-service-annotations:1.0.1'
+    implementation 'com.squareup:javapoet:1.12.1'
+//    kapt 'com.alibaba:arouter-compiler:1.5.2'
+    implementation project(':annotation')
+}

@@ -1,19 +1,15 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-kapt' // 如果你的 autoservice是用kt写的，那么就用kotlin-kapt 下面也是
     id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'com.soul.blesdk'
+    namespace 'com.haha.annotation'
     compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
-//    configurations {
-//        cleanedAnnotations
-//        implementation.exclude group: 'org.jetbrains' , module:'annotations'
-//        implementation.exclude group: 'com.intellij' , module:'annotations'
-//    }
     viewBinding {
         enabled = true
     }
@@ -23,9 +19,8 @@ android {
     }
 
     defaultConfig {
-//        applicationId "com.soul.blesdk"
+//        applicationId "com.haha.annotation"
         minSdkVersion 21
-        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
@@ -92,5 +87,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     implementation 'com.alibaba:arouter-api:1.5.2'
+    kapt 'com.google.auto.service:auto-service:1.1.1' //同上
+    implementation 'com.google.auto.service:auto-service:1.1.1'
+    implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
 //    kapt 'com.alibaba:arouter-compiler:1.5.2'
 }

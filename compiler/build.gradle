@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-//    id 'kotlin-kapt'
+    id 'kotlin-kapt'
     id 'org.jetbrains.kotlin.android'
 }
 
@@ -58,7 +58,7 @@ dependencies {
 
     implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
     implementation 'com.squareup:javapoet:1.12.1'
-//    kapt 'com.google.auto.service:auto-service:1.1.1' //同上
+    kapt 'com.google.auto.service:auto-service:1.1.1' //同上
     implementation 'com.google.auto.service:auto-service:1.1.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
 

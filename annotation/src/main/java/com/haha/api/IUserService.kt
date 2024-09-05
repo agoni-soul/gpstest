@@ -13,4 +13,6 @@ import com.haha.annotation.IServiceLoader
 //@IServiceLoader(interfaces = [IUserService::class], singleton = true, defaultImpl = true)
 interface IUserService {
     fun getUserName(): String?
+
+    fun start()
 }

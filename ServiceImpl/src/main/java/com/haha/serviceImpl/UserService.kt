@@ -22,6 +22,7 @@ class UserService: IUserService {
     }
 
     override fun start() {
+        println("Loading user service")
         Log.d(TAG, "Loading user service")
     }
 }

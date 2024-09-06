@@ -21,10 +21,14 @@ public class BindUtils {
     private final static String SUFFIX="_ViewBinding";
 
     public static void bind(Object target){
-        Log.e(TAG, target.getClass().getPackage().getName());
+        Package p = target.getClass().getPackage();
+        if (p == null) {
+            Log.e(TAG, "Package == null");
+            return;
+        }
+        Log.e(TAG, p.getName());
         String bindViewFile = target.getClass().getSimpleName().concat(SUFFIX);
-        bindViewFile=target.getClass().getPackage().getName()
-                .concat(".").concat(bindViewFile);
+        bindViewFile= p.getName().concat(".").concat(bindViewFile);
 
         Log.e(TAG,"bindView File Name:"+bindViewFile);
 
@@ -34,12 +38,16 @@ public class BindUtils {
             inject.invoke(null,target);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         } catch (InvocationTargetException e) {
             e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
 
     }

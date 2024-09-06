@@ -1,4 +1,4 @@
-package com.haha.precessor;
+package com.haha.processor;
 
 import com.squareup.javapoet.ClassName;
 

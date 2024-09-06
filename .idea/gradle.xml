@@ -10,10 +10,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/annotation" />
+            <option value="$PROJECT_DIR$/BaseAnnotation" />
+            <option value="$PROJECT_DIR$/Precessor" />
+            <option value="$PROJECT_DIR$/ServiceImpl" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/blesdk" />
-            <option value="$PROJECT_DIR$/compiler" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+    id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.jvm'
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
+    implementation 'com.squareup:javapoet:1.12.1'
+    implementation project(':BaseAnnotation')
+    kapt 'com.google.auto.service:auto-service:1.1.1' //同上
+    implementation 'com.google.auto.service:auto-service:1.1.1'
+//    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}

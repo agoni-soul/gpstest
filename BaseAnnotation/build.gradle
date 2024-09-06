@@ -1,0 +1,18 @@
+plugins {
+    id 'java-library'
+    id 'kotlin-kapt' // 如果你的 autoservice是用kt写的，那么就用kotlin-kapt 下面也是
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.alibaba:arouter-api:1.5.2'
+    kapt 'com.google.auto.service:auto-service:1.1.1' //同上
+    implementation 'com.google.auto.service:auto-service:1.1.1'
+    implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}

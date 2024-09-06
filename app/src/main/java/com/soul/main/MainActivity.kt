@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -32,6 +33,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
+import com.haha.annotation.BindView
+import com.haha.annotation.OnClick
+import com.haha.api.IUserService
+import com.haha.api.Service
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
@@ -59,6 +64,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
+import java.util.ServiceLoader
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -69,6 +75,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     private var dialog: CustomDialog? = null
+
+    @BindView(R.id.btn_skip_gps)
+    private var mTvGps: TextView? = null
 
 //    @RequiresApi(Build.VERSION_CODES.R)
 //    private val mConnectivityDiagnosticsCallback = ExampleCallback()
@@ -85,6 +94,17 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        BindUtils.bind(this)
+        mTvGps?.text = "not crash"
+    }
+
+    @OnClick(R.id.btn_skip_gps)
+    fun onViewClick(v: View) {
+        Log.d(TAG, "onViewClick")
+    }
 
     override fun initView() {
         mViewDataBinding?.btnSkipGps?.setOnClickListener(this)
@@ -226,7 +246,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             accessibilityTest()
         }
 
-        val builder = SpannableStringBuilder("请注意将温度传感器靠近网关\n若长时间未搜索到，可尝试重新操作设备")
+        val builder =
+            SpannableStringBuilder("请注意将温度传感器靠近网关\n若长时间未搜索到，可尝试重新操作设备")
         val str = "重新操作设备"
         val span = ForegroundColorSpan(Color.RED)
         builder.setSpan(object : ClickableSpan() {
@@ -244,6 +265,15 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
+        val loaders = ServiceLoader.load(IUserService::class.java)
+        Log.d(TAG, "loaders == null: ${loaders == null}, $loaders")
+        var i = 0
+        for (service in loaders) {
+            i++
+            service.start()
+            Log.d(TAG, service.getUserName() ?: "haha")
+        }
+        Log.d(TAG, "i = $i")
     }
 
     override fun getStatusBarColor(): Int {
@@ -517,6 +547,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     }
                     DOFLogUtil.d(TAG, "bean = $bean")
                 }
+
                 R.id.btn_skip_remote_view -> {
 //                    val intent = Intent(this, RemoteViewActivity::class.java);
 //                    startActivity(intent)
@@ -526,6 +557,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     val animation = AnimationUtils.loadAnimation(this, R.anim.success_up_anim)
                     mViewDataBinding?.ivSuccess?.startAnimation(animation)
                 }
+
                 R.id.btn_skip_network -> {
                     /*
                     val intent = Intent(this, NetworkActivity::class.java);
@@ -544,6 +576,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                         "accessibilityEvent = ${mViewDataBinding?.btnSkipGps?.accessibilityTraversalAfter}"
                     )
                 }
+
                 R.id.btn_refresh -> {
 //                    val panelIntent = Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY)
 //                    startActivityForResult(panelIntent, -1)
@@ -564,6 +597,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     val intent = Intent(this, CustomAccessibilityService::class.java)
                     startService(intent)
                 }
+
                 R.id.btn_test -> {
                     if (!isSatisfiedAndroidVersion(Build.VERSION_CODES.M)) return@let
 
@@ -645,6 +679,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                         pingForCMD("163.177.151.110")
                     }.start()
                 }
+
                 R.id.btn_test1 -> {
                     isWifiConnected(this)
 
@@ -653,12 +688,14 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                         mConnectivityManager.bindProcessToNetwork(mConnectivityManager.activeNetwork)
                     Log.d("haha", "bindProcessToNetwork: $b")
                 }
+
                 R.id.btn_permission -> {
                     val intent = Intent(this, TransparencyActivity::class.java)
                     val permissions = Array(1) { Manifest.permission.ACCESS_FINE_LOCATION }
                     intent.putExtra("permissions", permissions)
                     startActivity(intent)
                 }
+
                 R.id.btn_dialog_fragment -> {
                     val dialog = DialogFragment()
                     dialog.let {
@@ -667,6 +704,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                         it.show(supportFragmentManager, "")
                     }
                 }
+
                 R.id.btn_animation -> {
                     val intent = Intent(this, AnimationActivity::class.java)
 //                    startActivity(
@@ -675,24 +713,29 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 //                    )
                     startActivity(intent)
                 }
+
                 R.id.btn_activity_scene -> {
                     val intent = Intent(this, SceneFirstActivity::class.java)
                     startActivity(intent)
                 }
+
                 R.id.btn_activity_coroutineScope -> {
                     val intent = Intent(this, CoroutineScopeActivity::class.java)
                     startActivity(intent)
                 }
+
                 R.id.btn_activity_custom_scene -> {
                     val intent = Intent(this, CustomSceneFirstActivity::class.java)
                     startActivity(intent)
                 }
+
                 R.id.btn_activity_custom_scene2 -> {
 //                    val intent = Intent(this, CustomSceneSecondActivity::class.java)
 //                    startActivity(intent)
 //                    PermissionUtil.gotoPermission(this)
                     com.blankj.utilcode.util.PermissionUtils.launchAppDetailsSettings()
                 }
+
                 R.id.btn_activity_recyclerview -> {
                     if (!PermissionUtils.checkGPSPermission()) {
                         PermissionUtils.requestPermissions(
@@ -712,18 +755,22 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                         startActivity(intent)
                     }
                 }
+
                 R.id.btn_activity_waterfall -> {
                     val intent = Intent(this, WaterFallActivity::class.java)
                     startActivity(intent)
                 }
+
                 R.id.btn_activity_selector -> {
                     val intent = Intent(this, SelectorActivity::class.java)
                     startActivity(intent)
                 }
+
                 R.id.btn_activity_volume -> {
                     val intent = Intent(this, VolumeActivity::class.java)
                     startActivity(intent)
                 }
+
                 else -> {
 
                 }

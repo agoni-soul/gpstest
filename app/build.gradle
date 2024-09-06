@@ -95,9 +95,14 @@ dependencies {
 
     implementation 'com.alibaba:arouter-api:1.5.2'
 //    kapt 'com.alibaba:arouter-compiler:1.5.2'
+    implementation 'com.google.auto.service:auto-service:1.0'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0'
 
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
 //    implementation project(':starrysky')
     implementation project(':blesdk')
+    implementation project(':ServiceImpl')
+    implementation project(':Precessor')
+    implementation project(':BaseAnnotation')
 }

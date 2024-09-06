@@ -37,10 +37,6 @@ android {
         abortOnError false
     }
 
-    buildFeatures {
-        viewBinding true
-    }
-
     buildTypes {
         release {
             minifyEnabled false

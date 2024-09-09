@@ -100,7 +100,11 @@ public class ViewClassInfo {
          */
         //setContentView方法生成
         if (typeElement != null) {
-            codeBlock.add(BIND_METHOD_PARAMETER_NAME + ".setContentView( $L );\n", getItbirdAopBinderViewAnnotationValue(typeElement));
+            int annotationValue = getItbirdAopBinderViewAnnotationValue(typeElement);
+            codeBlock.add(
+                    "if ($L > 0) {\n" + BIND_METHOD_PARAMETER_NAME + ".setContentView( $L );\n" + "}\n",
+                    annotationValue, annotationValue
+            );
         }
 
         /**

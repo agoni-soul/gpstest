@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,25 +23,25 @@ import com.soul.gpstest.R;
  * @desc : 测试BindView和onClick的逻辑
  * @version: 1.0
  */
-@ItbirdAopBinderView(R.layout.activity_main)
+//@ItbirdAopBinderView(R.layout.activity_main)
 public class TestActivity extends AppCompatActivity {
     String TAG = this.getClass().getSimpleName();
 
-    @ItbirdAopBinderView(R.id.btn_skip_gps)
+    @BindView(R.id.btn_skip_gps)
     TextView mTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-        ItbirdBindView.bind(this);
-        if (mTv != null) {
-            mTv.setText("not crash");
-        }
+        setContentView(R.layout.activity_main);
+//        ItbirdBindView.bind(this);
+        BindUtils.bind(this);
+        Log.d(TAG, "mTv == null: " + (mTv == null));
+        mTv.setText("not crash");
     }
 
-    @ItbirdOnclick(R.id.btn_skip_gps)
+    @OnClick(R.id.btn_skip_gps)
     void onViewClick(View v){
-        Log.d(TAG, "onViewClick");
+        Toast.makeText(this, "button on click", Toast.LENGTH_SHORT).show();
     }
 }

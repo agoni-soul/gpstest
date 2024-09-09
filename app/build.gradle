@@ -21,6 +21,10 @@ android {
         dataBinding = true
     }
 
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
     defaultConfig {
         applicationId "com.soul.gpstest"
         minSdkVersion 21
@@ -99,6 +103,8 @@ dependencies {
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
     implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
     implementation 'com.squareup:javapoet:1.12.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
 
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'

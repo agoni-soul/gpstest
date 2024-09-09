@@ -4,6 +4,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import javax.lang.model.element.Element;
 
 public class ProcessorBean {
 
@@ -14,6 +15,8 @@ public class ProcessorBean {
     private TypeSpec mClass;
     private JavaFile mFile;
     private ParameterSpec parameter;
+
+    private Element element;
 
     public String getFileName() {
         return fileName;
@@ -32,27 +35,27 @@ public class ProcessorBean {
     }
 
 
-    public MethodSpec getmInjectMethod() {
+    public MethodSpec getInjectMethod() {
         return mInjectMethod;
     }
 
-    public void setmInjectMethod(MethodSpec mInjectMethod) {
+    public void setInjectMethod(MethodSpec mInjectMethod) {
         this.mInjectMethod = mInjectMethod;
     }
 
-    public TypeSpec getmClass() {
+    public TypeSpec getClazz() {
         return mClass;
     }
 
-    public void setmClass(TypeSpec mClass) {
+    public void setClazz(TypeSpec mClass) {
         this.mClass = mClass;
     }
 
-    public JavaFile getmFile() {
+    public JavaFile getFile() {
         return mFile;
     }
 
-    public void setmFile(JavaFile mFile) {
+    public void setFile(JavaFile mFile) {
         this.mFile = mFile;
     }
 
@@ -70,5 +73,13 @@ public class ProcessorBean {
 
     public void setTargetName(String targetName) {
         this.targetName = targetName;
+    }
+
+    public Element getElement() {
+        return element;
+    }
+
+    public void setElement(Element element) {
+        this.element = element;
     }
 }

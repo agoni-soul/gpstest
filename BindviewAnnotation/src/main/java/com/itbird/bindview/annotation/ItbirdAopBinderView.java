@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface ItbirdAopBinderView {
-    int value();
+    int value() default 0;
 }

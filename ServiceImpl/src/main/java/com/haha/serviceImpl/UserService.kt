@@ -17,12 +17,10 @@ import com.haha.api.IUserService
 class UserService: IUserService {
     private val TAG = "Service"
     override fun getUserName(): String {
-        Log.d(TAG, "hahanihao")
         return "hahanihao"
     }
 
     override fun start() {
-        println("Loading user service")
         Log.d(TAG, "Loading user service")
     }
 }

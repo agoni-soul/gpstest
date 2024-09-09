@@ -3,15 +3,10 @@ package com.haha.processor;
 import com.google.auto.service.AutoService;
 import com.haha.annotation.BindView;
 import com.haha.annotation.OnClick;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,15 +19,12 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
-@AutoService(Processor.class)
+//@AutoService(Processor.class)
 public class MPrecessor extends AbstractProcessor {
     private Filer filerUtils; //
     private Elements elementUtils; //
@@ -98,8 +90,8 @@ public class MPrecessor extends AbstractProcessor {
                 processor.setTargetName(enclosingElement.getSimpleName().toString());
                 helper.checkAndBuildParameter(processor);
                 helper.checkAndBuildInject(processor);
-                processor.setmInjectMethod(processor
-                        .getmInjectMethod()
+                processor.setInjectMethod(processor
+                        .getInjectMethod()
                         .toBuilder()
                         .addStatement("$L.$L=$L.findViewById($L)",
                                 enclosingElement.getSimpleName().toString().toLowerCase(),
@@ -133,7 +125,7 @@ public class MPrecessor extends AbstractProcessor {
                 processor.setTargetName(enclosingElement.getSimpleName().toString());
                 helper.checkAndBuildParameter(processor);
                 helper.checkAndBuildInject(processor);
-                MethodSpec methodSpec = processor.getmInjectMethod();
+                MethodSpec methodSpec = processor.getInjectMethod();
                 for (int id : annotation.value()) {
                     methodSpec = methodSpec.toBuilder().addStatement("$L.findViewById($L).setOnClickListener(new $T.OnClickListener() {\n" +
                                             "      @Override\n" +
@@ -149,7 +141,7 @@ public class MPrecessor extends AbstractProcessor {
                             )
                             .build();
                 }
-                processor.setmInjectMethod(methodSpec);
+                processor.setInjectMethod(methodSpec);
 
             } else {
                 logE("OnClick", "@OnClick not support this kind %s", element.getKind());

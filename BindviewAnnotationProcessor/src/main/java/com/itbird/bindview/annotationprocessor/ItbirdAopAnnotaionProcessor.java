@@ -171,11 +171,14 @@ public class ItbirdAopAnnotaionProcessor extends AbstractProcessor {
     private void createJavaFile() {
         mMessager.printMessage(Diagnostic.Kind.NOTE, "createJavaFile");
         mMessager.printMessage(Diagnostic.Kind.NOTE, "createJavaFile map = " + map.toString());
+        System.out.println("createJavaFile");
+        System.out.println("createJavaFile map = " + map.toString());
 
         for (String classname : map.keySet()) {
             ViewClassInfo proxy = map.get(classname);
             if (proxy != null) {
                 mMessager.printMessage(Diagnostic.Kind.NOTE, "createJavaFile " + proxy.getClassFullName());
+                System.out.println("createJavaFile " + proxy.getClassFullName());
                 proxy.createJavaCode(mProcessingEnvironment, mElementUtils);
             }
         }

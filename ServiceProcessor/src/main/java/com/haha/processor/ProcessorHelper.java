@@ -55,7 +55,8 @@ public class ProcessorHelper {
     }
 
     public void createFiles(ProcessingEnvironment processingEnvironment, Elements elementUtils) {
-        for (ProcessorBean processor : builderMaps.values()) {
+        for (String key : builderMaps.keySet()) {
+            ProcessorBean processor = builderMaps.get(key);
             checkAndBuildParameter(processor);
             checkAndBuildInject(processor);
             checkAndBuildClass(processor);
@@ -65,13 +66,14 @@ public class ProcessorHelper {
                     processor.getFile().writeTo(processingEnvironment.getFiler());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    System.out.println("createFiles: \n" + e.getMessage());
                 }
             }
         }
     }
 
     public void checkAndBuildFile(ProcessorBean processor) {
-        if (processor.getFile() != null) return;
+//        if (processor.getFile() != null) return;
         JavaFile javaFile =
                 JavaFile.builder(processor.getPackageName(), processor.getClazz())
                         .build();
@@ -79,7 +81,7 @@ public class ProcessorHelper {
     }
 
     public void checkAndBuildClass(ProcessorBean processor) {
-        if (processor.getClazz() != null) return;
+//        if (processor.getClazz() != null) return;
         TypeSpec typeSpec =
                 TypeSpec.classBuilder(processor.getFileName())
                         .addModifiers(Modifier.PUBLIC)
@@ -89,13 +91,13 @@ public class ProcessorHelper {
     }
 
     public void checkAndBuildInject(ProcessorBean processor) {
-        if (processor.getInjectMethod() != null) return;
+//        if (processor.getInjectMethod() != null) return;
         MethodSpec methodSpec =
                 MethodSpec.methodBuilder(MConstants.INJECT_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(void.class)
+//                        .returns(void.class)
                         .addParameter(processor.getParameter())
-                        .addAnnotation(MConstants.CLASSNAME_UI_THREAD)
+//                        .addAnnotation(MConstants.CLASSNAME_UI_THREAD)
                         .addCode(generateJavaCode(processor))
                         .build();
         processor.setInjectMethod(methodSpec);
@@ -169,9 +171,8 @@ public class ProcessorHelper {
     }
 
     public void checkAndBuildParameter(ProcessorBean processor) {
-        if (processor.getParameter() != null) return;
-//        ClassName targetClass = ClassName.get(processor.getPackageName(), processor.getTargetName());
-        ClassName targetClass = ClassName.get((TypeElement) processor.getElement().getEnclosingElement());
+//        if (processor.getParameter() != null) return;
+        ClassName targetClass = ClassName.get(processor.getPackageName(), processor.getTargetName());
         ParameterSpec parameterSpec =
                 ParameterSpec.builder(targetClass, processor.getTargetName().toLowerCase())
                         .addModifiers(Modifier.FINAL)

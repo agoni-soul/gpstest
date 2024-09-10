@@ -27,18 +27,20 @@ import com.soul.gpstest.R;
 public class TestActivity extends AppCompatActivity {
     String TAG = this.getClass().getSimpleName();
 
-    @BindView(R.id.btn_skip_gps)
-//    @ItbirdAopBinderView(R.id.btn_skip_gps)
+//    @BindView(R.id.btn_skip_gps)
+    @ItbirdAopBinderView(R.id.btn_skip_gps)
     TextView mTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        ItbirdBindView.bind(this);
-        BindUtils.bind(this);
+        ItbirdBindView.bind(this);
+//        BindUtils.bind(this);
         Log.d(TAG, "mTv == null: " + (mTv == null));
-        mTv.setText("not crash");
+        if (mTv != null) {
+            mTv.setText("not crash");
+        }
     }
 
 //    @OnClick(R.id.btn_skip_gps)

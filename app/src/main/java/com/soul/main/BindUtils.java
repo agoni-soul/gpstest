@@ -28,13 +28,13 @@ public class BindUtils {
             return;
         }
         Log.e(TAG, p.getName());
-//        String bindViewFile = target.getClass().getSimpleName().concat(MConstants._VIEW_BINDING);
+        String bindViewFile = target.getClass().getSimpleName().concat(MConstants._VIEW_BINDING);
 //        bindViewFile= p.getName().concat(".").concat(bindViewFile);
 //
-//        Log.e(TAG,"bindView File Name:"+bindViewFile);
+        Log.e(TAG,"bindView File Name:"+bindViewFile);
 
         try {
-            Class<?> aClass = Class.forName(target.getClass().getName() + MConstants._VIEW_BINDING);
+            Class<?> aClass = Class.forName(bindViewFile);
             Method inject = aClass.getDeclaredMethod(MConstants.INJECT_NAME, target.getClass());
             inject.invoke(aClass.newInstance(),target);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |

@@ -106,6 +106,11 @@ public class ViewClassInfo {
                     annotationValue, annotationValue
             );
         }
+        // typeElement1.getQualifiedName().toString(), typeElement1.getSimpleName().toString()
+        if (typeElement != null) {
+            codeBlock.add("String qualifiedName = \"$L\";\n", typeElement.getQualifiedName().toString());
+            codeBlock.add("String simpleName = \"$L\";\n", typeElement.getSimpleName().toString());
+        }
 
         /**
          * activity.textView1 = activity.findViewById( 2131231131 );
@@ -164,7 +169,7 @@ public class ViewClassInfo {
         MethodSpec methodSpec = MethodSpec.methodBuilder("bind")
                 .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                 .addParameter(parameterSpec)
-                .addCode(generateJavaCode())
+//                .addCode(generateJavaCode())
                 .build();
 
         //构造类
@@ -176,12 +181,46 @@ public class ViewClassInfo {
         JavaFile javaFile = JavaFile.builder(getPackageName(elementUtils), typeSpec).
                 build();
 
+        JavaFile javaFile1 = null;
+        if (!variableElements.isEmpty()) {
+            VariableElement variableElement = variableElements.get(0);
+            TypeElement typeElement1 = (TypeElement)variableElement.getEnclosingElement();
+            ClassName c = ClassName.get(elementUtils.getPackageOf(typeElement1).getQualifiedName().toString(), typeElement1.getSimpleName().toString());
+            javaFile1 = generateJavaFile(c, typeElement1, elementUtils, "haha");
+        }
+
         //写入文件
         try {
             javaFile.writeTo(mProcessingEnvironment.getFiler());
+            if (javaFile1 != null) javaFile1.writeTo(mProcessingEnvironment.getFiler());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private JavaFile generateJavaFile(ClassName className, TypeElement typeElement, Elements elementUtils, String tag) {
+        //获取类信息
+//        ClassName className = ClassName.get(typeElement);
+        //构建bind的入参
+        ParameterSpec parameterSpec = ParameterSpec.builder(className, BIND_METHOD_PARAMETER_NAME).build();
+        MethodSpec methodSpec = MethodSpec.methodBuilder("bind" + tag)
+                .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                .addParameter(parameterSpec)
+//                .addCode(generateJavaCode())
+                .build();
+
+        //构造类
+        TypeSpec typeSpec = TypeSpec.classBuilder(getClassSimpleName() + "_ViewBinding" + tag)
+                .addModifiers(Modifier.PUBLIC)
+                .addMethod(methodSpec)
+                .build();
+
+        PackageElement packageElement = elementUtils.getPackageOf(typeElement);
+        String packageElementStr = packageElement.getQualifiedName().toString();
+
+        //创建文件
+        return JavaFile.builder(packageElementStr, typeSpec).
+                build();
     }
 
     private String getPackageName(Elements elementUtils) {

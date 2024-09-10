@@ -58,7 +58,6 @@ public class ProcessorHelper {
         for (ProcessorBean processor : builderMaps.values()) {
             checkAndBuildParameter(processor);
             checkAndBuildInject(processor);
-
             checkAndBuildClass(processor);
             checkAndBuildFile(processor);
             if (processor.getFile() != null) {
@@ -120,7 +119,7 @@ public class ProcessorHelper {
             typeElement = (TypeElement) element.getEnclosingElement();
         }
         if (typeElement != null) {
-            BindView bindViewAnnotation = element.getAnnotation(BindView.class);
+            BindView bindViewAnnotation = typeElement.getAnnotation(BindView.class);
             int annotationValue = bindViewAnnotation == null ? 0 : bindViewAnnotation.value();
             codeBlock.add(
                     "if ($L > 0) {\n" + targetName + ".setContentView( $L );\n" + "}\n",

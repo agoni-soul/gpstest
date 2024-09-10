@@ -11,7 +11,9 @@ import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.lang.model.util.Elements
 
 /**
@@ -84,6 +86,9 @@ class AnnotationProcessor: AbstractProcessor() {
                 val processorBean = helper?.getOrEmpty(key)
                 processorBean?.apply {
                     element = it
+                    if (it.kind == ElementKind.FIELD) {
+                        variableElement = element as VariableElement
+                    }
                     fileName = enclosingElement.simpleName.toString() + MConstants._VIEW_BINDING
                     packageName = packageElement.qualifiedName.toString()
                     targetName = enclosingElement.simpleName.toString()
@@ -112,6 +117,7 @@ class AnnotationProcessor: AbstractProcessor() {
             val processorBean = helper?.getOrEmpty(key)
             processorBean?.apply {
                 element = it
+                executableElement = element as ExecutableElement
                 fileName = enclosingElement.simpleName.toString() + MConstants._VIEW_BINDING
                 packageName = packageElement.qualifiedName.toString()
                 targetName = enclosingElement.simpleName.toString()

@@ -5,6 +5,8 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
 
 public class ProcessorBean {
 
@@ -15,8 +17,9 @@ public class ProcessorBean {
     private TypeSpec mClass;
     private JavaFile mFile;
     private ParameterSpec parameter;
-
     private Element element;
+    VariableElement variableElement;
+    ExecutableElement executableElement;
 
     public String getFileName() {
         return fileName;

@@ -28,6 +28,7 @@ public class TestActivity extends AppCompatActivity {
     String TAG = this.getClass().getSimpleName();
 
     @BindView(R.id.btn_skip_gps)
+//    @ItbirdAopBinderView(R.id.btn_skip_gps)
     TextView mTv;
 
     @Override
@@ -40,7 +41,8 @@ public class TestActivity extends AppCompatActivity {
         mTv.setText("not crash");
     }
 
-    @OnClick(R.id.btn_skip_gps)
+//    @OnClick(R.id.btn_skip_gps)
+//    @ItbirdOnclick(R.id.btn_skip_gps)
     void onViewClick(View v){
         Toast.makeText(this, "button on click", Toast.LENGTH_SHORT).show();
     }

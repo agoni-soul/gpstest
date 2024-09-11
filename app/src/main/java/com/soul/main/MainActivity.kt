@@ -12,7 +12,6 @@ import android.graphics.Color
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -32,13 +31,10 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
-import com.blankj.utilcode.util.GsonUtils
-import com.haha.api.IUserService
-import com.haha.api.Service
+import com.haha.serviceApi.IUserService
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
-import com.soul.bean.SubDeviceResultBean
 import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
@@ -247,7 +243,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
-        val loaders = ServiceLoader.load(IUserService::class.java)
+        val loaders = ServiceLoader.load(com.haha.serviceApi.IUserService::class.java)
         var i = 0
         for (service in loaders) {
             i++

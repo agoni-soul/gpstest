@@ -2,7 +2,7 @@ package com.haha.serviceImpl
 
 import android.util.Log
 import com.google.auto.service.AutoService
-import com.haha.api.IUserService
+import com.haha.serviceApi.IUserService
 
 
 /**

@@ -110,6 +110,7 @@ dependencies {
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
 //    implementation project(':starrysky')
     implementation project(':BluetoothSdk')
+    implementation project(':ServiceApi')
     implementation project(':ServiceImpl')
     annotationProcessor project(':ServiceAnnotationProcessor')
     implementation project(':ServiceAnnotation')

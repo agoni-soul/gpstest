@@ -1,9 +1,16 @@
-package com.haha.precessor;
+package com.haha.processor;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 
 public class ProcessorBean {
 
@@ -14,6 +21,10 @@ public class ProcessorBean {
     private TypeSpec mClass;
     private JavaFile mFile;
     private ParameterSpec parameter;
+    private TypeElement typeElement;
+    private List<VariableElement> variableElementList = new ArrayList<>();
+    VariableElement variableElement;
+    ExecutableElement executableElement;
 
     public String getFileName() {
         return fileName;
@@ -32,27 +43,27 @@ public class ProcessorBean {
     }
 
 
-    public MethodSpec getmInjectMethod() {
+    public MethodSpec getInjectMethod() {
         return mInjectMethod;
     }
 
-    public void setmInjectMethod(MethodSpec mInjectMethod) {
+    public void setInjectMethod(MethodSpec mInjectMethod) {
         this.mInjectMethod = mInjectMethod;
     }
 
-    public TypeSpec getmClass() {
+    public TypeSpec getClazz() {
         return mClass;
     }
 
-    public void setmClass(TypeSpec mClass) {
+    public void setClazz(TypeSpec mClass) {
         this.mClass = mClass;
     }
 
-    public JavaFile getmFile() {
+    public JavaFile getFile() {
         return mFile;
     }
 
-    public void setmFile(JavaFile mFile) {
+    public void setFile(JavaFile mFile) {
         this.mFile = mFile;
     }
 
@@ -70,5 +81,21 @@ public class ProcessorBean {
 
     public void setTargetName(String targetName) {
         this.targetName = targetName;
+    }
+
+    public TypeElement getTypeElement() {
+        return typeElement;
+    }
+
+    public void setTypeElement(TypeElement typeElement) {
+        if (this.typeElement == null) this.typeElement = typeElement;
+    }
+
+    public void addVariableElement(VariableElement variableElement) {
+        this.variableElementList.add(variableElement);
+    }
+
+    public List<VariableElement> getVariableElementList() {
+        return variableElementList;
     }
 }

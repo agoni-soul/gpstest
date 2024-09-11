@@ -3,6 +3,7 @@ package com.haha.processor;
 import com.haha.service.annotation.BindView;
 import com.haha.service.annotation.OnClick;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -41,7 +42,7 @@ public class ProcessorHelper {
         for (ProcessorBean processor : builderMaps.values()) {
             checkAndBuildParameter(processor);
             checkAndBuildInject(processor);
-            buildJavaCode(processor.getElement(), processor);
+            buildJavaCode(processor);
             checkAndBuildClass(processor);
             checkAndBuildFile(processor);
             if (processor.getFile() != null) {
@@ -90,7 +91,8 @@ public class ProcessorHelper {
         processor.setParameter(parameterSpec);
     }
 
-    public void buildJavaCode(Element element, ProcessorBean processor) {
+    public void buildJavaCode(ProcessorBean processor) {
+        Element element = processor.getElement();
         if (element == null) {
             return;
         }
@@ -103,19 +105,11 @@ public class ProcessorHelper {
                 break;
             }
             case FIELD: {
-                buildBindViewJavaCode(
-                        element.getAnnotation(BindView.class),
-                        element.getSimpleName().toString(),
-                        processor
-                );
+                buildBindViewJavaCode(processor);
                 break;
             }
             case METHOD: {
-                buildOnClickJavaCode(
-                        element.getAnnotation(OnClick.class),
-                        element.getSimpleName().toString(),
-                        processor
-                );
+                buildOnClickJavaCode(processor);
                 break;
             }
             default: {
@@ -124,14 +118,16 @@ public class ProcessorHelper {
         }
     }
 
-    private void buildBindViewJavaCode(BindView bindView, String elementStr, ProcessorBean processor) {
-        if (bindView == null || processor == null) return;
-        checkAndBuildParameter(processor);
-        checkAndBuildInject(processor);
+    private void buildBindViewJavaCode(ProcessorBean processor) {
+        if (processor == null) return;
+        Element element = processor.getElement();
+        if (element == null) return;
+        BindView bindView = element.getAnnotation(BindView.class);
+        String elementStr = element.getSimpleName().toString();
+        if (bindView == null) return;
         MethodSpec methodSpec = processor.getMethodSpec();
-        if (methodSpec == null) {
-            return;
-        }
+        if (methodSpec == null) return;
+
         processor.setMethodSpec(
                 methodSpec.toBuilder()
                         .addStatement(
@@ -145,14 +141,16 @@ public class ProcessorHelper {
         );
     }
 
-    private void buildOnClickJavaCode(OnClick onClick, String elementStr, ProcessorBean processor) {
-        if (onClick == null || processor == null) return;
-        checkAndBuildParameter(processor);
-        checkAndBuildInject(processor);
+    private void buildOnClickJavaCode(ProcessorBean processor) {
+        if (processor == null) return;
+        Element element = processor.getElement();
+        if (element == null) return;
+        OnClick onClick = element.getAnnotation(OnClick.class);
+        String elementStr = element.getSimpleName().toString();
+        if (onClick == null) return;
         MethodSpec methodSpec = processor.getMethodSpec();
-        if (methodSpec == null) {
-            return;
-        }
+        if (methodSpec == null) return;
+
         for (int id : onClick.value()) {
             methodSpec = methodSpec.toBuilder()
                     .addStatement(

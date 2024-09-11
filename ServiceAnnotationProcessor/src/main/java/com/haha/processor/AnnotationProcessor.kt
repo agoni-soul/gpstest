@@ -91,6 +91,7 @@ class AnnotationProcessor : AbstractProcessor() {
                             fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
                             packageName = packageElement.qualifiedName.toString()
                             targetName = typeElement.simpleName.toString()
+//                            helper?.buildJavaCode(this)
                         }
                     }
                 }

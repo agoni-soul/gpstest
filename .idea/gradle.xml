@@ -10,14 +10,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/BaseAnnotation" />
-            <option value="$PROJECT_DIR$/BindViewRuntime" />
-            <option value="$PROJECT_DIR$/BindviewAnnotation" />
-            <option value="$PROJECT_DIR$/BindviewAnnotationProcessor" />
+            <option value="$PROJECT_DIR$/BluetoothSdk" />
+            <option value="$PROJECT_DIR$/ServiceAnnotation" />
+            <option value="$PROJECT_DIR$/ServiceAnnotationProcessor" />
+            <option value="$PROJECT_DIR$/ServiceApi" />
             <option value="$PROJECT_DIR$/ServiceImpl" />
-            <option value="$PROJECT_DIR$/ServiceProcessor" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/blesdk" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

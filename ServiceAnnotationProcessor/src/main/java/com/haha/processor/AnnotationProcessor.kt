@@ -3,15 +3,15 @@ package com.haha.processor
 import com.google.auto.service.AutoService
 import com.haha.service.annotation.BindView
 import com.haha.service.annotation.OnClick
+import com.squareup.javapoet.MethodSpec
 import java.io.IOException
+import java.util.Locale
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
-import javax.annotation.processing.SupportedAnnotationTypes
-import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
@@ -27,11 +27,9 @@ import javax.lang.model.util.Elements
  * @version: 1.0
  *
  */
-@SupportedAnnotationTypes("kim.hsl.router_annotation.Route")
 //自动生成META-INF/services/javax.annotation.processing.Processor文件，使javac可以发现当前自定义注解处理器
 @AutoService(Processor::class)
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
-class AnnotationProcessor: AbstractProcessor() {
+class AnnotationProcessor : AbstractProcessor() {
     private val TAG = javaClass.simpleName
 
     private var mProcessingEnvironment: ProcessingEnvironment? = null
@@ -54,9 +52,8 @@ class AnnotationProcessor: AbstractProcessor() {
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {
         val types = LinkedHashSet<String>()
-//        types.add(getBindViewClass().canonicalName)
-        types.add(BindView::class.java.canonicalName)
-//        types.add(getOnClickClass().canonicalName)
+        types.add(getBindViewClass().canonicalName)
+        types.add(getOnClickClass().canonicalName)
         return types
     }
 
@@ -69,12 +66,8 @@ class AnnotationProcessor: AbstractProcessor() {
         roundEnv: RoundEnvironment?
     ): Boolean {
         handleBindViewProcess(roundEnv)
-//        handleOnClickProcess(annotations, roundEnv)
-        try {
-            helper?.createFiles(filerUtils);
-        } catch (e: IOException) {
-            e.printStackTrace();
-        }
+        handleOnClickProcess(roundEnv)
+        createJavaFiles()
         return false
     }
 
@@ -96,11 +89,23 @@ class AnnotationProcessor: AbstractProcessor() {
                         val typeElement = it.enclosingElement as TypeElement
                         val packageElement = elementUtils!!.getPackageOf(typeElement)
                         val processorBean = helper!!.getOrEmpty(key)
+                        val annotation = it.getAnnotation(BindView::class.java)
                         processorBean.apply {
                             addVariableElement(variableElement)
                             fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
                             packageName = packageElement.qualifiedName.toString()
                             targetName = typeElement.simpleName.toString()
+                            helper?.checkAndBuildParameter(this)
+                            helper?.checkAndBuildInject(this)
+                            injectMethod = injectMethod.toBuilder()
+                                .addStatement(
+                                    "\$L.\$L=\$L.findViewById(\$L)",
+                                    targetName.lowercase(),
+                                    it.simpleName.toString(),
+                                    targetName.lowercase(),
+                                    annotation.value
+                                )
+                                .build()
                         }
                     }
                 }
@@ -125,37 +130,53 @@ class AnnotationProcessor: AbstractProcessor() {
         return OnClick::class.java
     }
 
-    private fun handleOnClickProcess(
-        annotations: MutableSet<out TypeElement>?,
-        roundEnv: RoundEnvironment?
-    ) {
+    private fun handleOnClickProcess(roundEnv: RoundEnvironment?) {
         roundEnv ?: return
-        annotations ?: return
         val elements = roundEnv.getElementsAnnotatedWith(OnClick::class.java)
         elements.forEach {
-            val enclosingElement = it.enclosingElement
-            val packageElement = elementUtils?.getPackageOf(enclosingElement) ?: return@forEach
+            if (it.kind == ElementKind.METHOD) {
+                val enclosingElement = it.enclosingElement
+                val packageElement = elementUtils?.getPackageOf(enclosingElement) ?: return@forEach
 //            val key = packageElement.toString() + enclosingElement.simpleName.toString()
-            val key = enclosingElement.simpleName.toString()
-            println("handleBindViewProcess: $key")
-            val processorBean = helper?.getOrEmpty(key)
-            processorBean?.apply {
-//                typeElement = it
-                executableElement = typeElement as ExecutableElement
-                fileName = enclosingElement.simpleName.toString() + MConstants._VIEW_BINDING
-                packageName = packageElement.qualifiedName.toString()
-                targetName = enclosingElement.simpleName.toString()
+                val key = enclosingElement.simpleName.toString()
+                println("handleBindViewProcess: $key")
+                val processorBean = helper?.getOrEmpty(key)
+                val annotation: OnClick = it.getAnnotation(OnClick::class.java)
+                processorBean?.apply {
+                    fileName = enclosingElement.simpleName.toString() + MConstants._VIEW_BINDING
+                    packageName = packageElement.qualifiedName.toString()
+                    targetName = enclosingElement.simpleName.toString()
+                    helper?.checkAndBuildParameter(this)
+                    helper?.checkAndBuildInject(this)
+                    var methodSpec: MethodSpec = injectMethod
+                    for (id: Int in annotation.value) {
+                        methodSpec = methodSpec.toBuilder()
+                            .addStatement(
+                                "\$L.findViewById(\$L).setOnClickListener(new \$T.OnClickListener() {\n" +
+                                        "      @Override\n" +
+                                        "      public void onClick(View v) {\n" +
+                                        "        \$L.\$L(v);\n" +
+                                        "      }\n" +
+                                        "    });\n",
+                                targetName.lowercase(),
+                                id,
+                                MConstants.CLASSNAME_VIEW,
+                                targetName.lowercase(),
+                                it.simpleName.toString()
+                            )
+                            .build()
+                    }
+                    injectMethod = methodSpec
+                }
             }
         }
     }
 
     private fun createJavaFiles() {
-//        for (className in map.keys) {
-//            val processorBean = map[className]
-//            if (processorBean != null) {
-//                helper?.createFiles(processorBean, processingEnv, elementUtils)
-//            }
-//        }
-        helper?.createFiles(processingEnv, elementUtils)
+        try {
+            helper?.createFiles(filerUtils)
+        } catch (e: IOException) {
+            e.printStackTrace();
+        }
     }
 }

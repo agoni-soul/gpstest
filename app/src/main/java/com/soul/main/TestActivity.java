@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.haha.service.annotation.BindView;
+import com.haha.service.annotation.OnClick;
 import com.soul.gpstest.R;
 
 /**
@@ -34,8 +35,8 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
-//    @OnClick(R.id.btn_skip_gps)
+    @OnClick(R.id.btn_skip_gps)
     void onViewClick(View v){
-        Toast.makeText(this, "button on click", Toast.LENGTH_SHORT).show();
+        mTv.setText("hahanihao");
     }
 }

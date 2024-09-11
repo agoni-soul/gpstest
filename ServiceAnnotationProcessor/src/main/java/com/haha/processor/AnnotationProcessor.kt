@@ -1,8 +1,8 @@
 package com.haha.processor
 
 import com.google.auto.service.AutoService
-import com.haha.annotation.BindView
-import com.haha.annotation.OnClick
+import com.haha.service.annotation.BindView
+import com.haha.service.annotation.OnClick
 import java.io.IOException
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Filer

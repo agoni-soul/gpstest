@@ -31,7 +31,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
-import com.haha.serviceApi.IUserService
+import com.haha.service.api.IUserService
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
@@ -243,7 +243,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
-        val loaders = ServiceLoader.load(com.haha.serviceApi.IUserService::class.java)
+        val loaders = ServiceLoader.load(IUserService::class.java)
         var i = 0
         for (service in loaders) {
             i++

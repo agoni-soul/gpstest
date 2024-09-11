@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.haha.annotation.BindView;
+import com.haha.service.annotation.BindView;
 import com.soul.gpstest.R;
 
 /**

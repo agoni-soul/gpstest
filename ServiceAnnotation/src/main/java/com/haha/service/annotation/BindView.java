@@ -1,4 +1,4 @@
-package com.haha.annotation;
+package com.haha.service.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

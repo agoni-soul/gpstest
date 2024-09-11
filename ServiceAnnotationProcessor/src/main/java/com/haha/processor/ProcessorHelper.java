@@ -1,6 +1,6 @@
 package com.haha.processor;
 
-import com.haha.annotation.BindView;
+import com.haha.service.annotation.BindView;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -14,14 +14,11 @@ import java.util.Map;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
-import javax.tools.FileObject;
-import javax.tools.StandardLocation;
 
 public class ProcessorHelper {
 

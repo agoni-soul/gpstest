@@ -1,9 +1,9 @@
-package com.haha.serviceImpl;
+package com.haha.service.impl;
 
 import android.util.Log;
 
 import com.google.auto.service.AutoService;
-import com.haha.serviceApi.Service;
+import com.haha.service.api.Service;
 
 @AutoService(Service.class)
 public class JavaService implements Service {

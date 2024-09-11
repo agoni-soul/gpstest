@@ -1,6 +1,6 @@
-package com.haha.serviceApi
+package com.haha.service.api
 
-import com.haha.annotation.IServiceLoader
+import com.haha.service.annotation.IServiceLoader
 
 /**
  *

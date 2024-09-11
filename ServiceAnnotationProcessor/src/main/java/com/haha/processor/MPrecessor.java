@@ -1,29 +1,5 @@
 package com.haha.processor;
 
-import com.google.auto.service.AutoService;
-import com.haha.annotation.BindView;
-import com.haha.annotation.OnClick;
-import com.squareup.javapoet.MethodSpec;
-
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
-
 //@AutoService(Processor.class)
 //public class MPrecessor extends AbstractProcessor {
 //    private Filer filerUtils; //

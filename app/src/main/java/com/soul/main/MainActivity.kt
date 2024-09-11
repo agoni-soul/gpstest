@@ -33,8 +33,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
-import com.haha.annotation.BindView
-import com.haha.annotation.OnClick
 import com.haha.api.IUserService
 import com.haha.api.Service
 import com.soul.animation.AnimationActivity
@@ -76,9 +74,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private var dialog: CustomDialog? = null
 
-    @BindView(R.id.btn_skip_gps)
-    private var mTvGps: TextView? = null
-
 //    @RequiresApi(Build.VERSION_CODES.R)
 //    private val mConnectivityDiagnosticsCallback = ExampleCallback()
 
@@ -94,17 +89,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        BindUtils.bind(this)
-        mTvGps?.text = "not crash"
-    }
-
-    @OnClick(R.id.btn_skip_gps)
-    fun onViewClick(v: View) {
-        Log.d(TAG, "onViewClick")
-    }
 
     override fun initView() {
         mViewDataBinding?.btnSkipGps?.setOnClickListener(this)
@@ -141,8 +125,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
             invalidate()
         }
-
-        Log.d("haha", Build.VERSION.SDK_INT.toString())
 
 
         /**
@@ -266,12 +248,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
         val loaders = ServiceLoader.load(IUserService::class.java)
-        Log.d(TAG, "loaders == null: ${loaders == null}, $loaders")
         var i = 0
         for (service in loaders) {
             i++
             service.start()
-            Log.d(TAG, service.getUserName() ?: "haha")
         }
         Log.d(TAG, "i = $i")
     }
@@ -537,15 +517,16 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 R.id.btn_skip_gps -> {
 //                    val intent = Intent(this, GpsActivity::class.java);
 //                    startActivity(intent)
-                    val resultList =
-                        "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
-                    var bean: SubDeviceResultBean? = null
-                    try {
-                        bean = GsonUtils.fromJson(resultList, SubDeviceResultBean::class.java)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                    DOFLogUtil.d(TAG, "bean = $bean")
+//                    val resultList =
+//                        "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
+//                    var bean: SubDeviceResultBean? = null
+//                    try {
+//                        bean = GsonUtils.fromJson(resultList, SubDeviceResultBean::class.java)
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                    }
+//                    DOFLogUtil.d(TAG, "bean = $bean")
+                    startActivity(Intent(this, TestActivity::class.java))
                 }
 
                 R.id.btn_skip_remote_view -> {

@@ -20,6 +20,8 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 
 public class ProcessorHelper {
 
@@ -55,36 +57,46 @@ public class ProcessorHelper {
 
     public void createFiles(Map<String, ProcessorBean> map, ProcessingEnvironment processingEnvironment, Elements elementUtils) {
         for (String key : map.keySet()) {
-            ProcessorBean processor = builderMaps.get(key);
-            TypeElement typeElement = processor.getTypeElement();
-            //获取类信息
-            ClassName className = ClassName.get(typeElement);
-            //构建bind的入参
-            ParameterSpec parameterSpec = ParameterSpec.builder(className, "activity").build();
-            MethodSpec methodSpec = MethodSpec.methodBuilder("bind")
-                    .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
-                    .addParameter(parameterSpec)
-                    .addCode(generateJavaCode(processor))
-                    .build();
+            ProcessorBean processor = map.get(key);
+            createFiles(processor, processingEnvironment, elementUtils);
+        }
+    }
 
-            //构造类
-            TypeSpec typeSpec =
-                    TypeSpec.classBuilder(typeElement.getSimpleName().toString() + "_ViewBinding")
-                            .addModifiers(Modifier.PUBLIC)
-                            .addMethod(methodSpec)
-                            .build();
+    public void createFiles(ProcessorBean processor, ProcessingEnvironment processingEnvironment, Elements elementUtils) {
+        TypeElement typeElement = processor.getTypeElement();
+        //获取类信息
+        ClassName className = ClassName.get(typeElement);
+        //构建bind的入参
+        ParameterSpec parameterSpec = ParameterSpec.builder(className, "activity").build();
+        MethodSpec methodSpec = MethodSpec.methodBuilder(MConstants.INJECT_NAME)
+                .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                .addParameter(parameterSpec)
+//                .addCode(generateJavaCode(processor))
+                .build();
 
+        String classSimpleName = null;
+        String packageName = null;
+        if (typeElement != null) {
+            classSimpleName = typeElement.getSimpleName().toString();
             PackageElement packageElement = elementUtils.getPackageOf(typeElement);
-            //创建文件
-            JavaFile javaFile =
-                    JavaFile.builder(packageElement.getQualifiedName().toString(), typeSpec).build();
+            packageName = packageElement.getQualifiedName().toString();
+        }
 
-            try {
-                javaFile.writeTo(processingEnvironment.getFiler());
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("createFiles: \n" + e.getMessage());
-            }
+        //构造类
+        TypeSpec typeSpec =
+                TypeSpec.classBuilder(classSimpleName + "_ViewBinding")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addMethod(methodSpec)
+                        .build();
+
+        //创建文件
+        JavaFile javaFile = JavaFile.builder(packageName, typeSpec).build();
+
+        try {
+            javaFile.writeTo(processingEnvironment.getFiler());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("createFiles: \n" + e.getMessage());
         }
     }
 
@@ -107,7 +119,7 @@ public class ProcessorHelper {
     }
 
     public void checkAndBuildFile(ProcessorBean processor) {
-//        if (processor.getFile() != null) return;
+        if (processor.getFile() != null) return;
         JavaFile javaFile =
                 JavaFile.builder(processor.getPackageName(), processor.getClazz())
                         .build();
@@ -125,11 +137,11 @@ public class ProcessorHelper {
     }
 
     public void checkAndBuildInject(ProcessorBean processor) {
-//        if (processor.getInjectMethod() != null) return;
+        if (processor.getInjectMethod() != null) return;
         MethodSpec methodSpec =
                 MethodSpec.methodBuilder(MConstants.INJECT_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-//                        .returns(void.class)
+                        .returns(void.class)
                         .addParameter(processor.getParameter())
 //                        .addAnnotation(MConstants.CLASSNAME_UI_THREAD)
                         .addCode(generateJavaCode(processor))
@@ -145,7 +157,7 @@ public class ProcessorHelper {
     private CodeBlock generateJavaCode(ProcessorBean processor) {
         CodeBlock.Builder codeBlock = CodeBlock.builder();
         TypeElement typeElement = processor.getTypeElement();
-        String targetName = "activity";
+        String targetName = processor.getTargetName().toLowerCase();
         /**
          *  activity.setContentView( 2131427358 );
          */
@@ -203,11 +215,11 @@ public class ProcessorHelper {
     }
 
     public void checkAndBuildParameter(ProcessorBean processor) {
-//        if (processor.getParameter() != null) return;
+        if (processor.getParameter() != null) return;
         ClassName targetClass = ClassName.get(processor.getPackageName(), processor.getTargetName());
         ParameterSpec parameterSpec =
                 ParameterSpec.builder(targetClass, processor.getTargetName().toLowerCase())
-                        .addModifiers(Modifier.FINAL)
+//                        .addModifiers(Modifier.FINAL)
                         .build();
         processor.setParameter(parameterSpec);
     }

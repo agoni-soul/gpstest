@@ -111,7 +111,7 @@ dependencies {
 //    implementation project(':starrysky')
     implementation project(':blesdk')
     implementation project(':ServiceImpl')
-    implementation project(':ServiceProcessor')
+    annotationProcessor project(':ServiceProcessor')
     implementation project(':BaseAnnotation')
     implementation project(path: ':BindviewAnnotation')
     implementation project(path: ':BindViewRuntime')

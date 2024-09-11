@@ -3,19 +3,21 @@ package com.haha.processor
 import com.google.auto.service.AutoService
 import com.haha.annotation.BindView
 import com.haha.annotation.OnClick
+import java.io.IOException
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedAnnotationTypes
+import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.util.Elements
-import javax.tools.Diagnostic
 
 /**
  *
@@ -25,21 +27,24 @@ import javax.tools.Diagnostic
  * @version: 1.0
  *
  */
+@SupportedAnnotationTypes("kim.hsl.router_annotation.Route")
+//自动生成META-INF/services/javax.annotation.processing.Processor文件，使javac可以发现当前自定义注解处理器
 @AutoService(Processor::class)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 class AnnotationProcessor: AbstractProcessor() {
     private val TAG = javaClass.simpleName
 
+    private var mProcessingEnvironment: ProcessingEnvironment? = null
     private var filerUtils: Filer? = null
     private var elementUtils: Elements? = null
     private var messager: Messager? = null
     private var options: Map<String, String>? = null
     private var helper: ProcessorHelper? = null
 
-    private val map = HashMap<String, ProcessorBean>()
-
     override fun init(processingEnv: ProcessingEnvironment?) {
         super.init(processingEnv)
 
+        mProcessingEnvironment = processingEnv
         filerUtils = processingEnv?.filer
         elementUtils = processingEnv?.elementUtils
         messager = processingEnv?.messager
@@ -49,8 +54,9 @@ class AnnotationProcessor: AbstractProcessor() {
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {
         val types = LinkedHashSet<String>()
-        types.add(getBindViewClass().canonicalName)
-        types.add(getOnClickClass().canonicalName)
+//        types.add(getBindViewClass().canonicalName)
+        types.add(BindView::class.java.canonicalName)
+//        types.add(getOnClickClass().canonicalName)
         return types
     }
 
@@ -62,47 +68,55 @@ class AnnotationProcessor: AbstractProcessor() {
         annotations: MutableSet<out TypeElement>?,
         roundEnv: RoundEnvironment?
     ): Boolean {
-        handleBindViewProcess(annotations, roundEnv)
+        handleBindViewProcess(roundEnv)
 //        handleOnClickProcess(annotations, roundEnv)
-        createJavaFiles()
-        return roundEnv?.processingOver() ?: false
+        try {
+            helper?.createFiles(filerUtils);
+        } catch (e: IOException) {
+            e.printStackTrace();
+        }
+        return false
     }
 
     private fun getBindViewClass(): Class<out Annotation> {
         return BindView::class.java
     }
 
-    private fun handleBindViewProcess(
-        annotations: MutableSet<out TypeElement>?,
-        roundEnv: RoundEnvironment?
-    ) {
+    private fun handleBindViewProcess(roundEnv: RoundEnvironment?) {
         roundEnv ?: return
-        annotations ?: return
         val elements = roundEnv.getElementsAnnotatedWith(BindView::class.java)
         elements.forEach {
             if (it.kind == ElementKind.FIELD) {
                 val enclosingElement = it.enclosingElement
-                val packageElement = elementUtils?.getPackageOf(enclosingElement) ?: return@forEach
                 val key = enclosingElement.simpleName.toString()
                 println("handleBindViewProcess: $key")
-                val processorBean: ProcessorBean?
-                if (map.containsKey(key)) {
-                    processorBean = map[key]
-                } else {
-                    processorBean = ProcessorBean()
-                    map[key] = processorBean
-                }
-                processorBean?.apply {
-                    if (it is VariableElement) {
-                        addVariableElement(it)
-                        if (it.enclosingElement is TypeElement) {
-                            typeElement = it.enclosingElement as TypeElement
+                if (it is VariableElement) {
+                    val variableElement = it
+                    if (it.enclosingElement is TypeElement) {
+                        val typeElement = it.enclosingElement as TypeElement
+                        val packageElement = elementUtils!!.getPackageOf(typeElement)
+                        val processorBean = helper!!.getOrEmpty(key)
+                        processorBean.apply {
+                            addVariableElement(variableElement)
+                            fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
+                            packageName = packageElement.qualifiedName.toString()
+                            targetName = typeElement.simpleName.toString()
                         }
                     }
-                    fileName = enclosingElement.simpleName.toString() + MConstants._VIEW_BINDING
-                    packageName = packageElement.qualifiedName.toString()
-                    targetName = enclosingElement.simpleName.toString()
                 }
+            } else if (it.kind == ElementKind.CLASS) {
+                if (it is TypeElement) {
+                    val typeElement = it
+                    val packageElement = elementUtils!!.getPackageOf(typeElement)
+                    val key = it.simpleName.toString()
+                    val processorBean = helper!!.getOrEmpty(key)
+                    processorBean.apply {
+                        fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
+                        packageName = packageElement.qualifiedName.toString()
+                        targetName = typeElement.simpleName.toString()
+                    }
+                }
+
             }
         }
     }
@@ -136,6 +150,12 @@ class AnnotationProcessor: AbstractProcessor() {
     }
 
     private fun createJavaFiles() {
-        helper?.createFiles(map, processingEnv, elementUtils)
+//        for (className in map.keys) {
+//            val processorBean = map[className]
+//            if (processorBean != null) {
+//                helper?.createFiles(processorBean, processingEnv, elementUtils)
+//            }
+//        }
+        helper?.createFiles(processingEnv, elementUtils)
     }
 }

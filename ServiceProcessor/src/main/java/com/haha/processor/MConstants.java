@@ -11,7 +11,7 @@ public class MConstants {
 
     public static ClassName CLASSNAME_VIEW = ClassName.get("android.view", "View");
 
-    public static String INJECT_NAME = "inject";
+    public static String INJECT_NAME = "bind";
 
     public static String _VIEW_BINDING = "_ViewBinding";
 

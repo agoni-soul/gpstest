@@ -1,7 +1,6 @@
 package com.haha.processor;
 
 import com.haha.annotation.BindView;
-import com.haha.annotation.OnClick;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -16,8 +15,8 @@ import java.util.Map;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -50,6 +49,41 @@ public class ProcessorHelper {
             checkAndBuildFile(processor);
             if (processor.getFile() != null) {
                 processor.getFile().writeTo(filer);
+            }
+        }
+    }
+
+    public void createFiles(Map<String, ProcessorBean> map, ProcessingEnvironment processingEnvironment, Elements elementUtils) {
+        for (String key : map.keySet()) {
+            ProcessorBean processor = builderMaps.get(key);
+            TypeElement typeElement = processor.getTypeElement();
+            //获取类信息
+            ClassName className = ClassName.get(typeElement);
+            //构建bind的入参
+            ParameterSpec parameterSpec = ParameterSpec.builder(className, "activity").build();
+            MethodSpec methodSpec = MethodSpec.methodBuilder("bind")
+                    .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+                    .addParameter(parameterSpec)
+                    .addCode(generateJavaCode(processor))
+                    .build();
+
+            //构造类
+            TypeSpec typeSpec =
+                    TypeSpec.classBuilder(typeElement.getSimpleName().toString() + "_ViewBinding")
+                            .addModifiers(Modifier.PUBLIC)
+                            .addMethod(methodSpec)
+                            .build();
+
+            PackageElement packageElement = elementUtils.getPackageOf(typeElement);
+            //创建文件
+            JavaFile javaFile =
+                    JavaFile.builder(packageElement.getQualifiedName().toString(), typeSpec).build();
+
+            try {
+                javaFile.writeTo(processingEnvironment.getFiler());
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("createFiles: \n" + e.getMessage());
             }
         }
     }
@@ -110,16 +144,12 @@ public class ProcessorHelper {
      */
     private CodeBlock generateJavaCode(ProcessorBean processor) {
         CodeBlock.Builder codeBlock = CodeBlock.builder();
-        Element element = processor.getElement();
-        String targetName = processor.getTargetName().toLowerCase();
+        TypeElement typeElement = processor.getTypeElement();
+        String targetName = "activity";
         /**
          *  activity.setContentView( 2131427358 );
          */
         //setContentView方法生成
-        TypeElement typeElement = null;
-        if (element instanceof TypeElement) {
-            typeElement = (TypeElement) element.getEnclosingElement();
-        }
         if (typeElement != null) {
             BindView bindViewAnnotation = typeElement.getAnnotation(BindView.class);
             int annotationValue = bindViewAnnotation == null ? 0 : bindViewAnnotation.value();
@@ -133,10 +163,12 @@ public class ProcessorHelper {
          * activity.textView1 = activity.findViewById( 2131231131 );
          */
         //findViewById方法生成
-        if (element instanceof VariableElement) {
-            BindView bindViewAnnotation = element.getAnnotation(BindView.class);
-            int annotationValue = bindViewAnnotation == null ? 0 : bindViewAnnotation.value();
-            codeBlock.add(targetName + "." + element.getSimpleName() + " = " + targetName + ".findViewById( $L );\n", annotationValue);
+        if (!processor.getVariableElementList().isEmpty()) {
+            for (VariableElement element : processor.getVariableElementList()) {
+                BindView bindViewAnnotation = element.getAnnotation(BindView.class);
+                int annotationValue = bindViewAnnotation == null ? 0 : bindViewAnnotation.value();
+                codeBlock.add(targetName + "." + element.getSimpleName() + " = " + targetName + ".findViewById( $L );\n", annotationValue);
+            }
         }
 
         /**

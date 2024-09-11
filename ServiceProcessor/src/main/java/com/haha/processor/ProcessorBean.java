@@ -4,8 +4,12 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
-import javax.lang.model.element.Element;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
 public class ProcessorBean {
@@ -17,7 +21,8 @@ public class ProcessorBean {
     private TypeSpec mClass;
     private JavaFile mFile;
     private ParameterSpec parameter;
-    private Element element;
+    private TypeElement typeElement;
+    private List<VariableElement> variableElementList = new ArrayList<>();
     VariableElement variableElement;
     ExecutableElement executableElement;
 
@@ -78,11 +83,19 @@ public class ProcessorBean {
         this.targetName = targetName;
     }
 
-    public Element getElement() {
-        return element;
+    public TypeElement getTypeElement() {
+        return typeElement;
     }
 
-    public void setElement(Element element) {
-        this.element = element;
+    public void setTypeElement(TypeElement typeElement) {
+        if (this.typeElement == null) this.typeElement = typeElement;
+    }
+
+    public void addVariableElement(VariableElement variableElement) {
+        this.variableElementList.add(variableElement);
+    }
+
+    public List<VariableElement> getVariableElementList() {
+        return variableElementList;
     }
 }

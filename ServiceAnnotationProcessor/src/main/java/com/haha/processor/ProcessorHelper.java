@@ -47,7 +47,6 @@ public class ProcessorHelper {
         for (ProcessorBean processor : builderMaps.values()) {
             checkAndBuildParameter(processor);
             checkAndBuildInject(processor);
-            buildJavaCode(processor);
             checkAndBuildClass(processor);
             checkAndBuildFile(processor);
             if (processor.getFile() != null) {
@@ -79,9 +78,10 @@ public class ProcessorHelper {
         MethodSpec methodSpec =
                 MethodSpec.methodBuilder(MConstants.INJECT_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                        .returns(void.class)
+//                        .returns(void.class)
                         .addParameter(processor.getParameter())
 //                        .addAnnotation(MConstants.CLASSNAME_UI_THREAD)
+                        .addCode(buildJavaCode(processor))
                         .build();
         processor.setMethodSpec(methodSpec);
     }
@@ -96,74 +96,64 @@ public class ProcessorHelper {
         processor.setParameter(parameterSpec);
     }
 
-    public void buildJavaCode(ProcessorBean processor) {
+    private CodeBlock buildJavaCode(ProcessorBean processor) {
         Element element = processor.getElement();
-        if (element == null) {
-            return;
-        }
+        CodeBlock.Builder builder = CodeBlock.builder();
+        if (element == null) return builder.build();
         ElementKind kind = element.getKind();
-        if (kind == null) {
-            return;
-        }
+        if (kind == null) return builder.build();
+
         switch (kind) {
             case CLASS: {
                 break;
             }
             case FIELD: {
-                buildBindViewFieldJavaCode(processor);
+                builder.add(buildBindViewFieldJavaCode(processor));
                 break;
             }
             case METHOD: {
-                buildOnClickMethodJavaCode(processor);
+                builder.add(buildOnClickMethodJavaCode(processor));
                 break;
             }
             default: {
 
             }
         }
+        return builder.build();
     }
 
-    private void buildBindViewFieldJavaCode(ProcessorBean processor) {
-        if (processor == null) return;
+    private CodeBlock buildBindViewFieldJavaCode(ProcessorBean processor) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+        if (processor == null) return builder.build();
         Element element = processor.getElement();
-        if (element == null) return;
+        if (element == null) return builder.build();
         BindView bindView = element.getAnnotation(BindView.class);
-        String elementStr = element.getSimpleName().toString();
-        if (bindView == null) return;
-        MethodSpec methodSpec = processor.getMethodSpec();
-        if (methodSpec == null) return;
-        CodeBlock codeBlock =
-                CodeBlock.builder()
-                        .add(
-                                "$L.$L=$L.findViewById($L)",
-                                processor.getTargetName().toLowerCase(),
-                                elementStr,
-                                processor.getTargetName().toLowerCase(),
-                                bindView.value()
-                        )
-                        .build();
-        messager.printMessage(Diagnostic.Kind.ERROR, "buildBindViewFieldJavaCode: " + codeBlock);
+        if (bindView == null) return builder.build();
 
-        processor.setMethodSpec(
-                methodSpec.toBuilder()
-                        .addStatement(codeBlock)
-                        .build()
+        String elementStr = element.getSimpleName().toString();
+        builder.add(
+                "$L.$L=$L.findViewById($L);\n",
+                processor.getTargetName().toLowerCase(),
+                elementStr,
+                processor.getTargetName().toLowerCase(),
+                bindView.value()
         );
+        messager.printMessage(Diagnostic.Kind.ERROR, "buildBindViewFieldJavaCode: " + builder);
+
+        return builder.build();
     }
 
-    private void buildOnClickMethodJavaCode(ProcessorBean processor) {
-        if (processor == null) return;
+    private CodeBlock buildOnClickMethodJavaCode(ProcessorBean processor) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+        if (processor == null) return builder.build();
         Element element = processor.getElement();
-        if (element == null) return;
+        if (element == null) return builder.build();
         OnClick onClick = element.getAnnotation(OnClick.class);
-        String elementStr = element.getSimpleName().toString();
-        if (onClick == null) return;
-        MethodSpec methodSpec = processor.getMethodSpec();
-        if (methodSpec == null) return;
+        if (onClick == null) return builder.build();
 
+        String elementStr = element.getSimpleName().toString();
         for (int id : onClick.value()) {
-            methodSpec = methodSpec.toBuilder()
-                    .addStatement(
+            builder.add(
                             "$L.findViewById($L).setOnClickListener(new $T.OnClickListener() {\n" +
                                     "      @Override\n" +
                                     "      public void onClick(View v) {\n" +
@@ -175,9 +165,8 @@ public class ProcessorHelper {
                             MConstants.CLASSNAME_VIEW,
                             processor.getTargetName().toLowerCase(),
                             elementStr
-                    )
-                    .build();
+                    );
         }
-        processor.setMethodSpec(methodSpec);
+        return builder.build();
     }
 }

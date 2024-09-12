@@ -14,23 +14,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import javax.tools.Diagnostic;
 
 public class ProcessorHelper {
 
-    private Map<String, ProcessorBean> builderMaps;
+    private final Map<String, ProcessorBean> builderMaps;
+    private Messager messager;
 
     public ProcessorHelper() {
         this.builderMaps = new HashMap<>();
     }
 
-
     public void put(String key, ProcessorBean processor) {
         builderMaps.put(key, processor);
     }
 
+    public void setMessager(Messager messager) {
+        this.messager = messager;
+    }
 
     public ProcessorBean getOrEmpty(String key) {
         if (builderMaps.get(key) == null) put(key, new ProcessorBean());
@@ -105,11 +110,11 @@ public class ProcessorHelper {
                 break;
             }
             case FIELD: {
-                buildBindViewJavaCode(processor);
+                buildBindViewFieldJavaCode(processor);
                 break;
             }
             case METHOD: {
-                buildOnClickJavaCode(processor);
+                buildOnClickMethodJavaCode(processor);
                 break;
             }
             default: {
@@ -118,7 +123,7 @@ public class ProcessorHelper {
         }
     }
 
-    private void buildBindViewJavaCode(ProcessorBean processor) {
+    private void buildBindViewFieldJavaCode(ProcessorBean processor) {
         if (processor == null) return;
         Element element = processor.getElement();
         if (element == null) return;
@@ -127,21 +132,26 @@ public class ProcessorHelper {
         if (bindView == null) return;
         MethodSpec methodSpec = processor.getMethodSpec();
         if (methodSpec == null) return;
-
-        processor.setMethodSpec(
-                methodSpec.toBuilder()
-                        .addStatement(
+        CodeBlock codeBlock =
+                CodeBlock.builder()
+                        .add(
                                 "$L.$L=$L.findViewById($L)",
                                 processor.getTargetName().toLowerCase(),
                                 elementStr,
                                 processor.getTargetName().toLowerCase(),
                                 bindView.value()
                         )
+                        .build();
+        messager.printMessage(Diagnostic.Kind.ERROR, "buildBindViewFieldJavaCode: " + codeBlock);
+
+        processor.setMethodSpec(
+                methodSpec.toBuilder()
+                        .addStatement(codeBlock)
                         .build()
         );
     }
 
-    private void buildOnClickJavaCode(ProcessorBean processor) {
+    private void buildOnClickMethodJavaCode(ProcessorBean processor) {
         if (processor == null) return;
         Element element = processor.getElement();
         if (element == null) return;

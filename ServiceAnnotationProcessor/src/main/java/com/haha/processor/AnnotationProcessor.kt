@@ -32,7 +32,6 @@ import javax.lang.model.util.Elements
 class AnnotationProcessor : AbstractProcessor() {
     private val TAG = javaClass.simpleName
 
-    private var mProcessingEnvironment: ProcessingEnvironment? = null
     private var filerUtils: Filer? = null
     private var elementUtils: Elements? = null
     private var messager: Messager? = null
@@ -42,12 +41,12 @@ class AnnotationProcessor : AbstractProcessor() {
     override fun init(processingEnv: ProcessingEnvironment?) {
         super.init(processingEnv)
 
-        mProcessingEnvironment = processingEnv
         filerUtils = processingEnv?.filer
         elementUtils = processingEnv?.elementUtils
         messager = processingEnv?.messager
         options = processingEnv?.options
         helper = ProcessorHelper()
+        helper!!.setMessager(messager)
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {

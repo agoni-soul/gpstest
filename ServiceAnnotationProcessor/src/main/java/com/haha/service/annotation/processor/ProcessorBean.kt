@@ -1,4 +1,4 @@
-package com.haha.processor
+package com.haha.service.annotation.processor
 
 import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec

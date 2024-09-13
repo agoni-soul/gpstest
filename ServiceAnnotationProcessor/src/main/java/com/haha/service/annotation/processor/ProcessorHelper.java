@@ -1,4 +1,4 @@
-package com.haha.processor;
+package com.haha.service.annotation.processor;
 
 import com.haha.service.annotation.BindView;
 import com.haha.service.annotation.OnClick;
@@ -83,7 +83,7 @@ public class ProcessorHelper {
     public void checkAndBuildInject(ProcessorBean processor) {
         if (processor.getMethodSpec() != null) return;
         MethodSpec methodSpec =
-                MethodSpec.methodBuilder(MConstants.INJECT_NAME)
+                MethodSpec.methodBuilder(ConstantUtils.INJECT_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(void.class)
                         .addParameter(processor.getParameter())
@@ -183,7 +183,7 @@ public class ProcessorHelper {
                                 "    });\n",
                         processor.getTargetName().toLowerCase(),
                         id,
-                        MConstants.CLASSNAME_VIEW,
+                        ConstantUtils.CLASSNAME_VIEW,
                         processor.getTargetName().toLowerCase(),
                         element.getSimpleName()
                 );

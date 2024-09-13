@@ -1,4 +1,4 @@
-package com.haha.messager
+package com.haha.service.annotation.messager
 
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element

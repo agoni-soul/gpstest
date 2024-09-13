@@ -1,4 +1,4 @@
-package com.soul.gpstest
+package com.soul.gps
 
 /**
  * 类描述：GPS状态类

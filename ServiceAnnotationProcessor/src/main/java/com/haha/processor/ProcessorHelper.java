@@ -17,8 +17,13 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
+
+import jdk.jshell.Snippet;
 
 public class ProcessorHelper {
 
@@ -43,20 +48,24 @@ public class ProcessorHelper {
     }
 
 
-    public void createFiles(Filer filer) throws IOException {
+    public void createFiles(Filer filer) {
         for (ProcessorBean processor : builderMaps.values()) {
             checkAndBuildParameter(processor);
             checkAndBuildInject(processor);
             checkAndBuildClass(processor);
             checkAndBuildFile(processor);
             if (processor.getFile() != null) {
-                processor.getFile().writeTo(filer);
+                try {
+                    processor.getFile().writeTo(filer);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     public void checkAndBuildFile(ProcessorBean processor) {
-        if (processor.getFile() != null) return;
+        if (processor.getFile() != null || processor.getTypeSpec() == null) return;
         JavaFile javaFile =
                 JavaFile.builder(processor.getPackageName(), processor.getTypeSpec())
                         .build();
@@ -78,10 +87,10 @@ public class ProcessorHelper {
         MethodSpec methodSpec =
                 MethodSpec.methodBuilder(MConstants.INJECT_NAME)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-//                        .returns(void.class)
+                        .returns(void.class)
                         .addParameter(processor.getParameter())
 //                        .addAnnotation(MConstants.CLASSNAME_UI_THREAD)
-                        .addCode(buildJavaCode(processor))
+//                        .addCode(buildJavaCode(processor))
                         .build();
         processor.setMethodSpec(methodSpec);
     }
@@ -97,47 +106,52 @@ public class ProcessorHelper {
     }
 
     private CodeBlock buildJavaCode(ProcessorBean processor) {
-        Element element = processor.getElement();
         CodeBlock.Builder builder = CodeBlock.builder();
-        if (element == null) return builder.build();
-        ElementKind kind = element.getKind();
-        if (kind == null) return builder.build();
+//        Element element = processor.getTypeElement();
+//        if (element == null) return builder.build();
+//        ElementKind kind = element.getKind();
+//        if (kind == null) return builder.build();
+//        builder.add(buildBindViewFieldJavaCode(processor));
+        builder.add(buildOnClickMethodJavaCode(processor));
 
-        switch (kind) {
-            case CLASS: {
-                break;
-            }
-            case FIELD: {
-                builder.add(buildBindViewFieldJavaCode(processor));
-                break;
-            }
-            case METHOD: {
-                builder.add(buildOnClickMethodJavaCode(processor));
-                break;
-            }
-            default: {
-
-            }
-        }
+//        switch (kind) {
+//            case CLASS: {
+//                break;
+//            }
+//            case FIELD: {
+//                break;
+//            }
+//            case METHOD: {
+//                break;
+//            }
+//            default: {
+//
+//            }
+//        }
         return builder.build();
     }
 
     private CodeBlock buildBindViewFieldJavaCode(ProcessorBean processor) {
         CodeBlock.Builder builder = CodeBlock.builder();
-        if (processor == null) return builder.build();
-        Element element = processor.getElement();
+        if (processor == null || processor.getVariableElements().isEmpty()) return builder.build();
+        TypeElement element = processor.getTypeElement();
         if (element == null) return builder.build();
-        BindView bindView = element.getAnnotation(BindView.class);
-        if (bindView == null) return builder.build();
 
         String elementStr = element.getSimpleName().toString();
-        builder.add(
-                "$L.$L=$L.findViewById($L);\n",
-                processor.getTargetName().toLowerCase(),
-                elementStr,
-                processor.getTargetName().toLowerCase(),
-                bindView.value()
-        );
+        for (VariableElement variableElement : processor.getVariableElements()) {
+            if (!ElementKind.FIELD.equals(variableElement.getKind())) continue;
+            BindView bindView = variableElement.getAnnotation(BindView.class);
+            if (bindView == null) continue;
+            builder.add(
+                    "$L.$L=$L.findViewById($L);\n",
+                    processor.getTargetName().toLowerCase(),
+                    elementStr,
+                    processor.getTargetName().toLowerCase(),
+                    bindView.value()
+            );
+            builder.add("String qualifiedName = \"$L\";\n", element.getQualifiedName().toString());
+            builder.add("String simpleName = \"$L\";\n", element.getSimpleName().toString());
+        }
         messager.printMessage(Diagnostic.Kind.ERROR, "buildBindViewFieldJavaCode: " + builder);
 
         return builder.build();
@@ -145,27 +159,37 @@ public class ProcessorHelper {
 
     private CodeBlock buildOnClickMethodJavaCode(ProcessorBean processor) {
         CodeBlock.Builder builder = CodeBlock.builder();
-        if (processor == null) return builder.build();
-        Element element = processor.getElement();
+        if (processor == null || processor.getMethodElements().isEmpty()) return builder.build();
+        TypeElement element = processor.getTypeElement();
         if (element == null) return builder.build();
-        OnClick onClick = element.getAnnotation(OnClick.class);
-        if (onClick == null) return builder.build();
 
         String elementStr = element.getSimpleName().toString();
-        for (int id : onClick.value()) {
-            builder.add(
-                            "$L.findViewById($L).setOnClickListener(new $T.OnClickListener() {\n" +
-                                    "      @Override\n" +
-                                    "      public void onClick(View v) {\n" +
-                                    "        $L.$L(v);\n" +
-                                    "      }\n" +
-                                    "    });\n",
-                            processor.getTargetName().toLowerCase(),
-                            id,
-                            MConstants.CLASSNAME_VIEW,
-                            processor.getTargetName().toLowerCase(),
-                            elementStr
-                    );
+        for (ExecutableElement executableElement : processor.getMethodElements()) {
+            if (!ElementKind.METHOD.equals(executableElement.getKind())) continue;
+            OnClick onClick = executableElement.getAnnotation(OnClick.class);
+            if (onClick == null) continue;
+            for (int id : onClick.value()) {
+                builder.add(
+                        "$L.findViewById($L).setOnClickListener(new $T.OnClickListener() {\n" +
+                                "      @Override\n" +
+                                "      public void onClick(View v) {\n" +
+                                "        $L.$L(v);\n" +
+                                "      }\n" +
+                                "    });\n",
+                        processor.getTargetName().toLowerCase(),
+                        id,
+                        MConstants.CLASSNAME_VIEW,
+                        processor.getTargetName().toLowerCase(),
+                        elementStr
+                );
+//                for (VariableElement variableElement : processor.getVariableElements()) {
+//                    BindView bindView = variableElement.getAnnotation(BindView.class);
+//                    if (bindView.value() == id) {
+//                    }
+//                }
+                builder.add("String qualifiedName = \"$L\";\n", element.getQualifiedName().toString());
+                builder.add("String simpleName = \"$L\";\n", element.getSimpleName().toString());
+            }
         }
         return builder.build();
     }

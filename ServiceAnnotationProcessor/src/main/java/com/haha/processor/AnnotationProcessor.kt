@@ -3,9 +3,7 @@ package com.haha.processor
 import com.google.auto.service.AutoService
 import com.haha.service.annotation.BindView
 import com.haha.service.annotation.OnClick
-import com.squareup.javapoet.MethodSpec
 import java.io.IOException
-import java.util.Locale
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Filer
 import javax.annotation.processing.Messager
@@ -80,17 +78,16 @@ class AnnotationProcessor : AbstractProcessor() {
         elements.forEach {
             if (it.kind == ElementKind.FIELD) {
                 if (it is VariableElement) {
-                    if (it.enclosingElement is TypeElement) {
-                        val typeElement = it.enclosingElement as TypeElement
-                        val packageElement = elementUtils!!.getPackageOf(typeElement)
-                        val key = packageElement.simpleName.toString() + typeElement.simpleName.toString()
-                        val processorBean = helper!!.getOrEmpty(key)
-                        processorBean.apply {
-                            element = it
-                            fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
-                            packageName = packageElement.qualifiedName.toString()
-                            targetName = typeElement.simpleName.toString()
-                        }
+                    val typeElement = it.enclosingElement as? TypeElement
+                    val packageElement = elementUtils!!.getPackageOf(typeElement)
+                    val key = packageElement.simpleName.toString() + typeElement?.simpleName.toString()
+                    val processorBean = helper!!.getOrEmpty(key)
+                    processorBean.apply {
+                        addVariableElement(it)
+                        setTypeElement(typeElement)
+                        fileName = typeElement?.simpleName.toString() + MConstants._VIEW_BINDING
+                        packageName = packageElement.qualifiedName.toString()
+                        targetName = typeElement?.simpleName.toString()
                     }
                 }
             } else if (it.kind == ElementKind.CLASS) {
@@ -100,7 +97,7 @@ class AnnotationProcessor : AbstractProcessor() {
                     val key = it.simpleName.toString()
                     val processorBean = helper!!.getOrEmpty(key)
                     processorBean.apply {
-                        element = it
+                        setTypeElement(it)
                         fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
                         packageName = packageElement.qualifiedName.toString()
                         targetName = typeElement.simpleName.toString()
@@ -119,15 +116,18 @@ class AnnotationProcessor : AbstractProcessor() {
         val elements = roundEnv.getElementsAnnotatedWith(OnClick::class.java)
         elements.forEach {
             if (it.kind == ElementKind.METHOD) {
-                val enclosingElement = it.enclosingElement
-                val packageElement = elementUtils?.getPackageOf(enclosingElement) ?: return@forEach
-                val key = packageElement.simpleName.toString() + enclosingElement.simpleName.toString()
-                val processorBean = helper?.getOrEmpty(key)
-                processorBean?.apply {
-                    element = it
-                    fileName = enclosingElement.simpleName.toString() + MConstants._VIEW_BINDING
-                    packageName = packageElement.qualifiedName.toString()
-                    targetName = enclosingElement.simpleName.toString()
+                if (it is ExecutableElement) {
+                    val typeElement: TypeElement? = it.enclosingElement as? TypeElement
+                    val packageElement = elementUtils?.getPackageOf(typeElement) ?: return@forEach
+                    val key = packageElement.simpleName.toString() + typeElement?.simpleName.toString()
+                    val processorBean = helper?.getOrEmpty(key)
+                    processorBean?.apply {
+                        addMethodElement(it)
+                        setTypeElement(typeElement)
+                        fileName = typeElement?.simpleName.toString() + MConstants._VIEW_BINDING
+                        packageName = packageElement.qualifiedName.toString()
+                        targetName = typeElement?.simpleName.toString()
+                    }
                 }
             }
         }

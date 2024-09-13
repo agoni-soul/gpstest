@@ -1,6 +1,4 @@
-package com.itbird.bindViewruntime;
-
-import android.app.Activity;
+package com.haha.serviceAnnotation.runtime;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,7 +7,7 @@ import java.lang.reflect.Method;
  * 反射调用APT+javapoet生成的类
  * Created by itbird on 2022/4/11
  */
-public class ItbirdBindView {
+public class BindViewUtils {
 
     public static void bind(Object activity) {
 

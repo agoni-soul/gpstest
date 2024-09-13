@@ -12,7 +12,6 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.Filer;
@@ -22,8 +21,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 
 public class ProcessorHelper {
 
@@ -56,35 +53,6 @@ public class ProcessorHelper {
             checkAndBuildClass(processor);
             checkAndBuildFile(processor);
             if (processor.getFile() != null) {
-                /*
-                try {
-                    JavaFile javaFile = processor.getFile();
-                    String fileName = javaFile.packageName.isEmpty()
-                            ? javaFile.typeSpec.name
-                            : javaFile.packageName + "." + javaFile.typeSpec.name;
-                    List<Element> originatingElements = javaFile.typeSpec.originatingElements;
-                    JavaFileObject filerSourceFile = null;
-                    try  {
-                        FileObject fileObject = filer.getResource(StandardLocation.locationFor(processor.getFileName()), processor.getPackageName(), processor.getTargetName());
-                        fileObject.delete();
-                        filerSourceFile = filer.createSourceFile(fileName,
-                                originatingElements.toArray(new Element[originatingElements.size()]));
-                        Writer writer = filerSourceFile.openWriter();
-                        javaFile.writeTo(writer);
-                    } catch (Exception e) {
-                        try {
-                            if (filerSourceFile != null) {
-                                filerSourceFile.delete();
-                            }
-                        } catch (Exception ignored) {
-                            ignored.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                 */
                 try {
                     processor.getFile().writeTo(filer);
                 } catch (IOException e) {
@@ -158,7 +126,7 @@ public class ProcessorHelper {
                 int annotationValue = bindView.value();
                 builder.add(
                         "if ($L > 0) {\n $L.setContentView( $L );\n}\n",
-                        processor.getTargetName().toLowerCase(), annotationValue, annotationValue
+                        annotationValue, processor.getTargetName().toLowerCase(), annotationValue
                 );
             }
         }
@@ -182,40 +150,6 @@ public class ProcessorHelper {
         }
     }
 
-    private String buildBindViewFieldJavaCode(ProcessorBean processor) {
-        StringBuilder sb = new StringBuilder();
-        if (processor == null || processor.getVariableElements().isEmpty()) return sb.toString();
-        TypeElement element = processor.getTypeElement();
-        if (element == null) return sb.toString();
-
-        for (VariableElement variableElement : processor.getVariableElements()) {
-            if (!ElementKind.FIELD.equals(variableElement.getKind())) continue;
-            BindView bindView = variableElement.getAnnotation(BindView.class);
-            if (bindView == null) continue;
-            TypeName viewType = ClassName.bestGuess(variableElement.asType().toString());
-            sb.append(processor.getTargetName().toLowerCase())
-                    .append(".")
-                    .append(variableElement.getSimpleName().toString())
-                    .append("=(")
-                    .append(viewType)
-                    .append(")")
-                    .append(processor.getTargetName().toLowerCase())
-                    .append(".findViewById(")
-                    .append(bindView.value())
-                    .append(");\n");
-//            sb.append(String.format(
-//                    "$L.$L=($T)$L.findViewById($L);\n",
-//                    processor.getTargetName().toLowerCase(),
-//                    variableElement.getSimpleName(),
-//                    viewType,
-//                    processor.getTargetName().toLowerCase(),
-//                    bindView.value()
-//            ));
-        }
-
-        return sb.toString();
-    }
-
     /**
      * activity.button.setOnClickListener(new android.view.View OnClickListener() {
      *       @Override
@@ -235,6 +169,11 @@ public class ProcessorHelper {
             OnClick onClick = element.getAnnotation(OnClick.class);
             if (onClick == null) continue;
             for (int id : onClick.value()) {
+//                for (VariableElement variableElement : processor.getVariableElements()) {
+//                    BindView bindView = variableElement.getAnnotation(BindView.class);
+//                    if (bindView.value() == id) {
+//                    }
+//                }
                 builder.add(
                         "$L.findViewById($L).setOnClickListener(new $T.OnClickListener() {\n" +
                                 "      @Override\n" +
@@ -248,11 +187,6 @@ public class ProcessorHelper {
                         processor.getTargetName().toLowerCase(),
                         element.getSimpleName()
                 );
-//                for (VariableElement variableElement : processor.getVariableElements()) {
-//                    BindView bindView = variableElement.getAnnotation(BindView.class);
-//                    if (bindView.value() == id) {
-//                    }
-//                }
             }
         }
     }

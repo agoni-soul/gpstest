@@ -114,7 +114,5 @@ dependencies {
     implementation project(':ServiceImpl')
     annotationProcessor project(':ServiceAnnotationProcessor')
     implementation project(':ServiceAnnotation')
-//    implementation project(path: ':BindviewAnnotation')
-//    implementation project(path: ':BindViewRuntime')
-//    annotationProcessor project(path: ':BindviewAnnotationProcessor')
+    implementation project(':ServiceAnnotationRuntime')
 }

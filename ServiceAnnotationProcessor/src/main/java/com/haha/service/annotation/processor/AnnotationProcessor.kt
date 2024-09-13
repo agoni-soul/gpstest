@@ -1,4 +1,4 @@
-package com.haha.processor
+package com.haha.service.annotation.processor
 
 import com.google.auto.service.AutoService
 import com.haha.service.annotation.BindView
@@ -85,7 +85,7 @@ class AnnotationProcessor : AbstractProcessor() {
                     processorBean.apply {
                         addVariableElement(it)
                         setTypeElement(typeElement)
-                        fileName = typeElement?.simpleName.toString() + MConstants._VIEW_BINDING
+                        fileName = typeElement?.simpleName.toString() + ConstantUtils._VIEW_BINDING
                         packageName = packageElement.qualifiedName.toString()
                         targetName = typeElement?.simpleName.toString()
                     }
@@ -98,7 +98,7 @@ class AnnotationProcessor : AbstractProcessor() {
                     val processorBean = helper!!.getOrEmpty(key)
                     processorBean.apply {
                         setTypeElement(it)
-                        fileName = typeElement.simpleName.toString() + MConstants._VIEW_BINDING
+                        fileName = typeElement.simpleName.toString() + ConstantUtils._VIEW_BINDING
                         packageName = packageElement.qualifiedName.toString()
                         targetName = typeElement.simpleName.toString()
                     }
@@ -124,7 +124,7 @@ class AnnotationProcessor : AbstractProcessor() {
                     processorBean?.apply {
                         addMethodElement(it)
                         setTypeElement(typeElement)
-                        fileName = typeElement?.simpleName.toString() + MConstants._VIEW_BINDING
+                        fileName = typeElement?.simpleName.toString() + ConstantUtils._VIEW_BINDING
                         packageName = packageElement.qualifiedName.toString()
                         targetName = typeElement?.simpleName.toString()
                     }

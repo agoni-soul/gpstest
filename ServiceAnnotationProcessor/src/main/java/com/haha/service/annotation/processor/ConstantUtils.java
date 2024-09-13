@@ -1,8 +1,8 @@
-package com.haha.processor;
+package com.haha.service.annotation.processor;
 
 import com.squareup.javapoet.ClassName;
 
-public class MConstants {
+public class ConstantUtils {
 
 
     public static ClassName CLASSNAME_LOG = ClassName.get("android.util", "Log");

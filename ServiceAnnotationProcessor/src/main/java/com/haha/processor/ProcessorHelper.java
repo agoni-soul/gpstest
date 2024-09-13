@@ -90,7 +90,7 @@ public class ProcessorHelper {
                         .returns(void.class)
                         .addParameter(processor.getParameter())
 //                        .addAnnotation(MConstants.CLASSNAME_UI_THREAD)
-//                        .addCode(buildJavaCode(processor))
+                        .addCode(buildJavaCode(processor))
                         .build();
         processor.setMethodSpec(methodSpec);
     }
@@ -111,7 +111,7 @@ public class ProcessorHelper {
 //        if (element == null) return builder.build();
 //        ElementKind kind = element.getKind();
 //        if (kind == null) return builder.build();
-//        builder.add(buildBindViewFieldJavaCode(processor));
+        builder.add(buildBindViewFieldJavaCode(processor));
         builder.add(buildOnClickMethodJavaCode(processor));
 
 //        switch (kind) {
@@ -145,12 +145,10 @@ public class ProcessorHelper {
             builder.add(
                     "$L.$L=$L.findViewById($L);\n",
                     processor.getTargetName().toLowerCase(),
-                    elementStr,
+                    variableElement.getSimpleName(),
                     processor.getTargetName().toLowerCase(),
                     bindView.value()
             );
-            builder.add("String qualifiedName = \"$L\";\n", element.getQualifiedName().toString());
-            builder.add("String simpleName = \"$L\";\n", element.getSimpleName().toString());
         }
         messager.printMessage(Diagnostic.Kind.ERROR, "buildBindViewFieldJavaCode: " + builder);
 
@@ -162,8 +160,9 @@ public class ProcessorHelper {
         if (processor == null || processor.getMethodElements().isEmpty()) return builder.build();
         TypeElement element = processor.getTypeElement();
         if (element == null) return builder.build();
-
-        String elementStr = element.getSimpleName().toString();
+;
+        builder.add("String qualifiedName = \"$L\";\n", element.getQualifiedName().toString());
+        builder.add("String simpleName = \"$L\";\n", element.getSimpleName().toString());
         for (ExecutableElement executableElement : processor.getMethodElements()) {
             if (!ElementKind.METHOD.equals(executableElement.getKind())) continue;
             OnClick onClick = executableElement.getAnnotation(OnClick.class);
@@ -180,15 +179,13 @@ public class ProcessorHelper {
                         id,
                         MConstants.CLASSNAME_VIEW,
                         processor.getTargetName().toLowerCase(),
-                        elementStr
+                        executableElement.getSimpleName()
                 );
 //                for (VariableElement variableElement : processor.getVariableElements()) {
 //                    BindView bindView = variableElement.getAnnotation(BindView.class);
 //                    if (bindView.value() == id) {
 //                    }
 //                }
-                builder.add("String qualifiedName = \"$L\";\n", element.getQualifiedName().toString());
-                builder.add("String simpleName = \"$L\";\n", element.getSimpleName().toString());
             }
         }
         return builder.build();

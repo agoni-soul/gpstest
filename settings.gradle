@@ -14,11 +14,12 @@
 //}
 rootProject.name = "GPSTest"
 include ':app'
-include ':blesdk'
+include ':BluetoothSdk'
 //include ':starrysky'
-include ':ServiceProcessor'
-include ':BaseAnnotation'
+include ':ServiceAnnotationProcessor'
+include ':ServiceAnnotation'
+include ':ServiceApi'
 include ':ServiceImpl'
-include ':BindviewAnnotation'
-include ':BindviewAnnotationProcessor'
-include ':BindViewRuntime'
+//include ':BindviewAnnotation'
+//include ':BindviewAnnotationProcessor'
+//include ':BindViewRuntime'

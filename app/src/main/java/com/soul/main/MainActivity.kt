@@ -12,7 +12,6 @@ import android.graphics.Color
 import android.net.*
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -32,13 +31,10 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
-import com.blankj.utilcode.util.GsonUtils
-import com.haha.api.IUserService
-import com.haha.api.Service
+import com.haha.service.api.IUserService
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
-import com.soul.bean.SubDeviceResultBean
 import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity

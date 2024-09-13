@@ -109,11 +109,12 @@ dependencies {
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
 //    implementation project(':starrysky')
-    implementation project(':blesdk')
+    implementation project(':BluetoothSdk')
+    implementation project(':ServiceApi')
     implementation project(':ServiceImpl')
-    annotationProcessor project(':ServiceProcessor')
-    implementation project(':BaseAnnotation')
-    implementation project(path: ':BindviewAnnotation')
-    implementation project(path: ':BindViewRuntime')
-    annotationProcessor project(path: ':BindviewAnnotationProcessor')
+    annotationProcessor project(':ServiceAnnotationProcessor')
+    implementation project(':ServiceAnnotation')
+//    implementation project(path: ':BindviewAnnotation')
+//    implementation project(path: ':BindViewRuntime')
+//    annotationProcessor project(path: ':BindviewAnnotationProcessor')
 }

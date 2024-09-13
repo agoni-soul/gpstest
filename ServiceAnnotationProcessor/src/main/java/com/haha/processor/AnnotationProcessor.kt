@@ -94,7 +94,7 @@ class AnnotationProcessor : AbstractProcessor() {
                 if (it is TypeElement) {
                     val typeElement = it
                     val packageElement = elementUtils!!.getPackageOf(typeElement)
-                    val key = it.simpleName.toString()
+                    val key = packageElement.simpleName.toString() + it.simpleName.toString()
                     val processorBean = helper!!.getOrEmpty(key)
                     processorBean.apply {
                         setTypeElement(it)

@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/BluetoothSdk" />
             <option value="$PROJECT_DIR$/ServiceAnnotation" />
             <option value="$PROJECT_DIR$/ServiceAnnotationProcessor" />
+            <option value="$PROJECT_DIR$/ServiceAnnotationRuntime" />
             <option value="$PROJECT_DIR$/ServiceApi" />
             <option value="$PROJECT_DIR$/ServiceImpl" />
             <option value="$PROJECT_DIR$/app" />

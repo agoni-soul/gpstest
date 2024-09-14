@@ -1,4 +1,4 @@
-package com.haha.service.annotation.processor;
+package com.haha.service.annotation.processor.processor;
 
 import com.haha.service.annotation.BindView;
 import com.haha.service.annotation.OnClick;

@@ -1,6 +1,6 @@
 package com.haha.service.annotation.runtime;
 
-import com.haha.service.annotation.processor.ConstantUtils;
+import com.haha.service.annotation.processor.processor.ConstantUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

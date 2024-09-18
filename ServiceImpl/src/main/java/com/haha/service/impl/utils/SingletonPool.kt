@@ -1,5 +1,6 @@
 package com.haha.service.impl.utils
 
+import com.haha.service.impl.service.DefaultFactory
 import com.haha.service.impl.service.IFactory
 
 /**
@@ -11,7 +12,7 @@ import com.haha.service.impl.service.IFactory
  *
  */
 object SingletonPool {
-    private val CACHE: MutableMap<Class<*>, Any?> = HashMap()
+    private val CACHE: MutableMap<Class<*>, out Any?> = HashMap()
 
     @Throws(Exception::class)
     fun <I, T : I?> get(clazz: Class<I>?, factory: IFactory?): T? {
@@ -20,10 +21,24 @@ object SingletonPool {
             return null
         }
         if (factory == null) {
-            factory = RouterComponents.getDefaultFactory()
+            factory = DefaultFactory.INSTANCE
         }
-        val instance = getInstance(clazz, factory)
-        return instance as T
+
+        var t = CACHE[clazz]
+        if ( t is I) {
+            return t as? T
+        } else {
+            synchronized(CACHE) {
+                t = CACHE[clazz]
+                if (t == null) {
+                    t = factory?.create(clazz)
+                    if (t != null) {
+                        CACHE[clazz] = t
+                    }
+                }
+            }
+            return t
+        }
     }
 
     @Throws(Exception::class)

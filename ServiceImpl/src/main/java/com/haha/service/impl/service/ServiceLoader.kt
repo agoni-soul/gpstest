@@ -1,6 +1,5 @@
 package com.haha.service.impl.service
 
-import android.util.Log
 import com.haha.service.annotation.processor.processor.ConstantUtils
 import com.haha.service.impl.ServiceImpl
 import com.haha.service.impl.utils.SingletonPool
@@ -24,7 +23,6 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
         fun lazyInit() {
             synchronized(this) {
                 if (!mIsHasInit) {
-
                     try {
                         // 反射调用Init类，避免引用的类过多，导致main dex capacity exceeded问题
                         Class.forName(ConstantUtils.SERVICE_LOADER_INIT)
@@ -56,18 +54,18 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
         /**
          * 根据接口获取 [ServiceLoader]
          */
-        fun <T> load(interfaceClass: Class<T>?): ServiceLoader<T>? {
+        fun <T> load(interfaceClass: Class<T>?): ServiceLoader<*>? {
             lazyInit()
             if (interfaceClass == null) {
                 NullPointerException("ServiceLoader.load的class参数不应为空")
                 return EmptyServiceLoader.INSTANCE
             }
-            var service: ServiceLoader<T>? = SERVICES[interfaceClass] as? ServiceLoader<T>
+            var service: ServiceLoader<*>? = SERVICES[interfaceClass]
             if (service == null) {
                 synchronized(SERVICES) {
-                    service = SERVICES[interfaceClass] as? ServiceLoader<T>
+                    service = SERVICES[interfaceClass]
                     if (service == null) {
-                        service = ServiceLoader(interfaceClass)
+                        service = ServiceLoader<Any>(interfaceClass)
                         SERVICES[interfaceClass] = service!!
                     }
                 }
@@ -81,10 +79,10 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
     private var mInterfaceName: String = ""
 
     init {
-        if (interfaceClass == null) {
-            mInterfaceName = ""
+        mInterfaceName = if (interfaceClass == null) {
+            ""
         } else {
-            mInterfaceName = interfaceClass.name
+            interfaceClass.name
         }
     }
 
@@ -118,7 +116,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
      * @return 可能返回EmptyList，List中的元素不为空
      */
     fun <T : I?> getAll(): List<T> {
-        return getAll<T>(null as IFactory?)
+        return getAll(null as IFactory?)
     }
 
     /**
@@ -146,8 +144,8 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
      *
      * @return 可能返回null
      */
-    fun <T : I?> getClass(key: String?): Class<T>? {
-        return mMap[key]?.implementationClazz as? Class<T>
+    fun <T : I?> getClass(key: String?): Class<*>? {
+        return mMap[key]?.implementationClazz
     }
 
     /**
@@ -155,10 +153,10 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
      *
      * @return 可能返回EmptyList，List中的元素不为空
      */
-    fun <T : I?> getAllClasses(): List<Class<T>> {
+    fun <T : I?> getAllClasses(): List<Class<*>> {
         val list: MutableList<Class<T>> = ArrayList(mMap.size)
         for (impl in mMap.values) {
-            val clazz = impl.implementationClazz as Class<T>?
+            val clazz = impl.implementationClazz as? Class<T>
             if (clazz != null) {
                 list.add(clazz)
             }
@@ -166,12 +164,12 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
         return list
     }
 
-    private fun <T : I?> createInstance(impl: ServiceImpl?, factory: IFactory?): T? {
-        var factory: IFactory? = factory
+    private fun <T : I?> createInstance(impl: ServiceImpl?, iFactory: IFactory?): T? {
+        var factory: IFactory? = iFactory
         if (impl == null) {
             return null
         }
-        val clazz = impl.implementationClazz as Class<T>
+        val clazz = impl.implementationClazz as Class<*>
         if (impl.isSingleton) {
             try {
                 return SingletonPool.get(clazz, factory)
@@ -183,8 +181,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
                 if (factory == null) {
                     factory = DefaultFactory()
                 }
-                val t: T = factory.create(clazz)
-//                Log.i("[ServiceLoader] create instance: %s, result = %s", clazz, t)
+                val t: T = factory.create(clazz) as T
                 return t
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
@@ -197,18 +194,14 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
         return "ServiceLoader ($mInterfaceName)"
     }
 
-    class EmptyServiceLoader : ServiceLoader<Any>(null) {
-        val allClasses: List<Class<*>>
+    class EmptyServiceLoader<I> : ServiceLoader<I>(null) {
+        val allClasses: List<Class<I>>
             get() = emptyList()
 
-        val all: List<*>
-            get() = emptyList<Any>()
+        val all: List<I>
+            get() = emptyList()
 
-//        override fun getAll(factory: IFactory?): MutableList<Any> {
-//            return emptyList<Any>()
-//        }
-
-        override fun <Any> getAll(factory: IFactory?): List<Any> {
+        override fun <T : I?> getAll(factory: IFactory?): List<T> {
             return emptyList()
         }
 
@@ -217,7 +210,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
         }
 
         companion object {
-            val INSTANCE: ServiceLoader<Any> = EmptyServiceLoader()
+            val INSTANCE: ServiceLoader<out Any> = EmptyServiceLoader()
         }
     }
 }

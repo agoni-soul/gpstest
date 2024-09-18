@@ -1,10 +1,6 @@
 package com.haha.service.impl.service;
 
 
-import androidx.annotation.NonNull;
-
-import com.midea.base.core.serviceloader.api.utils.ProviderPool;
-
 /**
  * 默认的Factory，先尝试Provider，再尝试无参数构造
  * <p>
@@ -24,11 +20,11 @@ public class DefaultFactory implements IFactory {
         if (clazz == null) {
             throw new Exception("clazz is null");
         }
-        T t = ProviderPool.create(clazz);
-        if (t != null) {
-            return t;
-        } else {
+//        T t = ProviderPool.create(clazz);
+//        if (t != null) {
+//            return t;
+//        } else {
             return clazz.newInstance();
-        }
+//        }
     }
 }

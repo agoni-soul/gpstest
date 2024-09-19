@@ -23,26 +23,12 @@ object SingletonPool {
         if (factory == null) {
             factory = DefaultFactory.INSTANCE
         }
-
-        var t = CACHE[clazz] as? T
-        if ( t != null) {
-            return t
-        } else {
-            synchronized(CACHE) {
-                t = CACHE[clazz] as? T
-                if (t == null) {
-                    t = factory?.create(clazz) as? T
-                    if (t != null) {
-                        CACHE[clazz] = t!!
-                    }
-                }
-            }
-            return t
-        }
+        val instance = getInstance(clazz, factory)
+        return instance as? T
     }
 
     @Throws(Exception::class)
-    private fun getInstance(clazz: Class<*>, factory: IFactory): Any {
+    private fun getInstance(clazz: Class<*>, factory: IFactory?): Any {
         var t = CACHE[clazz]
         if (t != null) {
             return t
@@ -50,7 +36,7 @@ object SingletonPool {
             synchronized(CACHE) {
                 t = CACHE[clazz]
                 if (t == null) {
-                    t = factory.create(clazz)
+                    t = factory?.create(clazz)
                     if (t != null) {
                         CACHE[clazz] = t!!
                     }

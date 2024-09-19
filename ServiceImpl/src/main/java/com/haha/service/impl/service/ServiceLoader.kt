@@ -61,17 +61,17 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
                 NullPointerException("ServiceLoader.load的class参数不应为空")
                 return EmptyServiceLoader.INSTANCE as? ServiceLoader<T>
             }
-            var service = SERVICES[interfaceClass] as? ServiceLoader<T>
+            var service = SERVICES[interfaceClass]
             if (service == null) {
                 synchronized(SERVICES) {
-                    service = SERVICES[interfaceClass] as? ServiceLoader<T>
+                    service = SERVICES[interfaceClass]
                     if (service == null) {
                         service = ServiceLoader<T>(interfaceClass)
                         SERVICES[interfaceClass] = service!!
                     }
                 }
             }
-            return service
+            return service as? ServiceLoader<T>
         }
     }
 
@@ -166,11 +166,9 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
     }
 
     private fun <T : I?> createInstance(impl: ServiceImpl?, iFactory: IFactory?): T? {
+        impl ?: return null
         var factory: IFactory? = iFactory
-        if (impl == null) {
-            return null
-        }
-        val clazz = impl.implementationClazz as Class<*>
+        val clazz = impl.implementationClazz as? Class<T>
         if (impl.isSingleton) {
             try {
                 return SingletonPool.get(clazz, factory)
@@ -182,7 +180,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
                 if (factory == null) {
                     factory = DefaultFactory()
                 }
-                val t: T = factory.create(clazz) as T
+                val t: T? = factory.create(clazz)
                 return t
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()

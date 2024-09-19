@@ -10,5 +10,5 @@ package com.haha.service.impl.service
  */
 interface IFactory {
     @Throws(Exception::class)
-    fun <T> create(clazz: Class<T>): T
+    fun <T> create(clazz: Class<T>?): T?
 }

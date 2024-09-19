@@ -9,7 +9,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
+import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.provider.Settings
@@ -27,12 +32,13 @@ import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
-import android.widget.*
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.haha.service.api.IUserService
-import com.haha.service.impl.impl.UserService
+import com.haha.service.impl.service.ServiceLoader
+import com.haha.service.loader.ServiceLoaderHelper
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
@@ -59,7 +65,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
-import java.util.ServiceLoader
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -244,13 +249,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
-        val loaders = ServiceLoader.load(IUserService::class.java)
-        var i = 0
-        for (service in loaders) {
-            i++
-            service.start()
-        }
-        Log.d(TAG, "i = $i")
+        val iUserService = ServiceLoaderHelper.getService(IUserService::class.java)
+        Log.d(TAG, "iUserService == null: ${iUserService == null}, username = ${iUserService?.getUserName().toString()}")
+        iUserService?.start()
     }
 
     override fun getStatusBarColor(): Int {

@@ -206,7 +206,7 @@ abstract class BaseProcessor: AbstractProcessor() {
             interfaceName ?: return this
             implementName ?: return this
             builder.addStatement(
-                "\$T.put(\$T.class, \$S, \$T.class, \$L)",
+                "\$T.Companion.put(\$T.class, \$S, \$T.class, \$L)",
                 serviceLoaderClass,
                 className(interfaceName),
                 key,
@@ -227,7 +227,7 @@ abstract class BaseProcessor: AbstractProcessor() {
             implementName ?: return this
             // implementName是注解生成的类，直接用$L拼接原始字符串
             builder.addStatement(
-                "\$T.put(\$T.class, \$S, \$L.class, \$L)",
+                "\$T.Companion.put(\$T.class, \$S, \$L.class, \$L)",
                 serviceLoaderClass,
                 className(interfaceName),
                 key,

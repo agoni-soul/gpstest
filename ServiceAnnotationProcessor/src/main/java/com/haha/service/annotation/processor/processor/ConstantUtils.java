@@ -15,7 +15,7 @@ public class ConstantUtils {
 
     public static String _VIEW_BINDING = "_ViewBinding";
 
-    private static final String PKG = "com.haha.service.annotation.processor.processor.";
+    private static final String PKG = "com.haha.service.impl.";
 
     public static final String NAME = "BASE_ANNOTATION";
 

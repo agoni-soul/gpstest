@@ -19,7 +19,4 @@ dependencies {
     implementation 'com.google.auto.service:auto-service:1.1.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
     implementation project(':ServiceAnnotation')
-//    implementation 'com.google.guava:guava:32.0.1-jre'
-//    implementation 'com.github.bumptech.glide:compiler:4.3.1'
-
 }

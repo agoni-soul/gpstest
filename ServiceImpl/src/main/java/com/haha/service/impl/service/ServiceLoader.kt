@@ -3,6 +3,7 @@ package com.haha.service.impl.service
 import com.haha.service.annotation.processor.processor.ConstantUtils
 import com.haha.service.impl.ServiceImpl
 import com.haha.service.impl.utils.SingletonPool
+import com.haha.service.annotation.IServiceLoader
 
 /**
  *
@@ -43,7 +44,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
          * @param implementClass 实现类
          */
         fun put(interfaceClass: Class<*>, key: String, implementClass: Class<*>, singleton: Boolean) {
-            var loader = SERVICES[interfaceClass]
+            var loader: ServiceLoader<*>? = SERVICES[interfaceClass]
             if (loader == null) {
                 loader = ServiceLoader<Any>(interfaceClass)
                 SERVICES[interfaceClass] = loader
@@ -54,23 +55,23 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
         /**
          * 根据接口获取 [ServiceLoader]
          */
-        fun <T> load(interfaceClass: Class<T>?): ServiceLoader<*>? {
+        fun <T> load(interfaceClass: Class<T>?): ServiceLoader<T>? {
             lazyInit()
             if (interfaceClass == null) {
                 NullPointerException("ServiceLoader.load的class参数不应为空")
-                return EmptyServiceLoader.INSTANCE
+                return EmptyServiceLoader.INSTANCE as? ServiceLoader<T>
             }
-            var service: ServiceLoader<*>? = SERVICES[interfaceClass]
+            var service = SERVICES[interfaceClass]
             if (service == null) {
                 synchronized(SERVICES) {
                     service = SERVICES[interfaceClass]
                     if (service == null) {
-                        service = ServiceLoader<Any>(interfaceClass)
+                        service = ServiceLoader<T>(interfaceClass)
                         SERVICES[interfaceClass] = service!!
                     }
                 }
             }
-            return service
+            return service as? ServiceLoader<T>
         }
     }
 
@@ -111,7 +112,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
     }
 
     /**
-     * 创建所有实现类的实例，使用 [IServiceProvider] 方法或无参数构造。对于声明了singleton的实现类，不会重复创建实例。
+     * 创建所有实现类的实例，使用 [IServiceLoader] 方法或无参数构造。对于声明了singleton的实现类，不会重复创建实例。
      *
      * @return 可能返回EmptyList，List中的元素不为空
      */
@@ -153,7 +154,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
      *
      * @return 可能返回EmptyList，List中的元素不为空
      */
-    fun <T : I?> getAllClasses(): List<Class<*>> {
+    open fun <T : I?> getAllClasses(): List<Class<*>> {
         val list: MutableList<Class<T>> = ArrayList(mMap.size)
         for (impl in mMap.values) {
             val clazz = impl.implementationClazz as? Class<T>
@@ -165,11 +166,9 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
     }
 
     private fun <T : I?> createInstance(impl: ServiceImpl?, iFactory: IFactory?): T? {
+        impl ?: return null
         var factory: IFactory? = iFactory
-        if (impl == null) {
-            return null
-        }
-        val clazz = impl.implementationClazz as Class<*>
+        val clazz = impl.implementationClazz as? Class<T>
         if (impl.isSingleton) {
             try {
                 return SingletonPool.get(clazz, factory)
@@ -181,7 +180,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
                 if (factory == null) {
                     factory = DefaultFactory()
                 }
-                val t: T = factory.create(clazz) as T
+                val t: T? = factory.create(clazz)
                 return t
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
@@ -195,14 +194,18 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
     }
 
     class EmptyServiceLoader<I> : ServiceLoader<I>(null) {
-        val allClasses: List<Class<I>>
+        private val mAllClasses: List<Class<I>>
             get() = emptyList()
 
-        val all: List<I>
+        private val mAll: List<I>
             get() = emptyList()
 
         override fun <T : I?> getAll(factory: IFactory?): List<T> {
             return emptyList()
+        }
+
+        override fun <T : I?> getAllClasses(): List<Class<*>> {
+            return mAllClasses
         }
 
         override fun toString(): String {

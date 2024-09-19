@@ -19,7 +19,7 @@ class ServiceLoaderHelper {
             if (service != null) {
                 return service
             } else {
-                val services: List<I>? = getAllServices<I, I>(clazz)
+                val services: List<I>? = getAllServices(clazz)
                 if (services?.size == 1) {
                     return services[0]
                 } else if ((services?.size ?: 0) > 1) {

@@ -12,7 +12,7 @@ import com.haha.service.impl.service.IFactory
  *
  */
 object SingletonPool {
-    private val CACHE: MutableMap<Class<*>, out Any?> = HashMap()
+    private val CACHE: MutableMap<Class<*>, Any> = HashMap()
 
     @Throws(Exception::class)
     fun <I, T : I?> get(clazz: Class<I>?, factory: IFactory?): T? {
@@ -23,26 +23,12 @@ object SingletonPool {
         if (factory == null) {
             factory = DefaultFactory.INSTANCE
         }
-
-        var t = CACHE[clazz]
-        if ( t is I) {
-            return t as? T
-        } else {
-            synchronized(CACHE) {
-                t = CACHE[clazz]
-                if (t == null) {
-                    t = factory?.create(clazz)
-                    if (t != null) {
-                        CACHE[clazz] = t
-                    }
-                }
-            }
-            return t
-        }
+        val instance = getInstance(clazz, factory)
+        return instance as? T
     }
 
     @Throws(Exception::class)
-    private fun getInstance(clazz: Class<*>, factory: IFactory): Any {
+    private fun getInstance(clazz: Class<*>, factory: IFactory?): Any {
         var t = CACHE[clazz]
         if (t != null) {
             return t
@@ -50,9 +36,9 @@ object SingletonPool {
             synchronized(CACHE) {
                 t = CACHE[clazz]
                 if (t == null) {
-                    t = factory.create(clazz)
+                    t = factory?.create(clazz)
                     if (t != null) {
-                        CACHE[clazz] = t
+                        CACHE[clazz] = t!!
                     }
                 }
             }

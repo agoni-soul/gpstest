@@ -3,10 +3,10 @@ package com.haha.service.annotation.processor.processor
 import com.google.auto.service.AutoService
 import com.haha.service.annotation.IServiceLoader
 import com.haha.service.impl.ServiceImpl
-import com.sun.tools.javac.code.Symbol
 import java.util.Collections
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
+import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.MirroredTypesException
 import javax.lang.model.type.TypeMirror
@@ -66,17 +66,17 @@ class ServiceAnnotationProcessor: BaseProcessor() {
     private fun processAnnotations(roundEnv: RoundEnvironment?) {
         roundEnv ?: return
         for (element in roundEnv.getElementsAnnotatedWith(IServiceLoader::class.java)) {
-            if (element !is Symbol.ClassSymbol) {
+            if (element.kind != ElementKind.CLASS || element !is TypeElement) {
                 continue
             }
             if (mHash == null) {
-                mHash = hash(element.className())
+                mHash = hash(element.qualifiedName.toString())
             }
             val service = element.getAnnotation(IServiceLoader::class.java) ?: continue
             val typeMirrors = getInterface(service)
             val keys = service.key
 
-            val implementationName = element.className()
+            val implementationName = element.qualifiedName.toString()
             val singleton = service.singleton
             val defaultImpl = service.defaultImpl
 
@@ -85,7 +85,7 @@ class ServiceAnnotationProcessor: BaseProcessor() {
                     mirror ?: continue
                     if (!isConcreteSubType(element, mirror)) {
                         val msg =
-                            "${element.className()}没有实现注解${IServiceLoader::class.java.name}标注的接口$mirror"
+                            "${element.qualifiedName}没有实现注解${IServiceLoader::class.java.name}标注的接口$mirror"
                         throw RuntimeException(msg)
                     }
                     val interfaceName = getClassName(mirror)

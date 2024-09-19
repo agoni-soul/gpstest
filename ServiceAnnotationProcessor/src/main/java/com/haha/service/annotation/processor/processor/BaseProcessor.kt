@@ -6,8 +6,6 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
-import com.sun.tools.javac.code.Symbol
-import com.sun.tools.javac.code.Type
 import java.io.IOException
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -150,10 +148,10 @@ abstract class BaseProcessor: AbstractProcessor() {
     /**
      * 创建Handler。格式：`"com.demo.TestActivity"` 或 `new TestHandler()`
      */
-    fun buildHandler(isActivity: Boolean, cls: Symbol.ClassSymbol): CodeBlock {
+    fun buildHandler(isActivity: Boolean, cls: TypeElement): CodeBlock {
         val b = CodeBlock.builder()
         if (isActivity) {
-            b.add("\$S", cls.className())
+            b.add("\$S", cls.qualifiedName.toString())
         } else {
             b.add("new \$T()", cls)
         }
@@ -167,10 +165,10 @@ abstract class BaseProcessor: AbstractProcessor() {
         val b = CodeBlock.builder()
         if (!interceptors.isNullOrEmpty()) {
             for (type in interceptors) {
-                if (type is Type.ClassType) {
-                    val e = type.asElement()
-                    if (e is Symbol.ClassSymbol && isInterceptor(e)) {
-                        b.add(", new \$T()", e)
+                if (type is TypeElement) {
+                    val e = type
+                    if (isInterceptor(e)) {
+                        b.add(", new \$T()", ClassName.bestGuess(e.asType().toString()))
                     }
                 }
             }
@@ -196,11 +194,7 @@ abstract class BaseProcessor: AbstractProcessor() {
      */
     inner class ServiceInitClassBuilder(private val className: String) {
         private val builder: CodeBlock.Builder = CodeBlock.builder()
-        private val serviceLoaderClass: ClassName
-
-        init {
-            this.serviceLoaderClass = className(ConstantUtils.SERVICE_LOADER_CLASS)!!
-        }
+        private val serviceLoaderClass: ClassName? = className(ConstantUtils.SERVICE_LOADER_CLASS)
 
         fun put(
             interfaceName: String?,
@@ -208,10 +202,11 @@ abstract class BaseProcessor: AbstractProcessor() {
             implementName: String?,
             singleton: Boolean
         ): ServiceInitClassBuilder {
+            serviceLoaderClass ?: return this
             interfaceName ?: return this
             implementName ?: return this
             builder.addStatement(
-                "\$T.put(\$T.class, \$S, \$T.class, \$L)",
+                "\$T.Companion.put(\$T.class, \$S, \$T.class, \$L)",
                 serviceLoaderClass,
                 className(interfaceName),
                 key,
@@ -227,11 +222,12 @@ abstract class BaseProcessor: AbstractProcessor() {
             implementName: String?,
             singleton: Boolean
         ): ServiceInitClassBuilder {
+            serviceLoaderClass ?: return this
             interfaceName ?: return this
             implementName ?: return this
             // implementName是注解生成的类，直接用$L拼接原始字符串
             builder.addStatement(
-                "\$T.put(\$T.class, \$S, \$L.class, \$L)",
+                "\$T.Companion.put(\$T.class, \$S, \$L.class, \$L)",
                 serviceLoaderClass,
                 className(interfaceName),
                 key,

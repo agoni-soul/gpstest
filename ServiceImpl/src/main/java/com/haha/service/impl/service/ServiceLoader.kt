@@ -1,5 +1,6 @@
 package com.haha.service.impl.service
 
+import android.util.Log
 import com.haha.service.annotation.processor.processor.ConstantUtils
 import com.haha.service.impl.ServiceImpl
 import com.haha.service.impl.utils.SingletonPool
@@ -15,18 +16,21 @@ import com.haha.service.annotation.IServiceLoader
  */
 open class ServiceLoader<I>(interfaceClass: Class<*>?) {
     companion object {
+        private val TAG = "ServiceLoader"
+
         private var mIsHasInit: Boolean = false
 
-        private val SERVICES: MutableMap<Class<*>, ServiceLoader<*>> by lazy {
+        val SERVICES: MutableMap<Class<*>, ServiceLoader<*>> by lazy {
             HashMap()
         }
 
         fun lazyInit() {
             synchronized(this) {
+                Log.d(TAG, "lazyInit, mIsHasInit = $mIsHasInit")
                 if (!mIsHasInit) {
                     try {
                         // 反射调用Init类，避免引用的类过多，导致main dex capacity exceeded问题
-                        Class.forName(ConstantUtils.SERVICE_LOADER_INIT)
+                        Class.forName("${ConstantUtils.GEN_PKG_SERVICE}${ConstantUtils.DOT}ServiceInit${ConstantUtils.SPLITTER}")
                             .getMethod(ConstantUtils.INIT_METHOD)
                             .invoke(null)
                     } catch (e: Exception) {
@@ -49,6 +53,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
                 loader = ServiceLoader<Any>(interfaceClass)
                 SERVICES[interfaceClass] = loader
             }
+            Log.d(TAG, "interfaceClass = ${interfaceClass.name}\n key = ${key}\n implementClass = ${implementClass.name}")
             loader.putImpl(key, implementClass, singleton)
         }
 
@@ -99,6 +104,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
      * @return 可能返回null
      */
     fun <T : I?> get(key: String?): T? {
+        Log.d(TAG, "get: key = ${key}, value = ${mMap[key]}")
         return createInstance<T>(mMap[key], null)
     }
 
@@ -127,6 +133,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
      */
     open fun <T : I?> getAll(factory: IFactory?): List<T> {
         val services: Collection<ServiceImpl> = mMap.values
+        Log.d(TAG, "getAll: services.size = ${services.size}")
         if (services.isEmpty()) {
             return emptyList()
         }

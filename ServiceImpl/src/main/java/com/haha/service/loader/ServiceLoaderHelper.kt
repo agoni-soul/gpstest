@@ -1,5 +1,6 @@
 package com.haha.service.loader
 
+import android.util.Log
 import com.haha.service.impl.ServiceImpl
 import com.haha.service.impl.service.ServiceLoader
 
@@ -14,8 +15,10 @@ import com.haha.service.impl.service.ServiceLoader
 class ServiceLoaderHelper {
 
     companion object {
+        private val TAG = "ServiceLoaderHelper"
         fun <I, T: I?> getService(clazz: Class<I>?): I? {
             val service: I? = ServiceLoader.load(clazz)?.get(ServiceImpl.DEFAULT_IMPL_KEY) as? I
+            Log.d(TAG, "service = $service")
             if (service != null) {
                 return service
             } else {

@@ -54,7 +54,7 @@ class ServiceAnnotationProcessor: BaseProcessor() {
         if (mEntityMap.isEmpty() || mHash == null) {
             return
         }
-        val generator = ServiceInitClassBuilder("ServiceInit${ConstantUtils.SPLITTER}$mHash")
+        val generator = ServiceInitClassBuilder("ServiceInit${ConstantUtils.SPLITTER}")//$mHash
         for (entry in mEntityMap.entries) {
             for (service in entry.value.map.values) {
                 generator.put(entry.key, service.key, service.implementation, service.isSingleton)

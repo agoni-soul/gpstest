@@ -37,6 +37,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import com.haha.service.api.IUserService
+import com.haha.service.impl.impl.UserService
 import com.haha.service.impl.service.ServiceLoader
 import com.haha.service.loader.ServiceLoaderHelper
 import com.soul.animation.AnimationActivity
@@ -249,9 +250,24 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding?.tvSpan?.text = builder
         mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
+
+        test()
+    }
+
+    private fun test() {
         val iUserService = ServiceLoaderHelper.getService(IUserService::class.java)
         Log.d(TAG, "iUserService == null: ${iUserService == null}, username = ${iUserService?.getUserName().toString()}")
         iUserService?.start()
+
+        val service = ServiceLoader.load(IUserService::class.java)
+        Log.d(TAG, "service == null: ${service == null}")
+        val serviceLoader = service?.getAll<IUserService>()
+        Log.d(TAG, "serviceLoader.size = ${serviceLoader?.size}")
+        serviceLoader?.forEach {
+            Log.d(TAG, "serviceLoader = $it")
+            Log.d(TAG, "username = ${it.getUserName()}")
+            Log.d(TAG, "start = ${it.start()}")
+        }
     }
 
     override fun getStatusBarColor(): Int {

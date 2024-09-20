@@ -4,7 +4,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationProvider
 import android.os.Bundle
-import com.soul.gpstest.GPSProviderStatus
 
 
 /**
@@ -21,9 +20,12 @@ class GPSLocation(private val mGpsLocationListener: GPSLocationListener) : Locat
     override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
         mGpsLocationListener.updateStatus(provider, status, extras)
         when (status) {
-            LocationProvider.AVAILABLE -> mGpsLocationListener.updateGPSProviderStatus(GPSProviderStatus.GPS_AVAILABLE)
-            LocationProvider.OUT_OF_SERVICE -> mGpsLocationListener.updateGPSProviderStatus(GPSProviderStatus.GPS_OUT_OF_SERVICE)
-            LocationProvider.TEMPORARILY_UNAVAILABLE -> mGpsLocationListener.updateGPSProviderStatus(GPSProviderStatus.GPS_TEMPORARILY_UNAVAILABLE)
+            LocationProvider.AVAILABLE -> mGpsLocationListener.updateGPSProviderStatus(
+                GPSProviderStatus.GPS_AVAILABLE)
+            LocationProvider.OUT_OF_SERVICE -> mGpsLocationListener.updateGPSProviderStatus(
+                GPSProviderStatus.GPS_OUT_OF_SERVICE)
+            LocationProvider.TEMPORARILY_UNAVAILABLE -> mGpsLocationListener.updateGPSProviderStatus(
+                GPSProviderStatus.GPS_TEMPORARILY_UNAVAILABLE)
         }
     }
 

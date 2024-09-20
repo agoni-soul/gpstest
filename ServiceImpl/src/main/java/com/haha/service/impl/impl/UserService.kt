@@ -1,7 +1,8 @@
-package com.haha.service.impl
+package com.haha.service.impl.impl
 
 import android.util.Log
 import com.google.auto.service.AutoService
+import com.haha.service.annotation.IServiceLoader
 import com.haha.service.api.IUserService
 
 
@@ -13,7 +14,8 @@ import com.haha.service.api.IUserService
  * @version: 1.0
  *
  */
-@AutoService(IUserService::class)
+//@AutoService(IUserService::class)
+@IServiceLoader(interfaces = [IUserService::class], singleton = true, defaultImpl = true)
 class UserService: IUserService {
     private val TAG = "Service"
     override fun getUserName(): String {

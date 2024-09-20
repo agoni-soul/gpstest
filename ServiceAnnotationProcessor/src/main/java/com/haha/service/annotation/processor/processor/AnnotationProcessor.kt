@@ -1,12 +1,10 @@
-package com.haha.service.annotation.processor
+package com.haha.service.annotation.processor.processor
 
 import com.google.auto.service.AutoService
 import com.haha.service.annotation.BindView
 import com.haha.service.annotation.OnClick
 import java.io.IOException
 import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Filer
-import javax.annotation.processing.Messager
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -15,7 +13,6 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
-import javax.lang.model.util.Elements
 
 /**
  *
@@ -27,24 +24,14 @@ import javax.lang.model.util.Elements
  */
 //自动生成META-INF/services/javax.annotation.processing.Processor文件，使javac可以发现当前自定义注解处理器
 @AutoService(Processor::class)
-class AnnotationProcessor : AbstractProcessor() {
-    private val TAG = javaClass.simpleName
+class AnnotationProcessor : BaseProcessor() {
 
-    private var filerUtils: Filer? = null
-    private var elementUtils: Elements? = null
-    private var messager: Messager? = null
-    private var options: Map<String, String>? = null
     private var helper: ProcessorHelper? = null
 
     override fun init(processingEnv: ProcessingEnvironment?) {
         super.init(processingEnv)
-
-        filerUtils = processingEnv?.filer
-        elementUtils = processingEnv?.elementUtils
-        messager = processingEnv?.messager
-        options = processingEnv?.options
         helper = ProcessorHelper()
-        helper!!.setMessager(messager)
+        helper!!.setMessager(mMessager)
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {
@@ -79,7 +66,7 @@ class AnnotationProcessor : AbstractProcessor() {
             if (it.kind == ElementKind.FIELD) {
                 if (it is VariableElement) {
                     val typeElement = it.enclosingElement as? TypeElement
-                    val packageElement = elementUtils!!.getPackageOf(typeElement)
+                    val packageElement = mElementUtils!!.getPackageOf(typeElement)
                     val key = packageElement.simpleName.toString() + typeElement?.simpleName.toString()
                     val processorBean = helper!!.getOrEmpty(key)
                     processorBean.apply {
@@ -93,7 +80,7 @@ class AnnotationProcessor : AbstractProcessor() {
             } else if (it.kind == ElementKind.CLASS) {
                 if (it is TypeElement) {
                     val typeElement = it
-                    val packageElement = elementUtils!!.getPackageOf(typeElement)
+                    val packageElement = mElementUtils!!.getPackageOf(typeElement)
                     val key = packageElement.simpleName.toString() + it.simpleName.toString()
                     val processorBean = helper!!.getOrEmpty(key)
                     processorBean.apply {
@@ -118,7 +105,7 @@ class AnnotationProcessor : AbstractProcessor() {
             if (it.kind == ElementKind.METHOD) {
                 if (it is ExecutableElement) {
                     val typeElement: TypeElement? = it.enclosingElement as? TypeElement
-                    val packageElement = elementUtils?.getPackageOf(typeElement) ?: return@forEach
+                    val packageElement = mElementUtils?.getPackageOf(typeElement) ?: return@forEach
                     val key = packageElement.simpleName.toString() + typeElement?.simpleName.toString()
                     val processorBean = helper?.getOrEmpty(key)
                     processorBean?.apply {
@@ -135,7 +122,7 @@ class AnnotationProcessor : AbstractProcessor() {
 
     private fun createJavaFiles() {
         try {
-            helper?.createFiles(filerUtils)
+            helper?.createFiles(mFiler)
         } catch (e: IOException) {
             e.printStackTrace()
         }

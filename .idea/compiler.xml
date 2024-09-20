@@ -23,7 +23,6 @@
       <module name="GPSTest.BaseAnnotation" target="11" />
       <module name="GPSTest.BaseAnnotation.main" target="11" />
       <module name="GPSTest.BaseAnnotation.test" target="11" />
-      <module name="GPSTest.BindViewRuntime" target="11" />
       <module name="GPSTest.blesdk" target="11" />
       <module name="GPSTest.ServiceProcessor" target="11" />
       <module name="GPSTest.ServiceProcessor.main" target="11" />

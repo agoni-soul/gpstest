@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  * @version: 1.0
  *
  */
-@Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
 annotation class IServiceLoader(
     /**

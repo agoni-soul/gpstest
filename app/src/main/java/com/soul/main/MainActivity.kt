@@ -259,11 +259,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         Log.d(TAG, "iUserService == null: ${iUserService == null}, username = ${iUserService?.getUserName().toString()}")
         iUserService?.start()
 
-        val service = ServiceLoader.load(IUserService::class.java)
-        Log.d(TAG, "service == null: ${service == null}")
-        val serviceLoader = service?.getAll<IUserService>()
+        val serviceLoader = ServiceLoaderHelper.getAllServices(IUserService::class.java)
         Log.d(TAG, "serviceLoader.size = ${serviceLoader?.size}")
         serviceLoader?.forEach {
+            it ?: return@forEach
             Log.d(TAG, "serviceLoader = $it")
             Log.d(TAG, "username = ${it.getUserName()}")
             Log.d(TAG, "start = ${it.start()}")

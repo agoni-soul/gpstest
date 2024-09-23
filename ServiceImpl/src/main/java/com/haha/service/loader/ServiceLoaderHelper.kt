@@ -16,6 +16,9 @@ class ServiceLoaderHelper {
 
     companion object {
         private val TAG = "ServiceLoaderHelper"
+
+        fun <T> loadService(clazz: Class<T>): ServiceLoader<T>? = ServiceLoader.load(clazz)
+
         fun <I, T: I?> getService(clazz: Class<I>?): I? {
             val service: I? = ServiceLoader.load(clazz)?.get(ServiceImpl.DEFAULT_IMPL_KEY) as? I
             Log.d(TAG, "service = $service")

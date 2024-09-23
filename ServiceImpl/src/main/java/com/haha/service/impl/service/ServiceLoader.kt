@@ -20,7 +20,7 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
 
         private var mIsHasInit: Boolean = false
 
-        val SERVICES: MutableMap<Class<*>, ServiceLoader<*>> by lazy {
+        private val SERVICES: MutableMap<Class<*>, ServiceLoader<*>> by lazy {
             HashMap()
         }
 

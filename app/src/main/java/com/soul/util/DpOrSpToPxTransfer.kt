@@ -23,4 +23,9 @@ object DpOrSpToPxTransfer {
      */
     fun sp2px(context: Context, sp: Int): Int = TypedValue
         .applyDimension(TypedValue.COMPLEX_UNIT_SP, sp.toFloat(), context.resources.displayMetrics).toInt()
+
+    fun px2sp(context: Context, pxValue: Float): Float {
+        val fontScale = context.resources.displayMetrics.scaledDensity
+        return pxValue / fontScale + 0.5f
+    }
 }

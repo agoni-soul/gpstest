@@ -45,6 +45,7 @@ import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
+import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.R
@@ -127,6 +128,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             setCenterTextColor(Color.GREEN)
             setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
             invalidate()
+        }
+        mViewDataBinding?.btnActivityDynamic?.setOnClickListener {
+            val intent = Intent(mContext, DynamicTextViewActivity::class.java)
+            startActivity(intent)
         }
 
 

@@ -1,5 +1,6 @@
 package com.soul.dynamicTextView
 
+import android.graphics.Paint
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -12,7 +13,6 @@ import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityDynamicTextviewBinding
 import com.soul.util.DpOrSpToPxTransfer
-import java.security.spec.EllipticCurve
 
 /**
  *
@@ -37,43 +37,62 @@ class DynamicTextViewActivity: BaseMvvmActivity<ActivityDynamicTextviewBinding, 
                     Toast.makeText(this@DynamicTextViewActivity, "请输入单位", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+                if (value.length % 2 == 0) {
+                    ivImage.setImageResource(R.color.cyan)
+                } else {
+                    ivImage.setImageResource(R.color.red)
+                }
+                tvValue.text = value
                 tvUnit.text = unit
-                val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-                val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-                tvUnit.measure(widthSpec, heightSpec)
-                val width = tvUnit.measuredWidth
-                Log.d(TAG, "setOnClickListener: width = ${llValue.width}, unitWidth = $width")
-                calculateTextViewWidth(llValue, tvValue, value, llValue.width - width)
-//                tvValue.text = value
+                Log.d(TAG, "")
+                val textWidth = calculateDynamicTextViewWidth(tvUnit)
+                Log.d(TAG, "setOnClickListener: llValue.width = ${llValue.width}, llValue.measuredWidth = ${llValue.measuredWidth}, 285.dp = ${DpOrSpToPxTransfer.dp2px(mContext, 285)}")
+                Log.d(TAG, "setOnClickListener: llValue.width = ${llValue.width}, ivImage.width = ${ivImage.width}, unitWidth = $textWidth")
+                dynamicChangeTextViewWidth(llValue, tvValue,llValue.width - ivImage.width - textWidth)
             }
         }
     }
 
-    private fun calculateTextViewWidth(ll: LinearLayout, tv: TextView, value: String, leaveLength: Int): Int {
-        tv.text = value
-        tv.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        tv.measure(widthSpec, heightSpec)
-        val width = tv.measuredWidth
+    private fun calculateTextViewWidth(ll: LinearLayout, tv: TextView, leaveLength: Int) {
+        val width = calculateDynamicTextViewWidth(tv)
         Log.d(TAG, "calculateTextViewWidth: width = $width")
         ll.gravity = Gravity.CENTER_HORIZONTAL.or(Gravity.BOTTOM)
-        return if (width < leaveLength) {
-//            tv.ellipsize = TextUtils.TruncateAt.END
-//            tv.setLines(1)
-//            tv.setTextColor(resources.getColor(R.color.white))
-//            tv.textSize = DpOrSpToPxTransfer.px2sp(this, 80f)
-            width
-        } else {
+        if (width >= leaveLength) {
             ll.gravity = Gravity.CENTER_HORIZONTAL.or(Gravity.BOTTOM)
             val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
             params.gravity = Gravity.END
             tv.layoutParams = params
             tv.ellipsize = TextUtils.TruncateAt.END
-//            tv.setLines(1)
-//            tv.setTextColor(resources.getColor(R.color.white))
-//            tv.textSize = DpOrSpToPxTransfer.px2sp(this, 80f)
-            leaveLength
+        }
+    }
+
+    private fun calculateDynamicTextViewWidth(tv: TextView): Int {
+        val paint = Paint()
+        paint.setTypeface(tv.typeface)
+        paint.textSize = tv.textSize
+        paint.textAlign = tv.paint.textAlign
+        val textWidth = paint.measureText(tv.text.toString())
+        Log.d(TAG, "calculateDynamicTextViewWidth: textWidth = $textWidth")
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        tv.measure(widthSpec, heightSpec)
+        Log.d(TAG,"calculateDynamicTextViewLength: view.class = ${tv::class.simpleName}, width = ${tv.width}, measuredWidth = ${tv.measuredWidth}")
+        return tv.measuredWidth
+    }
+
+    private fun dynamicChangeTextViewWidth(ll: LinearLayout, tv: TextView, leaveLength: Int) {
+        var params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        params.gravity = Gravity.BOTTOM
+        tv.layoutParams = params
+        val width = calculateDynamicTextViewWidth(tv)
+        Log.d(TAG, "dynamicChangeTextViewWidth: width = $width, leaveLength = $leaveLength")
+        ll.gravity = Gravity.CENTER_HORIZONTAL.or(Gravity.BOTTOM)
+        tv.ellipsize = TextUtils.TruncateAt.END
+        if (width > leaveLength) {
+            params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+            params.gravity = Gravity.BOTTOM.or(Gravity.START)
+            tv.layoutParams = params
+            tv.setLines(1)
         }
     }
 

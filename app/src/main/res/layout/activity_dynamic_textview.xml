@@ -43,32 +43,39 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@color/black"
-            android:gravity="center_horizontal"
+            android:gravity="center_horizontal|bottom"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_update">
 
+            <ImageView
+                android:id="@+id/iv_image"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:paddingRight="8dp"
+                android:layout_marginBottom="8dp"
+                tools:src="@color/blue" />
+
             <TextView
                 android:id="@+id/tv_value"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="end"
+                android:gravity="center_horizontal"
                 android:lines="1"
                 android:textColor="@color/white"
                 android:textSize="80sp"
-                tools:text="99.9" />
+                tools:text="99.99" />
 
             <TextView
                 android:id="@+id/tv_unit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_gravity="center_horizontal|bottom"
                 android:gravity="start"
                 android:lines="1"
+                android:paddingHorizontal="8dp"
                 android:textColor="#66FFFFFF"
                 android:textSize="22sp"
                 tools:text="米" />

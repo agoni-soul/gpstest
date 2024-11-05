@@ -79,5 +79,34 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_ds_enable" />
 
+        <com.soul.selector.CheckButton
+            android:id="@+id/cb_select"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/drawable_selector_checkbox_bg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_ds_press" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/rv"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="24dp"
+            app:layout_constraintTop_toBottomOf="@+id/cb_select"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <com.youth.banner.Banner
+            android:id="@+id/banner"
+            android:layout_marginTop="20dp"
+            android:layout_width="64dp"
+            android:layout_height="4dp"
+            app:layout_constraintTop_toBottomOf="@+id/rv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

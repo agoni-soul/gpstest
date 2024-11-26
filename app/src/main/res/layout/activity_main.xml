@@ -232,6 +232,7 @@
 
                 <com.soul.main.CircleSectorView
                     android:id="@+id/csv"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="216dp"
                     android:layout_marginTop="10dp"
@@ -240,36 +241,23 @@
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_dynamic" />
 
                 <com.soul.main.PieChartView
-                    android:id="@+id/pcvTop"
+                    android:id="@+id/pcv"
                     android:layout_width="216dp"
-                    android:layout_height="108dp"
+                    android:layout_height="216dp"
                     android:layout_marginTop="10dp"
+                    app:outerRadius="108dp"
+                    app:sectorBackgroundColor="#F9F9F9"
+                    app:sectorGradualStartColor="#FDFDFD"
+                    app:sectorGradualEndColor="#E5E5E8"
+                    app:innerRadius="24dp"
+                    app:innerCircleColor="#F0F0F0"
+                    app:triangleRadius="78dp"
+                    app:triangleColor="#C7C7CC"
+                    app:triangleSide="14dp"
+                    app:triangleHeight="6dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/csv" />
-
-                <com.soul.main.PieChartView
-                    android:id="@+id/pcvRight"
-                    android:layout_width="108dp"
-                    android:layout_height="216dp"
-                    app:layout_constraintEnd_toEndOf="@+id/pcvTop"
-                    app:layout_constraintTop_toTopOf="@+id/pcvTop" />
-
-                <com.soul.main.PieChartView
-                    android:id="@+id/pcvLeft"
-                    android:layout_width="108dp"
-                    android:layout_height="216dp"
-                    app:layout_constraintStart_toStartOf="@+id/pcvTop"
-                    app:layout_constraintTop_toTopOf="@+id/pcvTop" />
-
-                <com.soul.main.PieChartView
-                    android:id="@+id/pcvBottom"
-                    android:layout_width="216dp"
-                    android:layout_height="108dp"
-                    app:layout_constraintEnd_toEndOf="@+id/pcvTop"
-                    app:layout_constraintStart_toStartOf="@+id/pcvTop"
-                    app:layout_constraintTop_toBottomOf="@+id/pcvTop" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>

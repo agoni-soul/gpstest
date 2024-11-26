@@ -144,10 +144,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         picList.add(PieChartBean("2", 25f, gradient))
         picList.add(PieChartBean("3", 25f, gradient))
         mViewDataBinding.csv.setDate(picList)
-        mViewDataBinding.pcvTop.setDirectionPosition(PieChartView.DIRECTION_TOP)
-//        mViewDataBinding.pcvLeft.setDirectionPosition(PieChartView.DIRECTION_LEFT)
-//        mViewDataBinding.pcvRight.setDirectionPosition(PieChartView.DIRECTION_RIGHT)
-//        mViewDataBinding.pcvBottom.setDirectionPosition(PieChartView.DIRECTION_BOTTOM)
 
 
         /**

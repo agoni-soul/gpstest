@@ -35,7 +35,6 @@ import kotlin.math.sqrt
  * @desc   : 扇形圆
  *
  */
-@RequiresApi(Build.VERSION_CODES.M)
 class CircleSectorView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     View(context, attrs, defStyleAttr) {
         private val TAG = this.javaClass.simpleName

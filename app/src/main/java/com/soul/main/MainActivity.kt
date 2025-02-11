@@ -62,10 +62,12 @@ import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.InetAddress
+import java.util.regex.Pattern
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -267,6 +269,78 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             Log.d(TAG, "serviceLoader = $it")
             Log.d(TAG, "username = ${it.getUserName()}")
             Log.d(TAG, "start = ${it.start()}")
+        }
+        testOne()
+    }
+
+    private fun testOne() {
+        val applicationInfo = mContext.packageManager.getApplicationInfo(mContext.packageName, 0)
+        Log.d(TAG, "testOne: applicationInfo.sourceDir = ${applicationInfo.sourceDir}")
+        val sourceApk = File(applicationInfo.sourceDir)
+        val sourcePaths = ArrayList<String>()
+        sourcePaths.add(applicationInfo.sourceDir)
+        val extractedFilePrefix = sourceApk.name + ".classes"
+
+        if (!isVmMutidexCapable()) {
+            val totalDexNumber = mContext.getSharedPreferences("multidex.verson", Context.MODE_PRIVATE.or(Context.MODE_MULTI_PROCESS)).getInt("dex.number", 1)
+            val dexDir = File(applicationInfo.dataDir, "code_cache" + File.separator + "secondary-dexes")
+            for (secondaryNumber in 2 .. totalDexNumber) {
+                val fileName = "$extractedFilePrefix$secondaryNumber.zip"
+                val extractedFile = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    File(dataDir, fileName)
+                } else {
+                    null
+                }
+                if (extractedFile?.isFile == true) {
+                    sourcePaths.add(extractedFile.absolutePath)
+                } else {
+                    throw IOException("Missing exracted secondary dex file ' ${extractedFile?.path} '")
+                }
+            }
+        }
+        Log.d(TAG, "testOne: sourcePaths.size = ${sourcePaths.size}")
+    }
+
+    private fun isVmMutidexCapable(): Boolean {
+        var isMutidexCapable = false
+        var vmName: String? = null
+        try {
+            if (isYunOS()) {
+                vmName = "'YunOS'"
+                isMutidexCapable = System.getProperty("ro.build.version.sdk").toInt() >= 12
+            } else {
+                vmName = "'Android'"
+                val versionString = System.getProperty("java.vm.version")
+                if (versionString != null) {
+                    val matcher = Pattern.compile("(\\d+).(\\d+).(\\.\\d+)?").matcher(versionString)
+                    if (matcher.matches()) {
+                        try {
+                            val major = matcher.group(1)?.toIntOrNull() ?: 0
+                            val minor = matcher.group(2)?.toIntOrNull() ?: 0
+                            isMutidexCapable = major >= 2 || minor >= 1
+                        } catch (e: NumberFormatException) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        Log.i(TAG, "isVmMutidexCapable: VM with name: $vmName, ${if (isMutidexCapable) " has multidex support" else " does not have multidex support"}")
+        return isMutidexCapable
+    }
+
+    private fun isYunOS(): Boolean {
+        try {
+            val version = System.getProperty("ro.yunos.version")
+            val vmName = System.getProperty("java.vm.name")
+            return (vmName != null && vmName.toLowerCase().contains("lemur"))
+                    || (version != null && version.trim().isNotEmpty())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 

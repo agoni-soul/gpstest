@@ -40,16 +40,43 @@ abstract class BaseProcessor: AbstractProcessor() {
         }
     }
 
+    /**
+     *
+     */
     protected var mFiler: Filer? = null
+
+    /**
+     * 提供了各种实用方法来操作元素
+     */
     protected var mElementUtils: Elements? = null
     protected var mTypeUtils: Types? = null
+
+    /**
+     * 提供了一种方式来报告错误、警告以及其他通知
+     */
     protected var mMessager: Messager? = null
     protected var mOptions: Map<String, String>? = null
+
+    /**
+     * 用于获取语法树(JCTree)实例
+     */
+//    protected var mTrees: JavacTrees? = null
+
+    /**
+     * 一个工厂类，用于创建语法树节点
+     */
+//    protected var mTreeMaker: TreeMaker? = null
+
+    /**
+     * 用于创建名称(name)实例
+     */
+//    protected var mNames: Names? = null
 
     @Synchronized
     override fun init(processingEnv: ProcessingEnvironment?) {
         super.init(processingEnv)
         mFiler = processingEnv?.filer
+//        mTrees = JavacTrees.instance(processingEnv)
         mElementUtils = processingEnv?.elementUtils
         mTypeUtils = processingEnv?.typeUtils
         mMessager = processingEnv?.messager
@@ -196,6 +223,12 @@ abstract class BaseProcessor: AbstractProcessor() {
         private val builder: CodeBlock.Builder = CodeBlock.builder()
         private val serviceLoaderClass: ClassName? = className(ConstantUtils.SERVICE_LOADER_CLASS)
 
+        /**
+         * 占位符用于在生成代码时插入字符串、类型或变量名等内容
+         * $S 用于插入字符串
+         * $T 用于插入类型
+         * $N 用于插入变量名
+         */
         fun put(
             interfaceName: String?,
             key: String?,

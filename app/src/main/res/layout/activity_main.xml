@@ -119,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:importantForAccessibility="no"
                     android:text="自定义Activity动画"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_coroutineScope" />
 
                 <Button
                     android:id="@+id/btn_activity_custom_scene2"
@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:importantForAccessibility="no"
                     android:text="自定义Activity动画2"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_scene" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_custom_scene" />
 
                 <Button
                     android:id="@+id/btn_activity_recyclerview"

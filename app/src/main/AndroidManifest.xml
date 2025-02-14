@@ -34,6 +34,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name="com.soul.coroutineScope.CoroutineScopeActivity"
+            android:exported="true" />
         <activity
             android:name="com.soul.scene.CustomSceneSecondActivity"
             android:exported="true" />

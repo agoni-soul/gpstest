@@ -58,6 +58,22 @@ android {
     }
 }
 
+task createCoroutineExceptionHandlerServiceFile {
+    doLast {
+        // 定义服务文件所在目录
+        def serviceDir = new File("$projectDir/src/main/resources/META-INF/services")
+        // 创建目录（如果不存在）
+        serviceDir.mkdirs()
+        // 定义服务文件
+        def serviceFile = new File(serviceDir, "kotlinx.coroutines.CoroutineExceptionHandler")
+        // 写入全局异常处理器全类名
+        serviceFile.text = "com.example.MyGlobalCoroutineExceptionHandler"
+    }
+}
+
+// 让 assemble 任务依赖于创建文件的任务
+assemble.dependsOn createCoroutineExceptionHandlerServiceFile
+
 dependencies {
 
     implementation group:'org.jetbrains.kotlin', name:'kotlin-stdlib', version:kotlin_version

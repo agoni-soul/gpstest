@@ -1,7 +1,6 @@
 package com.soul.base
 
 import android.R
-import android.annotation.TargetApi
 import android.app.ActionBar
 import android.app.Activity
 import android.content.Context
@@ -9,11 +8,9 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.soul.log.DOFLogUtil
 
@@ -58,9 +55,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected open fun getRootViewId(): Int = 0
 
+    protected open fun requestFeature() {
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mContext = this
+        requestFeature()
         ActivityCollector.addActivity(this)
         hideTitleAndActionBar()
         setContentView(getLayoutId())

@@ -41,6 +41,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        aidl true
     }
 
     buildTypes {
@@ -81,6 +82,7 @@ dependencies {
     implementation group:'androidx.appcompat', name:'appcompat', version:'1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
+//    implementation 'com.tencent:mmkv-static:1.2.14'
 
 //    implementation 'androidx.appcompat:appcompat:1.6.1'
 //    implementation 'com.google.android.material:material:1.8.0'

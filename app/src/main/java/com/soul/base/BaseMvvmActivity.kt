@@ -1,6 +1,8 @@
 package com.soul.base
 
 import android.os.Bundle
+import android.util.Log
+import android.view.MotionEvent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -52,6 +54,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate")
         mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, R.color.white)
         if (!isShowStatus()) {
             addStatusBarView()
@@ -67,7 +70,47 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
         initData()
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(TAG, "onRestart")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d(TAG, "onSaveInstanceState")
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Log.d(TAG, "onRestoreInstanceState")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop")
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        return super.dispatchTouchEvent(ev)
+    }
+
     override fun onDestroy() {
+        Log.d(TAG, "onCreate")
         super.onDestroy()
         mViewDataBinding.unbind()
         lifecycle.removeObserver(mViewModel)

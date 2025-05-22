@@ -40,7 +40,9 @@ import com.soul.gpstest.databinding.FragmentBleClientBinding
 @SuppressWarnings("missingPermission")
 class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewModel>() {
 
-    val handler = Handler(Looper.getMainLooper())
+    companion object {
+        val handler = Handler(Looper.getMainLooper())
+    }
     private var mBleAdapter: BleScanAdapterV2? = null
     private val mData: MutableList<BleScanResult> = mutableListOf();
     private var mBluetoothGatt: BluetoothGatt? = null
@@ -48,7 +50,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var blueGatt: BluetoothGatt? = null
     private var isConnected = false
-    private val blueGattListener = object : BleGattCallback() {
+    private var blueGattListener: BleGattCallback? = object : BleGattCallback() {
         override fun onObtainGattServiceStatus(gatt: BluetoothGatt?, status: Int) {
             Log.d(TAG, "onObtainGattServiceStatus: status = $status")
         }
@@ -307,6 +309,8 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     private fun closeConnect() {
         mScanBleDevice?.stopScan(TAG)
         mBleClientManager?.closeConnect()
+        mBleClientManager = null
+        blueGattListener = null
     }
 
     private fun logInfo(msg: String) {
@@ -314,7 +318,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         closeConnect()
+        super.onDestroy()
     }
 }

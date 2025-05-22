@@ -127,7 +127,6 @@ class BleBondedFragment: BaseMvvmFragment<FragmentBleBondedBinding, BleViewModel
                             }
                         }
                     } else {
-
                         mBondBleDevices.add(bleScanResult)
                         mViewModel.viewModelScope.launch(Dispatchers.Main) {
                             mBondBleScanAdapter?.notifyItemChanged(mBondBleDevices.size)

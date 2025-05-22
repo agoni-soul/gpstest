@@ -189,5 +189,7 @@ class BleScanFragment : BaseMvvmFragment<FragmentBleScanBinding, BaseViewModel>(
     override fun onDestroyView() {
         super.onDestroyView()
         mBleScanDevice?.unregisterBleReceiver(requireActivity())
+        mBleScanReceiverCallback = null
+        mBleScanCallback = null
     }
 }

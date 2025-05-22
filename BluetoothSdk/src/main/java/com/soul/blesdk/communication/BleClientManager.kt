@@ -1,12 +1,10 @@
 package com.soul.blesdk.communication
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
 import android.content.Context
-import androidx.annotation.RequiresPermission
 import com.blankj.utilcode.util.Utils
 import com.soul.BleSDKApplication
 import com.soul.blesdk.constants.BleConstants
@@ -95,5 +93,7 @@ class BleClientManager {
             disconnect()
             close()
         }
+        mBleGattCallback = null
+        mBleGatt = null
     }
 }

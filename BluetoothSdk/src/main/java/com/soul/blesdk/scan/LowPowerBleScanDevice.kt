@@ -35,8 +35,6 @@ class LowPowerBleScanDevice : BaseBleScanDevice() {
 
     override fun stopScan(tag: String?) {
         super.stopScan(tag)
-        if (isScanning(tag)) {
-            BleScanManager.getInstance()?.stopScan(tag)
-        }
+        BleScanManager.getInstance()?.stopScan(tag)
     }
 }

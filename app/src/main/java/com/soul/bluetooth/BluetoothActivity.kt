@@ -35,6 +35,7 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
     private lateinit var mBleViewPager: ViewPager2
     private lateinit var mTabLayout: TabLayout
     private val mTabTitleList = mutableListOf<String>()
+    private var mOnPageChangeCallback: ViewPager2.OnPageChangeCallback? = null
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
@@ -54,12 +55,13 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
             isUserInputEnabled = false
             orientation = ViewPager2.ORIENTATION_HORIZONTAL
             currentItem = 0
-            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            mOnPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     mTabLayout.getTabAt(position)?.select()
                 }
-            })
+            }
+            registerOnPageChangeCallback(mOnPageChangeCallback!!)
         }
         mTabTitleList.add("蓝牙客户端")
         mTabTitleList.add("蓝牙扫描")
@@ -139,6 +141,14 @@ class BluetoothActivity : BaseMvvmActivity<ActivityBluetoothBinding, BaseViewMod
                     }
                 }
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mOnPageChangeCallback?.let { mBleViewPager.unregisterOnPageChangeCallback(it) }
+        mBleViewPager.adapter?.let {
+            it.notifyItemRangeRemoved(0, it.itemCount - 1)
         }
     }
 }

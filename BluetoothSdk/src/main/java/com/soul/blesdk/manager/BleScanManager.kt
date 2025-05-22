@@ -17,7 +17,7 @@ import com.soul.blesdk.bean.toBleScanResult
 import com.soul.blesdk.constants.toScanSettings
 import com.soul.blesdk.interfaces.IBleScanCallback
 import com.soul.blesdk.permissions.BleSDkPermissionManager
-import java.util.Collections.synchronizedMap
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
@@ -48,9 +48,9 @@ class BleScanManager private constructor() : BaseBleManager() {
 
     private var mIsScanning = false
     private var mIsClassicScanning = false
-    private val mBleScanCallbackMap = synchronizedMap(HashMap<String, IBleScanCallback?>())
-    private val mScanCallbackMap = synchronizedMap(HashMap<String, ScanCallback?>())
-    private val mScanningMap = synchronizedMap(HashMap<String, Boolean>())
+    private val mBleScanCallbackMap = ConcurrentHashMap<String, IBleScanCallback?>()
+    private val mScanCallbackMap = ConcurrentHashMap<String, ScanCallback?>()
+    private val mScanningMap = ConcurrentHashMap<String, Boolean>()
     private var mScanCallback: ScanCallback? = null
 
     fun isScanning(): Boolean = mIsScanning
@@ -187,26 +187,34 @@ class BleScanManager private constructor() : BaseBleManager() {
             mScanCallbackMap.remove(tag)
             return
         }
-        val scanCallback = object : ScanCallback() {
-            override fun onBatchScanResults(results: MutableList<ScanResult>?) {
-                val mutableList = mutableListOf<BleScanResult>()
-                results?.forEach {
-                    val bleScanResult = it.toBleScanResult()
-                    mutableList.add(bleScanResult)
+        if (mScanCallback == null) {
+            mScanCallback = object : ScanCallback() {
+                override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+                    val mutableList = mutableListOf<BleScanResult>()
+                    results?.forEach {
+                        val bleScanResult = it.toBleScanResult()
+                        mutableList.add(bleScanResult)
+                    }
+                    mBleScanCallbackMap.forEach { (_, scanCallback) ->
+                        scanCallback?.onBatchScanResults(mutableList)
+                    }
                 }
-                bleScanCallback?.onBatchScanResults(mutableList)
-            }
 
-            override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
-                val type = callbackType.toScanSettings()
-                bleScanCallback?.onScanResult(
-                    type.callbackType,
-                    bleScanResult?.toBleScanResult()
-                )
-            }
+                override fun onScanResult(callbackType: Int, bleScanResult: ScanResult?) {
+                    val type = callbackType.toScanSettings()
+                    mBleScanCallbackMap.forEach { (_, scanCallback) ->
+                        scanCallback?.onScanResult(
+                            type.callbackType,
+                            bleScanResult?.toBleScanResult()
+                        )
+                    }
+                }
 
-            override fun onScanFailed(errorCode: Int) {
-                bleScanCallback?.onScanFailed(errorCode)
+                override fun onScanFailed(errorCode: Int) {
+                    mBleScanCallbackMap.forEach { (_, scanCallback) ->
+                        scanCallback?.onScanFailed(errorCode)
+                    }
+                }
             }
         }
         if (scanDurationTime > 0) {
@@ -214,10 +222,9 @@ class BleScanManager private constructor() : BaseBleManager() {
                 stopScan(tag)
             }, scanDurationTime)
         }
-        mBleAdapter?.bluetoothLeScanner?.startScan(scanFilters, scanSettings, scanCallback)
+        mBleAdapter?.bluetoothLeScanner?.startScan(scanFilters, scanSettings, mScanCallback)
         mBleScanCallbackMap[tag] = bleScanCallback
         mScanningMap[tag] = true
-        mScanCallbackMap[tag] = scanCallback
     }
 
     /**
@@ -226,21 +233,27 @@ class BleScanManager private constructor() : BaseBleManager() {
     @SuppressLint("MissingPermission")
     fun stopScan(tag: String?) {
         Log.d(TAG, "stopScan: mIsSubScanning = ${isSubScanning(tag)}")
-        if (!isSubScanning(tag)) return
-        mBleScanCallbackMap.remove(tag)
-        mScanningMap.remove(tag)
-        val scanCallback = mScanCallbackMap.remove(tag)
-        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
+        if (!isSubScanning(tag) || mScanningMap.isEmpty()) {
+            if (mScanCallback != null && mBleScanCallbackMap.isEmpty()) {
+                mIsScanning = false
+                mBleAdapter?.bluetoothLeScanner?.stopScan(mScanCallback)
+                mScanCallback = null
+            }
             return
         }
-        if (scanCallback != null) {
-            mBleAdapter?.bluetoothLeScanner?.stopScan(scanCallback)
+        mBleScanCallbackMap.remove(tag)
+        mScanningMap.remove(tag)
+        Log.d(TAG, "mBleScanCallbackMap.size() = ${mBleScanCallbackMap.size}")
+        if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
+            Log.d(TAG, "all permissions: mScanCallback = $mScanCallback")
+            return
         }
         if (mScanCallback != null && mBleScanCallbackMap.isEmpty()) {
             mIsScanning = false
             mBleAdapter?.bluetoothLeScanner?.stopScan(mScanCallback)
             mScanCallback = null
         }
+        Log.d(TAG, "mScanCallback = $mScanCallback")
     }
 
     fun stopScan(bleScanCallback: IBleScanCallback?) {

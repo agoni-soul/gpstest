@@ -169,4 +169,15 @@ object BleServerManager {
         gattService ?: return
         bluetoothGateServer.addService(gattService)
     }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
+    fun removeService(
+        bluetoothGateServer: BluetoothGattServer?,
+        gattService: BluetoothGattService?
+    ) {
+        bluetoothGateServer ?: return
+        gattService ?: return
+        bluetoothGateServer.removeService(gattService)
+    }
 }

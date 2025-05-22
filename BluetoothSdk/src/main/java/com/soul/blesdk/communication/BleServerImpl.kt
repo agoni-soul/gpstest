@@ -235,12 +235,14 @@ class BleServerImpl(
             BleSDkPermissionManager.isGrantNecessaryBle()) {
             Log.d(TAG, "close: stopAdvertising")
             BleServerManager.stopAdvertising(mBleAdapter)
+            BleServerManager.removeService(mBleGattServer, mGattService)
         }
         mGattServerCallbackMap.remove(tag)
         // Manifest.permission.BLUETOOTH_CONNECT
         if (mGattServerCallbackMap.isEmpty() && BleSDkPermissionManager.isGrantBleConnect()) {
             Log.d(TAG, "close: close")
             mBleGattServer?.close()
+            mBleGattServer = null
         }
     }
 }

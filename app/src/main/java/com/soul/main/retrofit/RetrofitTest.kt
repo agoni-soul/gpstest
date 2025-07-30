@@ -47,7 +47,6 @@ class RetrofitTest {
             }
 
             override fun onError(e: Throwable) {
-                TODO("Not yet implemented")
             }
 
             override fun onComplete() {

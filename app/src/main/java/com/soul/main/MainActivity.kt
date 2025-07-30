@@ -13,6 +13,8 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
@@ -44,6 +46,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
@@ -59,6 +62,7 @@ import com.soul.binder.TestService
 import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.coroutineScope.EatGame
+import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.IProcessStub
@@ -113,33 +117,33 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     override fun getLayoutId(): Int = R.layout.activity_main
 
     override fun initView() {
-        mViewDataBinding?.btnSkipGps?.setOnClickListener(this)
-        mViewDataBinding?.btnSkipRemoteView?.setOnClickListener(this)
-        mViewDataBinding?.btnSkipNetwork?.setOnClickListener(this)
-        mViewDataBinding?.btnRefresh?.setOnClickListener(this)
-        mViewDataBinding?.btnTest?.setOnClickListener(this)
-        mViewDataBinding?.btnTest1?.setOnClickListener(this)
-        mViewDataBinding?.btnPermission?.setOnClickListener(this)
-        mViewDataBinding?.btnDialogFragment?.setOnClickListener(this)
-        mViewDataBinding?.btnAnimation?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityScene?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityCoroutineScope?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityCustomScene?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityCustomScene2?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityRecyclerview?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityWaterfall?.setOnClickListener(this)
-        mViewDataBinding?.btnActivitySelector?.setOnClickListener(this)
-        mViewDataBinding?.btnActivityVolume?.setOnClickListener(this)
-        mViewDataBinding?.btnActivitySlide?.setOnClickListener {
+        mViewDataBinding.btnSkipGps.setOnClickListener(this)
+        mViewDataBinding.btnSkipRemoteView.setOnClickListener(this)
+        mViewDataBinding.btnSkipNetwork.setOnClickListener(this)
+        mViewDataBinding.btnRefresh.setOnClickListener(this)
+        mViewDataBinding.btnTest.setOnClickListener(this)
+        mViewDataBinding.btnTest1.setOnClickListener(this)
+        mViewDataBinding.btnPermission.setOnClickListener(this)
+        mViewDataBinding.btnDialogFragment.setOnClickListener(this)
+        mViewDataBinding.btnAnimation.setOnClickListener(this)
+        mViewDataBinding.btnActivityScene.setOnClickListener(this)
+        mViewDataBinding.btnActivityCoroutineScope.setOnClickListener(this)
+        mViewDataBinding.btnActivityCustomScene.setOnClickListener(this)
+        mViewDataBinding.btnActivityCustomScene2.setOnClickListener(this)
+        mViewDataBinding.btnActivityRecyclerview.setOnClickListener(this)
+        mViewDataBinding.btnActivityWaterfall.setOnClickListener(this)
+        mViewDataBinding.btnActivitySelector.setOnClickListener(this)
+        mViewDataBinding.btnActivityVolume.setOnClickListener(this)
+        mViewDataBinding.btnActivitySlide.setOnClickListener {
             val intent = Intent(mContext, EasySwipeMenuActivity::class.java)
             startActivity(intent)
         }
-        mViewDataBinding?.btnActivityBluetooth?.setOnClickListener {
+        mViewDataBinding.btnActivityBluetooth.setOnClickListener {
             val intent = Intent(mContext, BluetoothActivity::class.java)
             intent.putExtras(Intent())
             startActivity(intent)
         }
-        mViewDataBinding?.cpv?.apply {
+        mViewDataBinding.cpv.apply {
             setProgress(20f)
             setCircleBgColor(Color.RED)
             setProgressColor(Color.BLACK)
@@ -148,6 +152,19 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
             invalidate()
         }
+        mViewDataBinding.btnActivityDynamic.setOnClickListener {
+            val intent = Intent(mContext, DynamicTextViewActivity::class.java)
+            startActivity(intent)
+        }
+        val picList = mutableListOf<PieChartBean>()
+        val colors: IntArray = intArrayOf(ContextCompat.getColor(mContext, R.color.circle_gradual_end),
+            ContextCompat.getColor(mContext, R.color.circle_gradual_end))
+        val gradient = LinearGradient(0f, 0f, 100f, 100f, colors, null, Shader.TileMode.CLAMP)
+        picList.add(PieChartBean("0", 25f, gradient))
+        picList.add(PieChartBean("1", 25f, gradient))
+        picList.add(PieChartBean("2", 25f, gradient))
+        picList.add(PieChartBean("3", 25f, gradient))
+        mViewDataBinding.csv.setDate(picList)
         mViewDataBinding.btnActivityLiveData.setOnClickListener {
             startActivity(Intent(mContext, LiveDataActivity::class.java))
         }
@@ -217,7 +234,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         val addresses = linkProperties.linkAddresses;
         var hostAddress: String? = null
         for (address in addresses) {
-        if (address.address.hostAddress?.contains(".") == true) {
+        if (address.address.hostAddress.contains(".") == true) {
         hostAddress = address.address.hostAddress
         Log.d(TAG, "hostAddress = $hostAddress")
         break
@@ -356,8 +373,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         }, builder.length - str.length, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        mViewDataBinding?.tvSpan?.text = builder
-        mViewDataBinding?.tvSpan?.movementMethod = LinkMovementMethod.getInstance()
+        mViewDataBinding.tvSpan.text = builder
+        mViewDataBinding.tvSpan.movementMethod = LinkMovementMethod.getInstance()
 
         test()
     }
@@ -476,61 +493,61 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun accessibilityTest() {
-//        mViewDataBinding?.btnSkipGps?.isEnabled = true
-//        mViewDataBinding?.btnSkipNetwork?.isEnabled = true
-//        mViewDataBinding?.btnSkipRemoteView?.isEnabled = true
-//        mViewDataBinding?.btnSkipRefresh?.isEnabled = true
-//        mViewDataBinding?.btnSkipGps?.isFocusable = true
-//        mViewDataBinding?.btnSkipNetwork?.isFocusable = true
-//        mViewDataBinding?.btnSkipRemoteView?.isFocusable = true
-//        mViewDataBinding?.btnSkipRefresh?.isFocusable = true
+//        mViewDataBinding.btnSkipGps.isEnabled = true
+//        mViewDataBinding.btnSkipNetwork.isEnabled = true
+//        mViewDataBinding.btnSkipRemoteView.isEnabled = true
+//        mViewDataBinding.btnSkipRefresh.isEnabled = true
+//        mViewDataBinding.btnSkipGps.isFocusable = true
+//        mViewDataBinding.btnSkipNetwork.isFocusable = true
+//        mViewDataBinding.btnSkipRemoteView.isFocusable = true
+//        mViewDataBinding.btnSkipRefresh.isFocusable = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            mViewDataBinding?.btnSkipGps?.focusable = View.FOCUSABLE
-//            mViewDataBinding?.btnSkipNetwork?.focusable = View.FOCUSABLE
-//            mViewDataBinding?.btnSkipRemoteView?.focusable = View.FOCUSABLE
-//            mViewDataBinding?.btnSkipRefresh?Network.focusable = View.FOCUSABLE
+//            mViewDataBinding.btnSkipGps.focusable = View.FOCUSABLE
+//            mViewDataBinding.btnSkipNetwork.focusable = View.FOCUSABLE
+//            mViewDataBinding.btnSkipRemoteView.focusable = View.FOCUSABLE
+//            mViewDataBinding.btnSkipRefresh?Network.focusable = View.FOCUSABLE
 
 //            val event = AccessibilityEvent()
 //            event.eventType = AccessibilityEvent.TYPE_VIEW_FOCUSED
-//            mViewDataBinding?.btnSkipGps?.onInitializeAccessibilityEvent(event)
+//            mViewDataBinding.btnSkipGps.onInitializeAccessibilityEvent(event)
 
-//            val btnSkipGPSNode = mViewDataBinding?.btnSkipGps?.createAccessibilityNodeInfo()
-//            val btnSkipNetwork = mViewDataBinding?.btnSkipNetwork?.createAccessibilityNodeInfo()
-//            val btnSkipRemoteView = mViewDataBinding?.btnSkipRemoteView?.createAccessibilityNodeInfo()
-//            val btnRefreshNetwork = mViewDataBinding?.btnSkipRefresh?.createAccessibilityNodeInfo()
+//            val btnSkipGPSNode = mViewDataBinding.btnSkipGps.createAccessibilityNodeInfo()
+//            val btnSkipNetwork = mViewDataBinding.btnSkipNetwork.createAccessibilityNodeInfo()
+//            val btnSkipRemoteView = mViewDataBinding.btnSkipRemoteView.createAccessibilityNodeInfo()
+//            val btnRefreshNetwork = mViewDataBinding.btnSkipRefresh.createAccessibilityNodeInfo()
 //
-//            btnSkipGPSNode.setTraversalAfter(mViewDataBinding?.btnSkipNetwork?)
-//            btnSkipNetwork.setTraversalAfter(mViewDataBinding?.btnSkipRemoteView?)
-//            btnSkipRemoteView.setTraversalAfter(mViewDataBinding?.btnSkipRefresh?)
+//            btnSkipGPSNode.setTraversalAfter(mViewDataBinding.btnSkipNetwork?)
+//            btnSkipNetwork.setTraversalAfter(mViewDataBinding.btnSkipRemoteView?)
+//            btnSkipRemoteView.setTraversalAfter(mViewDataBinding.btnSkipRefresh?)
 
-//            mViewDataBinding?.btnSkipGps?.accessibilityTraversalBefore = R.id.btn_skip_network
-//            mViewDataBinding?.btnSkipNetwork?.accessibilityTraversalBefore = R.id.btn_skip_remote_view
-//            mViewDataBinding?.btnSkipRemoteView?.accessibilityTraversalBefore = R.id.btn_refresh
+//            mViewDataBinding.btnSkipGps.accessibilityTraversalBefore = R.id.btn_skip_network
+//            mViewDataBinding.btnSkipNetwork.accessibilityTraversalBefore = R.id.btn_skip_remote_view
+//            mViewDataBinding.btnSkipRemoteView.accessibilityTraversalBefore = R.id.btn_refresh
 
 //            if (mAccessibilityManager.isEnabled) {
-//                mViewDataBinding?.btnSkipGps?.sendAccessibilityEventUnchecked(event)
+//                mViewDataBinding.btnSkipGps.sendAccessibilityEventUnchecked(event)
 //            }
         }
 
-//        mViewDataBinding?.btnSkipGps?.findUserSetNextFocus(mViewDataBinding?.clMain?, View.FOCUS_DOWN)
+//        mViewDataBinding.btnSkipGps.findUserSetNextFocus(mViewDataBinding.clMain?, View.FOCUS_DOWN)
 
 
-//        mViewDataBinding?.btnSkipGps?.nextFocusDownId = R.id.btn_skip_network
-//        mViewDataBinding?.btnSkipGps?.nextFocusDownId = R.id.btn_skip_network
-//        mViewDataBinding?.btnSkipNetwork?.nextFocusDownId = R.id.btn_skip_remote_view
-//        mViewDataBinding?.btnSkipNetwork?.nextFocusDownId = R.id.btn_skip_remote_view
-//        mViewDataBinding?.btnSkipNetwork?.nextFocusUpId = R.id.btn_skip_gps
-//        mViewDataBinding?.btnSkipRemoteView?.nextFocusUpId = R.id.btn_skip_network
-//        mViewDataBinding?.btnSkipRemoteView?.nextFocusDownId = R.id.btn_refresh
+//        mViewDataBinding.btnSkipGps.nextFocusDownId = R.id.btn_skip_network
+//        mViewDataBinding.btnSkipGps.nextFocusDownId = R.id.btn_skip_network
+//        mViewDataBinding.btnSkipNetwork.nextFocusDownId = R.id.btn_skip_remote_view
+//        mViewDataBinding.btnSkipNetwork.nextFocusDownId = R.id.btn_skip_remote_view
+//        mViewDataBinding.btnSkipNetwork.nextFocusUpId = R.id.btn_skip_gps
+//        mViewDataBinding.btnSkipRemoteView.nextFocusUpId = R.id.btn_skip_network
+//        mViewDataBinding.btnSkipRemoteView.nextFocusDownId = R.id.btn_refresh
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            val btnSkipGPSNodeInfo = AccessibilityNodeInfo(mViewDataBinding?.btnSkipGps?)
-//            val btnSkipRemoteViewNodeInfo = AccessibilityNodeInfo(mViewDataBinding?.btnSkipRemoteView?)
-//            val btnSkipNetworkNodeInfo = AccessibilityNodeInfo(mViewDataBinding?.btnSkipNetwork?)
-//            btnSkipGPSNodeInfo.setTraversalAfter(mViewDataBinding?.btnSkipNetwork?)
-//            btnSkipNetworkNodeInfo.setTraversalBefore(mViewDataBinding?.btnSkipGps?)
-//            btnSkipNetworkNodeInfo.setTraversalAfter(mViewDataBinding?.btnSkipRemoteView?)
-//            btnSkipRemoteViewNodeInfo.setTraversalBefore(mViewDataBinding?.btnSkipNetwork?)
+//            val btnSkipGPSNodeInfo = AccessibilityNodeInfo(mViewDataBinding.btnSkipGps?)
+//            val btnSkipRemoteViewNodeInfo = AccessibilityNodeInfo(mViewDataBinding.btnSkipRemoteView?)
+//            val btnSkipNetworkNodeInfo = AccessibilityNodeInfo(mViewDataBinding.btnSkipNetwork?)
+//            btnSkipGPSNodeInfo.setTraversalAfter(mViewDataBinding.btnSkipNetwork?)
+//            btnSkipNetworkNodeInfo.setTraversalBefore(mViewDataBinding.btnSkipGps?)
+//            btnSkipNetworkNodeInfo.setTraversalAfter(mViewDataBinding.btnSkipRemoteView?)
+//            btnSkipRemoteViewNodeInfo.setTraversalBefore(mViewDataBinding.btnSkipNetwork?)
 //
 //            DOFLogUtil.d(TAG, "btnSkipGPSNodeInfo = $btnSkipGPSNodeInfo")
 //        } else {
@@ -552,7 +569,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         val accessibilityNodeInfo = AccessibilityNodeInfo(mViewDataBinding!!.clMain)
         val list = accessibilityNodeInfo.actionList
 
-        list?.let {
+        list.let {
             for (accessibilityAction in list) {
                 DOFLogUtil.d(
                     TAG,
@@ -563,11 +580,11 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         val mBtnGPSProvider = object : AccessibilityNodeProvider() {
             override fun createAccessibilityNodeInfo(virtualViewId: Int): AccessibilityNodeInfo? {
-                return mViewDataBinding?.btnSkipGps?.let { AccessibilityNodeInfo(it) }
+                return mViewDataBinding.btnSkipGps.let { AccessibilityNodeInfo(it) }
             }
 
             override fun findFocus(focus: Int): AccessibilityNodeInfo? {
-                return mViewDataBinding?.btnSkipGps?.let { AccessibilityNodeInfo(it) }
+                return mViewDataBinding.btnSkipGps.let { AccessibilityNodeInfo(it) }
             }
         }
         mBtnGPSProvider.createAccessibilityNodeInfo(AccessibilityNodeProvider.HOST_VIEW_ID)
@@ -748,9 +765,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 //                    startActivity(intent)
 //                    val c = getSystemService(NETWORK_POLICY_SERVICE) as NetworkPolicyManager
 
-                    mViewDataBinding?.ivSuccess?.visibility = View.VISIBLE
+                    mViewDataBinding.ivSuccess.visibility = View.VISIBLE
                     val animation = AnimationUtils.loadAnimation(this, R.anim.success_up_anim)
-                    mViewDataBinding?.ivSuccess?.startAnimation(animation)
+                    mViewDataBinding.ivSuccess.startAnimation(animation)
                 }
 
                 R.id.btn_skip_network -> {
@@ -758,17 +775,17 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     val intent = Intent(this, NetworkActivity::class.java);
                     startActivity(intent)
                      */
-                    mViewDataBinding?.btnSkipGps?.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED)
+                    mViewDataBinding.btnSkipGps.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED)
 
                     val constructor = AccessibilityEvent::class.java.getDeclaredConstructor()
                     constructor.isAccessible = true
                     val accessibilityEvent = constructor.newInstance()
                     accessibilityEvent.eventType = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-                    accessibilityEvent.className = mViewDataBinding?.btnSkipGps?.javaClass?.name
+                    accessibilityEvent.className = mViewDataBinding.btnSkipGps.javaClass.name
                     DOFLogUtil.d(TAG, "accessibilityEvent = $accessibilityEvent")
                     DOFLogUtil.d(
                         TAG,
-                        "accessibilityEvent = ${mViewDataBinding?.btnSkipGps?.accessibilityTraversalAfter}"
+                        "accessibilityEvent = ${mViewDataBinding.btnSkipGps.accessibilityTraversalAfter}"
                     )
                 }
 
@@ -841,7 +858,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 //                            } catch (e: RemoteException) {
 //                                e.printStackTrace()
 //                            }
-//                            bucket?.let {
+//                            bucket.let {
 //                                val total = it.rxBytes + it.txBytes
 //                                Log.d("haha", "Total = $total")
 //                                Log.d("haha", "rxBytes = ${it.rxBytes}")

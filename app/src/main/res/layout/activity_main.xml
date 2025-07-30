@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cl_main"
         android:layout_width="match_parent"
@@ -228,16 +228,52 @@
                     android:layout_width="88dp"
                     android:layout_height="88dp"
                     android:visibility="gone"
-                    app:arcWidth="4dp"
-                    app:circleRadius="30dp"
-                    app:arcProgressColor="@color/yellow"
                     app:arcCircleBgColor="@color/red"
+                    app:arcProgressColor="@color/yellow"
+                    app:arcWidth="4dp"
                     app:centerTextColor="@color/cyan"
                     app:centerTextSize="24sp"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:circleRadius="30dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_bluetooth"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_bluetooth" />
 
+                <Button
+                    android:id="@+id/btn_activity_dynamic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="动态textview"
+                    app:layout_constraintTop_toBottomOf="@+id/cpv" />
+
+                <com.soul.main.CircleSectorView
+                    android:id="@+id/csv"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="216dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_dynamic" />
+
+                <com.soul.main.PieChartView
+                    android:id="@+id/pcv"
+                    android:layout_width="216dp"
+                    android:layout_height="216dp"
+                    android:layout_marginTop="10dp"
+                    app:outerRadius="108dp"
+                    app:sectorBackgroundColor="#F9F9F9"
+                    app:sectorGradualStartColor="#FDFDFD"
+                    app:sectorGradualEndColor="#E5E5E8"
+                    app:innerRadius="24dp"
+                    app:innerCircleColor="#F0F0F0"
+                    app:triangleRadius="78dp"
+                    app:triangleColor="#C7C7CC"
+                    app:triangleSide="14dp"
+                    app:triangleHeight="6dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/csv" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </ScrollView>

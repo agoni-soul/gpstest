@@ -33,9 +33,9 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
     private var textBoundRect: Rect
     private var mCenterText: String? = null
 
-    constructor(context: Context) : this(context, null, 0)
+    constructor(context: Context): this(context, null, 0)
 
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
 
     init {
         val typedArray =
@@ -67,18 +67,18 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
         backgroundPaint.style = Paint.Style.STROKE
         backgroundPaint.strokeWidth = mArcWidth
         backgroundPaint.isAntiAlias = true
-        rectF = RectF() // 初始化时设置大小和位置
 
         centerTextPaint = Paint()
         centerTextPaint.style = Paint.Style.FILL
         centerTextPaint.color = mCenterTextColor
         centerTextPaint.textSize = mCenterTextSize
+        centerTextPaint.isAntiAlias = true
+        rectF = RectF()
         textBoundRect = Rect()
     }
 
     fun setProgress(progress: Float) {
         this.progress = progress
-//        invalidate() // 重绘视图
     }
 
     fun setProgressColor(progressColor: Int) {
@@ -131,36 +131,20 @@ class CircleProgressView(context: Context, attrs: AttributeSet?, defStyleAttr: I
             (width / 2 + mCircleRadius - mArcWidth / 2),
             (height / 2 + mCircleRadius - mArcWidth / 2)
         )
+        backgroundPaint.color = mCircleBgColor
         // 绘制背景圆环
         canvas.drawOval(rectF, backgroundPaint)
-        progressPaint.shader = SweepGradient(
-            (width / 2).toFloat(),
-            (height / 2).toFloat(),
-            mCircleBgColor,
-            mProgressColor
-        )
-        // 绘制进度圆环
-        canvas.drawArc(rectF, -90f, progress, false, progressPaint)
-
-        textBoundRect.set(
-            (mCircleRadius + mArcWidth).toInt(),
-            (mCircleRadius + mArcWidth).toInt(),
-            (mCircleRadius - mArcWidth).toInt(),
-            (mCircleRadius - mArcWidth).toInt()
-        )
-        val data = mCenterText ?: "${progress.toInt()}%"
-        var i = data.length + 1
-        var text: String
-        do {
-            i --
-            text = if (i == data.length) data else "${data.substring(0, i)}..."
-            val measureWidth = centerTextPaint.measureText(text)
-        } while (measureWidth > (mCircleRadius * 2) && i >= 0)
-        centerTextPaint.getTextBounds(text, 0, text.length, textBoundRect)
+        progressPaint.color = mProgressColor
+        val radio = progress * 3.6f
+        canvas.drawArc(rectF, -90f, radio, false, progressPaint)
+        val data = mCenterText ?: "$progress%"
+        centerTextPaint.color = mCenterTextColor
+        centerTextPaint.textSize = mCenterTextSize
+        centerTextPaint.getTextBounds(data, 0, data.length, textBoundRect)
         canvas.drawText(
-            text,
-            (width / 2f - textBoundRect.width() / 2f).coerceAtLeast(width/2f - mCircleRadius + mArcWidth),
-            (height / 2f + textBoundRect.height() / 2f),
+            data,
+            width / 2f - textBoundRect.width() / 2f,
+            height / 2f + textBoundRect.height() / 2f,
             centerTextPaint
         )
     }

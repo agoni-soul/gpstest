@@ -1,4 +1,4 @@
-package com.soul.main
+package com.soul.main.pieChartView
 
 import android.content.Context
 import android.graphics.Canvas

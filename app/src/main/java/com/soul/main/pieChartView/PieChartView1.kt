@@ -1,4 +1,4 @@
-package com.soul.main
+package com.soul.main.pieChartView
 
 import android.content.Context
 import android.graphics.Canvas
@@ -6,22 +6,16 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RadialGradient
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.Transformation
-import com.soul.gpstest.R
 import com.soul.util.DpOrSpToPxTransfer
 import kotlin.math.atan2
-import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.pow
-import kotlin.math.sin
 import kotlin.math.sqrt
 
 

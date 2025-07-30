@@ -19,7 +19,6 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkInfo
 import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -72,6 +71,7 @@ import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
 import com.soul.main.network.NetWorkUtils
 import com.soul.main.network.NetworkIp
+import com.soul.main.pieChartView.PieChartBean
 import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
@@ -84,12 +84,8 @@ import com.soul.util.PermissionUtils
 import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
-import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.net.InetAddress
 import java.util.regex.Pattern
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {

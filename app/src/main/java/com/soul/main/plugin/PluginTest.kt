@@ -6,5 +6,7 @@ package com.soul.main.plugin
  * @date:       2025/7/31
  * Description: 插件化学习
  *
- **/class PluginTest {
+ **/
+public class PluginTest {
+    private val TAG = this.javaClass.simpleName
 }

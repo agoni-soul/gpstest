@@ -1,4 +1,4 @@
-package com.soul.main;
+package com.soul.main.retrofit;
 
 import rx.Observable;
 import rx.Observer;

@@ -116,10 +116,13 @@ class BleScanManager private constructor() : BaseBleManager() {
      */
     @SuppressLint("MissingPermission")
     fun startScan(tag: String, bleScanCallback: IBleScanCallback?) {
-        Log.d(TAG, "startScan: mIsSubScanning = ${isSubScanning(tag)}")
-        if (isSubScanning(tag)) return
+        Log.d(TAG, "startScan: mIsSubScanning = ${mScanningMap.contains(tag) && !isSubScanning(tag)}")
+        if (mScanningMap.contains(tag) && !isSubScanning(tag)) {
+            return
+        }
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             mIsScanning = false
+            mScanningMap[tag] = false
             return
         }
         if (!mIsScanning) {
@@ -179,8 +182,10 @@ class BleScanManager private constructor() : BaseBleManager() {
         scanSettings: ScanSettings = ScanSettings.Builder().build(),
         bleScanCallback: IBleScanCallback?
     ) {
-        Log.d(TAG, "startScan: mIsSubScanning = ${isSubScanning(tag)}")
-        if (isSubScanning(tag)) return
+        Log.d(TAG, "startScan: mIsSubScanning = ${mScanningMap.contains(tag) && !isSubScanning(tag)}")
+        if (mScanningMap.contains(tag) && !isSubScanning(tag)) {
+            return
+        }
         if (!BleSDkPermissionManager.isGrantScanAllPermissions()) {
             mBleScanCallbackMap.remove(tag)
             mScanningMap.remove(tag)
@@ -232,13 +237,15 @@ class BleScanManager private constructor() : BaseBleManager() {
      */
     @SuppressLint("MissingPermission")
     fun stopScan(tag: String?) {
-        Log.d(TAG, "stopScan: mIsSubScanning = ${isSubScanning(tag)}")
-        if (!isSubScanning(tag) || mScanningMap.isEmpty()) {
+        Log.d(TAG, "startScan: mIsSubScanning = ${tag?.let { mScanningMap.contains(it) } ?: false && !isSubScanning(tag)}")
+        if (mScanningMap.isEmpty() || (tag != null && mScanningMap.contains(tag) && !isSubScanning(tag))) {
             if (mScanCallback != null && mBleScanCallbackMap.isEmpty()) {
                 mIsScanning = false
                 mBleAdapter?.bluetoothLeScanner?.stopScan(mScanCallback)
                 mScanCallback = null
             }
+            mScanningMap.remove(tag)
+            mBleScanCallbackMap.remove(tag)
             return
         }
         mBleScanCallbackMap.remove(tag)

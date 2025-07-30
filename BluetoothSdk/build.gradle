@@ -14,8 +14,8 @@ android {
 //        implementation.exclude group: 'org.jetbrains' , module:'annotations'
 //        implementation.exclude group: 'com.intellij' , module:'annotations'
 //    }
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
     }
 
     buildFeatures {

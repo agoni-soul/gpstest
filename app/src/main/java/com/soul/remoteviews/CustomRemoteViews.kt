@@ -38,9 +38,8 @@ class CustomRemoteViews(context: Context, packageName: String, layoutId: Int): R
         Glide.with(mContext)
             .load(icon!!)
             .into(object : SimpleTarget<Drawable?>() {
-                @RequiresApi(Build.VERSION_CODES.CUPCAKE)
                 override fun onResourceReady(
-                    resource: Drawable?,
+                    resource: Drawable,
                     transition: Transition<in Drawable?>?
                 ) {
                     (mContext as Activity).runOnUiThread {

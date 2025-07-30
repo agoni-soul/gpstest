@@ -13,8 +13,8 @@ android {
 //        implementation.exclude group: 'org.jetbrains' , module:'annotations'
 //        implementation.exclude group: 'com.intellij' , module:'annotations'
 //    }
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
     }
 
     buildFeatures {
@@ -122,7 +122,6 @@ dependencies {
     // Glide 库
 //    implementation 'com.github.bumptech.glide:glide:4.3.1'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
-    implementation 'com.google.firebase:firebase-database-ktx:22.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
 
     testImplementation 'junit:junit:4.13'

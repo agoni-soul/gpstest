@@ -235,10 +235,11 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
 
             setCallback(TAG, object : IBleScanCallback {
                 override fun onBatchScanResults(results: MutableList<BleScanResult>?) {
-
+                    Log.d(TAG, "onBatchScanResults --->>>  results.size() = ${results?.size}")
                 }
 
                 override fun onScanResult(callbackType: Int, bleScanResult: BleScanResult?) {
+                    Log.d(TAG, "onScanResult --->>>  bleScanResult = ${bleScanResult}")
                     bleScanResult?.let {
                         it.name ?: return
                         if (it.name!!.startsWith("colmo", true) ||
@@ -254,6 +255,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
                 }
 
                 override fun onScanFailed(errorCode: Int) {
+                    Log.d(TAG, "onScanFailed --->>>  errorCode = ${errorCode}")
                 }
 
             })

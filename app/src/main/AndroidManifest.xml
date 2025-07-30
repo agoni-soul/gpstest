@@ -77,6 +77,12 @@
             android:name="com.soul.main.TestActivity"
             android:exported="true"/>
         <activity
+            android:name="com.soul.liveData.LiveDataActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.recyclerview.RecyclerViewActivity"
+            android:exported="true" />
+        <activity
             android:name="com.soul.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.GPSTest.NoActionBar">
@@ -109,6 +115,7 @@
             android:exported="true"
             android:label="@string/accessibility_service"
             android:packageNames="com.soul.gpstest"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />

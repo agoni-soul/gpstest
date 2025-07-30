@@ -33,8 +33,12 @@ class SceneFirstActivity : BaseMvvmActivity<ActivitySceneFirstBinding, BaseViewM
 
     override fun getLayoutId(): Int = R.layout.activity_scene_first
 
-    override fun initView() {
+    override fun requestFeature() {
+        super.requestFeature()
         setSceneAnimation()
+    }
+
+    override fun initView() {
         activity = this
 
         ivImage.transitionName = "activityTransform"

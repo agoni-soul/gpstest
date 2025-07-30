@@ -5,9 +5,13 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.AppOpsManager
 import android.app.usage.NetworkStatsManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.LinkProperties
@@ -17,6 +21,11 @@ import android.net.NetworkInfo
 import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.os.Message
+import android.os.RemoteException
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -36,20 +45,28 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.GlideBuilder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.cache.LruResourceCache
 import com.haha.service.api.IUserService
-import com.haha.service.impl.impl.UserService
 import com.haha.service.impl.service.ServiceLoader
 import com.haha.service.loader.ServiceLoaderHelper
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
+import com.soul.binder.TestService
 import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
+import com.soul.coroutineScope.EatGame
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
+import com.soul.gpstest.IProcessStub
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
+import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
+import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
 import com.soul.selector.SelectorActivity
@@ -119,6 +136,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
         mViewDataBinding?.btnActivityBluetooth?.setOnClickListener {
             val intent = Intent(mContext, BluetoothActivity::class.java)
+            intent.putExtras(Intent())
             startActivity(intent)
         }
         mViewDataBinding?.cpv?.apply {
@@ -130,7 +148,34 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
             invalidate()
         }
+        mViewDataBinding.btnActivityLiveData.setOnClickListener {
+            startActivity(Intent(mContext, LiveDataActivity::class.java))
+        }
+        mViewDataBinding.btnActivityRecyclerView.setOnClickListener {
+            startActivity(Intent(mContext, RecyclerViewActivity::class.java))
+        }
+        mViewDataBinding.btnActivityRecyclerView.post(Runnable() {
+            val options = BitmapFactory.Options()
+            options.inMutable = true
+            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.net_ic_phone, options)
+            bitmap.config = Bitmap.Config.RGB_565
+            val byteCount = bitmap.byteCount // 直接获取内存占用字节数
+            Log.d("Memory", "Bitmap size: $byteCount bytes")
+        })
 
+        testService()
+
+        Thread {
+            val sharedPreferences = getSharedPreferences("haha", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putInt("age", 25)
+            editor.commit()
+            editor.apply()
+
+            editor?.let {
+
+            }
+        }.start()
 
         /**
         if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
@@ -224,6 +269,67 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION))
          **/
+        handlerLoop(mViewDataBinding.btnSkipGps)
+    }
+
+    private fun testService() {
+        val intent = Intent(this, TestService::class.java)
+        bindService(intent, object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val stub = IProcessStub.Stub.asInterface(service)
+                try {
+                    stub.request(" ")
+                } catch (e: RemoteException) {
+                    e.printStackTrace()
+                }
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+
+            }
+
+        }, Context.MODE_PRIVATE.or(Context.BIND_AUTO_CREATE))
+    }
+
+    private var threadHandler: Handler? = null
+
+    val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
+        EatGame() // 非线程安全，但初始化更快
+    }
+
+    private fun testHandler() {
+
+    }
+
+    fun handlerLoop(view: View) {
+        val myThread = Thread(Runnable {
+            Looper.prepare()
+            threadHandler = object : Handler() {
+                override fun handleMessage(msg: Message) {
+                    Log.i(TAG, "handleMessage: ")
+                    Toast.makeText(mContext, "子线程收到消息", Toast.LENGTH_SHORT).show()
+                }
+            }
+            Looper.loop()
+        })
+        myThread.start()
+    }
+
+    fun sendMessageToThreadHandler(view: View) {
+        threadHandler?.sendMessage(Message())
+        threadHandler?.sendMessageDelayed(threadHandler?.obtainMessage() ?: Message(), 1000)
+    }
+
+    private fun testCoroutine() {
+        Glide.with(mContext)
+            .load(R.drawable.me_ic_message)
+            .error(R.drawable.circle)
+            .override(500, 500) // 固定尺寸
+            .centerCrop()
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(mViewDataBinding.ivSuccess)
+        val glideBuilder = GlideBuilder()
+            .setMemoryCache(LruResourceCache(10 * 1024 * 1024)) // 10MB 内存缓存
     }
 
     override fun initData() {
@@ -614,7 +720,27 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 //                        e.printStackTrace()
 //                    }
 //                    DOFLogUtil.d(TAG, "bean = $bean")
-                    startActivity(Intent(this, TestActivity::class.java))
+//                    startActivity(Intent(this, TestActivity::class.java))
+                    threadHandler?.postDelayed(object : Runnable {
+                        override fun run() {
+                            Log.d(TAG, "1000")
+                        }
+
+                    }, 1000)
+                    threadHandler?.postDelayed(object : Runnable {
+                        override fun run() {
+                            Log.d(TAG, "2000")
+                        }
+
+                    }, 2000)
+                    Thread.sleep(2000)
+                    val message = Message()
+                    threadHandler?.postDelayed(object : Runnable {
+                        override fun run() {
+                            Log.d(TAG, "0")
+                        }
+
+                    }, 0)
                 }
 
                 R.id.btn_skip_remote_view -> {

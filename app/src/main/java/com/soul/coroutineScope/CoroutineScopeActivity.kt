@@ -1,13 +1,16 @@
 package com.soul.coroutineScope
 
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.soul.base.BaseMvvmActivity
-import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityCoroutineScopeBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
 /**
  * <pre>
@@ -53,8 +56,40 @@ class CoroutineScopeActivity: BaseMvvmActivity<ActivityCoroutineScopeBinding, Co
         mViewModel.mSsidSecondData.observe(this) {
             mTvSecondScope.text = it
         }
+
+        lifecycleScope.launch {
+            eatGame()
+        }
     }
 
     override fun initData() {
+    }
+
+    suspend fun eatGame() {
+        coroutineScope {
+            val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+            val game = EatGame()
+            launch(dispatcher) {
+                println("Ready Go!")
+                delay(1000)
+                game.timeout()
+                println("Timeout!")
+            }
+            launch(dispatcher) {
+                while (game.isActive) {
+                    delay(60)
+                    val food = Math.random()
+                    println("[${Thread.currentThread().name} #1] Feed: $food >>>")
+                    println("[${Thread.currentThread().name} #1] Complete: ${game.feed("$food")} >>>")
+                }
+            }
+
+            launch(dispatcher) {
+                while (game.isActive) {
+                    delay(50)
+                    println("[${Thread.currentThread().name} #2] Eat: ${game.eat()} >>>")
+                }
+            }
+        }
     }
 }

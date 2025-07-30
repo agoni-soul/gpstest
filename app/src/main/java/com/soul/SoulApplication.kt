@@ -3,8 +3,8 @@ package com.soul
 import android.app.Application
 import android.util.Log
 import com.soul.log.DOFLogUtil
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
+//import com.squareup.leakcanary.LeakCanary
+//import com.tencent.mmkv.MMKV
 import java.io.File
 
 
@@ -26,6 +26,8 @@ class SoulApplication : Application() {
         Log.d(TAG, "onCreate")
         super.onCreate()
         application = this
+//        LeakCanary.install(this)
+//        MMKV.initialize(this);
         initComponents()
         DOFLogUtil.init()
 //        logger?.info("Initializing log4j") ?: Log.d(TAG, "init log4j fail")

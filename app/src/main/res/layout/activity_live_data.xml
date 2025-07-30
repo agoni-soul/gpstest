@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btn_main_send"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:text="主线程发送信息"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_thread_send"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:text="子线程发送信息"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@+id/btn_main_send" />
+
+        <Button
+            android:id="@+id/btn_enter_activity"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:text="进入子Activity"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@+id/btn_thread_send" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

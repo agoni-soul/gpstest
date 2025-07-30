@@ -207,6 +207,22 @@
                     android:text="蓝牙扫描"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_slide" />
 
+                <Button
+                    android:id="@+id/btn_activity_live_data"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="LiveData测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_bluetooth" />
+
+                <Button
+                    android:id="@+id/btn_activity_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="手写RecyclerView测试"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_live_data" />
+
                 <com.soul.main.CircleProgressView
                     android:id="@+id/cpv"
                     android:layout_width="88dp"

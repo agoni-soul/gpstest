@@ -64,6 +64,7 @@ object CacheFile {
 
     fun downloadFile(context: Context, url: String?, urlFileName: String?, cacheFolder:String, dataCallback: (Boolean, ByteArray?) -> Unit){
         if (!PermissionUtils.checkSinglePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            context
             Toast.makeText(context, "没有写权限", Toast.LENGTH_SHORT).show()
         }
         val fileDir = File(context.externalCacheDir, cacheFolder)

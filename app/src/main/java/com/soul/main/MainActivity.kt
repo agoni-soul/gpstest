@@ -22,10 +22,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
-import android.os.Message
 import android.os.RemoteException
 import android.provider.Settings
 import android.text.Spannable
@@ -47,16 +44,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import com.bumptech.glide.Glide
-import com.bumptech.glide.GlideBuilder
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.cache.LruResourceCache
-import com.haha.service.api.IUserService
-import com.haha.service.impl.service.ServiceLoader
-import com.haha.service.loader.ServiceLoaderHelper
+import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
+import com.soul.bean.SubDeviceResultBean
 import com.soul.binder.TestService
 import com.soul.bluetooth.BluetoothActivity
 import com.soul.coroutineScope.CoroutineScopeActivity
@@ -69,24 +61,22 @@ import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
+import com.soul.main.handler.HandlerTest
 import com.soul.main.network.NetWorkUtils
 import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
+import com.soul.main.service.ServiceTest
 import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
 import com.soul.selector.SelectorActivity
 import com.soul.service.accessibility.CustomAccessibilityService
 import com.soul.transparency.TransparencyActivity
-import com.soul.ui.dialog.CustomDialog
 import com.soul.util.DpOrSpToPxTransfer
 import com.soul.util.PermissionUtils
 import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
-import java.io.File
-import java.io.IOException
-import java.util.regex.Pattern
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
@@ -95,8 +85,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private val mAccessibilityManager: AccessibilityManager by lazy {
         getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     }
-
-    private var dialog: CustomDialog? = null
 
     private val mConnectivityManager: ConnectivityManager by lazy {
         getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -172,18 +160,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         })
 
         testService()
-
-        Thread {
-            val sharedPreferences = getSharedPreferences("haha", Context.MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-            editor.putInt("age", 25)
-            editor.commit()
-            editor.apply()
-
-            editor?.let {
-
-            }
-        }.start()
+        SharedPreference.test(mContext)
 
         /**
         if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
@@ -277,7 +254,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION))
          **/
-        handlerLoop(mViewDataBinding.btnSkipGps)
+        HandlerTest.handlerLoop(mViewDataBinding.btnSkipGps)
     }
 
     private fun testService() {
@@ -299,45 +276,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }, Context.MODE_PRIVATE.or(Context.BIND_AUTO_CREATE))
     }
 
-    private var threadHandler: Handler? = null
 
     val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
         EatGame() // 非线程安全，但初始化更快
-    }
-
-    private fun testHandler() {
-
-    }
-
-    fun handlerLoop(view: View) {
-        val myThread = Thread(Runnable {
-            Looper.prepare()
-            threadHandler = object : Handler() {
-                override fun handleMessage(msg: Message) {
-                    Log.i(TAG, "handleMessage: ")
-                    Toast.makeText(mContext, "子线程收到消息", Toast.LENGTH_SHORT).show()
-                }
-            }
-            Looper.loop()
-        })
-        myThread.start()
-    }
-
-    fun sendMessageToThreadHandler(view: View) {
-        threadHandler?.sendMessage(Message())
-        threadHandler?.sendMessageDelayed(threadHandler?.obtainMessage() ?: Message(), 1000)
-    }
-
-    private fun testCoroutine() {
-        Glide.with(mContext)
-            .load(R.drawable.me_ic_message)
-            .error(R.drawable.circle)
-            .override(500, 500) // 固定尺寸
-            .centerCrop()
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(mViewDataBinding.ivSuccess)
-        val glideBuilder = GlideBuilder()
-            .setMemoryCache(LruResourceCache(10 * 1024 * 1024)) // 10MB 内存缓存
     }
 
     override fun initData() {
@@ -367,95 +308,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding.tvSpan.text = builder
         mViewDataBinding.tvSpan.movementMethod = LinkMovementMethod.getInstance()
 
-        test()
-    }
-
-    private fun test() {
-        val iUserService = ServiceLoaderHelper.getService(IUserService::class.java)
-        Log.d(TAG, "iUserService == null: ${iUserService == null}, username = ${iUserService?.getUserName().toString()}")
-        iUserService?.start()
-
-        val service = ServiceLoader.load(IUserService::class.java)
-        Log.d(TAG, "service == null: ${service == null}")
-        val serviceLoader = service?.getAll<IUserService>()
-        Log.d(TAG, "serviceLoader.size = ${serviceLoader?.size}")
-        serviceLoader?.forEach {
-            Log.d(TAG, "serviceLoader = $it")
-            Log.d(TAG, "username = ${it.getUserName()}")
-            Log.d(TAG, "start = ${it.start()}")
-        }
-        testOne()
-    }
-
-    private fun testOne() {
-        val applicationInfo = mContext.packageManager.getApplicationInfo(mContext.packageName, 0)
-        Log.d(TAG, "testOne: applicationInfo.sourceDir = ${applicationInfo.sourceDir}")
-        val sourceApk = File(applicationInfo.sourceDir)
-        val sourcePaths = ArrayList<String>()
-        sourcePaths.add(applicationInfo.sourceDir)
-        val extractedFilePrefix = sourceApk.name + ".classes"
-
-        if (!isVmMutidexCapable()) {
-            val totalDexNumber = mContext.getSharedPreferences("multidex.verson", Context.MODE_PRIVATE.or(Context.MODE_MULTI_PROCESS)).getInt("dex.number", 1)
-            val dexDir = File(applicationInfo.dataDir, "code_cache" + File.separator + "secondary-dexes")
-            for (secondaryNumber in 2 .. totalDexNumber) {
-                val fileName = "$extractedFilePrefix$secondaryNumber.zip"
-                val extractedFile = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    File(dataDir, fileName)
-                } else {
-                    null
-                }
-                if (extractedFile?.isFile == true) {
-                    sourcePaths.add(extractedFile.absolutePath)
-                } else {
-                    throw IOException("Missing exracted secondary dex file ' ${extractedFile?.path} '")
-                }
-            }
-        }
-        Log.d(TAG, "testOne: sourcePaths.size = ${sourcePaths.size}")
-    }
-
-    private fun isVmMutidexCapable(): Boolean {
-        var isMutidexCapable = false
-        var vmName: String? = null
-        try {
-            if (isYunOS()) {
-                vmName = "'YunOS'"
-                isMutidexCapable = System.getProperty("ro.build.version.sdk").toInt() >= 12
-            } else {
-                vmName = "'Android'"
-                val versionString = System.getProperty("java.vm.version")
-                if (versionString != null) {
-                    val matcher = Pattern.compile("(\\d+).(\\d+).(\\.\\d+)?").matcher(versionString)
-                    if (matcher.matches()) {
-                        try {
-                            val major = matcher.group(1)?.toIntOrNull() ?: 0
-                            val minor = matcher.group(2)?.toIntOrNull() ?: 0
-                            isMutidexCapable = major >= 2 || minor >= 1
-                        } catch (e: NumberFormatException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        Log.i(TAG, "isVmMutidexCapable: VM with name: $vmName, ${if (isMutidexCapable) " has multidex support" else " does not have multidex support"}")
-        return isMutidexCapable
-    }
-
-    private fun isYunOS(): Boolean {
-        try {
-            val version = System.getProperty("ro.yunos.version")
-            val vmName = System.getProperty("java.vm.name")
-            return (vmName != null && vmName.toLowerCase().contains("lemur"))
-                    || (version != null && version.trim().isNotEmpty())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
+        ServiceTest.test(mContext)
     }
 
     override fun getStatusBarColor(): Int {
@@ -716,38 +569,18 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         v?.let {
             when (v.id) {
                 R.id.btn_skip_gps -> {
-//                    val intent = Intent(this, GpsActivity::class.java);
-//                    startActivity(intent)
-//                    val resultList =
-//                        "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
-//                    var bean: SubDeviceResultBean? = null
-//                    try {
-//                        bean = GsonUtils.fromJson(resultList, SubDeviceResultBean::class.java)
-//                    } catch (e: Exception) {
-//                        e.printStackTrace()
-//                    }
-//                    DOFLogUtil.d(TAG, "bean = $bean")
-//                    startActivity(Intent(this, TestActivity::class.java))
-                    threadHandler?.postDelayed(object : Runnable {
-                        override fun run() {
-                            Log.d(TAG, "1000")
-                        }
-
-                    }, 1000)
-                    threadHandler?.postDelayed(object : Runnable {
-                        override fun run() {
-                            Log.d(TAG, "2000")
-                        }
-
-                    }, 2000)
-                    Thread.sleep(2000)
-                    val message = Message()
-                    threadHandler?.postDelayed(object : Runnable {
-                        override fun run() {
-                            Log.d(TAG, "0")
-                        }
-
-                    }, 0)
+                    val intent = Intent(this, GpsActivity::class.java);
+                    startActivity(intent)
+                    val resultList =
+                        "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
+                    var bean: SubDeviceResultBean? = null
+                    try {
+                        bean = GsonUtils.fromJson(resultList, SubDeviceResultBean::class.java)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    DOFLogUtil.d(TAG, "bean = $bean")
+                    startActivity(Intent(this, TestActivity::class.java))
                 }
 
                 R.id.btn_skip_remote_view -> {

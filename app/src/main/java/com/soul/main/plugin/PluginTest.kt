@@ -1,5 +1,7 @@
 package com.soul.main.plugin
 
+import android.util.Log
+
 /**
  *
  * @author:     haha
@@ -9,4 +11,9 @@ package com.soul.main.plugin
  **/
 public class PluginTest {
     private val TAG = this.javaClass.simpleName
+
+    public fun test() {
+        Log.d(TAG, "String.classLoader = ${String::class.java.classLoader}")
+        Log.d(TAG, "String.classLoader = ${String::class.java.classLoader}")
+    }
 }

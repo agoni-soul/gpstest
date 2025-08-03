@@ -15,7 +15,8 @@ import android.os.Message
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
-import com.tbruyelle.rxpermissions3.RxPermissions
+import pub.devrel.easypermissions.EasyPermissions
+import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
 import java.lang.ref.WeakReference
 import java.lang.reflect.Method
 import java.util.*
@@ -660,9 +661,17 @@ class BleHelp private constructor() {
     @SuppressLint("CheckResult")
     private fun permissionLocation() {
         if (weakReference?.get() == null) return
-        val rxPermissions = weakReference!!.get()?.let { RxPermissions(it) }
-        rxPermissions?.request(Manifest.permission.ACCESS_FINE_LOCATION)?.subscribe { aBoolean ->
-                if (aBoolean) {
+        val activity = weakReference!!.get() ?: return
+        val receivers = mutableListOf<PermissionCallbacks>().apply {
+            add(object : PermissionCallbacks {
+                override fun onRequestPermissionsResult(
+                    requestCode: Int,
+                    permissions: Array<out String>,
+                    grantResults: IntArray
+                ) {
+                }
+
+                override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
                     //申请的定位权限允许
                     //设置整个连接过程超时时间
                     workHandler!!.sendEmptyMessageDelayed(
@@ -676,13 +685,18 @@ class BleHelp private constructor() {
                         Log.d(TAG, "此次为蓝牙扫描连接")
                         workHandler!!.sendEmptyMessage(START_SCAN)
                     }
-                } else {
+                }
+
+                override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
                     //只要有一个权限被拒绝，就会执行
                     Log.d(TAG, "未授权定位权限，蓝牙功能不能使用：")
                     Toast.makeText(weakReference?.get(), "未授权定位权限，蓝牙功能不能使用", Toast.LENGTH_LONG)
                         .show()
                 }
-            }
+
+            })
+        }
+        EasyPermissions.onRequestPermissionsResult(0, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), intArrayOf(1), receivers)
     }
 
     // 通过GPS卫星定位，定位级别可以精确到街（通过24颗卫星定位，在室外和空旷的地方定位准确、速度快）

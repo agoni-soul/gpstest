@@ -31,6 +31,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true // 启用多DEX
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,7 +42,7 @@ android {
 
     buildFeatures {
         viewBinding true
-        aidl true
+//        aidl true
     }
 
     buildTypes {
@@ -54,12 +55,19 @@ android {
 //    composeOptions {
 //        kotlinCompilerExtensionVersion = "1.5.0"
 //    }
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
+//    kotlinOptions {
+//        jvmTarget = '1.8'
+//    }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = '1.8'
+    kotlinOptions { // 如果使用Kotlin
+        jvmTarget = '11'
     }
 }
 
@@ -79,6 +87,12 @@ task createCoroutineExceptionHandlerServiceFile {
 // 让 assemble 任务依赖于创建文件的任务
 assemble.dependsOn createCoroutineExceptionHandlerServiceFile
 
+//configurations.all {
+//    resolutionStrategy {
+//        force 'androidx.activity:activity:1.9.0'
+//    }
+//}
+
 dependencies {
 
     implementation group:'org.jetbrains.kotlin', name:'kotlin-stdlib', version:kotlin_version
@@ -86,6 +100,7 @@ dependencies {
     implementation group:'androidx.appcompat', name:'appcompat', version:'1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.activity:activity:1.7.2'
 //    implementation "androidx.compose.material:material:1.5.0"
 //    implementation "androidx.activity:activity-compose:1.9.3"
 //    implementation platform("androidx.compose:compose-bom:2024.01.00")
@@ -111,12 +126,11 @@ dependencies {
     implementation 'com.blankj:utilcode:1.30.7'
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.core:core:1.5.0-alpha05'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'  // For Android Support Library
-    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
     // For androidx
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'com.github.tbruyelle:rxpermissions:0.12'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.1'  // For Android Support Library
+//    implementation 'com.github.tbruyelle:rxpermissions:0.12'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
 
     // Glide 库
@@ -134,8 +148,8 @@ dependencies {
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
     implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
     implementation 'com.squareup:javapoet:1.12.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
-    implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
+//    implementation 'org.apache.logging.log4j:log4j-core:2.13.+'
+//    implementation 'org.apache.logging.log4j:log4j-api:2.13.+'
     implementation 'io.github.youth5201314:banner:2.2.3'
     // Retrofit库
     implementation 'com.squareup.okhttp3:okhttp:3.1.2'

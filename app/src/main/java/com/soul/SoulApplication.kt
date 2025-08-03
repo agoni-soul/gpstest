@@ -1,8 +1,10 @@
 package com.soul
 
 import android.app.Application
+import android.content.res.Resources
 import android.util.Log
 import com.soul.log.DOFLogUtil
+import com.soul.pluincore.PluginManager
 //import com.squareup.leakcanary.LeakCanary
 //import com.tencent.mmkv.MMKV
 import java.io.File
@@ -22,6 +24,8 @@ class SoulApplication : Application() {
         var application: Application? = null
     }
 
+    private var mResources: Resources? = null;
+
     override fun onCreate() {
         Log.d(TAG, "onCreate")
         super.onCreate()
@@ -30,6 +34,13 @@ class SoulApplication : Application() {
 //        MMKV.initialize(this);
         initComponents()
         DOFLogUtil.init()
+        val pluginManager = PluginManager.getInStance(this)
+        pluginManager.init()
+        try {
+            mResources = pluginManager.loadResources()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 //        logger?.info("Initializing log4j") ?: Log.d(TAG, "init log4j fail")
 //        initLogger()
     }
@@ -40,5 +51,9 @@ class SoulApplication : Application() {
     }
 
     private fun initComponents() {
+    }
+
+    override fun getResources(): Resources {
+        return mResources ?: super.getResources()
     }
 }

@@ -4,21 +4,45 @@ buildscript {
 //    ext.kotlin_version = "1.9.22"
     ext.kotlin_version = "1.8.0"
     repositories {
+        mavenLocal()
+//        maven { url "https://maven.google.com" }
+        // 配置Maven仓库地址，以提高依赖下载速度
+        // 添加公共仓库的阿里云镜像，这个仓库包含了大量开源项目的发布版本
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // 添加中央仓库的阿里云镜像
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // 添加Gradle插件仓库的阿里云镜像，这个仓库主要用于Gradle插件的下载
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        // 添加Apache Snapshots仓库的阿里云镜像，这个仓库用于下载Apache项目的快照版本
         maven {
-            url "https://maven.google.com"
+            url 'https://maven.aliyun.com/repository/apache-snapshots'
         }
+        // 华为开发者仓库
+        maven {
+            url 'https://developer.huawei.com/repo/'
+        }
+        // 腾讯镜像仓库
+        maven{
+            url 'https://mirrors.tencent.com/nexus/repository/maven-public/'
+        }
+        // Jitpack仓库
+        maven { url 'https://jitpack.io' }
+//        google {
+//            content {
+//                includeGroupByRegex("com/.android.*")
+//                includeGroupByRegex("com/.google.*")
+//                includeGroupByRegex("androidx.*")
+//            }
+//        }
         google()
         mavenCentral()
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        maven { url 'https://jitpack.io' }
         gradlePluginPortal()
     }
     dependencies {
 //        classpath "com.android.tools.build:gradle:8.3.0"
 //        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -27,17 +51,47 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
+//        maven { url "https://maven.google.com" }
+        // 配置Maven仓库地址，以提高依赖下载速度
+        // 添加公共仓库的阿里云镜像，这个仓库包含了大量开源项目的发布版本
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        // 添加中央仓库的阿里云镜像
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        // 添加Gradle插件仓库的阿里云镜像，这个仓库主要用于Gradle插件的下载
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        // 添加Apache Snapshots仓库的阿里云镜像，这个仓库用于下载Apache项目的快照版本
         maven {
-            url "https://maven.google.com"
+            url 'https://maven.aliyun.com/repository/apache-snapshots'
         }
+        // 华为开发者仓库
+        maven {
+            url 'https://developer.huawei.com/repo/'
+        }
+        // 腾讯镜像仓库
+        maven{
+            url 'https://mirrors.tencent.com/nexus/repository/maven-public/'
+        }
+        // Jitpack仓库
+        maven { url 'https://jitpack.io' }
+//        google {
+//            content {
+//                includeGroupByRegex("com/.android.*")
+//                includeGroupByRegex("com/.google.*")
+//                includeGroupByRegex("androidx.*")
+//            }
+//        }
         google()
         mavenCentral()
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        maven { url "https://jitpack.io" }
         gradlePluginPortal()
     }
+
+//    configurations.all {
+//        resolutionStrategy {
+//            force 'androidx.activity:activity:1.8.0'
+//        }
+//    }
 }
 
 ext {
@@ -48,6 +102,6 @@ ext {
 //    sourceCompatibility
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }

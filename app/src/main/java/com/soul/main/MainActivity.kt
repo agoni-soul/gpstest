@@ -61,11 +61,9 @@ import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
-import com.soul.main.handler.HandlerTest
 import com.soul.main.network.NetWorkUtils
 import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
-import com.soul.main.service.ServiceTest
 import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
@@ -158,10 +156,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             val byteCount = bitmap.byteCount // 直接获取内存占用字节数
             Log.d("Memory", "Bitmap size: $byteCount bytes")
         })
+        mViewDataBinding.btnActivityPlugin.setOnClickListener(this)
 
         testService()
-        SharedPreference.test(mContext)
-
         /**
         if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
         mConnectivityDiagnosticsManager = getSystemService(Context.CONNECTIVITY_DIAGNOSTICS_SERVICE) as ConnectivityDiagnosticsManager
@@ -254,7 +251,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION))
          **/
-        HandlerTest.handlerLoop(mViewDataBinding.btnSkipGps)
     }
 
     private fun testService() {
@@ -276,9 +272,31 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }, Context.MODE_PRIVATE.or(Context.BIND_AUTO_CREATE))
     }
 
-
     val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
         EatGame() // 非线程安全，但初始化更快
+    }
+
+    override fun isUsedEncapsulatedPermissions(): Boolean = true
+
+    override fun requestPermissionArray(): Array<String> {
+        return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            arrayOf(
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_IMAGES
+            )
+        }
+    }
+
+    override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+        permissionResultMap.forEach { (k, v) ->
+            Log.d(TAG, "$k ----->>>>>  $v")
+        }
     }
 
     override fun initData() {
@@ -307,8 +325,14 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding.tvSpan.text = builder
         mViewDataBinding.tvSpan.movementMethod = LinkMovementMethod.getInstance()
+    }
 
-        ServiceTest.test(mContext)
+    override fun onResume() {
+        super.onResume()
+
+        TestLearnUtils.test(mContext)
+        TestLearnUtils.test(mViewDataBinding.btnSkipGps)
+        TestLearnUtils.test()
     }
 
     override fun getStatusBarColor(): Int {
@@ -806,6 +830,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
                 R.id.btn_activity_volume -> {
                     val intent = Intent(this, VolumeActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.btn_activity_plugin -> {
+                    val intent = Intent()
+                    intent.setComponent(ComponentName("com.soul.pluginapp", "com.soul.pluginapp.PluginActivity"))
                     startActivity(intent)
                 }
 

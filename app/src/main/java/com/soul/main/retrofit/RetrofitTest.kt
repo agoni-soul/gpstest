@@ -20,6 +20,8 @@ import retrofit2.http.Path
  *
  **/
 class RetrofitTest {
+    private val TAG = this.javaClass.simpleName
+
     fun test() {
         val observable: Observable<Int> = Observable.create(object : ObservableOnSubscribe<Int> {
             @Throws(java.lang.Exception::class)
@@ -36,7 +38,7 @@ class RetrofitTest {
             private var disposable: Disposable? = null
 
             override fun onNext(value: Int) {
-                Log.d("xujun", value.toString())
+                Log.d(TAG, value.toString())
                 if (value >= 2) {   // >=2  时为异常数据，解除订阅
                     disposable?.dispose()
                 }

@@ -157,6 +157,11 @@ dependencies {
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
 
+    // Xposed API
+    compileOnly 'de.robv.android.xposed:api:82'
+    // 如果需要源代码
+    compileOnly 'de.robv.android.xposed:api:82:sources'
+
 //    implementation 'com.github.EspoirX:StarrySky:v2.6.3'
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.0'
 //    implementation project(':starrysky')

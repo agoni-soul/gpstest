@@ -37,13 +37,15 @@
     <application
         android:name="com.soul.SoulApplication"
         android:allowBackup="true"
-        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name="com.soul.coroutineScope.CoroutineScopeActivity"
+        android:theme="@style/AppTheme"
+        android:usesNonSdkApi="true">
+        <activity
+            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
             android:exported="true" />
         <activity
             android:name="com.soul.scene.CustomSceneSecondActivity"
@@ -81,10 +83,10 @@
             android:exported="true" />
         <activity
             android:name="com.soul.waterfall.WaterFallActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name="com.soul.main.TestActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name="com.soul.dynamicTextView.DynamicTextViewActivity"
             android:exported="true" />
@@ -94,8 +96,7 @@
         <activity
             android:name="com.soul.recyclerview.RecyclerViewActivity"
             android:exported="true" />
-        <activity
-            android:name="com.soul.main.plugin.RegisteredActivity" />
+        <activity android:name="com.soul.main.plugin.RegisteredActivity" />
         <activity
             android:name="com.soul.main.MainActivity"
             android:exported="true"
@@ -125,11 +126,11 @@
 
         <service
             android:name="com.soul.service.accessibility.CustomAccessibilityService"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:enabled="true"
             android:exported="true"
             android:label="@string/accessibility_service"
             android:packageNames="com.soul.gpstest"
-            android:configChanges="orientation|screenSize|keyboardHidden"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
@@ -196,6 +197,16 @@
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
+
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="my demo for xposed" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" />
     </application>
 
 </manifest>

@@ -9,11 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.soul.pluginapp.databinding.FragmentSecondBinding;
+import com.soul.pluginapp.databinding.PluginFragmentSecondBinding;
 
 public class SecondFragment extends Fragment {
 
-    private FragmentSecondBinding binding;
+    private PluginFragmentSecondBinding binding;
 
     @Override
     public View onCreateView(
@@ -21,7 +21,7 @@ public class SecondFragment extends Fragment {
             Bundle savedInstanceState
     ) {
 
-        binding = FragmentSecondBinding.inflate(inflater, container, false);
+        binding = PluginFragmentSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
 
     }

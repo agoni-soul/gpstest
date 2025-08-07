@@ -1,13 +1,18 @@
 package com.soul
 
-import android.app.Application
-import android.content.res.Resources
-import android.util.Log
-import com.soul.log.DOFLogUtil
-import com.soul.pluincore.PluginManager
 //import com.squareup.leakcanary.LeakCanary
 //import com.tencent.mmkv.MMKV
+import android.app.Application
+import android.content.Context
+import android.content.res.Resources
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import com.soul.log.DOFLogUtil
+import com.soul.pluincore.HookUtils
+import com.soul.pluincore.PluginManager
 import java.io.File
+import java.lang.reflect.Field
 
 
 /**

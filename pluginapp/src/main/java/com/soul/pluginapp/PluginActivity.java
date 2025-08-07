@@ -1,51 +1,58 @@
 package com.soul.pluginapp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
-public class PluginActivity extends AppCompatActivity {
+import com.google.android.material.snackbar.Snackbar;
+import com.soul.pluginapp.databinding.PluginActivityPluginBinding;
+
+public class PluginActivity extends BaseActivity {
 
     private static String TAG = PluginActivity.class.getSimpleName();
 
-    public static void doSomething() {
-        Log.d(TAG, "PluginActivity doSomething");
-    }
-
 //    private AppBarConfiguration appBarConfiguration;
-//    private ActivityPluginBinding binding;
+//    private PluginActivityPluginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_plugin);
-
+        Log.d(TAG, "Context = " + ((Context) this).getClass().getName());
         Log.e(TAG, "PluginActivity onCreate");
-
-//        binding = ActivityPluginBinding.inflate(getLayoutInflater());
+        Log.e(TAG, "Context = " + getBaseContext().getClass().getName());
+        Log.e(TAG, "application = " + getApplication().getClass().getName());
+        Log.e(TAG, "resources = " + getResources().getClass().getName());
+        // 动态设置资源
+        getResources().getIdentifier("plugin_activity_plugin", "layout", "com.soul.pluginapp");
+        setContentView(R.layout.plugin_activity_plugin); // 使用合并后的资源ID
+        getResources().getIdentifier("Base_Theme_GPSTest", "values/themes", "com.soul.pluginapp");
+        setTheme(R.style.Base_Theme_GPSTest);
+//        binding = PluginActivityPluginBinding.inflate(getLayoutInflater());
 //        setContentView(binding.getRoot());
-//
+
 //        setSupportActionBar(binding.toolbar);
-//
+
 //        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_plugin);
 //        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
 //        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 //
-//        binding.fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAnchorView(R.id.fab)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+//        binding.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAnchorView(R.id.fab)
+//                .setAction("Action", null).show());
     }
 
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_plugin, menu);
+//        getMenuInflater().inflate(R.menu.plugin_menu_plugin, menu);
 //        return true;
 //    }
 //

@@ -128,8 +128,10 @@ public class PluginManager {
 
             // 获取host的dexElements, PathClassLoader
             ClassLoader pathClassLoader = mContext.getClassLoader();
+            Field hostElementsField = pathListClass.getDeclaredField("dexElements");
+            hostElementsField.setAccessible(true);
             Object hostPathListObject = pathListField.get(pathClassLoader);
-            Object hostDexElements = dexElementsField.get(hostPathListObject);
+            Object hostDexElements = hostElementsField.get(hostPathListObject);
 
             // 合并
             int pluginDexElementsLength = Array.getLength(pluginDexElements);

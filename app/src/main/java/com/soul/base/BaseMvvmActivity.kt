@@ -23,11 +23,11 @@ import kotlinx.coroutines.launch
  */
 abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseActivity() {
 
-    protected val mViewDataBinding: V by lazy {
+    protected val mViewDataBinding: V by lazy(LazyThreadSafetyMode.PUBLICATION) {
         DataBindingUtil.setContentView(this, getLayoutId())
     }
 
-    protected val mViewModel: VM by lazy {
+    protected val mViewModel: VM by lazy(LazyThreadSafetyMode.PUBLICATION) {
         val modelClass: Class<VM> = getViewModelClass()
         val viewModel = ViewModelProvider(this)[modelClass]
         viewModel.viewModelScope.launch(Dispatchers.Main) {

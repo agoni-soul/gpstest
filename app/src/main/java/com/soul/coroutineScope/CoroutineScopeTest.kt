@@ -12,6 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -49,6 +50,8 @@ class CoroutineScopeTest {
         Log.d(TAG, "start()")
 
         testFlowCompleteInOnCompletion()
+        testRunBlocking()
+        testRunBlocking1()
     }
 
     private fun testSelectChannel(): Unit = runBlocking {
@@ -70,6 +73,27 @@ class CoroutineScopeTest {
             }
         }
         result?.toString()?.let { Log.d(TAG, it) }
+    }
+
+    private fun testRunBlocking(): Unit = runBlocking {
+        launch {
+            delay(1000)
+            println("world")
+        }
+
+        println("hello")
+    }
+
+    private fun testRunBlocking1(): Unit = runBlocking {
+
+        coroutineScope {
+            launch {
+                delay(1000)
+                println("${Thread.currentThread()} world")
+            }
+        }
+
+        println("${Thread.currentThread()} hello")
     }
 
     private fun testCancelAndException(): Unit = runBlocking {

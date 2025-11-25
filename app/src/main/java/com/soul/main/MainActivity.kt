@@ -76,7 +76,14 @@ import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
 
+
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
+
+    /**
+     * A native method that is implemented by the 'GPSTest' native library,
+     * which is packaged with this application.
+     */
+    external fun stringFromJNI(): String?
 
     private var mCustomAccessibilityService: CustomAccessibilityService? = null
 
@@ -325,9 +332,28 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
         mViewDataBinding.tvSpan.text = builder
         mViewDataBinding.tvSpan.movementMethod = LinkMovementMethod.getInstance()
+        Log.d(TAG, "C++ = ${stringFromJNI()}")
+//        Thread {
+//            synchronizedTest()
+//        }.start()
+    }
+
+    @Synchronized
+    private fun synchronizedTest() {
+        synchronized(this) {
+            val startTime = System.currentTimeMillis()
+            Log.d(TAG, "synchronizedTest: start time = $startTime")
+            Thread.sleep(11000)
+            Log.d(TAG, "synchronizedTest: end time = ${System.currentTimeMillis() - startTime}")
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
     }
 
     override fun onResume() {
+//        synchronizedTest()
         super.onResume()
 
         TestLearnUtils.test(mContext)

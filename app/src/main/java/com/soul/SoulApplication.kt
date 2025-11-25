@@ -27,6 +27,10 @@ class SoulApplication : Application() {
 
     companion object {
         var application: Application? = null
+        init {
+            // Used to load the 'nativeTest' library on application startup.
+            System.loadLibrary("GPSTest")
+        }
     }
 
     private var mResources: Resources? = null;

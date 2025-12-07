@@ -98,7 +98,7 @@ ext {
     compileSdkVersion = 33
     buildToolsVersion = "22.0.1"
     minSdkVersion = 21
-    targetSdkVersion = 33
+    targetSdkVersion = 26
 //    sourceCompatibility
 }
 

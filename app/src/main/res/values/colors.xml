@@ -24,4 +24,7 @@
     <color name="circle_gradual_end">#FFE5E5E8</color>
     <color name="circle_gradual_start">#FFFDFDFD</color>
 
+    <color name="splash_background">#00FFFF</color>
+    <color name="icon_background">#FFFF00</color>
+
 </resources>

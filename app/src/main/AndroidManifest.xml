@@ -37,6 +37,7 @@
     <application
         android:name="com.soul.SoulApplication"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
@@ -100,7 +101,7 @@
         <activity
             android:name="com.soul.main.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.GPSTest.NoActionBar">
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -59,9 +59,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+    protected open fun extraConfig() {
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mContext = this
+        extraConfig()
         requestFeature()
         ActivityCollector.addActivity(this)
         hideTitleAndActionBar()

@@ -19,6 +19,19 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- 设置闪屏页的背景 -->
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <!-- 设置中心图标的动画，可选 -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <!-- 设置图标动画的持续时间，默认为1000毫秒 -->
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+<!--        &lt;!&ndash; 设置图标后面的背景，可选 &ndash;&gt;-->
+<!--        <item name="windowSplashScreenIconBackgroundColor">@color/icon_background</item>-->
+
+        <item name="postSplashScreenTheme">@style/Theme.GPSTest.NoActionBar</item>
+    </style>
+
     <style name="Theme.GPSTest.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.GPSTest.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

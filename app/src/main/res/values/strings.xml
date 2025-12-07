@@ -29,4 +29,7 @@
     <string name="ble_device_uuids">DeviceUuids:\n%s</string>
     <string name="ble_unbind">解绑</string>
     <string name="ble_communicate">通信</string>
+
+    <string name="monitor_control_start">开启UI监控</string>
+    <string name="monitor_control_stop">停止UI监控</string>
 </resources>

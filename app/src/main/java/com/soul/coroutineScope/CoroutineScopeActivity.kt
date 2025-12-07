@@ -346,6 +346,7 @@ class CoroutineScopeActivity: BaseMvvmActivity<ActivityCoroutineScopeBinding, Co
 
     private fun main11() = runBlocking {
         val sharedFlow = MutableSharedFlow<Int>(replay = 2, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        sharedFlow.distinctUntilChanged()
 
         // 启动一个协程来发射数据
         launch {

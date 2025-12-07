@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.AppOpsManager
+import android.app.Service
 import android.app.usage.NetworkStatsManager
 import android.content.ComponentName
 import android.content.Context
@@ -22,8 +23,12 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.RemoteException
+import android.os.SystemClock
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -43,6 +48,8 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
@@ -61,9 +68,11 @@ import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
-import com.soul.main.network.NetWorkUtils
+import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
+import com.soul.main.timeMonitor.TimeMonitorConfig
+import com.soul.main.timeMonitor.TimeMonitorManager
 import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
@@ -78,6 +87,10 @@ import com.soul.wifi.WifiActivity
 
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
+
+    companion object {
+        private const val SPLASH_DURATION = 1500L
+    }
 
     /**
      * A native method that is implemented by the 'GPSTest' native library,
@@ -97,8 +110,48 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private var mNetworkIp: NetworkIp? = null
 
+    private var keepSplashOnScreen = true
+
+    private var mSplashScreen: SplashScreen? = null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        mSplashScreen = installSplashScreen()
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun hideTitleAndActionBar() {
+        // Android 12 以上，SplashScreen会自行处理隐藏顶部状态栏的逻辑
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            super.hideTitleAndActionBar()
+        }
+    }
+
+    override fun extraConfig() {
+        super.extraConfig()
+
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("AppStartActivity_create")
+
+        // 设置保持条件，当keepSplashOnScreen为false时，闪屏页会消失
+        mSplashScreen?.setKeepOnScreenCondition { keepSplashOnScreen }
+
+        // 模拟一些初始化工作
+        simulateInitialization {
+            val processors = Runtime.getRuntime().availableProcessors()
+            keepSplashOnScreen = false
+        }
+    }
+
+    private fun simulateInitialization(onInitializationComplete: () -> Unit) {
+        // 模拟延迟，比如网络请求或数据加载
+        Handler(Looper.getMainLooper()).postDelayed({
+            onInitializationComplete()
+        }, 2000)
+    }
 
     override fun initView() {
         mViewDataBinding.btnSkipGps.setOnClickListener(this)
@@ -155,15 +208,19 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding.btnActivityRecyclerView.setOnClickListener {
             startActivity(Intent(mContext, RecyclerViewActivity::class.java))
         }
-        mViewDataBinding.btnActivityRecyclerView.post(Runnable() {
+        mViewDataBinding.btnActivityRecyclerView.post {
             val options = BitmapFactory.Options()
             options.inMutable = true
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.net_ic_phone, options)
             bitmap.config = Bitmap.Config.RGB_565
             val byteCount = bitmap.byteCount // 直接获取内存占用字节数
             Log.d("Memory", "Bitmap size: $byteCount bytes")
-        })
+        }
         mViewDataBinding.btnActivityPlugin.setOnClickListener(this)
+        mViewDataBinding.btnUiMonitor.setOnClickListener {
+            //TODO 目前版本问题，导致获取权限不到，无法使用，后续优化
+            changeMonitorPerf()
+        }
 
         testService()
         /**
@@ -279,6 +336,16 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }, Context.MODE_PRIVATE.or(Context.BIND_AUTO_CREATE))
     }
 
+    private fun changeMonitorPerf() {
+        if (UiPerfMonitor.getInstance().isMonitoring()) {
+            UiPerfMonitor.getInstance().stopMonitor()
+            mViewDataBinding.btnUiMonitor.text = resources.getText(R.string.monitor_control_start)
+        } else {
+            UiPerfMonitor.getInstance().startMonitor()
+            mViewDataBinding.btnUiMonitor.text = resources.getText(R.string.monitor_control_stop)
+        }
+    }
+
     val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
         EatGame() // 非线程安全，但初始化更快
     }
@@ -336,6 +403,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 //        Thread {
 //            synchronizedTest()
 //        }.start()
+
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("AppStartActivity_createOver")
     }
 
     @Synchronized
@@ -343,13 +414,16 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         synchronized(this) {
             val startTime = System.currentTimeMillis()
             Log.d(TAG, "synchronizedTest: start time = $startTime")
-            Thread.sleep(11000)
+            Thread.sleep(21000)
             Log.d(TAG, "synchronizedTest: end time = ${System.currentTimeMillis() - startTime}")
         }
     }
 
     override fun onStart() {
         super.onStart()
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .end("AppStartActivity_start", false)
     }
 
     override fun onResume() {
@@ -766,15 +840,18 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 }
 
                 R.id.btn_test1 -> {
-                    if (mNetworkIp == null) {
-                        mNetworkIp = NetworkIp()
-                    }
-                    mNetworkIp?.isWifiConnected(this, mConnectivityManager.activeNetworkInfo)
-
-                    NetWorkUtils.requestNetwork(this)
-                    val b =
-                        mConnectivityManager.bindProcessToNetwork(mConnectivityManager.activeNetwork)
-                    Log.d("haha", "bindProcessToNetwork: $b")
+//                    if (mNetworkIp == null) {
+//                        mNetworkIp = NetworkIp()
+//                    }
+//                    mNetworkIp?.isWifiConnected(this, mConnectivityManager.activeNetworkInfo)
+//
+//                    NetWorkUtils.requestNetwork(this)
+//                    val b =
+//                        mConnectivityManager.bindProcessToNetwork(mConnectivityManager.activeNetwork)
+//                    Log.d("haha", "bindProcessToNetwork: $b")
+                    createMemoryChurn()
+//                    testANRService()
+//                    createRunnableChurn()
                 }
 
                 R.id.btn_permission -> {
@@ -872,6 +949,109 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
+    private fun createMemoryChurn() {
+        for (i in 0..10000) {
+            var result: String? = ""
+            for (j in 0..99) {
+                result += j // 每次+=都会创建新的StringBuilder和String
+            }
+        }
+    }
+
+    private fun badCollectionUsage() {
+        val data: MutableList<String> = ArrayList()
+        for (i in 0..9999) {
+            data.add("item$i")
+
+
+            // 创建临时List进行筛选
+            val filtered: MutableList<String> = ArrayList()
+            for (item in data) {
+                if (item.contains("5")) {
+                    filtered.add(item)
+                }
+            }
+        }
+    }
+
+    private fun createRunnableChurn() {
+        for (i in 0..999) {
+            // 每次循环都创建新Runnable
+            Handler().postDelayed({
+                // do something
+            }, 1000)
+        }
+    }
+
+    private fun testOOM() {
+        val list = mutableListOf<ByteArray>()
+        try {
+            while (true) {
+                // 每次循环分配1MB内存
+                list.add(ByteArray(1024 * 1024))
+            }
+        } catch (e: OutOfMemoryError) {
+            // 捕获到OOM，进行后续处理或日志记录
+            Log.e("OOM_TEST", "OutOfMemoryError caught!")
+        }
+    }
+
+    private fun TestANRSleep() {
+        Thread.sleep(20 * 1000)
+    }
+
+    private fun testANRLock() {
+        synchronizedTest2()
+    }
+
+    private fun synchronizedTest2() {
+        Thread { synchronizedInThread() }.start()
+        runOnUiThread { synchronizedInMain() }
+    }
+
+    @Synchronized
+    fun synchronizedInThread() {
+        SystemClock.sleep(30000)
+    }
+
+    @Synchronized
+    fun synchronizedInMain() {
+    }
+
+    private fun testANRService() {
+        produceANRByService()
+    }
+
+    /**
+     * 点击后，启动一个 Service，在 Service 内阻塞主线程
+     *
+     * 20s 左右会有 ANR 的log，再过 10s 左右有 ANR 的弹框
+     */
+    private fun produceANRByService(view: View?) {
+        val intent = Intent(this, MyService::class.java)
+        startService(intent)
+    }
+
+    /**
+     * 点击后，阻塞主线程，再启动一个 Service
+     *
+     * 20s 左右会有 ANR 的log，再过 10s 左右有 ANR 的弹框
+     */
+    private fun produceANRByService() {
+        Thread {
+            SystemClock.sleep(3000)
+            val intent = Intent(this, MyService::class.java)
+            startService(intent)
+        }.start()
+
+        sleepTest()
+    }
+
+    private fun sleepTest() {
+        SystemClock.sleep(100000)
+    }
+
+
     private fun accessibilityManagerTest() {
         val accessibilityManager =
             getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -921,4 +1101,16 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private fun isSatisfiedAndroidVersion(version: Int): Boolean = Build.VERSION.SDK_INT >= version
 
+}
+
+class MyService: Service() {
+
+    override fun onCreate() {
+        super.onCreate()
+        SystemClock.sleep(100000)
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
 }

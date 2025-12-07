@@ -254,6 +254,14 @@
                     android:text="跳转到插件"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_dynamic" />
 
+                <Button
+                    android:id="@+id/btn_ui_monitor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="UI监控"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_plugin" />
+
                 <com.soul.main.pieChartView.CircleSectorView
                     android:id="@+id/csv"
                     android:visibility="gone"
@@ -262,7 +270,7 @@
                     android:layout_marginTop="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_plugin" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_ui_monitor" />
 
                 <com.soul.main.pieChartView.PieChartView
                     android:id="@+id/pcv"

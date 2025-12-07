@@ -36,7 +36,7 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     @SuppressWarnings("missingPermission")
-    private val gattServiceCallback = object : BluetoothGattServerCallback() {
+    private var gattServiceCallback: BluetoothGattServerCallback? = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
             device ?: return
             Log.d(TAG, "zsr onConnectionStateChange: ")
@@ -195,5 +195,6 @@ class BleServerFragment : BaseMvvmFragment<FragmentBleServerBinding, BaseViewMod
     override fun onDestroy() {
         super.onDestroy()
         mBleServerImpl?.close(TAG)
+        gattServiceCallback = null
     }
 }

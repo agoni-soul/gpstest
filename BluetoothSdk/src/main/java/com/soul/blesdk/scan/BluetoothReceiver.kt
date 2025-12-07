@@ -81,4 +81,9 @@ class BluetoothReceiver: BroadcastReceiver() {
             }
         }
     }
+
+    fun close() {
+        mBleScanCallback = null
+        mBleBoundCallback = null
+    }
 }

@@ -36,7 +36,9 @@ open class BaseBleScanDevice: IBleScanDevice {
     }
 
     override fun stopScan(tag: String?) {
-        mBleScanCallbackMap.remove(tag)
+        if (tag != null && mBleScanCallbackMap.contains(tag)) {
+            mBleScanCallbackMap.remove(tag)
+        }
     }
 
     override fun isScanning(tag: String?): Boolean = mIsScanning
@@ -63,8 +65,7 @@ open class BaseBleScanDevice: IBleScanDevice {
     }
 
     fun unregisterBleReceiver(activity: Activity?) {
-        activity ?: return
-        if (activity.isFinishing || activity.isDestroyed) return
-        activity.unregisterReceiver(mBluetoothReceiver)
+        activity?.unregisterReceiver(mBluetoothReceiver)
+        mBluetoothReceiver?.close()
     }
 }

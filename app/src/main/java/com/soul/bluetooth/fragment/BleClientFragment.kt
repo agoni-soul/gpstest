@@ -313,6 +313,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
         mBleClientManager?.closeConnect()
         mBleClientManager = null
         blueGattListener = null
+        mBleAdapter?.setOnItemClickListener(null)
     }
 
     private fun logInfo(msg: String) {

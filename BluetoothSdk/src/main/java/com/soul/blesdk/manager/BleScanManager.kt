@@ -159,8 +159,10 @@ class BleScanManager private constructor() : BaseBleManager() {
             }
             mBleAdapter?.bluetoothLeScanner?.startScan(mScanCallback)
         }
-        mBleScanCallbackMap[tag] = bleScanCallback
-        mScanningMap[tag] = true
+        if (bleScanCallback != null) {
+            mBleScanCallbackMap[tag] = bleScanCallback
+            mScanningMap[tag] = true
+        }
     }
 
     /**
@@ -228,8 +230,10 @@ class BleScanManager private constructor() : BaseBleManager() {
             }, scanDurationTime)
         }
         mBleAdapter?.bluetoothLeScanner?.startScan(scanFilters, scanSettings, mScanCallback)
-        mBleScanCallbackMap[tag] = bleScanCallback
-        mScanningMap[tag] = true
+        if (bleScanCallback != null) {
+            mBleScanCallbackMap[tag] = bleScanCallback
+            mScanningMap[tag] = true
+        }
     }
 
     /**

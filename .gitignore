@@ -8,6 +8,17 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 /.idea
+.idea/*
+# 但保留版本控制相关配置
+!.idea/vcs.xml
+!.idea/.name
+!.idea/.gitignore
+# 可选：保留其他可能有用的配置
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+!.idea/runConfigurations/
+!.idea/shelf/
+
 .DS_Store
 /build
 build/

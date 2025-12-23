@@ -73,6 +73,7 @@ import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
 import com.soul.main.timeMonitor.TimeMonitorConfig
 import com.soul.main.timeMonitor.TimeMonitorManager
+import com.soul.mviFrame.main.MainMVIActivity
 import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
@@ -221,6 +222,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             //TODO 目前版本问题，导致获取权限不到，无法使用，后续优化
             changeMonitorPerf()
         }
+        mViewDataBinding.btnActivityMviFrame.setOnClickListener(this)
 
         testService()
         /**
@@ -939,6 +941,11 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 R.id.btn_activity_plugin -> {
                     val intent = Intent()
                     intent.setComponent(ComponentName("com.soul.pluginapp", "com.soul.pluginapp.PluginActivity"))
+                    startActivity(intent)
+                }
+
+                R.id.btn_activity_mvi_frame -> {
+                    val intent = Intent(this, MainMVIActivity::class.java)
                     startActivity(intent)
                 }
 

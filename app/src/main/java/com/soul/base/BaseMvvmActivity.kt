@@ -52,10 +52,12 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
 
     }
 
+    protected open fun defaultBackgroundId(): Int = R.color.white
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
-        mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, R.color.white)
+        mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, defaultBackgroundId())
         if (!isShowStatus()) {
             addStatusBarView()
         }
@@ -110,7 +112,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onCreate")
+        Log.d(TAG, "onDestroy")
         super.onDestroy()
         mViewDataBinding.unbind()
         lifecycle.removeObserver(mViewModel)

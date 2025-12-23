@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -127,7 +128,8 @@
                     android:layout_height="wrap_content"
                     android:importantForAccessibility="no"
                     android:text="自定义Activity动画2"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_custom_scene" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_custom_scene"
+                    tools:layout_editor_absoluteX="0dp" />
 
                 <Button
                     android:id="@+id/btn_activity_recyclerview"
@@ -262,6 +264,14 @@
                     android:text="UI监控"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_plugin" />
 
+                <Button
+                    android:id="@+id/btn_activity_mvi_frame"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="MVI 框架"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_ui_monitor" />
+
                 <com.soul.main.pieChartView.CircleSectorView
                     android:id="@+id/csv"
                     android:visibility="gone"
@@ -270,7 +280,7 @@
                     android:layout_marginTop="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_ui_monitor" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_mvi_frame" />
 
                 <com.soul.main.pieChartView.PieChartView
                     android:id="@+id/pcv"

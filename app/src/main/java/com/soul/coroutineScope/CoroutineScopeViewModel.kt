@@ -3,7 +3,9 @@ package com.soul.coroutineScope
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.soul.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +44,11 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
 
         scopeTest = CoroutineScopeTest()
         scopeTest?.start()
+         val mediatorLiveData = MediatorLiveData<String>()
+        mediatorLiveData.addSource(mSsidFirstData) {
+            Log.d(TAG, "onChange1: ${it}")
+        }
+        mSsidSecondData.postValue("haha")
     }
 
     private fun initScanData(): MutableList<String> {

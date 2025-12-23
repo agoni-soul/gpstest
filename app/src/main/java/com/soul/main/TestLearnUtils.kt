@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import com.soul.main.collection.CollectionTest
 import com.soul.main.handler.HandlerTest
+import com.soul.main.leakCanary.LeakCanaryTest
 import com.soul.main.plugin.PluginTest
 import com.soul.main.retrofit.RetrofitTest
 import com.soul.main.service.ServiceTest
@@ -34,6 +35,7 @@ object TestLearnUtils {
         SharedPreference.test(context)
         ServiceTest.test(context)
         PluginTest.test(context)
+        LeakCanaryTest.main()
     }
 
     fun test(view: View) {

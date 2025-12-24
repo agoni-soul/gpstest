@@ -43,6 +43,19 @@ class CoroutineScopeActivity: BaseMvvmActivity<ActivityCoroutineScopeBinding, Co
         findViewById(R.id.tv_coroutine_scope_second)
     }
 
+    // LeakThread 定义为 CoroutineScopeActivity 的内部类
+    class LeakThread : Thread() {
+        override fun run() {
+            super.run()
+            try {
+                //线程内耗时操作
+                sleep(6 * 60 * 1000)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     override fun getViewModelClass(): Class<CoroutineScopeViewModel> = CoroutineScopeViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_coroutine_scope
@@ -102,6 +115,8 @@ class CoroutineScopeActivity: BaseMvvmActivity<ActivityCoroutineScopeBinding, Co
 
     private fun test() {
         main()
+//        val leakThread = LeakThread()
+//        leakThread.start()
     }
 
     private suspend fun doSomething(): String {

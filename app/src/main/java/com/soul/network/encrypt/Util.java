@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.common.utils;
+package com.soul.network.encrypt;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -7,6 +7,7 @@ import android.net.wifi.WifiInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,9 +33,6 @@ import java.util.zip.ZipOutputStream;
 /**
  * <h1>工具类</h1>
  * <p>一些工具方法。
- *
- * @author <a href="http://msmart.midea.com">美的智慧家居科技有限公司</a>
- * @date 2016/7/4
  */
 public class Util {
     private final static String TAG = "Util";
@@ -347,7 +345,7 @@ public class Util {
             try {
                 bytes[nIndex] = (byte) (Integer.parseInt(szDec[nIndex]));
             } catch (Exception ex) {
-                LogUtils.i(TAG, "decStringToBytes()," + ex.getMessage());
+                Log.i(TAG, "decStringToBytes()," + ex.getMessage());
             }
 
         }
@@ -364,7 +362,7 @@ public class Util {
             try {
                 bytes[nIndex] = (byte) (Integer.parseInt(szDec[nIndex]));
             } catch (Exception ex) {
-                LogUtils.i("decStringToBytes", ex.getMessage());
+                Log.i("decStringToBytes", ex.getMessage());
             }
 
         }
@@ -832,9 +830,9 @@ public class Util {
             strMacAddr = buffer.toString().toLowerCase();
         } catch (Exception e) {
             e.printStackTrace();
-            LogUtils.e("get localmac failed");
+            Log.e(TAG, "get localmac failed");
         }
-        LogUtils.e("get localmac strMacAddr = "+strMacAddr);
+        Log.e(TAG, "get localmac strMacAddr = " + strMacAddr);
         return strMacAddr;
     }
 
@@ -864,7 +862,7 @@ public class Util {
                 }
             }
         } catch (SocketException e) {
-            LogUtils.e("get local ip failed");
+            Log.e(TAG, "get local ip failed");
             e.printStackTrace();
         }
         return ip;

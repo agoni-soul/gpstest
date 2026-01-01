@@ -1,4 +1,8 @@
-package com.midea.iot.msmart.network;
+package com.soul.network;
+
+import static com.soul.network.NetworkMonitor.EXTRA_NETWORK_INFO;
+import static com.soul.network.NetworkMonitor.EXTRA_NETWORK_STATE;
+import static com.soul.network.NetworkMonitor.EXTRA_PRE_NETWORK_INFO;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,18 +14,10 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_NETWORK_INFO;
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_NETWORK_STATE;
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_PRE_NETWORK_INFO;
-
 
 /**
  * Mobile monitor.
  * <p>For Mobile network app can monitor the connect state by receive the broadcast {@link #ACTION_MOBILE_STATE_CHANGED}.
- * Created by seagle on 2018/4/23.
- *
- * @author yuanxiudong66@sina.com
- * @since 2018-4-23
  */
 
 public class MobileNetworkMonitor extends NetStateMachine {

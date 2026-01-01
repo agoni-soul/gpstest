@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.network;
+package com.soul.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -9,18 +9,10 @@ import android.net.NetworkRequest;
 import android.os.Build;
 import android.util.Log;
 
-
-import com.midea.iot.msmart.common.utils.LogUtils;
-
 import androidx.annotation.RequiresApi;
-
 
 /**
  * The parent class of network state monitor.
- * <p>Created by seagle on 2018/4/23.
- *
- * @author yuanxiudong66@sina.com
- * @since 2018-4-23
  */
 abstract class NetStateMachine {
     private static final String TAG="NetStateMachine";
@@ -51,14 +43,13 @@ abstract class NetStateMachine {
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onAvailable(Network network) {
-
                     mNetwork = network;
                     if (network != null) {
                         NetworkInfo networkInfo = mConnectivityManager.getNetworkInfo(network);
-                        LogUtils.i(TAG,"xxxxonAvailable:"+networkInfo);
+                        Log.i(TAG, "xxxxonAvailable:" + networkInfo);
                         notifyNetworkState(true, networkInfo);
                     }else{
-                        LogUtils.i(TAG,"xxxxonAvailable:null");
+                        Log.i(TAG, "xxxxonAvailable:null");
                     }
                 }
 
@@ -83,9 +74,9 @@ abstract class NetStateMachine {
                     Log.i(TAG,"onCapabilitiesChanged("+(network== null?"null":mConnectivityManager.getNetworkInfo(network))+","+networkCapabilities);
                     if(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)){
                         if(networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
-                            LogUtils.e(TAG,"wifi网络已连接");
+                            Log.e(TAG, "wifi网络已连接");
                         }else {
-                            LogUtils.e(TAG,"移动网络已连接");
+                            Log.e(TAG, "移动网络已连接");
                         }
                     }
                 }

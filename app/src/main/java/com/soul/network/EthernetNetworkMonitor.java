@@ -1,4 +1,7 @@
-package com.midea.iot.msmart.network;
+package com.soul.network;
+
+import static com.soul.network.NetworkMonitor.EXTRA_NETWORK_STATE;
+import static com.soul.network.NetworkMonitor.EXTRA_PRE_NETWORK_INFO;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,16 +12,9 @@ import android.net.NetworkRequest;
 import android.os.Build;
 import android.util.Log;
 
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_NETWORK_STATE;
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_PRE_NETWORK_INFO;
-
 /**
  * Ethernet monitor.
  * <p>For Ethernet app can monitor the connect state by receive the broadcast {@link #ACTION_ETHERNET_STATE_CHANGED}.
- * Created by seagle on 2018/4/23.
- *
- * @author yuanxiudong66@sina.com
- * @since 2018-4-23
  */
 
 public class EthernetNetworkMonitor extends NetStateMachine {

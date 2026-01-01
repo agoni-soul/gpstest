@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.network;
+package com.soul.network;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,9 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-
-
-import com.midea.iot.msmart.common.utils.LogUtils;
+import android.util.Log;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -19,10 +17,6 @@ import java.util.List;
 
 /**
  * Android system network monitor.
- * Created by seagle on 2018/4/23.
- *
- * @author : yuanxiudong66@sina.com
- * @since : 2018-4-23
  */
 public class NetworkMonitor {
 
@@ -316,7 +310,7 @@ public class NetworkMonitor {
                     activeNetworkInfo = intentNetworkInfo;
                 }
             }
-            LogUtils.d("xxxxonReceive",activeNetworkInfo==null?"null":activeNetworkInfo.toString());
+            Log.d("xxxxonReceive", activeNetworkInfo == null ? "null" : activeNetworkInfo.toString());
             if (activeNetworkInfo == null) {
                 if (mActiveNetworkInfo != null) {
                     if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -326,10 +320,10 @@ public class NetworkMonitor {
                     }
                     notifyNetworkDisconnected(context, mActiveNetworkInfo);
                     mActiveNetworkInfo = null;
-                    LogUtils.i(TAG, "Network disconnected!");
+                    Log.i(TAG, "Network disconnected!");
                 }
             } else if (mActiveNetworkInfo == null) {
-                LogUtils.i(TAG, "Network connected: " + activeNetworkInfo);
+                Log.i(TAG, "Network connected: " + activeNetworkInfo);
                 if (ConnectivityManager.TYPE_MOBILE == activeNetworkInfo.getType()) {
                     mActiveNetworkInfo = activeNetworkInfo;
                     if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -349,12 +343,12 @@ public class NetworkMonitor {
                     }
                     notifyNetworkConnected(context, mActiveNetworkInfo);
                 } else {
-                    LogUtils.i(TAG, "Other Network connected!");
+                    Log.i(TAG, "Other Network connected!");
                     mActiveNetworkInfo = null;
                 }
             } else if (mActiveNetworkInfo.getType() != activeNetworkInfo.getType()) {
                 if (ConnectivityManager.TYPE_MOBILE == activeNetworkInfo.getType()) {
-                    LogUtils.i(TAG, "Network change to mobile: " + activeNetworkInfo);
+                    Log.i(TAG, "Network change to mobile: " + activeNetworkInfo);
                     if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
                         mMobileStateMachine.notifyNetworkState(true, activeNetworkInfo);
                         mWifiStateMachine.notifyNetworkState(false, null);
@@ -364,7 +358,7 @@ public class NetworkMonitor {
                     mActiveNetworkInfo = activeNetworkInfo;
                     notifyNetworkChanged(context, preNetworkInfo, mActiveNetworkInfo);
                 } else if (ConnectivityManager.TYPE_WIFI == activeNetworkInfo.getType()) {
-                    LogUtils.i(TAG, "Network change to wifi: " + activeNetworkInfo);
+                    Log.i(TAG, "Network change to wifi: " + activeNetworkInfo);
                     if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
                         mWifiStateMachine.notifyNetworkState(true, activeNetworkInfo);
                         mMobileStateMachine.notifyNetworkState(false, null);
@@ -374,7 +368,7 @@ public class NetworkMonitor {
                     mActiveNetworkInfo = activeNetworkInfo;
                     notifyNetworkChanged(context, preNetworkInfo, mActiveNetworkInfo);
                 } else if (ConnectivityManager.TYPE_ETHERNET == activeNetworkInfo.getType()) {
-                    LogUtils.i(TAG, " Network change to ethernet: " + activeNetworkInfo);
+                    Log.i(TAG, " Network change to ethernet: " + activeNetworkInfo);
                     if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
                         mEthernetStateMachine.notifyNetworkState(true, activeNetworkInfo);
                         mWifiStateMachine.notifyNetworkState(false, null);
@@ -384,7 +378,7 @@ public class NetworkMonitor {
                     mActiveNetworkInfo = activeNetworkInfo;
                     notifyNetworkChanged(context, preNetworkInfo, mActiveNetworkInfo);
                 } else {
-                    LogUtils.i(TAG, "Other Network connected!");
+                    Log.i(TAG, "Other Network connected!");
                     mActiveNetworkInfo = null;
                 }
             }

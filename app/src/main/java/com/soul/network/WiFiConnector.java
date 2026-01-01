@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.network;
+package com.soul.network;
 
 
 import android.net.ConnectivityManager;
@@ -13,27 +13,22 @@ import android.net.wifi.WifiConfiguration.KeyMgmt;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiNetworkSpecifier;
 import android.os.Build;
-import android.os.PatternMatcher;
 import android.text.TextUtils;
+import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 
-import com.midea.iot.msmart.MSContext;
-import com.midea.iot.msmart.common.utils.LogUtils;
-import com.midea.iot.msmart.common.utils.ReflectUtil;
+import com.soul.gpstest.BuildConfig;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import androidx.annotation.RequiresApi;
-
 /**
  * WiFi connector.
- * Created by seagle on 2018/4/23.
- *
- * @author yuanxiudong66@sina.com
- * @since 2018-4-23
  */
 class WiFiConnector {
+    private static final String TAG = WiFiConnector.class.getSimpleName();
+
     private static final int SECURITY_NONE = 0;
     private static final int SECURITY_WEP = 1;
     private static final int SECURITY_PSK = 2;
@@ -136,9 +131,10 @@ class WiFiConnector {
 
     public int connect() {
         WifiConfiguration wifiConfiguration = getExistedConfiguration(mSSID);
-        LogUtils.i("WiFiConnector", "connect " + mSSID);
+        Log.i(TAG, "WifiConfiguration = " + wifiConfiguration);
+        Log.i("WiFiConnector", "connect " + mSSID);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (MSContext.getInstance().getContext().getApplicationInfo().targetSdkVersion >= 29) {
+            if (BuildConfig.TARGET_SDK_VERSION >= 29) {
                 return connectWifiQ();
             } else {
                 return connectWifiNormal(wifiConfiguration);
@@ -198,7 +194,7 @@ class WiFiConnector {
             mRequestCallback = new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
-                    LogUtils.d("WiFiConnector", "android Q连接成功");
+                    Log.d("WiFiConnector", "android Q连接成功");
                     super.onAvailable(network);
                     if (mNetworkCallback != null) {
                         mNetworkCallback.onAvailable(network);
@@ -207,7 +203,7 @@ class WiFiConnector {
 
                 @Override
                 public void onUnavailable() {
-                    LogUtils.d("WiFiConnector", "android Q连接失败，但是我不提示");
+                    Log.d("WiFiConnector", "android Q连接失败，但是我不提示");
                     super.onUnavailable();
 //                    if (mNetworkCallback != null) {
 //                        mNetworkCallback.onUnavailable();
@@ -227,62 +223,62 @@ class WiFiConnector {
      */
     private int connectWifiNormal(WifiConfiguration wifiConfiguration) {
         if (wifiConfiguration == null) {
-            LogUtils.i("WiFiConnector", "wifiConfiguration=null");
+            Log.i("WiFiConnector", "wifiConfiguration=null");
             wifiConfiguration = getConfig();
-            LogUtils.i("WiFiConnector", "getConfig()=" + wifiConfiguration.toString());
+            Log.i("WiFiConnector", "getConfig()=" + wifiConfiguration.toString());
             int netID = mWifiManager.addNetwork(wifiConfiguration);
-            LogUtils.i("WiFiConnector", "netID=" + netID);
+            Log.i("WiFiConnector", "netID=" + netID);
             if (netID > 0 && mWifiManager.enableNetwork(netID, true)) {
-                LogUtils.i("WiFiConnector", "enableNetWork");
+                Log.i("WiFiConnector", "enableNetWork");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    LogUtils.i("WiFiConnector", "Build.VERSION.SDK_INT >= Build.VERSION_CODES.N");
+                    Log.i("WiFiConnector", Build.VERSION.SDK_INT + " >= " + Build.VERSION_CODES.N);
                     try {
                         mWifiManager.saveConfiguration();
-                        LogUtils.i("WiFiConnector", "saveConfiguration()");
+                        Log.i("WiFiConnector", "saveConfiguration()");
                     } catch (Exception e) {//deadsystemexception这里无法catch,这个方式不知道能不能解决，因为这里华为系统8.0以上会出现系统进程崩溃，具体原因无法了解
-                        LogUtils.e("WiFiConnector", e.getMessage());
+                        Log.e("WiFiConnector", e.getMessage());
                     }
                 } else {
-                    LogUtils.i("WiFiConnector", "Build.VERSION.SDK_INT < Build.VERSION_CODES.N");
+                    Log.i("WiFiConnector", "Build.VERSION.SDK_INT < Build.VERSION_CODES.N");
                     mWifiManager.saveConfiguration();
-                    LogUtils.i("WiFiConnector", "saveConfiguration()");
+                    Log.i("WiFiConnector", "saveConfiguration()");
                 }
                 mWifiManager.reconnect();
-                LogUtils.i("WiFiConnector", "reconnect");
+                Log.i("WiFiConnector", "reconnect");
                 return netID;
             } else {
                 return -1;
             }
         } else {
-            LogUtils.i("WiFiConnector", "wifiConfiguration!=null");
+            Log.i("WiFiConnector", "wifiConfiguration!=null");
             wifiConfiguration = updateConfig(wifiConfiguration);
-            LogUtils.i("WiFiConnector", "updateConfig(wifiConfiguration)=" + wifiConfiguration);
+            Log.i("WiFiConnector", "updateConfig(wifiConfiguration)=" + wifiConfiguration);
             try {
                 mWifiManager.updateNetwork(wifiConfiguration);//某些系统中，不是自己创建config是无法update的，会抛出IllegalStateException
             } catch (Throwable e) {
                 e.printStackTrace();
             }
-            LogUtils.i("WiFiConnector", "mWifiManager.updateNetwork(wifiConfiguration)");
+            Log.i("WiFiConnector", "mWifiManager.updateNetwork(wifiConfiguration)");
             if (mWifiManager.enableNetwork(wifiConfiguration.networkId, true)) {
-                LogUtils.i("WiFiConnector", "enableNetWork");
+                Log.i("WiFiConnector", "enableNetWork");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    LogUtils.i("WiFiConnector", "Build.VERSION.SDK_INT >= Build.VERSION_CODES.N");
+                    Log.i("WiFiConnector", "Build.VERSION.SDK_INT >= Build.VERSION_CODES.N");
                     try {
                         mWifiManager.saveConfiguration();
-                        LogUtils.i("WiFiConnector", "saveConfiguration()");
+                        Log.i("WiFiConnector", "saveConfiguration()");
                     } catch (Exception e) {//deadsystemexception这里无法catch,这个方式不知道能不能解决，因为这里华为系统8.0以上会出现系统进程崩溃，具体原因无法了解
-                        LogUtils.e("WiFiConnector", e.getMessage());
+                        Log.e("WiFiConnector", e.getMessage());
                     }
                 } else {
-                    LogUtils.i("WiFiConnector", "Build.VERSION.SDK_INT < Build.VERSION_CODES.N");
+                    Log.i("WiFiConnector", "Build.VERSION.SDK_INT < Build.VERSION_CODES.N");
                     mWifiManager.saveConfiguration();
-                    LogUtils.i("WiFiConnector", "saveConfiguration()");
+                    Log.i("WiFiConnector", "saveConfiguration()");
                 }
                 mWifiManager.reconnect();
-                LogUtils.i("WiFiConnector", "enableNetwork true" + wifiConfiguration.networkId);
+                Log.i("WiFiConnector", "enableNetwork true" + wifiConfiguration.networkId);
                 return wifiConfiguration.networkId;
             } else {
-                LogUtils.i("WiFiConnector", "enableNetwork false" + wifiConfiguration.networkId);
+                Log.i("WiFiConnector", "enableNetwork false" + wifiConfiguration.networkId);
                 return -1;
             }
         }
@@ -295,18 +291,18 @@ class WiFiConnector {
      * @return int-networkID
      */
     private int connectWifiReflect(WifiConfiguration configuration, WifiConfiguration existConfig) {
-        LogUtils.i("WifiMonitor", "Connect reflect wifi: " + configuration);
+        Log.i("WifiMonitor", "Connect reflect wifi: " + configuration);
         int networkID = configuration.networkId;
         try {
             if (existConfig != null) {
                 networkID = existConfig.networkId;
                 mConnectMethod2.invoke(mWifiManager, existConfig.networkId, null);
-                LogUtils.i("WiFiConnector", "has existconfig" + existConfig);
+                Log.i("WiFiConnector", "has existconfig" + existConfig);
             } else {
                 mConnectMethod.invoke(mWifiManager, configuration, null);
                 //让上层等待连接
                 networkID = 1000;
-                LogUtils.i("WiFiConnector", "has no config" + configuration);
+                Log.i("WiFiConnector", "has no config" + configuration);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -337,25 +333,25 @@ class WiFiConnector {
 
     /***
      * 判断wifi配置是否disable状态
-     * @param wifiConfiguration
+     * @param // wifiConfiguration
      * @return
      */
-    private boolean isDiasble(WifiConfiguration wifiConfiguration) {
-        Class<?> clazz = wifiConfiguration.getClass();
-        try {
-            Object object = ReflectUtil.getField(clazz, wifiConfiguration, "mNetworkSelectionStatus");
-            String status = (String) ReflectUtil.invoke(object.getClass(), wifiConfiguration, "getNetworkStatusString", object);
-            return "NETWORK_SELECTION_TEMPORARY_DISABLE".equalsIgnoreCase(status) ||
-                    "NETWORK_SELECTION_PERMANENTLY_DISABLE".equalsIgnoreCase(status);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+//    private boolean isDiasble(WifiConfiguration wifiConfiguration) {
+//        Class<?> clazz = wifiConfiguration.getClass();
+//        try {
+//            Object object = ReflectUtil.getField(clazz, wifiConfiguration, "mNetworkSelectionStatus");
+//            String status = (String) ReflectUtil.invoke(object.getClass(), wifiConfiguration, "getNetworkStatusString", object);
+//            return "NETWORK_SELECTION_TEMPORARY_DISABLE".equalsIgnoreCase(status) ||
+//                    "NETWORK_SELECTION_PERMANENTLY_DISABLE".equalsIgnoreCase(status);
+//        } catch (NoSuchFieldException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
     private void removeExistConfig(String ssid) {
         List<WifiConfiguration> wifiConfigurationList = mWifiManager.getConfiguredNetworks();

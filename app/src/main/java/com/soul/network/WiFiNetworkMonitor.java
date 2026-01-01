@@ -1,4 +1,8 @@
-package com.midea.iot.msmart.network;
+package com.soul.network;
+
+import static com.soul.network.NetworkMonitor.EXTRA_NETWORK_INFO;
+import static com.soul.network.NetworkMonitor.EXTRA_NETWORK_STATE;
+import static com.soul.network.NetworkMonitor.EXTRA_PRE_NETWORK_INFO;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -16,13 +20,9 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
-
-import com.midea.iot.msmart.common.MSKey;
-import com.midea.iot.msmart.common.utils.LogUtils;
-import com.midea.iot.msmart.event.MSEvent;
-import com.midea.iot.msmart.event.MSEventCenter;
-import com.midea.iot.msmart.event.MSEventCode;
+import androidx.annotation.NonNull;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -31,18 +31,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
-
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_NETWORK_INFO;
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_NETWORK_STATE;
-import static com.midea.iot.msmart.network.NetworkMonitor.EXTRA_PRE_NETWORK_INFO;
-
 /**
  * WiFi monitor.
- * Created by seagle on 2018/4/23.
- *
- * @author : yuanxiudong66@sina.com
- * @since : 2018-4-23
  */
 public class WiFiNetworkMonitor extends NetStateMachine {
 
@@ -258,10 +248,10 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                     super.onAvailable(network);
                     if (network != null) {
                         NetworkInfo networkInfo = mConnectivityManager.getNetworkInfo(network);
-                        LogUtils.d(TAG, "" + networkInfo);
+                        Log.d(TAG, "" + networkInfo);
                         notifyNetworkState(true, networkInfo);
                     } else {
-                        LogUtils.d(TAG, "null");
+                        Log.d(TAG, "null");
                     }
                 }
 
@@ -328,17 +318,17 @@ public class WiFiNetworkMonitor extends NetStateMachine {
             broadCastIntent.putExtra(EXTRA_NETWORK_INFO, mNetworkInfo);
             broadCastIntent.putExtra(EXTRA_WIFI_INFO, mWifiInfo);
             mContext.sendBroadcast(broadCastIntent);
-            LogUtils.i(TAG, "WiFi network connected: " + mNetworkInfo + "  WiFIInfo:" + mWifiInfo);
-            MSEventCenter.getInstance().dispatchSDKEvent(new MSEvent(MSEventCode.EVENT_CODE_LOGTACKER_ADDTAGS, "LOGTRACKER",
-                    MSKey.KEY_LOGTACKER_ADDTAGS_TRANSACTION, "SLKNETCONFIG",
-                    MSKey.KEY_LOGTACKER_ADDTAGS_KEY, "wifiConnected",
-                    MSKey.KEY_LOGTACKER_ADDTAGS_VALUE, mWifiInfo == null ? "null" : mWifiInfo.getSSID()));
+            Log.i(TAG, "WiFi network connected: " + mNetworkInfo + "  WiFIInfo:" + mWifiInfo);
+//            MSEventCenter.getInstance().dispatchSDKEvent(new MSEvent(MSEventCode.EVENT_CODE_LOGTACKER_ADDTAGS, "LOGTRACKER",
+//                    MSKey.KEY_LOGTACKER_ADDTAGS_TRANSACTION, "SLKNETCONFIG",
+//                    MSKey.KEY_LOGTACKER_ADDTAGS_KEY, "wifiConnected",
+//                    MSKey.KEY_LOGTACKER_ADDTAGS_VALUE, mWifiInfo == null ? "null" : mWifiInfo.getSSID()));
         } else {
-            LogUtils.i(TAG, "WiFi network disconnected: " + mNetworkInfo);
-            MSEventCenter.getInstance().dispatchSDKEvent(new MSEvent(MSEventCode.EVENT_CODE_LOGTACKER_ADDTAGS, "LOGTRACKER",
-                    MSKey.KEY_LOGTACKER_ADDTAGS_TRANSACTION, "SLKNETCONFIG",
-                    MSKey.KEY_LOGTACKER_ADDTAGS_KEY, "wifiDisconnected",
-                    MSKey.KEY_LOGTACKER_ADDTAGS_VALUE, mWifiInfo == null ? "null" : mWifiInfo.getSSID()));
+            Log.i(TAG, "WiFi network disconnected: " + mNetworkInfo);
+//            MSEventCenter.getInstance().dispatchSDKEvent(new MSEvent(MSEventCode.EVENT_CODE_LOGTACKER_ADDTAGS, "LOGTRACKER",
+//                    MSKey.KEY_LOGTACKER_ADDTAGS_TRANSACTION, "SLKNETCONFIG",
+//                    MSKey.KEY_LOGTACKER_ADDTAGS_KEY, "wifiDisconnected",
+//                    MSKey.KEY_LOGTACKER_ADDTAGS_VALUE, mWifiInfo == null ? "null" : mWifiInfo.getSSID()));
             Intent broadCastIntent = new Intent(ACTION_WIFI_STATE_CHANGED);
             broadCastIntent.setPackage(mContext.getPackageName());
             broadCastIntent.putExtra(EXTRA_NETWORK_STATE, false);
@@ -357,7 +347,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
      */
     @Override
     protected void notifyNetworkConnectFail() {
-        LogUtils.i(TAG, "连接网络失败了");
+        Log.i(TAG, "连接网络失败了");
         Intent broadCastIntent = new Intent(ACTION_WIFI_STATE_CONNECT_FAIL);
         broadCastIntent.setPackage(mContext.getPackageName());
         broadCastIntent.putExtra(EXTRA_NETWORK_STATE, true);
@@ -386,7 +376,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
 
     private class ConnectWiFiTask extends BroadcastReceiver implements Callable<Integer> {
         private static final int S_RETRY_COUNT = 3;
-        private final WiFiConnector mWiFiConnector;
+        private WiFiConnector mWiFiConnector;
         private volatile int mNetID = -2;
         private volatile boolean mConnecting;
         private CountDownLatch mLatch;
@@ -400,7 +390,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
         //是否是调用释放Wifi的方法，Android Q上使用
         private boolean isReleaseWifiConnect;
 
-        public sichognConnectWiFiTask(WiFiConnector wiFiConnector) {
+        public ConnectWiFiTask(WiFiConnector wiFiConnector) {
             mWiFiConnector = wiFiConnector;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
                 retryCount = 1;
@@ -421,9 +411,12 @@ public class WiFiNetworkMonitor extends NetStateMachine {
 
         @Override
         public Integer call() {
-            LogUtils.d("releasewifi", "开始了");
+            Log.d("releasewifi", "开始了");
             WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+            Log.d(TAG, "wifiInfo = " + wifiInfo);
+            Log.d(TAG, "mWiFiConnector.getSSID() = " + mWiFiConnector.getSSID());
             String ssid = WiFiConnector.convertToQuotedString(mWiFiConnector.getSSID());
+            Log.d(TAG, "ssid = " + ssid);
             if (wifiInfo != null && ssid.equals(wifiInfo.getSSID())) {
                 return CONNECT_SUCCESS;
             }
@@ -440,20 +433,20 @@ public class WiFiNetworkMonitor extends NetStateMachine {
             mConnecting = true;
             if (isReleaseWifiConnect) {
                 mNetID = 9999;//设置数据，方便路由回切判断
-                LogUtils.d("releasewifi", "开始释放999");
+                Log.d("releasewifi", "开始释放999");
                 mLatch = new CountDownLatch(1);
                 mWiFiConnector.releaseWifiConnector();
                 try {
                     if (!mLatch.await(25, TimeUnit.SECONDS)) {
-                        LogUtils.d("releasewifi", "释放完成卡住了");
+                        Log.d("releasewifi", "释放完成卡住了");
                         checkConnectResult(ssid);
                     } else {
-                        LogUtils.d("releasewifi", "释放完成没卡住");
+                        Log.d("releasewifi", "释放完成没卡住");
                         checkConnectResult(ssid);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    LogUtils.d("releasewifi", "异常了");
+                    Log.d("releasewifi", "异常了");
                     checkConnectResult(ssid);
                 }
             } else {
@@ -462,24 +455,24 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                     if ((mNetID = mWiFiConnector.connect()) >= 0) {
                         try {
                             if (!mLatch.await(waitTime, TimeUnit.SECONDS)) {
-                                LogUtils.i(TAG, "等待释放了" + i);
+                                Log.i(TAG, "等待释放了" + i);
                                 if (checkConnectResult(ssid)) {
                                     break;
                                 }
                             } else {
-                                LogUtils.i(TAG, "没卡住" + i);
+                                Log.i(TAG, "没卡住" + i);
                                 if (checkConnectResult(ssid)) {
                                     break;
                                 }
                             }
                         } catch (Exception ex) {
-                            LogUtils.i(TAG, "异常了" + ex.getMessage());
+                            Log.i(TAG, "异常了" + ex.getMessage());
                             if (checkConnectResult(ssid)) {
                                 break;
                             }
                         }
                     }
-                    LogUtils.i(TAG, "第一次连接过了，没连上" + i);
+                    Log.i(TAG, "第一次连接过了，没连上" + i);
                 }
             }
 
@@ -488,7 +481,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
             mConnecting = false;
             mContext.unregisterReceiver(this);
 
-            LogUtils.i("WiFiConnector", "resultCode = " + mResultCode);
+            Log.i("WiFiConnector", "resultCode = " + mResultCode);
             cancle();
             return mResultCode;
         }
@@ -498,11 +491,11 @@ public class WiFiNetworkMonitor extends NetStateMachine {
          */
         private boolean checkConnectResult(String ssid) {
             if (checkConnectWifi(ssid)) {
-                LogUtils.i(TAG, "连接成功了");
+                Log.i(TAG, "连接成功了");
                 mResultCode = CONNECT_SUCCESS;
                 return true;
             } else {
-                LogUtils.i(TAG, "连接失败了");
+                Log.i(TAG, "连接失败了");
                 mResultCode = ERR_CONNECT_TIMEOUT;
             }
             return false;
@@ -526,7 +519,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
 
         @Override
         public void onReceive(Context context, final Intent intent) {
-            LogUtils.d(TAG, "mNetId=" + mNetID + "connectState" + mConnecting + intent.getAction() + intent);
+            Log.d(TAG, "mNetId=" + mNetID + "connectState" + mConnecting + intent.getAction() + intent);
             if (mNetID >= 0 && mConnecting) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {//5.0以上用新的wifi监听方式来处理
                     receiverWifiChangeL(intent);
@@ -547,7 +540,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                     @Override
                     public void run() {
                         SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
-                        LogUtils.i(TAG, "State Changed: " + state);
+                        Log.i(TAG, "State Changed: " + state);
                         WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
                         final String ssid = WiFiConnector.convertToQuotedString(mWiFiConnector.getSSID());
                         String wifiName = wifiInfo.getSSID();
@@ -562,24 +555,24 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                                 break;
                             }
                         }
-                        LogUtils.i(TAG, " wifiname= " + wifiName);
+                        Log.i(TAG, " wifiname= " + wifiName);
                         if (wifiInfo != null && ssid.equalsIgnoreCase(wifiName)) {
                             //防止频繁创建线程
                             SupplicantState wifiState = wifiInfo.getSupplicantState();
-                            LogUtils.i(TAG, " xxx wifiState: " + wifiState + "ip=" + getIp(wifiInfo.getIpAddress()));
+                            Log.i(TAG, " xxx wifiState: " + wifiState + "ip=" + getIp(wifiInfo.getIpAddress()));
                             if (SupplicantState.COMPLETED == state && SupplicantState.COMPLETED == wifiState) {
                                 if (wifiInfo.getIpAddress() == 0) {//判断Ip分配成功回返回成功,因为有可能刚连上设备的时候，设备分配Ip比较慢
                                     while (!isCancle) {
                                         WifiInfo info = mWifiManager.getConnectionInfo();
                                         if (info != null && info.getIpAddress() != 0) {
-                                            LogUtils.i(TAG, "ip 分配完成" + getIp(info.getIpAddress()));
+                                            Log.i(TAG, "ip 分配完成" + getIp(info.getIpAddress()));
                                             break;
                                         }
-                                        LogUtils.i(TAG, "ip没分配");
+                                        Log.i(TAG, "ip没分配");
 
                                     }
                                 } else {
-                                    LogUtils.i(TAG, "ip 分配完成" + getIp(wifiInfo.getIpAddress()));
+                                    Log.i(TAG, "ip 分配完成" + getIp(wifiInfo.getIpAddress()));
                                 }
                                 mResultCode = CONNECT_SUCCESS;
                                 mWifiManager.saveConfiguration();
@@ -596,13 +589,13 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                                         mResultCode = CONNECT_SUCCESS;
                                         mWifiManager.saveConfiguration();
                                         mLatch.countDown();
-                                        LogUtils.i(TAG, "disconnect 后还连着目标wifi=" + info.getSSID());
+                                        Log.i(TAG, "disconnect 后还连着目标wifi=" + info.getSSID());
                                     } else {
                                         mResultCode = ERR_CONNECT_FAILED;
                                         mLatch.countDown();
                                         mWifiManager.removeNetwork(mNetID);
                                         mWifiManager.reconnect();
-                                        LogUtils.i(TAG, "disconnect 后没连着目标wifi=" + ssid);
+                                        Log.i(TAG, "disconnect 后没连着目标wifi=" + ssid);
                                     }
 
                                 }
@@ -624,7 +617,7 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                     @Override
                     public void run() {
                         boolean isConnect = intent.getBooleanExtra(EXTRA_NETWORK_STATE, false);
-                        LogUtils.d(TAG, "isConnect=" + isConnect);
+                        Log.d(TAG, "isConnect=" + isConnect);
                         if (isConnect) {
                             String wifiName = "";
                             final String ssid = WiFiConnector.convertToQuotedString(mWiFiConnector.getSSID());
@@ -635,20 +628,20 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                                 wifiName = mNetworkInfo.getExtraInfo();
                             }
 
-                            LogUtils.i(TAG, " wifiname= " + wifiName);
+                            Log.i(TAG, " wifiname= " + wifiName);
                             if (mWifiInfo != null && ssid.equalsIgnoreCase(wifiName)) {
                                 if (mWifiInfo.getIpAddress() == 0) {//判断Ip分配成功回返回成功,因为有可能刚连上设备的时候，设备分配Ip比较慢
                                     while (!isCancle) {
                                         WifiInfo info = mWifiManager.getConnectionInfo();
                                         if (info != null && info.getIpAddress() != 0) {
-                                            LogUtils.i(TAG, "ip 分配完成" + getIp(info.getIpAddress()));
+                                            Log.i(TAG, "ip 分配完成" + getIp(info.getIpAddress()));
                                             break;
                                         }
-                                        LogUtils.i(TAG, "ip没分配");
+                                        Log.i(TAG, "ip没分配");
 
                                     }
                                 } else {
-                                    LogUtils.i(TAG, "ip 分配完成" + getIp(mWifiInfo.getIpAddress()));
+                                    Log.i(TAG, "ip 分配完成" + getIp(mWifiInfo.getIpAddress()));
                                 }
                                 mResultCode = CONNECT_SUCCESS;
                                 mWifiManager.saveConfiguration();
@@ -664,13 +657,13 @@ public class WiFiNetworkMonitor extends NetStateMachine {
                     mResultCode = CONNECT_SUCCESS;
                     mWifiManager.saveConfiguration();
                     mLatch.countDown();
-                    LogUtils.i(TAG, "底层反馈连接网络失败 后还连着目标wifi=" + info.getSSID());
+                    Log.i(TAG, "底层反馈连接网络失败 后还连着目标wifi=" + info.getSSID());
                 } else {
                     mResultCode = ERR_CONNECT_FAILED;
                     mLatch.countDown();
                     mWifiManager.removeNetwork(mNetID);
                     mWifiManager.reconnect();
-                    LogUtils.i(TAG, "底层反馈连接网络失败");
+                    Log.i(TAG, "底层反馈连接网络失败");
                 }
 
             }

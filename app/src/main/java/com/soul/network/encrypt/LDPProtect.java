@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.annotation;
+package com.soul.network.encrypt;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

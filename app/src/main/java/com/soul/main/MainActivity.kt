@@ -39,7 +39,6 @@ import android.text.style.ForegroundColorSpan
 import android.transition.Slide
 import android.util.Log
 import android.view.View
-import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
@@ -74,6 +73,7 @@ import com.soul.main.pieChartView.PieChartBean
 import com.soul.main.timeMonitor.TimeMonitorConfig
 import com.soul.main.timeMonitor.TimeMonitorManager
 import com.soul.mviFrame.main.MainMVIActivity
+import com.soul.network.NetworkActivity
 import com.soul.recyclerview.RecyclerViewActivity
 import com.soul.scene.CustomSceneFirstActivity
 import com.soul.scene.SceneFirstActivity
@@ -720,22 +720,20 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 }
 
                 R.id.btn_skip_network -> {
-                    /*
                     val intent = Intent(this, NetworkActivity::class.java);
                     startActivity(intent)
-                     */
-                    mViewDataBinding.btnSkipGps.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED)
-
-                    val constructor = AccessibilityEvent::class.java.getDeclaredConstructor()
-                    constructor.isAccessible = true
-                    val accessibilityEvent = constructor.newInstance()
-                    accessibilityEvent.eventType = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
-                    accessibilityEvent.className = mViewDataBinding.btnSkipGps.javaClass.name
-                    DOFLogUtil.d(TAG, "accessibilityEvent = $accessibilityEvent")
-                    DOFLogUtil.d(
-                        TAG,
-                        "accessibilityEvent = ${mViewDataBinding.btnSkipGps.accessibilityTraversalAfter}"
-                    )
+//                    mViewDataBinding.btnSkipGps.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_CLICKED)
+//
+//                    val constructor = AccessibilityEvent::class.java.getDeclaredConstructor()
+//                    constructor.isAccessible = true
+//                    val accessibilityEvent = constructor.newInstance()
+//                    accessibilityEvent.eventType = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+//                    accessibilityEvent.className = mViewDataBinding.btnSkipGps.javaClass.name
+//                    DOFLogUtil.d(TAG, "accessibilityEvent = $accessibilityEvent")
+//                    DOFLogUtil.d(
+//                        TAG,
+//                        "accessibilityEvent = ${mViewDataBinding.btnSkipGps.accessibilityTraversalAfter}"
+//                    )
                 }
 
                 R.id.btn_refresh -> {

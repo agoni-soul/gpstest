@@ -2,17 +2,24 @@
 <layout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context="com.soul.network.NetworkActivity">
 
         <WebView
             android:id="@+id/web_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"/>
+            android:layout_height="200.dp"
+            android:layout_margin="10dp" />
+
+        <Button
+            android:id="@+id/btn_scan_wifi"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="10.dp"
+            android:text="扫码wifi" />
 
     </LinearLayout>
 </layout>

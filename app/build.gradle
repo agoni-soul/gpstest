@@ -34,6 +34,8 @@ android {
         multiDexEnabled true // 启用多DEX
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "int", "TARGET_SDK_VERSION", targetSdkVersion.mApiLevel.toString()
     }
     lintOptions {
         checkReleaseBuilds false
@@ -156,6 +158,12 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version" // optional - for Kotlin extensions
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
+
+    // 加密算法库
+    implementation 'com.madgag.spongycastle:core:1.54.0.0'
+    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
+    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+    implementation 'com.madgag.spongycastle:pg:1.54.0.0'
 
     // 闪屏页
     implementation 'androidx.core:core-splashscreen:1.0.0'

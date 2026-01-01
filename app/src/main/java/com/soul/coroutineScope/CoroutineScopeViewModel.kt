@@ -32,9 +32,27 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
 
     private var scopeTest: CoroutineScopeTest? = null
 
-    var mSsidFirstData: MutableLiveData<String> = MutableLiveData()
+    private val _mSsidFirstData: MutableLiveData<String> = MutableLiveData()
+    val mSsidFirstData: LiveData<String> = _mSsidFirstData
 
-    var mSsidSecondData: MutableLiveData<String> = MutableLiveData()
+    private val _mSsidSecondData: MutableLiveData<String> = MutableLiveData()
+    val mSsidSecondData: LiveData<String> = _mSsidSecondData
+
+    private val _mediatorLiveData: MediatorLiveData<String> = MediatorLiveData()
+    val mediatorLiveData: LiveData<String> = _mediatorLiveData
+
+    init {
+        _mediatorLiveData.addSource<String>(
+            _mSsidFirstData,
+            Observer<String> {
+                _mediatorLiveData.value = it
+            })
+        _mediatorLiveData.addSource<String>(
+            _mSsidSecondData,
+            Observer<String> {
+                _mediatorLiveData.value = it
+            })
+    }
 
     fun startScan() {
         val array = initScanData()
@@ -48,7 +66,7 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
         mediatorLiveData.addSource(mSsidFirstData) {
             Log.d(TAG, "onChange1: ${it}")
         }
-        mSsidSecondData.postValue("haha")
+        _mSsidSecondData.postValue("haha")
     }
 
     private fun initScanData(): MutableList<String> {
@@ -90,7 +108,7 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
                         if (mSSID == s) {
                             GlobalScope.launch(Dispatchers.Main) {
                                 if (mIsPreciseMatch) {
-                                    mSsidFirstData.postValue(s)
+                                    _mSsidFirstData.postValue(s)
                                     Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} hahahahh")
                                 }
                             }
@@ -106,7 +124,7 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
                                 if (!mIsPreciseMatch) {
                                     mIsPreciseMatch = true
                                     mSSID = s
-                                    mSsidSecondData.postValue(s)
+                                    _mSsidSecondData.postValue(s)
                                     Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.Main mFindDeviceJob")
                                 }
                             }

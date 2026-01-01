@@ -1,6 +1,5 @@
 package com.soul.main.thread
 
-import android.util.Log
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -15,7 +14,8 @@ class ThreadTest {
     private final val TAG = this.javaClass.simpleName
 
     val mExecutor: ThreadPoolExecutor by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        ThreadPoolExecutor(3, 5, 10, TimeUnit.MILLISECONDS, SynchronousQueue(),
+        ThreadPoolExecutor(
+            3, 5, 10, TimeUnit.MILLISECONDS, SynchronousQueue(),
             { r ->
                 val t = Thread(r)
                 t.name = "Thread_" + System.currentTimeMillis() + "_" + r.hashCode()

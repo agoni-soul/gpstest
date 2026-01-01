@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.security;
+package com.soul.network.encrypt;
 
 public class IOTPWManager {
 	static int switchTable[] = new int[]{

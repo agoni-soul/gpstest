@@ -1,12 +1,7 @@
-package com.midea.iot.msmart.security;
+package com.soul.network.encrypt;
 
 import java.util.Arrays;
 
-/**
- * 作者：liqian
- * 邮箱：qian5.li@midea.com
- * 时间: 2019-9-23 16:51
- */
 public class IOTAES {
 	int Sbox[]=new int[256];
 	int InvSbox[]=new int[256];

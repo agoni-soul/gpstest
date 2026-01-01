@@ -1,4 +1,4 @@
-package com.midea.iot.msmart.security;
+package com.soul.network.encrypt;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,11 +20,6 @@ import java.io.Writer;
  * limitations under the License.
  */
 
-/**
- * 作者：liqian
- * 邮箱：qian5.li@midea.com
- * 时间: 2019-9-23 16:51
- */
 public class IOTBase64 {
     private static final char[] DEFAULT_BASE64CHAR = {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',

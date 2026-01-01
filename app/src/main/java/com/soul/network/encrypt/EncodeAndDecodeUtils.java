@@ -1,8 +1,4 @@
-package com.midea.iot.msmart.security;
-
-
-
-import com.midea.iot.msmart.annotation.LDPProtect;
+package com.soul.network.encrypt;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

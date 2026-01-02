@@ -62,6 +62,7 @@ import com.soul.coroutineScope.EatGame
 import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
+import com.soul.gpstest.BuildConfig
 import com.soul.gpstest.IProcessStub
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
@@ -115,11 +116,18 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private var mSplashScreen: SplashScreen? = null
 
+    private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mSplashScreen = installSplashScreen()
+        if (mIsShowSplash) {
+            setTheme(R.style.Theme_App_Starting)
+            mSplashScreen = installSplashScreen()
+        } else {
+            setTheme(R.style.Theme_GPSTest_NoActionBar)
+        }
         super.onCreate(savedInstanceState)
     }
 
@@ -148,6 +156,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     private fun simulateInitialization(onInitializationComplete: () -> Unit) {
+        if (!mIsShowSplash) {
+            keepSplashOnScreen = false
+            return
+        }
         // 模拟延迟，比如网络请求或数据加载
         Handler(Looper.getMainLooper()).postDelayed({
             onInitializationComplete()

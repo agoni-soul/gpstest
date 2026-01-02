@@ -36,6 +36,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "int", "TARGET_SDK_VERSION", targetSdkVersion.mApiLevel.toString()
+        buildConfigField "boolean", "IS_SHOW_SPLASH", false.toString()
     }
     lintOptions {
         checkReleaseBuilds false

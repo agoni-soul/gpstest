@@ -41,11 +41,12 @@ class KotlinCoroutineTest constructor() {
     fun test() {
         getData()
 //        main6_1()
-//        GlobalScope.launch {
+        GlobalScope.launch {
+            runnable()
 //            suspendingExample()
-////            flow()
+//            flow()
 //            sharedFlow()
-//        }
+        }
     }
 
     fun getData() {
@@ -509,7 +510,6 @@ class KotlinCoroutineTest constructor() {
             }
         }
         val runnableEven = Runnable {
-            Thread.sleep(100)
             countDownLatch.countDown()
             while (true) {
                 if (count % 2 == 0) {

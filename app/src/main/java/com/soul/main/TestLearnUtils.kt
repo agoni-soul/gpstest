@@ -9,6 +9,7 @@ import com.soul.main.plugin.PluginTest
 import com.soul.main.retrofit.RetrofitTest
 import com.soul.main.service.ServiceTest
 import com.soul.main.thread.ThreadTest
+import java.util.Random
 
 /**
  *
@@ -46,5 +47,24 @@ object TestLearnUtils {
         retrofitTest.test()
         threadTest.test()
         collectionTest.test()
+        mapTest()
+    }
+
+    private fun mapTest() {
+        val map: MutableMap<Int, String> = HashMap()
+        val random = Random()
+        for (i in 0..9) {
+            map[random.nextInt(100)] = i.toString()
+        }
+        map.forEach { (string, i) ->
+            println("$string: $i")
+        }
+        val sortedMap = map.toSortedMap { o1, o2 ->
+            o1 - o2
+        }
+        println("sorted")
+        sortedMap.forEach { (string, i) ->
+            println("$string: $i")
+        }
     }
 }

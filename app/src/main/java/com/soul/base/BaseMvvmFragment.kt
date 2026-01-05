@@ -82,6 +82,5 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
     override fun onDestroyView() {
         super.onDestroyView()
         mViewDataBinding.unbind()
-        lifecycle.removeObserver(mViewModel)
     }
 }

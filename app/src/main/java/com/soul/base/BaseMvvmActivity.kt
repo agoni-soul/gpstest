@@ -33,6 +33,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
         viewModel.viewModelScope.launch(Dispatchers.Main) {
             lifecycle.addObserver(viewModel)
         }
+        ViewModelProvider(this).get(modelClass)
         viewModel
     }
 
@@ -115,6 +116,5 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
         Log.d(TAG, "onDestroy")
         super.onDestroy()
         mViewDataBinding.unbind()
-        lifecycle.removeObserver(mViewModel)
     }
 }

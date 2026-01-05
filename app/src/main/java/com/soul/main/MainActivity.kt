@@ -6,9 +6,11 @@ import android.app.AlertDialog
 import android.app.AppOpsManager
 import android.app.Service
 import android.app.usage.NetworkStatsManager
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -49,7 +51,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.fragment.app.DialogFragment
 import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
@@ -68,6 +69,8 @@ import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
+import com.soul.main.broadcast.MyReceiver
+import com.soul.main.broadcast.MyReceiver1
 import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
@@ -207,8 +210,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             startActivity(intent)
         }
         val picList = mutableListOf<PieChartBean>()
-        val colors: IntArray = intArrayOf(ContextCompat.getColor(mContext, R.color.circle_gradual_end),
-            ContextCompat.getColor(mContext, R.color.circle_gradual_end))
+        val colors: IntArray = intArrayOf(
+            ContextCompat.getColor(mContext, R.color.circle_gradual_end),
+            ContextCompat.getColor(mContext, R.color.circle_gradual_end)
+        )
         val gradient = LinearGradient(0f, 0f, 100f, 100f, colors, null, Shader.TileMode.CLAMP)
         picList.add(PieChartBean("0", 25f, gradient))
         picList.add(PieChartBean("1", 25f, gradient))
@@ -387,8 +392,20 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
+    private val receiver: MyReceiver by lazy {
+        MyReceiver()
+    }
+
+    private val receiver1: MyReceiver1 by lazy {
+        MyReceiver1()
+    }
+
     override fun initData() {
         setupWindowAnimations()
+
+        val filter = IntentFilter("com.soul.main.broadcast.intent.action.MyReceiver")
+        registerReceiver(receiver, filter)
+        registerReceiver(receiver1, filter)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             accessibilityTest()
@@ -874,12 +891,16 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 }
 
                 R.id.btn_dialog_fragment -> {
-                    val dialog = DialogFragment()
-                    dialog.let {
-                        it.isCancelable = false
-                        it.isCancelable = false
-                        it.show(supportFragmentManager, "")
-                    }
+//                    val dialog = DialogFragment()
+//                    dialog.let {
+//                        it.isCancelable = false
+//                        it.isCancelable = false
+//                        it.show(supportFragmentManager, "")
+//                    }
+
+                    val intent = Intent();
+                    intent.setAction("com.soul.main.broadcast.intent.action.MyReceiver")
+                    sendOrderedBroadcast(intent, null)//有序广播需要用sendOrderedBroadcast()方法发送
                 }
 
                 R.id.btn_animation -> {
@@ -950,7 +971,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
                 R.id.btn_activity_plugin -> {
                     val intent = Intent()
-                    intent.setComponent(ComponentName("com.soul.pluginapp", "com.soul.pluginapp.PluginActivity"))
+                    intent.setComponent(
+                        ComponentName(
+                            "com.soul.pluginapp",
+                            "com.soul.pluginapp.PluginActivity"
+                        )
+                    )
                     startActivity(intent)
                 }
 
@@ -1082,6 +1108,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         super.onDestroy()
         val intent = Intent(this, CustomAccessibilityService::class.java)
         stopService(intent)
+        unregisterReceiver(receiver1)
+        unregisterReceiver(receiver)
 //        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
 //            mConnectivityDiagnosticsManager.unregisterConnectivityDiagnosticsCallback(
 //                mConnectivityDiagnosticsCallback
@@ -1120,7 +1148,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
 }
 
-class MyService: Service() {
+class MyService : Service() {
 
     override fun onCreate() {
         super.onCreate()
@@ -1129,5 +1157,24 @@ class MyService: Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+}
+
+class OrderedReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        // 获取传递的数据
+        val data = resultData
+        val bundle = getResultExtras(true);
+
+        // 修改广播数据（只有有序广播可以）
+        setResultData("Modified data");
+        bundle.putString("extra", "new value");
+        setResultExtras(bundle);
+
+        // 中止广播（阻止传递给低优先级的接收器）
+        abortBroadcast()
+
+        // 获取优先级
+        val priority = resultCode
     }
 }

@@ -18,7 +18,7 @@ class FlutterChannel(private val context: Context) {
     private lateinit var methodChannel: MethodChannel
 
     companion object {
-        private const val CHANNEL_NAME = "com.example.flutter_module/channel"
+        private const val CHANNEL_NAME = "com.haha.flutter_module/channel"
     }
 
     // 初始化 FlutterEngine

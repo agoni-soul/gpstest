@@ -20,7 +20,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static const platform = MethodChannel('com.example.flutter_module/channel');
+  static const platform = MethodChannel('com.haha.flutter_module/channel');
 
   // 提供给 Android 调用的方法
   Future<String> getFlutterData(String input) async {

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.soul.gpstest.R
+import androidx.core.view.isGone
 
 
 /**
@@ -64,7 +65,7 @@ class WaterFallLayout(
         // (1)因为子view有很多，所以循环遍历执行
         for (i in 0 until childCount) {
             val childView = getChildAt(i)
-            if (childView.visibility == GONE) {
+            if (childView.isGone) {
                 continue
             }
             // 测量view之前，先把测量需求的参数准备好 通过[ViewGroup#getChildMeasureSpec] 获取子View的MeasureSpec信息
@@ -145,7 +146,7 @@ class WaterFallLayout(
                 val view = everyLineView[j]
                 Log.d(TAG, "onLayout measureWidth = ${view.measuredWidth}, width = ${view.width}")
                 Log.d(TAG, "onLayout measuredHeight = ${view.measuredHeight}, height = ${view.height}")
-                if (view.visibility == GONE) continue
+                if (view.isGone) continue
                 val end = curS + view.measuredWidth
                 val bottom = curT + view.measuredHeight
                 view.layout(curS, curT, end, bottom)

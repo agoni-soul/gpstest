@@ -11,3 +11,7 @@ dependencies {
     implementation 'androidx.annotation:annotation-jvm:1.9.1'
     implementation project(":ServiceRouterAnnotation")
 }
+java {
+    sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+    targetCompatibility rootProject.ext.targetCompatibility_javaVersion
+}

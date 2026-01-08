@@ -8,6 +8,7 @@ import com.haha.service.impl.service.ServiceLoader
 import com.haha.service.loader.ServiceLoaderHelper
 import java.io.File
 import java.io.IOException
+import java.util.Locale.getDefault
 import java.util.regex.Pattern
 
 /**
@@ -101,7 +102,7 @@ object ServiceTest {
         try {
             val version = System.getProperty("ro.yunos.version")
             val vmName = System.getProperty("java.vm.name")
-            return (vmName != null && vmName.toLowerCase().contains("lemur"))
+            return (vmName != null && vmName.lowercase(getDefault()).contains("lemur"))
                     || (version != null && version.trim().isNotEmpty())
         } catch (e: Exception) {
             e.printStackTrace()

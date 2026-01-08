@@ -16,7 +16,7 @@ import com.haha.servicerouter.table.RouteTable
 import com.haha.servicerouterannotation.annotation.RouteType
 import com.haha.servicerouterannotation.annotation.data.RouteMetaData
 import com.haha.servicerouterannotation.annotation.utils.Consts
-import com.haha.servicerouterutils.utils.ClassUtils
+import com.haha.servicerouter.utils.ClassUtils
 import com.haha.servicerouterutils.utils.Logger
 
 /**

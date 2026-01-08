@@ -7,7 +7,7 @@ plugins {
 android {
     namespace 'com.soul.blesdk'
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion "30.0.3"
+    buildToolsVersion "35.0.0"
 
 //    configurations {
 //        cleanedAnnotations
@@ -26,8 +26,6 @@ android {
 //        applicationId "com.soul.blesdk"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,11 +41,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+        targetCompatibility rootProject.ext.targetCompatibility_javaVersion
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = rootProject.ext.jvmTarget_version
     }
 }
 

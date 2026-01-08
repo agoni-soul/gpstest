@@ -40,12 +40,12 @@ class CustomView(context: Context, attrs: AttributeSet? = null, defStyleAttr: In
         rectList.add(rectBottom)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         paint.color = context.resources.getColor(R.color.gray_990c0c0c)
         Color.TRANSPARENT
         for (rect in rectList) {
-            canvas?.drawRect(rect, paint)
+            canvas.drawRect(rect, paint)
         }
     }
 }

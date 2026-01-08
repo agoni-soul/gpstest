@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.soul.gpstest.R
-import com.soul.log.DOFLogUtil
 
 
 /**
@@ -156,7 +155,7 @@ class WaterFallLayout(
         }
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         Log.d(TAG, "haha: onDraw")
     }

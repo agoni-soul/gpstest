@@ -1,5 +1,6 @@
 package com.soul.main
 
+//import com.soul.gpstest.IProcessStub
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -29,7 +30,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.os.RemoteException
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.Spannable
@@ -64,13 +64,13 @@ import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.BuildConfig
-import com.soul.gpstest.IProcessStub
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
 import com.soul.main.broadcast.MyReceiver
 import com.soul.main.broadcast.MyReceiver1
+import com.soul.main.flutter.FlutterChannel
 import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
@@ -89,6 +89,9 @@ import com.soul.util.PermissionUtils
 import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
@@ -120,6 +123,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private var mSplashScreen: SplashScreen? = null
 
     private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
+
+    private lateinit var flutterChannel: FlutterChannel
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
@@ -340,12 +345,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         val intent = Intent(this, TestService::class.java)
         bindService(intent, object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val stub = IProcessStub.Stub.asInterface(service)
-                try {
-                    stub.request(" ")
-                } catch (e: RemoteException) {
-                    e.printStackTrace()
-                }
+//                val stub = IProcessStub.Stub.asInterface(service)
+//                try {
+//                    stub.request(" ")
+//                } catch (e: RemoteException) {
+//                    e.printStackTrace()
+//                }
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
@@ -404,8 +409,13 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         setupWindowAnimations()
 
         val filter = IntentFilter("com.soul.main.broadcast.intent.action.MyReceiver")
-        registerReceiver(receiver, filter)
-        registerReceiver(receiver1, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+            registerReceiver(receiver1, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+            registerReceiver(receiver1, filter)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             accessibilityTest()
@@ -438,6 +448,33 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AppStartActivity_createOver")
+
+        // 初始化 Flutter Channel
+        flutterChannel = FlutterChannel(this)
+        flutterChannel.initialize()
+
+        // 调用示例
+        testFlutterCalls()
+    }
+
+    private fun testFlutterCalls() {
+        CoroutineScope(Dispatchers.Main).launch {
+            // 示例1：调用简单方法
+            val result1 = flutterChannel.getFlutterData("Hello from Android")
+            println("Flutter 返回: $result1")
+
+            // 示例2：调用计算方法
+            val numbers = listOf(1, 2, 3, 4, 5)
+            val sum = flutterChannel.calculateSum(numbers)
+            println("计算总和: $sum")
+
+            // 示例3：直接调用任意方法
+            val customResult = flutterChannel.callFlutterMethod(
+                "customMethod",
+                mapOf("key" to "value")
+            )
+            println("自定义方法结果: $customResult")
+        }
     }
 
     @Synchronized
@@ -1110,6 +1147,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         stopService(intent)
         unregisterReceiver(receiver1)
         unregisterReceiver(receiver)
+        flutterChannel.destroy()
 //        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
 //            mConnectivityDiagnosticsManager.unregisterConnectivityDiagnosticsCallback(
 //                mConnectivityDiagnosticsCallback

@@ -23,7 +23,7 @@ import com.soul.blesdk.manager.BleScanManager
  */
 
 public class BluetoothHelper(context: Context) {
-    private val TAG = this.javaClass::class.java.simpleName
+    private val TAG = javaClass.simpleName
 
     private var bluetoothHeadset: BluetoothHeadset? = null
 

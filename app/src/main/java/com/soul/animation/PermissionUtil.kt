@@ -3,12 +3,11 @@ package com.soul.animation
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.text.TextUtils
 import com.airbnb.lottie.BuildConfig
-import java.util.*
+import java.util.Locale
 
 
 /**
@@ -23,7 +22,7 @@ import java.util.*
 object PermissionUtil {
     fun gotoPermission(context: Context) {
         val brand = Build.BRAND
-        val brandLower = brand.toLowerCase(Locale.ROOT)
+        val brandLower = brand.lowercase(Locale.ROOT)
         if (TextUtils.equals(brandLower, "redmi") || TextUtils.equals(brandLower, "xiaomi")) { // 可行
             gotoMiuiPermission(context)
         } else if (TextUtils.equals(brandLower, "meizu")) {

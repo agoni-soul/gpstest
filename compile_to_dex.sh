@@ -1,4 +1,4 @@
-ANDROID_BUILD_TOOLS="/Users/soulagoni/Library/Android/sdk/build-tools/33.0.0"
+ANDROID_BUILD_TOOLS="/Users/soulagoni/Library/Android/sdk/build-tools/35.0.1"
 D8="$ANDROID_BUILD_TOOLS/d8"
 #JAVA_CLASSES="/Users/soulagoni/Downloads/*.class"
 OUTPUT_DEX="/Users/soulagoni/Downloads"

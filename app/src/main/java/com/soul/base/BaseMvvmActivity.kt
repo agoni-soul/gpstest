@@ -33,7 +33,6 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
         viewModel.viewModelScope.launch(Dispatchers.Main) {
             lifecycle.addObserver(viewModel)
         }
-        ViewModelProvider(this).get(modelClass)
         viewModel
     }
 

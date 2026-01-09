@@ -67,4 +67,8 @@ object TestLearnUtils {
             println("$string: $i")
         }
     }
+
+    fun destroy() {
+        HandlerTest.destroy()
+    }
 }

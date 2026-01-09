@@ -126,6 +126,18 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private lateinit var flutterChannel: FlutterChannel
 
+    val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
+        EatGame() // 非线程安全，但初始化更快
+    }
+
+    private val receiver: MyReceiver by lazy {
+        MyReceiver()
+    }
+
+    private val receiver1: MyReceiver1 by lazy {
+        MyReceiver1()
+    }
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
 
@@ -370,10 +382,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
-    val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
-        EatGame() // 非线程安全，但初始化更快
-    }
-
     override fun isUsedEncapsulatedPermissions(): Boolean = true
 
     override fun requestPermissionArray(): Array<String> {
@@ -395,14 +403,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         permissionResultMap.forEach { (k, v) ->
             Log.d(TAG, "$k ----->>>>>  $v")
         }
-    }
-
-    private val receiver: MyReceiver by lazy {
-        MyReceiver()
-    }
-
-    private val receiver1: MyReceiver1 by lazy {
-        MyReceiver1()
     }
 
     override fun initData() {
@@ -449,15 +449,15 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AppStartActivity_createOver")
 
-        // 初始化 Flutter Channel
-        flutterChannel = FlutterChannel(this)
-        flutterChannel.initialize()
-
         // 调用示例
         testFlutterCalls()
     }
 
     private fun testFlutterCalls() {
+        // 初始化 Flutter Channel
+        flutterChannel = FlutterChannel(this)
+        flutterChannel.initialize()
+
         CoroutineScope(Dispatchers.Main).launch {
             // 示例1：调用简单方法
             val result1 = flutterChannel.getFlutterData("Hello from Android")
@@ -1148,6 +1148,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         unregisterReceiver(receiver1)
         unregisterReceiver(receiver)
         flutterChannel.destroy()
+        TestLearnUtils.destroy()
 //        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
 //            mConnectivityDiagnosticsManager.unregisterConnectivityDiagnosticsCallback(
 //                mConnectivityDiagnosticsCallback

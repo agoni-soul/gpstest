@@ -62,6 +62,7 @@ import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.coroutineScope.EatGame
 import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
+import com.soul.flutter.FlutterIntegrationActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.BuildConfig
 import com.soul.gpstest.R
@@ -70,7 +71,6 @@ import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
 import com.soul.main.broadcast.MyReceiver
 import com.soul.main.broadcast.MyReceiver1
-import com.soul.main.flutter.FlutterChannel
 import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
 import com.soul.main.pieChartView.PieChartBean
@@ -89,9 +89,6 @@ import com.soul.util.PermissionUtils
 import com.soul.volume.ui.VolumeActivity
 import com.soul.waterfall.WaterFallActivity
 import com.soul.wifi.WifiActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
@@ -123,8 +120,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private var mSplashScreen: SplashScreen? = null
 
     private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
-
-    private lateinit var flutterChannel: FlutterChannel
 
     val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
         EatGame() // 非线程安全，但初始化更快
@@ -257,6 +252,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             changeMonitorPerf()
         }
         mViewDataBinding.btnActivityMviFrame.setOnClickListener(this)
+        mViewDataBinding.btnActivityFlutterIntegration.setOnClickListener(this)
 
         testService()
         /**
@@ -448,33 +444,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AppStartActivity_createOver")
-
-        // 调用示例
-        testFlutterCalls()
-    }
-
-    private fun testFlutterCalls() {
-        // 初始化 Flutter Channel
-        flutterChannel = FlutterChannel(this)
-        flutterChannel.initialize()
-
-        CoroutineScope(Dispatchers.Main).launch {
-            // 示例1：调用简单方法
-            val result1 = flutterChannel.getFlutterData("Hello from Android")
-            println("Flutter 返回: $result1")
-
-            // 示例2：调用计算方法
-            val numbers = listOf(1, 2, 3, 4, 5)
-            val sum = flutterChannel.calculateSum(numbers)
-            println("计算总和: $sum")
-
-            // 示例3：直接调用任意方法
-            val customResult = flutterChannel.callFlutterMethod(
-                "customMethod",
-                mapOf("key" to "value")
-            )
-            println("自定义方法结果: $customResult")
-        }
     }
 
     @Synchronized
@@ -1022,6 +991,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     startActivity(intent)
                 }
 
+                R.id.btn_activity_flutter_integration -> {
+                    startActivity(Intent(this, FlutterIntegrationActivity::class.java))
+                }
+
                 else -> {
 
                 }
@@ -1147,7 +1120,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         stopService(intent)
         unregisterReceiver(receiver1)
         unregisterReceiver(receiver)
-        flutterChannel.destroy()
         TestLearnUtils.destroy()
 //        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
 //            mConnectivityDiagnosticsManager.unregisterConnectivityDiagnosticsCallback(

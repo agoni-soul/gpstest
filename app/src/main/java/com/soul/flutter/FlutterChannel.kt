@@ -1,10 +1,12 @@
-package com.soul.main.flutter
+package com.soul.flutter
 
 import android.content.Context
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
@@ -35,6 +37,27 @@ class FlutterChannel(private val context: Context) {
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL_NAME
         )
+    }
+
+    fun testFlutterCalls() {
+        CoroutineScope(Dispatchers.Main).launch {
+            // 示例1：调用简单方法
+            val result1 = getFlutterData("Hello from Android")
+            println("Flutter 返回: $result1")
+
+            // 示例2：调用计算方法
+            val numbers = listOf(1, 2, 3, 4, 5)
+            val sum = calculateSum(numbers)
+            println("计算总和: $sum")
+
+            // 示例3：直接调用任意方法
+            val customResult = callFlutterMethod(
+                "customMethod",
+                mapOf("key" to "value")
+            )
+            println("自定义方法结果: $customResult")
+        }
+
     }
 
     // 调用 Flutter 方法

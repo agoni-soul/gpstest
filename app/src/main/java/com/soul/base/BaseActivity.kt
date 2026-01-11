@@ -1,17 +1,21 @@
 package com.soul.base
 
-import android.R
 import android.app.ActionBar
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowInsetsController
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
+import com.soul.gpstest.R
 import com.soul.log.DOFLogUtil
 
 
@@ -34,10 +38,14 @@ abstract class BaseActivity : AppCompatActivity() {
 
     /**
      * 隐藏标题栏[ActionBar]
+     *
+     * 适配版本号[Build.VERSION_CODES.UPSIDE_DOWN_CAKE]时，需要主动设置主题背景
      */
     protected open fun hideTitleAndActionBar() {
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-        supportActionBar?.hide()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+            supportActionBar?.hide()
+        }
     }
 
     protected open fun getNavigationBarColor(): Int = R.color.transparent
@@ -55,8 +63,15 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected open fun getRootViewId(): Int = 0
 
+    /**
+     * 上层额外状态设置
+     *
+     * 适配版本号[Build.VERSION_CODES.UPSIDE_DOWN_CAKE]时，需要主动设置主题背景
+     */
     protected open fun requestFeature() {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            setTheme(R.style.Theme_GPSTest_NoActionBar)
+        }
     }
 
     protected open fun extraConfig() {

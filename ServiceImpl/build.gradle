@@ -24,11 +24,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+        targetCompatibility rootProject.ext.targetCompatibility_javaVersion
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = rootProject.ext.jvmTarget_version
     }
 }
 
@@ -43,7 +43,6 @@ dependencies {
     androidTestImplementation 'org.testng:testng:6.9.6'
     testImplementation 'junit:junit:4.13.2'
     kapt 'com.google.auto.service:auto-service:1.1.1' //同上
-    implementation 'com.google.auto.service:auto-service:1.1.1'
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
     implementation project(':ServiceAnnotation')
     implementation project(':ServiceApi')

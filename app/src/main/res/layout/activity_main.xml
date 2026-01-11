@@ -272,6 +272,14 @@
                     android:text="MVI 框架"
                     app:layout_constraintTop_toBottomOf="@+id/btn_ui_monitor" />
 
+                <Button
+                    android:id="@+id/btn_activity_flutter_integration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="Flutter 框架"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_mvi_frame" />
+
                 <com.soul.main.pieChartView.CircleSectorView
                     android:id="@+id/csv"
                     android:visibility="gone"
@@ -280,7 +288,7 @@
                     android:layout_marginTop="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_mvi_frame" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_flutter_integration" />
 
                 <com.soul.main.pieChartView.PieChartView
                     android:id="@+id/pcv"

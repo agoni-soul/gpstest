@@ -1,5 +1,6 @@
 package com.soul.main
 
+//import com.soul.gpstest.IProcessStub
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -29,7 +30,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.os.RemoteException
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.Spannable
@@ -62,9 +62,9 @@ import com.soul.coroutineScope.CoroutineScopeActivity
 import com.soul.coroutineScope.EatGame
 import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
+import com.soul.flutter.FlutterIntegrationActivity
 import com.soul.gps.GpsActivity
 import com.soul.gpstest.BuildConfig
-import com.soul.gpstest.IProcessStub
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
@@ -120,6 +120,18 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private var mSplashScreen: SplashScreen? = null
 
     private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
+
+    val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
+        EatGame() // 非线程安全，但初始化更快
+    }
+
+    private val receiver: MyReceiver by lazy {
+        MyReceiver()
+    }
+
+    private val receiver1: MyReceiver1 by lazy {
+        MyReceiver1()
+    }
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
@@ -240,6 +252,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             changeMonitorPerf()
         }
         mViewDataBinding.btnActivityMviFrame.setOnClickListener(this)
+        mViewDataBinding.btnActivityFlutterIntegration.setOnClickListener(this)
 
         testService()
         /**
@@ -340,12 +353,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         val intent = Intent(this, TestService::class.java)
         bindService(intent, object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val stub = IProcessStub.Stub.asInterface(service)
-                try {
-                    stub.request(" ")
-                } catch (e: RemoteException) {
-                    e.printStackTrace()
-                }
+//                val stub = IProcessStub.Stub.asInterface(service)
+//                try {
+//                    stub.request(" ")
+//                } catch (e: RemoteException) {
+//                    e.printStackTrace()
+//                }
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
@@ -363,10 +376,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             UiPerfMonitor.getInstance().startMonitor()
             mViewDataBinding.btnUiMonitor.text = resources.getText(R.string.monitor_control_stop)
         }
-    }
-
-    val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
-        EatGame() // 非线程安全，但初始化更快
     }
 
     override fun isUsedEncapsulatedPermissions(): Boolean = true
@@ -392,20 +401,17 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
-    private val receiver: MyReceiver by lazy {
-        MyReceiver()
-    }
-
-    private val receiver1: MyReceiver1 by lazy {
-        MyReceiver1()
-    }
-
     override fun initData() {
         setupWindowAnimations()
 
         val filter = IntentFilter("com.soul.main.broadcast.intent.action.MyReceiver")
-        registerReceiver(receiver, filter)
-        registerReceiver(receiver1, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
+            registerReceiver(receiver1, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+            registerReceiver(receiver1, filter)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             accessibilityTest()
@@ -985,6 +991,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     startActivity(intent)
                 }
 
+                R.id.btn_activity_flutter_integration -> {
+                    startActivity(Intent(this, FlutterIntegrationActivity::class.java))
+                }
+
                 else -> {
 
                 }
@@ -1110,6 +1120,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         stopService(intent)
         unregisterReceiver(receiver1)
         unregisterReceiver(receiver)
+        TestLearnUtils.destroy()
 //        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
 //            mConnectivityDiagnosticsManager.unregisterConnectivityDiagnosticsCallback(
 //                mConnectivityDiagnosticsCallback

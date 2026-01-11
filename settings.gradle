@@ -21,8 +21,17 @@ include ':ServiceAnnotation'
 include ':ServiceApi'
 include ':ServiceImpl'
 include ':ServiceAnnotationRuntime'
-include ':ServiceRouter'
-include ':ServiceRouterProcessor'
 include ':pluginapp'
-include ':ServiceRouterAnnotation'
-include ':ServiceRouterUtils'
+//include ':ServiceRouter'
+//include ':ServiceRouterProcessor'
+//include ':ServiceRouterAnnotation'
+//include ':ServiceRouterUtils'
+// 引入 Flutter 模块
+include ':fluttertest'
+//project(':fluttertest').projectDir = file('../fluttertest/.android/include_flutter.groovy') // 注意路径
+
+setBinding(new Binding([gradle: this]))
+evaluate(new File(
+        settingsDir,
+        'fluttertest/.android/include_flutter.groovy'
+))

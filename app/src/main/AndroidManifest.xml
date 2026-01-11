@@ -46,6 +46,9 @@
         android:theme="@style/AppTheme"
         android:usesNonSdkApi="true">
         <activity
+            android:name="com.soul.flutter.FlutterIntegrationActivity"
+            android:exported="true" />
+        <activity
             android:name="com.soul.mviFrame.main.MainMVIActivity"
             android:exported="true" />
         <activity

@@ -1,5 +1,16 @@
 # 项目开发规范（Android）
 
+## 添加flutter module配置
+
+- 版本号：
+    - flutter sdk: 3.38.5
+    - dart: 3.10.4
+    - flutter plugin: 88.2.0
+    - gradle-wrapper: 8.13-all
+    - kotlin: 1.8.10
+    - gradle tools: 8.1.1
+    - jdk: 17
+
 ## 技术栈约束
 
 - 语言：仅使用Kotlin（禁止Java）；

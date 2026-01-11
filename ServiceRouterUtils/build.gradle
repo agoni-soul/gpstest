@@ -1,35 +1,7 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlin-android'
+    id 'java-library'
     id 'kotlin-kapt'
-}
-
-android {
-    namespace 'com.haha.servicerouterannotation'
-    compileSdkVersion rootProject.ext.compileSdkVersion
-
-    defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 dependencies {
@@ -38,4 +10,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.annotation:annotation-jvm:1.9.1'
     implementation project(":ServiceRouterAnnotation")
+}
+java {
+    sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+    targetCompatibility rootProject.ext.targetCompatibility_javaVersion
 }

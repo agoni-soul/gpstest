@@ -55,5 +55,6 @@ object HandlerTest {
 
     fun destroy() {
         getHandler()?.removeCallbacksAndMessages(null)
+        mContextRef.clear()
     }
 }

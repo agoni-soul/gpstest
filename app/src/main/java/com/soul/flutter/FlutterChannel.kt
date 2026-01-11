@@ -1,6 +1,13 @@
 package com.soul.flutter
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.util.Log
+import com.soul.flutter.FlutterChannel.Companion.MESSAGE_CALCULATE_SUM
+import com.soul.flutter.FlutterChannel.Companion.MESSAGE_ERROR_EXCEPTION
+import com.soul.flutter.FlutterChannel.Companion.MESSAGE_GET_FLUTTER_DATA
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
@@ -20,7 +27,36 @@ class FlutterChannel(private val context: Context) {
     private lateinit var methodChannel: MethodChannel
 
     companion object {
+        private val TAG = "FlutterChannel"
         private const val CHANNEL_NAME = "com.haha.flutter_module/channel"
+
+        const val MESSAGE_CALCULATE_SUM = 101
+        const val MESSAGE_GET_FLUTTER_DATA = 102
+        const val MESSAGE_ERROR_EXCEPTION = 103
+
+        val mHandler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                val obj = msg.obj
+                when (msg.what) {
+                    MESSAGE_CALCULATE_SUM -> {
+                        println("计算总和: ${(obj as? Int) ?: 0}")
+                    }
+
+                    MESSAGE_GET_FLUTTER_DATA -> {
+                        println("Flutter 返回: ${obj ?: "调用失败"}")
+                    }
+
+                    MESSAGE_ERROR_EXCEPTION -> {
+                        val e = obj as? Exception
+                        Log.e(TAG, "message = ${e?.message}")
+                    }
+
+                    else -> {
+                        println("自定义方法结果: $obj")
+                    }
+                }
+            }
+        }
     }
 
     // 初始化 FlutterEngine
@@ -40,52 +76,86 @@ class FlutterChannel(private val context: Context) {
     }
 
     fun testFlutterCalls() {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             // 示例1：调用简单方法
-            val result1 = getFlutterData("Hello from Android")
-            println("Flutter 返回: $result1")
+            getFlutterData("Hello from Android")
 
             // 示例2：调用计算方法
             val numbers = listOf(1, 2, 3, 4, 5)
-            val sum = calculateSum(numbers)
-            println("计算总和: $sum")
+            calculateSum(numbers)
 
             // 示例3：直接调用任意方法
-            val customResult = callFlutterMethod(
+            callFlutterMethod(
                 "customMethod",
                 mapOf("key" to "value")
             )
-            println("自定义方法结果: $customResult")
         }
 
     }
 
     // 调用 Flutter 方法
-    suspend fun callFlutterMethod(methodName: String, arguments: Any?): Any? {
-        return withContext(Dispatchers.IO) {
+    suspend fun callFlutterMethod(methodName: String, arguments: Any?) {
+        withContext(Dispatchers.Main) {
             try {
-                methodChannel.invokeMethod(methodName, arguments)
+                methodChannel.invokeMethod(methodName, arguments, object : MethodChannel.Result {
+                    override fun success(result: Any?) {
+                        val message = mHandler.obtainMessage()
+                        message.what = MessageType.getMessageValue(methodName)
+                        message.obj = result
+                        mHandler.sendMessage(message)
+                    }
+
+                    override fun error(
+                        errorCode: String,
+                        errorMessage: String?,
+                        errorDetails: Any?
+                    ) {
+                        val message = mHandler.obtainMessage()
+                        message.what = MESSAGE_ERROR_EXCEPTION
+                        message.obj = Exception("$errorCode - $errorMessage")
+                        mHandler.sendMessage(message)
+                    }
+
+                    override fun notImplemented() {
+                        Log.i(TAG, "notImplemented")
+                    }
+                })
             } catch (e: Exception) {
                 e.printStackTrace()
-                null
             }
         }
     }
 
     // 获取 Flutter 数据
-    suspend fun getFlutterData(input: String): String {
-        val result = callFlutterMethod("getFlutterData", input)
-        return result as? String ?: "调用失败"
+    suspend fun getFlutterData(input: String) {
+        callFlutterMethod("getFlutterData", input)
     }
 
     // 计算总和
-    suspend fun calculateSum(numbers: List<Int>): Int {
-        val result = callFlutterMethod("calculateSum", numbers)
-        return (result as? Number)?.toInt() ?: 0
+    suspend fun calculateSum(numbers: List<Int>) {
+        callFlutterMethod("calculateSum", numbers)
     }
 
     // 释放资源
     fun destroy() {
+        mHandler.removeCallbacksAndMessages(null)
         flutterEngine.destroy()
+    }
+}
+
+enum class MessageType(val messageType: String, val value: Int) {
+    GetFlutterData("getFlutterData", MESSAGE_GET_FLUTTER_DATA),
+    CalculateSum("calculateSum", MESSAGE_CALCULATE_SUM),
+    ErrorException("errorException", MESSAGE_ERROR_EXCEPTION);
+
+    companion object {
+        fun getMessageValue(messageType: String): Int {
+            return when (messageType) {
+                GetFlutterData.messageType -> GetFlutterData.value
+                CalculateSum.messageType -> CalculateSum.value
+                ErrorException.messageType -> ErrorException.value
+                else -> ErrorException.value
+            }
+        }
     }
 }

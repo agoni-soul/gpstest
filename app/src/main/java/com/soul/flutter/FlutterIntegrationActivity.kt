@@ -17,7 +17,6 @@ import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * @auther: haha
@@ -173,22 +172,42 @@ class FlutterIntegrationActivity :
     }
 
     private fun callFlutterFunction() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             try {
-                val result = mMethodChannel.invokeMethod(
+                mMethodChannel.invokeMethod(
                     "getFlutterData",
-                    "来自 Kotlin 的请求"
+                    "来自 Kotlin 的请求",
+                    object : MethodChannel.Result {
+                        override fun success(result: Any?) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                // 在主线程更新 UI
+                                println("收到 Flutter 响应: $result")
+                            }
+                        }
+
+                        override fun error(
+                            errorCode: String,
+                            errorMessage: String?,
+                            errorDetails: Any?
+                        ) {
+                            Log.e(
+                                TAG,
+                                "error: errorCode = $errorCode, errorMessage = $errorMessage, errorDetails = $errorDetails"
+                            )
+                        }
+
+                        override fun notImplemented() {
+                            Log.i(TAG, "notImplemented")
+                        }
+
+                    }
                 )
-                withContext(Dispatchers.Main) {
-                    // 在主线程更新 UI
-                    println("收到 Flutter 响应: $result")
-                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
 
-//        testFlutterCalls()
+        testFlutterCalls()
     }
 
     private fun testFlutterCalls() {

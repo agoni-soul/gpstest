@@ -40,6 +40,7 @@ class CustomAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        AccessibilityOperator.instance.onDestroy()
         DOFLogUtil.d(TAG, "onDestroy")
     }
 
@@ -120,5 +121,4 @@ class CustomAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() {
     }
-
 }

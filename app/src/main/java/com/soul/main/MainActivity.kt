@@ -17,8 +17,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Shader
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
@@ -48,7 +46,6 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.blankj.utilcode.util.GsonUtils
@@ -73,7 +70,6 @@ import com.soul.main.broadcast.MyReceiver
 import com.soul.main.broadcast.MyReceiver1
 import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
-import com.soul.main.pieChartView.PieChartBean
 import com.soul.main.timeMonitor.TimeMonitorConfig
 import com.soul.main.timeMonitor.TimeMonitorManager
 import com.soul.mviFrame.main.MainMVIActivity
@@ -102,8 +98,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String?
-
-    private var mCustomAccessibilityService: CustomAccessibilityService? = null
 
     private val mAccessibilityManager: AccessibilityManager by lazy {
         getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -221,17 +215,17 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             val intent = Intent(mContext, DynamicTextViewActivity::class.java)
             startActivity(intent)
         }
-        val picList = mutableListOf<PieChartBean>()
-        val colors: IntArray = intArrayOf(
-            ContextCompat.getColor(mContext, R.color.circle_gradual_end),
-            ContextCompat.getColor(mContext, R.color.circle_gradual_end)
-        )
-        val gradient = LinearGradient(0f, 0f, 100f, 100f, colors, null, Shader.TileMode.CLAMP)
-        picList.add(PieChartBean("0", 25f, gradient))
-        picList.add(PieChartBean("1", 25f, gradient))
-        picList.add(PieChartBean("2", 25f, gradient))
-        picList.add(PieChartBean("3", 25f, gradient))
-        mViewDataBinding.csv.setDate(picList)
+//        val picList = mutableListOf<PieChartBean>()
+//        val colors: IntArray = intArrayOf(
+//            ContextCompat.getColor(mContext, R.color.circle_gradual_end),
+//            ContextCompat.getColor(mContext, R.color.circle_gradual_end)
+//        )
+//        val gradient = LinearGradient(0f, 0f, 100f, 100f, colors, null, Shader.TileMode.CLAMP)
+//        picList.add(PieChartBean("0", 25f, gradient))
+//        picList.add(PieChartBean("1", 25f, gradient))
+//        picList.add(PieChartBean("2", 25f, gradient))
+//        picList.add(PieChartBean("3", 25f, gradient))
+//        mViewDataBinding.csv.setDate(picList)
         mViewDataBinding.btnActivityLiveData.setOnClickListener {
             startActivity(Intent(mContext, LiveDataActivity::class.java))
         }
@@ -254,7 +248,26 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding.btnActivityMviFrame.setOnClickListener(this)
         mViewDataBinding.btnActivityFlutterIntegration.setOnClickListener(this)
 
-        testService()
+        val builder =
+            SpannableStringBuilder("请注意将温度传感器靠近网关\n若长时间未搜索到，可尝试重新操作设备")
+        val str = "重新操作设备"
+        val span = ForegroundColorSpan(Color.RED)
+        builder.setSpan(object : ClickableSpan() {
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.RED
+                ds.isUnderlineText = false
+            }
+
+            override fun onClick(widget: View) {
+                Toast.makeText(this@MainActivity, "nihao", Toast.LENGTH_SHORT).show()
+            }
+
+        }, builder.length - str.length, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        mViewDataBinding.tvSpan.text = builder
+        mViewDataBinding.tvSpan.movementMethod = LinkMovementMethod.getInstance()
+
         /**
         if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
         mConnectivityDiagnosticsManager = getSystemService(Context.CONNECTIVITY_DIAGNOSTICS_SERVICE) as ConnectivityDiagnosticsManager
@@ -416,30 +429,13 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             accessibilityTest()
         }
-
-        val builder =
-            SpannableStringBuilder("请注意将温度传感器靠近网关\n若长时间未搜索到，可尝试重新操作设备")
-        val str = "重新操作设备"
-        val span = ForegroundColorSpan(Color.RED)
-        builder.setSpan(object : ClickableSpan() {
-            override fun updateDrawState(ds: TextPaint) {
-                super.updateDrawState(ds)
-                ds.color = Color.RED
-                ds.isUnderlineText = false
-            }
-
-            override fun onClick(widget: View) {
-                Toast.makeText(this@MainActivity, "nihao", Toast.LENGTH_SHORT).show()
-            }
-
-        }, builder.length - str.length, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        mViewDataBinding.tvSpan.text = builder
-        mViewDataBinding.tvSpan.movementMethod = LinkMovementMethod.getInstance()
         Log.d(TAG, "C++ = ${stringFromJNI()}")
 //        Thread {
 //            synchronizedTest()
 //        }.start()
+
+        // TODO 该Service存在内存泄漏
+//        testService()
 
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
@@ -1118,6 +1114,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         super.onDestroy()
         val intent = Intent(this, CustomAccessibilityService::class.java)
         stopService(intent)
+
+        val testIntent = Intent(this, TestService::class.java)
+        stopService(testIntent)
         unregisterReceiver(receiver1)
         unregisterReceiver(receiver)
         TestLearnUtils.destroy()

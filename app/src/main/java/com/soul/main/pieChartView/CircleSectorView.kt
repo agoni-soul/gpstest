@@ -5,10 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.RadialGradient
 import android.graphics.Rect
 import android.graphics.RectF
-import android.graphics.Shader
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -230,25 +228,25 @@ class CircleSectorView(context: Context, attrs: AttributeSet?, defStyleAttr: Int
             var pieStart = START_DEGREE
             for (i in 0 until anglesSize) {
                 if (mTouchDownPosition >= 0) {
-                    val gradient:RadialGradient = RadialGradient(
-                        rectF!!.centerX(),
-                        rectF!!.centerY(),
-                        outerRadius,
-                        mGradualStartColor,
-                        mGradualEndColor,
-                        Shader.TileMode.CLAMP
-                    )
+//                    val gradient:RadialGradient = RadialGradient(
+//                        rectF!!.centerX(),
+//                        rectF!!.centerY(),
+//                        outerRadius,
+//                        mGradualStartColor,
+//                        mGradualEndColor,
+//                        Shader.TileMode.CLAMP
+//                    )
                     piePaint!!.color = Color.BLUE
                     canvas.drawArc(rectF!!, pieStart, mSweep[i], true, piePaint!!) //扇形
                 } else {
-                    val gradient:RadialGradient = RadialGradient(
-                        rectF!!.centerX(),
-                        rectF!!.centerY(),
-                        outerRadius,
-                        mGradualDefaultColor,
-                        mGradualDefaultColor,
-                        Shader.TileMode.CLAMP
-                    )
+//                    val gradient:RadialGradient = RadialGradient(
+//                        rectF!!.centerX(),
+//                        rectF!!.centerY(),
+//                        outerRadius,
+//                        mGradualDefaultColor,
+//                        mGradualDefaultColor,
+//                        Shader.TileMode.CLAMP
+//                    )
                     mTouchDownPaint!!.color = Color.RED
                     canvas.drawArc(rectF!!, pieStart, mSweep[i], true, mTouchDownPaint!!) //扇形
                 }

@@ -197,6 +197,11 @@ class AccessibilityOperator private constructor() {
         return targetInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK)
     }
 
+    fun onDestroy() {
+        mAccessibilityEvent = null
+        accessibilityService = null
+    }
+
     companion object {
         private val TAG = "AccessibilityOperator"
         val instance = AccessibilityOperator()

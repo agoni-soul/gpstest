@@ -16,7 +16,7 @@ object SharedPreference {
             val sharedPreferences = context.getSharedPreferences("haha", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putInt("age", 25)
-            editor.commit()
+            // editor.commit()
             editor.apply()
 
             editor?.let {

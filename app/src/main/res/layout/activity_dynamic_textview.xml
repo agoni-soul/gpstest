@@ -53,8 +53,8 @@
                 android:id="@+id/iv_image"
                 android:layout_width="48dp"
                 android:layout_height="40dp"
-                android:paddingRight="8dp"
                 android:layout_marginBottom="8dp"
+                android:paddingRight="8dp"
                 tools:src="@color/blue" />
 
             <TextView
@@ -98,6 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:visibility="gone"
             app:contentColor="#0000FF"
             app:contentHeight="wrap_content"
             app:contentMaxLine="2"
@@ -113,6 +114,31 @@
             app:unitSize="14sp"
             app:unitText="立方米"
             app:unitWidth="wrap_content" />
+
+        <com.soul.dynamicTextView.DynamicFrameLayout
+            android:id="@+id/dynamic_frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/green"
+            app:layout_constraintTop_toBottomOf="@+id/dynamic_layout">
+
+            <ImageView
+                android:id="@+id/iv_dynamic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/drawable_volume_high" />
+
+            <TextView
+                android:id="@+id/tv_dynamic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="哈哈，你好, 一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十"
+                android:textColor="@color/red" />
+
+        </com.soul.dynamicTextView.DynamicFrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

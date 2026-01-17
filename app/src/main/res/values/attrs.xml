@@ -32,4 +32,50 @@
         <attr name="triangleSide" format="dimension" />
         <attr name="triangleHeight" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="fontPaddingTextView">
+        <attr name="fontPaddingTop" format="boolean" />
+        <attr name="fontPaddingBottom" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="dynamicLayout">
+        <attr name="iconWidth" format="reference|dimension|enum">
+            <enum name="wrap_content" value="-2" />
+            <enum name="match_parent" value="-1" />
+            <enum name="fill_parent" value="-1" />
+        </attr>
+        <attr name="iconHeight" format="reference|dimension|enum">
+            <enum name="wrap_content" value="-2" />
+            <enum name="match_parent" value="-1" />
+            <enum name="fill_parent" value="-1" />
+        </attr>
+        <attr name="iconUrl" format="reference" />
+        <attr name="contentWidth" format="reference|dimension|enum">
+            <enum name="wrap_content" value="-2" />
+            <enum name="match_parent" value="-1" />
+            <enum name="fill_parent" value="-1" />
+        </attr>
+        <attr name="contentHeight" format="reference|dimension|enum">
+            <enum name="wrap_content" value="-2" />
+            <enum name="match_parent" value="-1" />
+            <enum name="fill_parent" value="-1" />
+        </attr>
+        <attr name="contentText" format="string" />
+        <attr name="contentColor" format="color|reference" />
+        <attr name="contentSize" format="dimension" />
+        <attr name="contentMaxLine" format="reference|integer" />
+        <attr name="unitWidth" format="reference|dimension|enum">
+            <enum name="wrap_content" value="-2" />
+            <enum name="match_parent" value="-1" />
+            <enum name="fill_parent" value="-1" />
+        </attr>
+        <attr name="unitHeight" format="reference|dimension|enum">
+            <enum name="wrap_content" value="-2" />
+            <enum name="match_parent" value="-1" />
+            <enum name="fill_parent" value="-1" />
+        </attr>
+        <attr name="unitText" format="string" />
+        <attr name="unitColor" format="color" />
+        <attr name="unitSize" format="dimension" />
+    </declare-styleable>
 </resources>

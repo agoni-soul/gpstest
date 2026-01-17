@@ -50,6 +50,8 @@ class DynamicTextViewActivity: BaseMvvmActivity<ActivityDynamicTextviewBinding, 
                 Log.d(TAG, "setOnClickListener: llValue.width = ${llValue.width}, ivImage.width = ${ivImage.width}, unitWidth = $textWidth")
                 dynamicChangeTextViewWidth(llValue, tvValue,llValue.width - ivImage.width - textWidth)
             }
+            dynamicLayout.setFontPaddingBottom(false)
+            dynamicLayout.requestLayout()
         }
     }
 

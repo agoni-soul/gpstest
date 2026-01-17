@@ -83,6 +83,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tv_electric"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black"
@@ -91,6 +92,27 @@
             android:textColor="#B3FFFFFF"
             android:textSize="24sp"
             app:layout_constraintTop_toBottomOf="@+id/ll_value" />
+
+        <com.soul.dynamicTextView.DynamicLayout
+            android:id="@+id/dynamic_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:contentColor="#0000FF"
+            app:contentHeight="wrap_content"
+            app:contentMaxLine="2"
+            app:contentSize="20sp"
+            app:contentText="哈哈哈哈，哈哈哈哈，哈哈哈哈哈哈啊哈"
+            app:contentWidth="wrap_content"
+            app:iconHeight="40sp"
+            app:iconUrl="@drawable/drawable_volume_high"
+            app:iconWidth="40sp"
+            app:layout_constraintTop_toBottomOf="@+id/tv_electric"
+            app:unitColor="@color/red"
+            app:unitHeight="wrap_content"
+            app:unitSize="14sp"
+            app:unitText="立方米"
+            app:unitWidth="wrap_content" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

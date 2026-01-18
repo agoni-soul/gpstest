@@ -138,7 +138,43 @@
                 android:text="哈哈，你好, 一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十"
                 android:textColor="@color/red" />
 
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="哈哈，你好, 一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十"
+                android:textColor="@color/red" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/drawable_volume_high" />
+
         </com.soul.dynamicTextView.DynamicFrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/dynamic_frame_layout">
+
+            <ImageView
+                android:id="@+id/ll_iv_dynamic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/drawable_volume_high" />
+
+            <TextView
+                android:id="@+id/ll_tv_dynamic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="哈哈，你好, 一二三四五六七八九十一二三四五六七八九十一二三四五六七八九十"
+                android:textColor="@color/red" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

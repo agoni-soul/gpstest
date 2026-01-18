@@ -2,6 +2,7 @@ package com.soul.dynamicTextView
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 
 /**
@@ -14,6 +15,8 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
 
     private var mTotalWidth = 0
     private var mTotalHeight = 0
+    private val mAllViewIndex = mutableListOf<Int>()
+    private val mLineHeightList = mutableListOf<Int>()
 
     constructor(context: Context) : this(context, null, 0)
 
@@ -37,14 +40,13 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
         return p is MarginLayoutParams
     }
 
-//    override fun getLayoutDirection(): Int {
-//        return LayoutDirection.LTR
-//    }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         println("onMeasure")
+        mAllViewIndex.clear()
+        mLineHeightList.clear()
         mTotalWidth = 0
         mTotalHeight = 0
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -55,6 +57,11 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
         val availableHeight = heightSize - paddingTop - paddingBottom
 
         val childCount = childCount
+
+        var lineMaxHeight = 0
+        var lineViewList = mutableListOf<View>()
+        var lineTotalWidth = 0
+
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             if (child.visibility == GONE) continue
@@ -65,8 +72,9 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
             var lp = child.layoutParams as MarginLayoutParams
             var childWidth = child.measuredWidth + lp.leftMargin + lp.rightMargin
             var childHeight = child.measuredHeight + lp.topMargin + lp.bottomMargin
-            if (mTotalWidth + childWidth > availableWidth) {
-                val leaving = availableWidth - mTotalWidth
+            var isAdjust = false
+            if (lineTotalWidth + childWidth > availableWidth) {
+                val leaving = availableWidth - lineTotalWidth
                 // 长度不够时，用剩下长度使用[MeasureSpec.AT_MOST]设置
                 val childSpec = MeasureSpec.makeMeasureSpec(leaving, MeasureSpec.AT_MOST)
                 measureChildWithMargins(
@@ -76,17 +84,47 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
                 lp = child.layoutParams as MarginLayoutParams
                 childWidth = child.measuredWidth + lp.leftMargin + lp.rightMargin
                 childHeight = child.measuredHeight + lp.topMargin + lp.bottomMargin
+                isAdjust = true
             }
-            mTotalHeight = mTotalHeight.coerceAtLeast(childHeight)
-            mTotalWidth += childWidth
+            if (lineTotalWidth + childWidth > availableWidth ||
+                (!lineViewList.isEmpty() && childHeight > lineMaxHeight)
+            ) {
+                mAllViewIndex.add(i)
+                mLineHeightList.add(lineMaxHeight)
+                mTotalWidth = mTotalWidth.coerceAtLeast(lineTotalWidth)
+                lineTotalWidth = 0
+                lineViewList = mutableListOf()
+                mTotalHeight += lineMaxHeight
+
+                if (isAdjust) {
+                    val leaving = availableWidth
+                    val childSpec = MeasureSpec.makeMeasureSpec(leaving, MeasureSpec.AT_MOST)
+                    measureChildWithMargins(
+                        child, childSpec, 0,
+                        heightMeasureSpec, 0
+                    )
+                    lp = child.layoutParams as MarginLayoutParams
+                    childWidth = child.measuredWidth + lp.leftMargin + lp.rightMargin
+                    childHeight = child.measuredHeight + lp.topMargin + lp.bottomMargin
+                }
+            }
+            if (lineViewList.isEmpty()) {
+                lineMaxHeight = childHeight
+            }
+            lineViewList.add(child)
+            lineTotalWidth += childWidth
         }
+        if (!lineViewList.isEmpty()) {
+            mAllViewIndex.add(childCount)
+            mLineHeightList.add(lineMaxHeight)
+            mTotalWidth = mTotalWidth.coerceAtLeast(lineTotalWidth)
+            mTotalHeight += lineMaxHeight
+        }
+
         val width = resolveSize(mTotalWidth, widthMeasureSpec)
         val height = resolveSize(mTotalHeight, heightMeasureSpec)
         setMeasuredDimension(width, height)
     }
-
-    private var mStartLeft = 0
-    private var mStartTop = 0
 
     override fun onLayout(
         changed: Boolean,
@@ -96,29 +134,58 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
         b: Int
     ) {
         println("onLayout: changed = ${changed}, l = $l, t = $t, r = $r, b = $b")
-        val totalWidth = r - l
-        val totalHeight = b - t
-        mStartLeft = paddingLeft
-        mStartTop = (totalHeight - paddingTop - paddingBottom) / 2
-        println("totalWidth = $totalWidth, totalHeight = $totalHeight")
-        if (!changed) return
+        if (!changed || childCount == 0) return
 
-        val childCount = childCount
-        for (i in 0 until childCount) {
+        val count = childCount
+        var k = 0
+        var startLeft = paddingLeft
+        var lineMaxHeightHalf = mLineHeightList[k] / 2
+        var startTop = paddingTop + lineMaxHeightHalf
+        for (i in 0 until count) {
             val child = getChildAt(i)
             if (child.visibility == GONE) continue
+            if (i >= mAllViewIndex[k]) { // 一行结束
+                startTop += lineMaxHeightHalf // 前一行加上后一半高度
+                k++
+                startLeft = paddingLeft
+                lineMaxHeightHalf = mLineHeightList[k] / 2
+                startTop += lineMaxHeightHalf
+            }
             val lp = child.layoutParams as MarginLayoutParams
-            val childWidth = child.measuredWidth //+ lp.leftMargin + lp.rightMargin
-            val childHeight = child.measuredHeight// + lp.topMargin + lp.bottomMargin
+            val childWidth = child.measuredWidth
+            val childHeight = child.measuredHeight
             val childHeightHalf = childHeight / 2
-            // 先加上左边的间距leftMargin
-            mStartLeft += lp.leftMargin
+            startLeft += lp.leftMargin
             child.layout(
-                mStartLeft, mStartTop - childHeightHalf,
-                mStartLeft + childWidth, mStartTop + childHeightHalf
+                startLeft, startTop - childHeightHalf,
+                startLeft + childWidth, startTop + childHeightHalf
             )
-            // 再加上View内容长度，以及右边间距rightMargin
-            mStartLeft += (childWidth + lp.rightMargin)
+            startLeft += childWidth + lp.rightMargin
         }
+
+//        val size = mAllView.size
+//        var startTop = paddingTop
+//        for (i in 0 until size) {
+//            val lineViewList = mAllView[i]
+//            var startLeft = paddingLeft
+//            val lineMaxHeightHalf = mLineHeightList[i]/2
+//            startTop += lineMaxHeightHalf
+//
+//            val lineSize = lineViewList.size
+//            for (j in 0 until lineSize) {
+//                val child = lineViewList[j]
+//                val lp = child.layoutParams as MarginLayoutParams
+//                val childWidth = child.measuredWidth
+//                val childHeight = child.measuredHeight
+//                val childHeightHalf = childHeight / 2
+//                startLeft += lp.leftMargin
+//                child.layout(
+//                    startLeft, startTop - childHeightHalf,
+//                    startLeft + childWidth, startTop + childHeightHalf
+//                )
+//                startLeft += childWidth + lp.rightMargin
+//            }
+//            startTop += lineMaxHeightHalf
+//        }
     }
 }

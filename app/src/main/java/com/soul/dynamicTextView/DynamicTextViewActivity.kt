@@ -51,7 +51,9 @@ class DynamicTextViewActivity: BaseMvvmActivity<ActivityDynamicTextviewBinding, 
                 dynamicChangeTextViewWidth(llValue, tvValue,llValue.width - ivImage.width - textWidth)
             }
             dynamicLayout.setFontPaddingBottom(false)
-            dynamicLayout.requestLayout()
+            dynamicView.setOnClickListener {
+                println("haha, nihao")
+            }
         }
     }
 

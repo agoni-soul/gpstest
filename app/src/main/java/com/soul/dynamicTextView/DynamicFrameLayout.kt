@@ -41,7 +41,6 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        println("onMeasure")
         mAllViewIndex.clear()
         mLineHeightList.clear()
         mTotalWidth = 0
@@ -133,7 +132,6 @@ class DynamicFrameLayout(context: Context, attrs: AttributeSet?, defStyleAttr: I
         r: Int,
         b: Int
     ) {
-        println("onLayout: changed = ${changed}, l = $l, t = $t, r = $r, b = $b")
         if (!changed || childCount == 0) return
 
         val count = childCount

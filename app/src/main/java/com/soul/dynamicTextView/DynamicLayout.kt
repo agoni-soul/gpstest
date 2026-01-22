@@ -150,7 +150,6 @@ class DynamicLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        println("onMeasure")
         maxHeight = 0
         // 获取父容器给的限制
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -230,7 +229,6 @@ class DynamicLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        println("onLayout: ")
         mStartTop = 0
         mStartLeft = 0
         if (!changed) {
@@ -240,7 +238,6 @@ class DynamicLayout(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         val paddingL = paddingLeft
         val paddingR = paddingRight
         val paddingB = paddingBottom
-        println("l = $l, t = $t, r = $r, b = $b, paddingL = $paddingT, paddingR = $paddingR, measuredWidth = $measuredWidth, width = $width")
         mStartLeft = paddingL + l
         mStartTop = paddingT + t
 

@@ -43,8 +43,19 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppNoTheme"
         android:usesNonSdkApi="true">
+        <activity
+            android:name="com.soul.imageViewer.ImageViewerActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.soul.main.glide.MultiPreviewActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="com.soul.main.glide.SinglePreviewActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme" />
         <activity
             android:name="com.soul.flutter.FlutterIntegrationActivity"
             android:exported="true" />

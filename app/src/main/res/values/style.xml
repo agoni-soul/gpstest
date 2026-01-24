@@ -31,7 +31,21 @@
         <item name="android:drawable">@drawable/drawable_shape_circle_24</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="actionMenuTextColor">@color/red</item>
+    </style>
+
+    <style name="AppNoTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="ActionBar" parent="Widget.AppCompat.ActionBar">
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
+    </style>
+
+    <style name="TitleTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

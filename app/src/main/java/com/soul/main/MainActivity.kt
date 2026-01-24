@@ -68,6 +68,7 @@ import com.soul.liveData.LiveDataActivity
 import com.soul.log.DOFLogUtil
 import com.soul.main.broadcast.MyReceiver
 import com.soul.main.broadcast.MyReceiver1
+import com.soul.main.glide.SinglePreviewActivity
 import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
 import com.soul.main.timeMonitor.TimeMonitorConfig
@@ -883,6 +884,11 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                     createMemoryChurn()
 //                    testANRService()
 //                    createRunnableChurn()
+
+                    val intent = Intent()
+                    intent.setClass(mContext, SinglePreviewActivity::class.java)
+//                    intent.setClass(mContext, MultiPreviewActivity::class.java)
+                    startActivity(intent)
                 }
 
                 R.id.btn_permission -> {

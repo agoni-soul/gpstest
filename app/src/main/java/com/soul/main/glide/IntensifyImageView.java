@@ -263,7 +263,7 @@ public class IntensifyImageView extends View implements IntensifyImage,
     }
 
     @Override
-    public void onTouch(float x, float y) {
+    public void onDown(float x, float y) {
         if (!mScroller.isFinished()) {
             mScroller.abortAnimation();
         }

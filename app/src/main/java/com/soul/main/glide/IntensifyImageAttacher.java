@@ -4,12 +4,11 @@ import android.content.Context;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 
 /**
  * Created by felix on 16/5/24.
  */
-public class IntensifyImageAttacher implements View.OnTouchListener {
+public class IntensifyImageAttacher {
     private static final String TAG = "IntensifyImageAttacher";
 
     private IntensifyImageView mIntensifyView;
@@ -21,12 +20,9 @@ public class IntensifyImageAttacher implements View.OnTouchListener {
         Context context = intensifyView.getContext();
         mScaleGestureDetector = new ScaleGestureDetector(context, new OnScaleGestureAdapter());
         mGestureDetector = new GestureDetector(context, new OnGestureAdapter());
-        mIntensifyView.setOnTouchListener(this);
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return mGestureDetector.onTouchEvent(event) | mScaleGestureDetector.onTouchEvent(event);
+        mIntensifyView.setOnTouchListener((v, event) ->
+                mGestureDetector.onTouchEvent(event) | mScaleGestureDetector.onTouchEvent(event)
+        );
     }
 
     private class OnScaleGestureAdapter extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -48,7 +44,7 @@ public class IntensifyImageAttacher implements View.OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            mIntensifyView.onTouch(e.getX(), e.getY());
+            mIntensifyView.onDown(e.getX(), e.getY());
             return true;
         }
 

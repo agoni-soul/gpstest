@@ -36,7 +36,7 @@ public interface IntensifyImage {
 
     void nextScale(float focusX, float focusY);
 
-    void onTouch(float x, float y);
+    void onDown(float x, float y);
 
     void home();
 

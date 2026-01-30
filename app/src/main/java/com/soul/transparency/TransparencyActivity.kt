@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
-import android.os.Bundle
 import android.view.Window
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -24,20 +23,20 @@ class TransparencyActivity : BaseMvvmActivity<ActivityTransparencyBinding, BaseV
     override fun getLayoutId(): Int = R.layout.activity_transparency
 
     override fun initView() {
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
 //        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         val permissions = intent.getStringArrayExtra("permissions") as Array<String>?
         requestPermissions(permissions)
+    }
+
+    override fun requestFeature() {
+        super.requestFeature()
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
     }
 
     override fun initData() {
     }
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     private fun requestPermissions(permissions: Array<String>?) {
         if (permissions == null) return

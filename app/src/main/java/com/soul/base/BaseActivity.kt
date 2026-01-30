@@ -79,10 +79,10 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestFeature()
         super.onCreate(savedInstanceState)
         mContext = this
         extraConfig()
-        requestFeature()
         ActivityCollector.addActivity(this)
         hideTitleAndActionBar()
         setContentView(getLayoutId())

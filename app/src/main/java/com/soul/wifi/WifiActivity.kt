@@ -10,6 +10,7 @@ import android.net.ConnectivityManager
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -99,7 +100,11 @@ class WifiActivity: BaseMvvmActivity<ActivityWifiBinding, BaseViewModel>() {
         filter.addAction(WifiManager.RSSI_CHANGED_ACTION)
 
         mWifiReceiver = WifiReceiver()
-        registerReceiver(mWifiReceiver, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(mWifiReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(mWifiReceiver, filter)
+        }
     }
 }
 

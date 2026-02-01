@@ -32,10 +32,10 @@ class _DemoItemState extends State<DemoItem> {
             Padding(padding: EdgeInsets.only(left: 5.0)),
 
             ///显示文本
-            new Text(
+            Text(
               text,
               //设置字体样式：颜色灰色，字体大小14.0
-              style: new TextStyle(color: Colors.grey, fontSize: 14.0),
+              style: TextStyle(color: Colors.grey, fontSize: 14.0),
               //超过的省略为...显示
               overflow: TextOverflow.ellipsis,
               //最长一行

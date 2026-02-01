@@ -4,6 +4,8 @@ part of my_app;
 class User {
   String name;
   int age;
+  String? login;
+  String? avatar_url;
   String _privateInfo = '私有信息'; // 私有变量
 
   User(this.name, this.age);

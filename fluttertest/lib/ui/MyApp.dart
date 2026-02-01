@@ -61,8 +61,8 @@ class _MyHomePageState extends State<MyHomePage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         ///flex默认为1
-        new Expanded(child: new Text("1111"), flex: 2),
-        new Expanded(child: new Text("2222")),
+        Expanded(flex: 2, child: Text("1111")),
+        Expanded(child: Text("2222")),
       ],
     );
     return Column(

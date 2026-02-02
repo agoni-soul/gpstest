@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertest/ui/DemoPage.dart';
+import 'package:fluttertest/test/demo_page.dart' show DemoPage;
 
 void main() {
   runApp(DemoApp());

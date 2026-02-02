@@ -237,7 +237,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             val options = BitmapFactory.Options()
             options.inMutable = true
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.net_ic_phone, options)
-            bitmap.config = Bitmap.Config.RGB_565
+            bitmap.setConfig(Bitmap.Config.RGB_565)
             val byteCount = bitmap.byteCount // 直接获取内存占用字节数
             Log.d("Memory", "Bitmap size: $byteCount bytes")
         }

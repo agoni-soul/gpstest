@@ -95,10 +95,10 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 34
+    compileSdkVersion = 36
     buildToolsVersion = "35.0.0"
     minSdkVersion = 24
-    targetSdkVersion = 34
+    targetSdkVersion = 36
     sourceCompatibility_javaVersion = JavaVersion.VERSION_17
     targetCompatibility_javaVersion = JavaVersion.VERSION_17
     jvmTarget_version = "17"

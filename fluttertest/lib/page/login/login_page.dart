@@ -7,7 +7,7 @@ import 'package:fluttertest/common/localization/extension.dart';
 import 'package:fluttertest/common/net/address.dart';
 import 'package:fluttertest/common/toast.dart';
 import 'package:fluttertest/common/utils/navigator_utils.dart';
-import 'package:fluttertest/redux/Haha_state.dart';
+import 'package:fluttertest/redux/haha_state.dart';
 import 'package:fluttertest/redux/login_redux.dart';
 import 'package:fluttertest/common/style/Haha_style.dart';
 import 'package:fluttertest/common/utils/common_utils.dart';

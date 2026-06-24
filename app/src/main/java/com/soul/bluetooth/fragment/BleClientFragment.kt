@@ -198,6 +198,8 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
             mBleClientManager?.writeBleMessage(message)
         }
         initRecyclerView()
+        // TODO 这儿逻辑待定，暂时先注释掉
+//        handler.postDelayed()
     }
 
     /**

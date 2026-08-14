@@ -1,6 +1,10 @@
 package com.soul.main
 
 //import com.soul.gpstest.IProcessStub
+// TODO: 临时关闭 SplashScreen，恢复时取消下方注释
+//import androidx.core.splashscreen.SplashScreen
+//import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+//import com.soul.gpstest.BuildConfig
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -27,7 +31,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.Spannable
@@ -46,8 +49,6 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
-import androidx.core.splashscreen.SplashScreen
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
 import com.soul.base.BaseMvvmActivity
@@ -61,7 +62,6 @@ import com.soul.dynamicTextView.DynamicTextViewActivity
 import com.soul.easyswipemenulayout.EasySwipeMenuActivity
 import com.soul.flutter.FlutterIntegrationActivity
 import com.soul.gps.GpsActivity
-import com.soul.gpstest.BuildConfig
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityMainBinding
 import com.soul.liveData.LiveDataActivity
@@ -90,9 +90,10 @@ import com.soul.wifi.WifiActivity
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
 
-    companion object {
-        private const val SPLASH_DURATION = 1500L
-    }
+    // TODO: 临时关闭 SplashScreen；恢复时取消下方注释
+//    companion object {
+//        private const val SPLASH_DURATION = 1500L
+//    }
 
     /**
      * A native method that is implemented by the 'GPSTest' native library,
@@ -110,11 +111,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private var mNetworkIp: NetworkIp? = null
 
-    private var keepSplashOnScreen = true
-
-    private var mSplashScreen: SplashScreen? = null
-
-    private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
+    // TODO: 临时关闭 SplashScreen，启动直接进首页；恢复时取消下方注释
+//    private var keepSplashOnScreen = true
+//
+//    private var mSplashScreen: SplashScreen? = null
+//
+//    private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
 
     val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
         EatGame() // 非线程安全，但初始化更快
@@ -132,20 +134,24 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     override fun getLayoutId(): Int = R.layout.activity_main
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (mIsShowSplash) {
-            setTheme(R.style.Theme_App_Starting)
-            mSplashScreen = installSplashScreen()
-        } else {
-            setTheme(R.style.Theme_GPSTest_NoActionBar)
-        }
+        // TODO: 临时关闭 SplashScreen，启动直接进首页
+        setTheme(R.style.Theme_GPSTest_NoActionBar)
+//        if (mIsShowSplash) {
+//            setTheme(R.style.Theme_App_Starting)
+//            mSplashScreen = installSplashScreen()
+//        } else {
+//            setTheme(R.style.Theme_GPSTest_NoActionBar)
+//        }
         super.onCreate(savedInstanceState)
     }
 
     override fun hideTitleAndActionBar() {
+        // TODO: 临时关闭 SplashScreen；恢复 Splash 时改回按 API 分支处理
+        super.hideTitleAndActionBar()
         // Android 12 以上，SplashScreen会自行处理隐藏顶部状态栏的逻辑
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            super.hideTitleAndActionBar()
-        }
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+//            super.hideTitleAndActionBar()
+//        }
     }
 
     override fun extraConfig() {
@@ -155,26 +161,27 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AppStartActivity_create")
 
-        // 设置保持条件，当keepSplashOnScreen为false时，闪屏页会消失
-        mSplashScreen?.setKeepOnScreenCondition { keepSplashOnScreen }
-
-        // 模拟一些初始化工作
-        simulateInitialization {
-            val processors = Runtime.getRuntime().availableProcessors()
-            keepSplashOnScreen = false
-        }
+        // TODO: 临时关闭 SplashScreen 保持与延迟初始化逻辑
+//        // 设置保持条件，当keepSplashOnScreen为false时，闪屏页会消失
+//        mSplashScreen?.setKeepOnScreenCondition { keepSplashOnScreen }
+//
+//        // 模拟一些初始化工作
+//        simulateInitialization {
+//            val processors = Runtime.getRuntime().availableProcessors()
+//            keepSplashOnScreen = false
+//        }
     }
 
-    private fun simulateInitialization(onInitializationComplete: () -> Unit) {
-        if (!mIsShowSplash) {
-            keepSplashOnScreen = false
-            return
-        }
-        // 模拟延迟，比如网络请求或数据加载
-        Handler(Looper.getMainLooper()).postDelayed({
-            onInitializationComplete()
-        }, 2000)
-    }
+//    private fun simulateInitialization(onInitializationComplete: () -> Unit) {
+//        if (!mIsShowSplash) {
+//            keepSplashOnScreen = false
+//            return
+//        }
+//        // 模拟延迟，比如网络请求或数据加载
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            onInitializationComplete()
+//        }, 2000)
+//    }
 
     override fun initView() {
         mViewDataBinding.btnSkipGps.setOnClickListener(this)

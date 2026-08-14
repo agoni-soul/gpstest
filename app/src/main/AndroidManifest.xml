@@ -119,7 +119,9 @@
             android:name="com.soul.main.MainActivity"
             android:exported="true"
             android:launchMode="singleInstance"
-            android:theme="@style/Theme.App.Starting">
+            android:theme="@style/Theme.GPSTest.NoActionBar">
+            <!-- TODO: 临时关闭 SplashScreen，原主题 Theme.App.Starting -->
+            <!-- android:theme="@style/Theme.App.Starting" -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

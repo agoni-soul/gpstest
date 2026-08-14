@@ -17,6 +17,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
 import com.soul.gpstest.R
 import com.soul.log.DOFLogUtil
+import com.soul.main.timeMonitor.TimeMonitorConfig
+import com.soul.main.timeMonitor.TimeMonitorManager
 
 
 /**
@@ -63,6 +65,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected open fun getRootViewId(): Int = 0
 
+    protected open fun inflateContentView() {
+        setContentView(getLayoutId())
+        // 可选：_binding?.lifecycleOwner = this
+    }
+
     /**
      * 上层额外状态设置
      *
@@ -79,15 +86,39 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_requestFeature_before")
         requestFeature()
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_onCreate_before")
         super.onCreate(savedInstanceState)
         mContext = this
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_extraConfig_before")
         extraConfig()
         ActivityCollector.addActivity(this)
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_hideTitleAndActionBar_before")
         hideTitleAndActionBar()
-        setContentView(getLayoutId())
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_inflateContentView_before")
+        inflateContentView()
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_setStatusBarColor_before")
         setStatusBarColor(getStatusBarColor())
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_setNavigationBarColor_before")
         setNavigationBarColor(getNavigationBarColor())
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_handleNavigationVAndStatusVisibility_before")
         handleNavigationVAndStatusVisibility()
     }
 

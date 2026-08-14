@@ -11,6 +11,8 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.soul.gpstest.R
+import com.soul.main.timeMonitor.TimeMonitorConfig
+import com.soul.main.timeMonitor.TimeMonitorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -23,9 +25,9 @@ import kotlinx.coroutines.launch
  */
 abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseActivity() {
 
-    protected val mViewDataBinding: V by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        DataBindingUtil.setContentView(this, getLayoutId())
-    }
+    private var _binding: V? = null
+    protected val mViewDataBinding: V
+        get() = _binding ?: error("binding 未初始化，须先走 inflateContentView")
 
     protected val mViewModel: VM by lazy(LazyThreadSafetyMode.PUBLICATION) {
         val modelClass: Class<VM> = getViewModelClass()
@@ -38,6 +40,11 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     }
 
     private var mRequestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+
+    override fun inflateContentView() {
+        _binding = DataBindingUtil.setContentView(this, getLayoutId())
+        _binding?.lifecycleOwner = this
+    }
 
     protected abstract fun getViewModelClass(): Class<VM>
 
@@ -58,6 +65,11 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
+
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseMvvmActivity_create")
+
         mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, defaultBackgroundId())
         if (!isShowStatus()) {
             addStatusBarView()
@@ -69,7 +81,14 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
                 }
         }
         mRequestPermissionLauncher?.launch(requestPermissionArray())
+
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseMvvmActivity_initView_before")
         initView()
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseMvvmActivity_initData_before")
         initData()
     }
 
@@ -114,7 +133,8 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
+        _binding?.unbind()
+        _binding = null
         super.onDestroy()
-        mViewDataBinding.unbind()
     }
 }

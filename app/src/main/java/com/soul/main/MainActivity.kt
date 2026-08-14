@@ -48,6 +48,7 @@ import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.core.app.ActivityCompat
 import com.blankj.utilcode.util.GsonUtils
 import com.soul.animation.AnimationActivity
@@ -134,6 +135,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
 
+    override fun shouldInflateContentInOnCreate(): Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // TODO: 临时关闭 SplashScreen，启动直接进首页
         setTheme(R.style.Theme_GPSTest_NoActionBar)
@@ -161,6 +164,29 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AppStartActivity_create")
+
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("AsyncLayoutInflater_start")
+        // 后台 inflate，回调在主线程；等待期间窗口靠 theme.windowBackground
+        AsyncLayoutInflater(this).inflate(R.layout.activity_main, null) { view, _, _ ->
+            if (isFinishing || isDestroyed) {
+                return@inflate
+            }
+            TimeMonitorManager.getInstance()
+                .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+                .recodingTimeTag("AsyncLayoutInflater_callback")
+            bindInflatedContentView(view)
+            TimeMonitorManager.getInstance()
+                .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+                .recodingTimeTag("AsyncLayoutInflater_bind_done")
+            onContentReady()
+            // setContentView 发生在 onResume 之后，补跑依赖 binding 的 resume 逻辑
+            runResumeBindingTasks()
+            TimeMonitorManager.getInstance()
+                .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+                .end("AppStartActivity_contentReady", false)
+        }
 
         // TODO: 临时关闭 SplashScreen 保持与延迟初始化逻辑
 //        // 设置保持条件，当keepSplashOnScreen为false时，闪屏页会消失
@@ -485,15 +511,19 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     override fun onStart() {
         super.onStart()
-        TimeMonitorManager.getInstance()
-            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
-            .end("AppStartActivity_start", false)
+        // 首页走异步 inflate，完整耗时在 contentReady 回调里 end，避免 onStart 时内容尚未就绪
     }
 
     override fun onResume() {
 //        synchronizedTest()
         super.onResume()
+        runResumeBindingTasks()
+    }
 
+    private fun runResumeBindingTasks() {
+        if (!isBindingInitialized()) {
+            return
+        }
         TestLearnUtils.test(mContext)
         TestLearnUtils.test(mViewDataBinding.btnSkipGps)
         TestLearnUtils.test()

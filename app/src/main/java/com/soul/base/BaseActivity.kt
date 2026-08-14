@@ -65,9 +65,15 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected open fun getRootViewId(): Int = 0
 
+    /**
+     * 是否在 [onCreate] 里同步 inflate。
+     * 首页等需要 [androidx.asynclayoutinflater.view.AsyncLayoutInflater] 的页面返回 false，
+     * 自行在主线程 [setContentView] 后再走后续内容初始化。
+     */
+    protected open fun shouldInflateContentInOnCreate(): Boolean = true
+
     protected open fun inflateContentView() {
         setContentView(getLayoutId())
-        // 可选：_binding?.lifecycleOwner = this
     }
 
     /**
@@ -107,7 +113,9 @@ abstract class BaseActivity : AppCompatActivity() {
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_inflateContentView_before")
-        inflateContentView()
+        if (shouldInflateContentInOnCreate()) {
+            inflateContentView()
+        }
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_setStatusBarColor_before")
@@ -116,10 +124,13 @@ abstract class BaseActivity : AppCompatActivity() {
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_setNavigationBarColor_before")
         setNavigationBarColor(getNavigationBarColor())
-        TimeMonitorManager.getInstance()
-            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
-            .recodingTimeTag("BaseActivity_handleNavigationVAndStatusVisibility_before")
-        handleNavigationVAndStatusVisibility()
+        // insetsController / decorView 依赖 DecorView；异步 inflate 时须等 setContentView 后再处理
+        if (shouldInflateContentInOnCreate()) {
+            TimeMonitorManager.getInstance()
+                .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+                .recodingTimeTag("BaseActivity_handleNavigationVAndStatusVisibility_before")
+            handleNavigationVAndStatusVisibility()
+        }
     }
 
     /**
@@ -142,7 +153,11 @@ abstract class BaseActivity : AppCompatActivity() {
         window.statusBarColor = resources.getColor(color)
     }
 
-    private fun handleNavigationVAndStatusVisibility() {
+    /**
+     * 须在 [setContentView] / DecorView 就绪后调用。
+     * 异步 inflate 场景请在 bind 完成后显式调用。
+     */
+    protected fun handleNavigationVAndStatusVisibility() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             handleAdvancedSystemNavigationAndStatus()
         } else {
@@ -152,7 +167,13 @@ abstract class BaseActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun handleAdvancedSystemNavigationAndStatus() {
-        if (window.insetsController == null) {
+        // peekDecorView：Decor 未安装时为 null；直接读 insetsController 会在部分机型 NPE
+        if (window.peekDecorView() == null) {
+            handleNormalSystemNavigationAndStatus()
+            return
+        }
+        val insetsController = window.insetsController
+        if (insetsController == null) {
             handleNormalSystemNavigationAndStatus()
             return
         }
@@ -160,7 +181,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val isShowNavigation = isShowNavigation()
         val isShowStatus = isShowStatus()
         val isBlackStatusText = isBlackStatusText()
-        window.insetsController!!.apply {
+        insetsController.apply {
             // TODO 隐藏导航栏，上滑仍会会显示，后续再研究
             if (isShowNavigation) {
                 show(WindowInsetsCompat.Type.navigationBars())

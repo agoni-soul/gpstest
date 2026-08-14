@@ -14,9 +14,11 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.GPSTest.NoActionBar">
+    <style name="Theme.GPSTest.NoActionBar" parent="Theme.GPSTest">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <!-- 异步 inflate 期间 Preview Window 用此背景，避免白屏；不用 Splash -->
+        <item name="android:windowBackground">@color/green</item>
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">

@@ -1,15 +1,16 @@
 package com.soul.ui.dialog
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.Button
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,12 +36,19 @@ class CustomDialogFragment(): DialogFragment() {
     private var mContext: Context? = null
 
     constructor(context: Context): this() {
-        mContext = context
+        // Context 在 onAttach 中赋值，避免构造器长期持有 Activity
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        mContext = context
         Log.d("haha", "onAttach")
+    }
+
+    override fun onDetach() {
+        mContext = null
+        mDismissListener = null
+        super.onDetach()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

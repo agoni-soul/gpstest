@@ -71,6 +71,7 @@ import com.soul.main.broadcast.MyReceiver1
 import com.soul.main.glide.SinglePreviewActivity
 import com.soul.main.logMonitor.UiPerfMonitor
 import com.soul.main.network.NetworkIp
+import com.soul.main.pieChartView.CircleProgressView
 import com.soul.main.timeMonitor.TimeMonitorConfig
 import com.soul.main.timeMonitor.TimeMonitorManager
 import com.soul.mviFrame.main.MainMVIActivity
@@ -210,15 +211,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             intent.putExtras(Intent())
             startActivity(intent)
         }
-        mViewDataBinding.cpv.apply {
-            setProgress(20f)
-            setCircleBgColor(Color.RED)
-            setProgressColor(Color.BLACK)
-            setCenterText("哈哈哈哈")
-            setCenterTextColor(Color.GREEN)
-            setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
-            invalidate()
-        }
+        // CircleProgressView / PieChartView 改由 ViewStub 首帧后加载，见 inflateHeavyCustomViews()
         mViewDataBinding.btnActivityDynamic.setOnClickListener {
             val intent = Intent(mContext, DynamicTextViewActivity::class.java)
             startActivity(intent)
@@ -255,6 +248,11 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
         mViewDataBinding.btnActivityMviFrame.setOnClickListener(this)
         mViewDataBinding.btnActivityFlutterIntegration.setOnClickListener(this)
+
+        // 首帧后再加载自定义重控件，缩短 activity_main inflate 时间
+        mViewDataBinding.root.post {
+            inflateHeavyCustomViews()
+        }
 
         val builder =
             SpannableStringBuilder("请注意将温度传感器靠近网关\n若长时间未搜索到，可尝试重新操作设备")
@@ -419,6 +417,31 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
         permissionResultMap.forEach { (k, v) ->
             Log.d(TAG, "$k ----->>>>>  $v")
+        }
+    }
+
+    /**
+     * 延迟 inflate 自定义重控件（ViewStub），避免拖慢首页 setContentView。
+     * DataBinding 对 ViewStub 生成的是 ViewStubProxy。
+     */
+    private fun inflateHeavyCustomViews() {
+        val stubCpv = mViewDataBinding.stubCpv
+        if (!stubCpv.isInflated) {
+            val cpv = stubCpv.viewStub?.inflate() as? CircleProgressView
+            cpv?.apply {
+                setProgress(20f)
+                setCircleBgColor(Color.RED)
+                setProgressColor(Color.BLACK)
+                setCenterText("哈哈哈哈")
+                setCenterTextColor(Color.GREEN)
+                setCenterTextSize(DpOrSpToPxTransfer.sp2px(mContext, 18).toFloat())
+                invalidate()
+            }
+        }
+
+        val stubPcv = mViewDataBinding.stubPcv
+        if (!stubPcv.isInflated) {
+            stubPcv.viewStub?.inflate()
         }
     }
 

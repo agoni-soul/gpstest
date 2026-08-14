@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.soul.main.pieChartView.CircleProgressView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="88dp"
+    android:layout_height="88dp"
+    android:visibility="gone"
+    app:arcCircleBgColor="@color/red"
+    app:arcProgressColor="@color/yellow"
+    app:arcWidth="4dp"
+    app:centerTextColor="@color/cyan"
+    app:centerTextSize="24sp"
+    app:circleRadius="30dp" />

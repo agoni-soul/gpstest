@@ -17,7 +17,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.Collator
-import java.util.*
+import java.util.Locale
 import kotlin.random.Random
 
 
@@ -184,14 +184,27 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
             return
         }
 
-        mViewCount.postDelayed({
-            mPopupWindow?.showAsDropDown(
-                mViewCount as View,
-                0,
-                32,
-                Gravity.START
-            )
-        }, 100)
+        mViewCount.removeCallbacks(showPopupRunnable)
+        mViewCount.postDelayed(showPopupRunnable, 100)
+    }
+
+    private val showPopupRunnable = Runnable {
+        if (isFinishing || isDestroyed) {
+            return@Runnable
+        }
+        mPopupWindow?.showAsDropDown(
+            mViewCount as View,
+            0,
+            32,
+            Gravity.START
+        )
+    }
+
+    override fun onDestroy() {
+        mViewCount.removeCallbacks(showPopupRunnable)
+        mPopupWindow?.dismiss()
+        mPopupWindow = null
+        super.onDestroy()
     }
 
     override fun getNavigationBarColor(): Int {

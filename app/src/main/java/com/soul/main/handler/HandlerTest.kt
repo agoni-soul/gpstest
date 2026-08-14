@@ -19,28 +19,56 @@ import java.lang.ref.WeakReference
 object HandlerTest {
     private val TAG = javaClass.simpleName
 
+    private val lock = Any()
     private var threadHandler: Handler? = null
+    private var looperThread: Thread? = null
+    private var mContextRef: WeakReference<Context>? = null
 
     private fun getHandler(): Handler? = threadHandler
 
-    private lateinit var mContextRef: WeakReference<Context>
-
     fun handlerLoop(view: View) {
-        mContextRef = WeakReference(view.context)
-        val myThread = Thread {
-            Looper.prepare()
-            threadHandler = object : Handler() {
-                override fun handleMessage(msg: Message) {
-                    Log.i(TAG, "handleMessage: ")
-                    Toast.makeText(mContextRef.get(), "子线程收到消息", Toast.LENGTH_SHORT).show()
-                }
+        // applicationContext：避免弱引用失效前的短暂强引用路径持有 Activity
+        mContextRef = WeakReference(view.context.applicationContext)
+        synchronized(lock) {
+            // 已有存活的 Looper 线程则复用，避免每次 onResume 新建永不退出的线程
+            if (looperThread?.isAlive == true) {
+                return
             }
-            Looper.loop()
+            val thread = Thread {
+                Looper.prepare()
+                val handler = object : Handler(Looper.myLooper()!!) {
+                    override fun handleMessage(msg: Message) {
+                        Log.i(TAG, "handleMessage: ")
+                        val ctx = mContextRef?.get() ?: return
+                        // Toast 需在主线程展示
+                        Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(ctx, "子线程收到消息", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                synchronized(lock) {
+                    threadHandler = handler
+                }
+                Looper.loop()
+                // quit 后清理，允许下次重新启动
+                synchronized(lock) {
+                    if (threadHandler === handler) {
+                        threadHandler = null
+                    }
+                    if (looperThread === Thread.currentThread()) {
+                        looperThread = null
+                    }
+                }
+            }.also {
+                it.name = "HandlerTest-Looper"
+            }
+            looperThread = thread
+            thread.start()
         }
-        myThread.start()
     }
 
     fun sendMessageToThreadHandler(view: View) {
+        mContextRef = WeakReference(view.context.applicationContext)
         threadHandler?.sendMessage(Message())
         threadHandler?.sendMessageDelayed(threadHandler?.obtainMessage() ?: Message(), 1000)
     }
@@ -49,12 +77,16 @@ object HandlerTest {
         getHandler()?.postDelayed({ Log.d(TAG, "1000") }, 1000)
         getHandler()?.postDelayed({ Log.d(TAG, "2000") }, 2000)
         Thread.sleep(2000)
-        val message = Message()
         getHandler()?.postDelayed({ Log.d(TAG, "0") }, 0)
     }
 
     fun destroy() {
-        getHandler()?.removeCallbacksAndMessages(null)
-        mContextRef.clear()
+        synchronized(lock) {
+            val handler = threadHandler
+            handler?.removeCallbacksAndMessages(null)
+            handler?.looper?.quitSafely()
+            mContextRef?.clear()
+            mContextRef = null
+        }
     }
 }

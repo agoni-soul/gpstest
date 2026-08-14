@@ -12,8 +12,10 @@ import android.content.Context
 object SharedPreference {
 
     fun test(context: Context) {
+        // 子线程只持有 applicationContext，避免短暂持有 Activity 导致泄漏
+        val appContext = context.applicationContext
         Thread {
-            val sharedPreferences = context.getSharedPreferences("haha", Context.MODE_PRIVATE)
+            val sharedPreferences = appContext.getSharedPreferences("haha", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putInt("age", 25)
             // editor.commit()

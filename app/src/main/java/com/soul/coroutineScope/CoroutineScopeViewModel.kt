@@ -6,14 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /**
  *
@@ -100,80 +97,52 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
     }
 
     private fun filterDevice(s: String) {
-        mScanDeviceJob = CoroutineScope(Dispatchers.Default).launch {
+        mScanDeviceJob = viewModelScope.launch(Dispatchers.Default) {
             if (mIsPreciseMatch) {
-                runBlocking {
-                    Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} hahahahh")
-                    if (mIsPreciseMatch) {
-                        if (mSSID == s) {
-                            GlobalScope.launch(Dispatchers.Main) {
-                                if (mIsPreciseMatch) {
-                                    _mSsidFirstData.postValue(s)
-                                    Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} hahahahh")
-                                }
-                            }
+                Log.d(
+                    TAG,
+                    "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} hahahahh"
+                )
+                if (mIsPreciseMatch && mSSID == s) {
+                    launch(Dispatchers.Main) {
+                        if (mIsPreciseMatch) {
+                            _mSsidFirstData.value = s
+                            Log.d(
+                                TAG,
+                                "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} hahahahh"
+                            )
                         }
                     }
                 }
             } else {
-                runBlocking {
-                    Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} mFindDeviceJob")
-                    if (!mIsPreciseMatch) {
-                        if (s.contains(mSSID, true)) {
-                            GlobalScope.launch(Dispatchers.Main) {
-                                if (!mIsPreciseMatch) {
-                                    mIsPreciseMatch = true
-                                    mSSID = s
-                                    _mSsidSecondData.postValue(s)
-                                    Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.Main mFindDeviceJob")
-                                }
-                            }
+                Log.d(
+                    TAG,
+                    "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, ${Thread.currentThread()} mFindDeviceJob"
+                )
+                if (!mIsPreciseMatch && s.contains(mSSID, true)) {
+                    launch(Dispatchers.Main) {
+                        if (!mIsPreciseMatch) {
+                            mIsPreciseMatch = true
+                            mSSID = s
+                            _mSsidSecondData.value = s
+                            Log.d(
+                                TAG,
+                                "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.Main mFindDeviceJob"
+                            )
                         }
                     }
                 }
-            }
-
-//            synchronized(mIsPreciseMatch) {
-//                Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.Default hahahahh")
-//                if (mIsPreciseMatch) {
-//                    if (mSSID == s) {
-//                        GlobalScope.launch(Dispatchers.Main) {
-//                            if (mIsPreciseMatch) {
-//                                mTvSecondScope.text = s
-//                                Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.Main hahahahh")
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.IO mFindDeviceJob")
-//                    if (s.contains(mSSID, true)) {
-//                        GlobalScope.launch(Dispatchers.Main) {
-//                            if (!mIsPreciseMatch) {
-//                                mIsPreciseMatch = true
-//                                mSSID = s
-//                                mTvFirstScope.text = s
-//                                Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.Main mFindDeviceJob")
-//                            } else {
-//                                Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, Dispatchers.IO 异步线程")
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-            if (mIsPreciseMatch) {
-//                mFindDeviceJob?.let {
-//                    if (it.isActive) {
-//                        Log.d(TAG, "mIsPreciseMatch = $mIsPreciseMatch, mSSID = $mSSID, s = $s, mFindDeviceJob 取消")
-//                        it.cancelChildren()
-//                    }
-//                }
-            } else {
             }
         }
     }
 
     fun stopScan() {
-        mScanDeviceJob?.cancelChildren()
+        mScanDeviceJob?.cancel()
         scopeTest?.stop()
+    }
+
+    override fun onCleared() {
+        stopScan()
+        super.onCleared()
     }
 }

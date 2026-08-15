@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,6 +33,9 @@ public class NetWorkUtils {
     public static volatile boolean isActivityConnected = true;
     public static volatile boolean isConnected = true;
     private static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledFuture<?> networkMonitorFuture;
+    private static ConnectivityManager.NetworkCallback sNetworkCallback;
+    private static ConnectivityManager sConnectivityManager;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static List<NetworkCapabilities> getAllNetworkCapabilities(Context context) {
@@ -142,7 +146,9 @@ public class NetWorkUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void requestNetwork(Context context) {
-        final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final Context appContext = context.getApplicationContext();
+        final ConnectivityManager connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        sConnectivityManager = connectivityManager;
         NetworkRequest.Builder builder = new NetworkRequest.Builder();
         builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
         builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
@@ -158,12 +164,16 @@ public class NetWorkUtils {
                 }
             }
         };
+        sNetworkCallback = networkCallback;
         final boolean[] chanelFlag = {true};
-        executorService.scheduleWithFixedDelay(() -> {
+        if (networkMonitorFuture != null) {
+            networkMonitorFuture.cancel(false);
+        }
+        networkMonitorFuture = executorService.scheduleWithFixedDelay(() -> {
             try {
                 //网络都没连接直接返回
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (isActivityCellular(context)) {
+                    if (isActivityCellular(appContext)) {
                         return;
                     }
                 }
@@ -192,6 +202,26 @@ public class NetWorkUtils {
                 e.printStackTrace();
             }
         }, 1, 5, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 停止网络监测任务并注销回调，避免静态调度器长期持有 Context/Callback。
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static void stopRequestNetwork() {
+        if (networkMonitorFuture != null) {
+            networkMonitorFuture.cancel(false);
+            networkMonitorFuture = null;
+        }
+        if (sConnectivityManager != null && sNetworkCallback != null) {
+            try {
+                sConnectivityManager.unregisterNetworkCallback(sNetworkCallback);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        sNetworkCallback = null;
+        sConnectivityManager = null;
     }
 
     // PING命令 使用新进程使用默认网络 不会使用 networkCallback 绑定的通道  用来判断以太网或者WiFi是否可上外网非常不错

@@ -41,6 +41,10 @@ class RemoteViewActivity : BaseMvvmActivity<ActivityRemoteViewBinding, BaseViewM
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
+    @Volatile
+    private var notificationThreadRunning = false
+    private var notificationThread: Thread? = null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_remote_view
@@ -82,15 +86,13 @@ class RemoteViewActivity : BaseMvvmActivity<ActivityRemoteViewBinding, BaseViewM
         v?.let {
             when(v.id) {
                 R.id.create_remote_view_bt -> {
-                    while (true) {
-                        createRemoteView1()
-                    }
+                    createRemoteView1()
                 }
                 R.id.add_remote_view_bt -> {
 
                 }
                 R.id.remove_remote_view_bt -> {
-
+                    stopNotificationThread()
                 }
                 else -> {
 
@@ -100,34 +102,58 @@ class RemoteViewActivity : BaseMvvmActivity<ActivityRemoteViewBinding, BaseViewM
     }
 
     private fun createRemoteView1() {
-        Thread({
-            val remoteView = RemoteViews(packageName, R.layout.layout_custom_remote_views)
+        if (notificationThreadRunning) {
+            return
+        }
+        notificationThreadRunning = true
+        val appContext = applicationContext
+        val pkg = packageName
+        val nm = mNotificationManager
+        notificationThread = Thread({
+            val remoteView = RemoteViews(pkg, R.layout.layout_custom_remote_views)
             remoteView.setTextViewText(R.id.tv_device_name, "哈哈哈哈")
             remoteView.setImageViewResource(R.id.iv_device_icon, R.mipmap.ic_launcher)
 
-            val builder = Notification.Builder(applicationContext)
+            val builder = Notification.Builder(appContext)
             builder.setSmallIcon(R.mipmap.ic_launcher)
             val notification = builder.build()
 
             var bitmap: Bitmap?
             var i = 0
-            while (true) {
+            while (notificationThreadRunning && !Thread.currentThread().isInterrupted) {
                 remoteView.setTextViewText(R.id.tv_device_name, "Notification, count = $i")
-                if (i % 2 == 1) {
-                    bitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+                bitmap = if (i % 2 == 1) {
+                    BitmapFactory.decodeResource(appContext.resources, R.mipmap.ic_launcher)
                 } else {
-                    bitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_round)
+                    BitmapFactory.decodeResource(appContext.resources, R.mipmap.ic_launcher_round)
                 }
                 i++
                 remoteView.setImageViewBitmap(R.id.iv_device_icon, bitmap)
                 notification.contentView = remoteView
-                mNotificationManager.notify(1, notification)
+                nm.notify(1, notification)
+                try {
+                    Thread.sleep(1000)
+                } catch (_: InterruptedException) {
+                    break
+                }
             }
-        }, "add Notification").start()
+        }, "add Notification").also { it.start() }
+    }
+
+    private fun stopNotificationThread() {
+        notificationThreadRunning = false
+        notificationThread?.interrupt()
+        notificationThread = null
+    }
+
+    override fun onDestroy() {
+        stopNotificationThread()
+        super.onDestroy()
     }
 
     private fun createRemoteView() {
-        var remoteView = CustomRemoteViews(this, packageName, R.layout.layout_custom_remote_views)
+        var remoteView =
+            CustomRemoteViews(applicationContext, packageName, R.layout.layout_custom_remote_views)
         remoteView.build(
             "https://midea-file.oss-cn-hangzhou.aliyuncs.com/2021/5/26/18/EknLqOeDxZjshMOoEeZx.png",
             "空调"

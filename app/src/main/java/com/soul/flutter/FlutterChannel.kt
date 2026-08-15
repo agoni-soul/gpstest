@@ -13,6 +13,7 @@ import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,10 +22,12 @@ import kotlinx.coroutines.withContext
  * @Date:   2026/1/7
  * @Detail:
  */
-class FlutterChannel(private val context: Context) {
+class FlutterChannel(context: Context) {
 
+    private val appContext = context.applicationContext
     private lateinit var flutterEngine: FlutterEngine
     private lateinit var methodChannel: MethodChannel
+    private var testJob: Job? = null
 
     companion object {
         private val TAG = "FlutterChannel"
@@ -59,9 +62,9 @@ class FlutterChannel(private val context: Context) {
         }
     }
 
-    // 初始化 FlutterEngine
+    // 初始化 FlutterEngine（仅使用 applicationContext）
     fun initialize() {
-        flutterEngine = FlutterEngine(context)
+        flutterEngine = FlutterEngine(appContext)
 
         // 启动 FlutterEngine
         flutterEngine.dartExecutor.executeDartEntrypoint(
@@ -76,7 +79,8 @@ class FlutterChannel(private val context: Context) {
     }
 
     fun testFlutterCalls() {
-        CoroutineScope(Dispatchers.IO).launch {
+        testJob?.cancel()
+        testJob = CoroutineScope(Dispatchers.IO).launch {
             // 示例1：调用简单方法
             getFlutterData("Hello from Android")
 
@@ -138,8 +142,12 @@ class FlutterChannel(private val context: Context) {
 
     // 释放资源
     fun destroy() {
+        testJob?.cancel()
+        testJob = null
         mHandler.removeCallbacksAndMessages(null)
-        flutterEngine.destroy()
+        if (::flutterEngine.isInitialized) {
+            flutterEngine.destroy()
+        }
     }
 }
 

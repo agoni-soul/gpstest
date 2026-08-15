@@ -220,4 +220,21 @@ class GpsActivity : BaseMvvmActivity<ActivityGpsBinding, BaseViewModel>() {
             }
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    override fun onDestroy() {
+        stopLocationUpdates()
+        super.onDestroy()
+    }
+
+    private fun stopLocationUpdates() {
+        try {
+            mLocationManager.removeUpdates(mListener)
+        } catch (_: Exception) {
+        }
+    }
 }

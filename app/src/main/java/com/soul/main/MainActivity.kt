@@ -132,6 +132,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         MyReceiver1()
     }
 
+    private var mWifiConnectCallback: ConnectivityManager.NetworkCallback? = null
+    private var mAccessibilityStateListener: AccessibilityManager.AccessibilityStateChangeListener? =
+        null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
 
@@ -736,11 +740,20 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private fun connect(ssid: String, context: Context) {
         Log.i("haha", "try connect to $ssid")
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val appContext = context.applicationContext
+        val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nr = NetworkRequest.Builder()
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
             .setNetworkSpecifier(ssid)
             .build()
+
+        // 先注销旧回调，避免重复注册导致泄漏
+        mWifiConnectCallback?.let {
+            try {
+                cm.unregisterNetworkCallback(it)
+            } catch (_: Exception) {
+            }
+        }
 
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -769,6 +782,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                 }
             }
         }
+        mWifiConnectCallback = callback
         Log.i("haha", "requestNetwork!")
         cm.registerNetworkCallback(nr, callback)
     }
@@ -1170,13 +1184,29 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private fun accessibilityManagerTest() {
         val accessibilityManager =
             getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
-        accessibilityManager.addAccessibilityStateChangeListener { enabled ->
+        mAccessibilityStateListener?.let {
+            accessibilityManager.removeAccessibilityStateChangeListener(it)
+        }
+        val listener = AccessibilityManager.AccessibilityStateChangeListener { enabled ->
             if (enabled) {
             }
         }
+        mAccessibilityStateListener = listener
+        accessibilityManager.addAccessibilityStateChangeListener(listener)
     }
 
     override fun onDestroy() {
+        mWifiConnectCallback?.let {
+            try {
+                mConnectivityManager.unregisterNetworkCallback(it)
+            } catch (_: Exception) {
+            }
+            mWifiConnectCallback = null
+        }
+        mAccessibilityStateListener?.let {
+            mAccessibilityManager.removeAccessibilityStateChangeListener(it)
+            mAccessibilityStateListener = null
+        }
         super.onDestroy()
         val intent = Intent(this, CustomAccessibilityService::class.java)
         stopService(intent)

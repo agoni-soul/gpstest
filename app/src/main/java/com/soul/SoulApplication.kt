@@ -7,18 +7,13 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.soul.log.DOFLogUtil
 import com.soul.main.timeMonitor.TimeMonitorConfig
 import com.soul.main.timeMonitor.TimeMonitorManager
-import com.soul.pluincore.HookUtils
-import com.soul.pluincore.PluginManager
 import leakcanary.AppWatcher
 import leakcanary.LeakCanary
 import java.io.File
-import java.lang.reflect.Field
 
 
 /**
@@ -85,9 +80,9 @@ class SoulApplication : Application() {
         //App 处于前台时检测保留对象的阈值，默认是 5
         LeakCanary.config = LeakCanary.config.copy(retainedVisibleThreshold = 3)
         //自定义要检测的保留对象类型，默认监测 Activity，Fragment，FragmentViews 和 ViewModels
-        AppWatcher.config= AppWatcher.config.copy(watchFragmentViews = false)
-        //隐藏泄漏显示活动启动器图标，默认为 true
-        LeakCanary.showLeakDisplayActivityLauncherIcon(false)
+        AppWatcher.config = AppWatcher.config.copy(watchFragmentViews = false)
+        // 显示桌面「Leaks」入口（LeakLauncherActivity → LeakActivity），便于查看泄漏报告
+        LeakCanary.showLeakDisplayActivityLauncherIcon(true)
     }
 
     private fun initLogger() {

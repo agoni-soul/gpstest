@@ -1,24 +1,12 @@
 package com.soul.animation
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.content.res.Resources
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.transition.Fade
-import android.transition.Slide
-import android.util.Log
 import android.view.View
-import android.view.animation.*
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -54,6 +42,22 @@ class AnimationActivity: AppCompatActivity() {
 
     private var mSubDeviceAdapter: SearchSubDeviceAdapter? = null
 
+    private val loadingRevealRunnable = Runnable {
+        mIvLoading.animation?.cancel()
+        val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce_anim)
+        mIvLoading.startAnimation(animationLoading)
+
+        val animationText = AnimationUtils.loadAnimation(this, R.anim.move_reduce_text_anim)
+        mTvTitle.startAnimation(animationText)
+
+        mRvSubDevice.visibility = View.VISIBLE
+    }
+
+    private val findDeviceRunnable = Runnable {
+        addData()
+        findSubDevice()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_animation)
@@ -83,27 +87,16 @@ class AnimationActivity: AppCompatActivity() {
         mRvSubDevice.adapter = mSubDeviceAdapter
         mRvSubDevice.layoutManager = LinearLayoutManager(this)
 
-        mRvSubDevice.postDelayed(
-            {
-                mIvLoading.animation.cancel()
-                val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce_anim)
-                mIvLoading.startAnimation(animationLoading)
+        mRvSubDevice.postDelayed(loadingRevealRunnable, 2000)
+        mBtNext.postDelayed(findDeviceRunnable, 3000)
+    }
 
-                val animationText = AnimationUtils.loadAnimation(this, R.anim.move_reduce_text_anim)
-                mTvTitle.startAnimation(animationText)
-
-                mRvSubDevice.visibility = View.VISIBLE
-        }, 2000)
-
-        mBtNext.postDelayed(
-            {
-//                mIvLoading.animation.cancel()
-//                val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce1_anim)
-//                mIvLoading.startAnimation(animationLoading)
-
-                addData()
-                findSubDevice()
-            }, 3000)
+    override fun onDestroy() {
+        mRvSubDevice.removeCallbacks(loadingRevealRunnable)
+        mBtNext.removeCallbacks(findDeviceRunnable)
+        mIvLoading.clearAnimation()
+        mTvTitle.clearAnimation()
+        super.onDestroy()
     }
 
     private fun addData() {

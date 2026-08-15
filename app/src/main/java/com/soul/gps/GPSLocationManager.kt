@@ -24,10 +24,16 @@ class GPSLocationManager private constructor(context: Activity) {
     private var isOPenGps = false
     private var mMinTime: Long = 0
     private var mMinDistance = 0f
+    private fun refreshContext(context: Activity) {
+        initData(context)
+    }
+
     private fun initData(context: Activity) {
         mContext = WeakReference(context)
         if (mContext!!.get() != null) {
-            locationManager = mContext!!.get()!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            // LocationManager 取自 application，避免单例长期依赖 Activity 的 SystemService 代理
+            locationManager =
+                context.applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         }
         //定位类型：GPS
         mLocateType = LocationManager.GPS_PROVIDER
@@ -106,14 +112,21 @@ class GPSLocationManager private constructor(context: Activity) {
      * 方法描述：终止GPS定位,该方法最好在onPause()中调用
      */
     fun stop() {
-        if (mContext!!.get() != null) {
-            if (ActivityCompat.checkSelfPermission(mContext!!.get()!!, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                    PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext!!.get()!!,
+        val activity = mContext?.get()
+        val gpsLocation = mGPSLocation
+        if (activity != null && gpsLocation != null && locationManager != null) {
+            if (ActivityCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    activity,
                             Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return
             }
-            locationManager!!.removeUpdates(mGPSLocation!!)
+            locationManager!!.removeUpdates(gpsLocation)
         }
+        mGPSLocation = null
     }
 
     companion object {
@@ -128,6 +141,9 @@ class GPSLocationManager private constructor(context: Activity) {
                         gpsLocationManager = GPSLocationManager(context)
                     }
                 }
+            } else {
+                // 刷新 WeakReference，避免旧 Activity 已销毁后仍用过期引用
+                gpsLocationManager?.refreshContext(context)
             }
             return gpsLocationManager
         }

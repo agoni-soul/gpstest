@@ -41,7 +41,7 @@ import com.soul.gpstest.databinding.FragmentBleClientBinding
 class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewModel>() {
 
     companion object {
-        val handler = Handler(Looper.getMainLooper())
+        private val handler = Handler(Looper.getMainLooper())
     }
     private var mBleAdapter: BleScanAdapterV2? = null
     private val mData: MutableList<BleScanResult> = mutableListOf();
@@ -323,6 +323,7 @@ class BleClientFragment : BaseMvvmFragment<FragmentBleClientBinding, BaseViewMod
     }
 
     override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
         closeConnect()
         super.onDestroy()
     }

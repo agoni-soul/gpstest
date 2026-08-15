@@ -5,7 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
@@ -143,11 +143,13 @@ class FlutterIntegrationActivity :
         // 统一 get-or-create，避免重复建 Engine / 重复执行 Dart 入口
         val flutterEngine = FlutterChannel.getOrCreateEngine(applicationContext)
 
+        // 创建 MethodChannel
         mMethodChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             FlutterChannel.CHANNEL_NAME
         )
 
+        // 添加 Flutter Fragment
         val flutterFragment =
             FlutterFragment.withCachedEngine(FlutterChannel.FLUTTER_ENGINE_ID)
                 .build<FlutterFragment>()
@@ -158,7 +160,7 @@ class FlutterIntegrationActivity :
     }
 
     private fun callFlutterFunction() {
-        mViewModel.viewModelScope.launch {
+        lifecycleScope.launch {
             try {
                 mMethodChannel?.invokeMethod(
                     "getFlutterData",
@@ -194,6 +196,7 @@ class FlutterIntegrationActivity :
     }
 
     private fun testFlutterCalls() {
+        // 初始化 Flutter Channel（applicationContext，避免持有 Activity）
         mFlutterChannel = FlutterChannel(applicationContext).also {
             it.initialize()
             it.testFlutterCalls()

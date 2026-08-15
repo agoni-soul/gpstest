@@ -87,6 +87,9 @@ class FlutterChannel(context: Context) {
         }
     }
 
+    /**
+     * 初始化 FlutterEngine（仅使用 applicationContext）
+     */
     fun initialize() {
         val appContext = mAppContext ?: return
         val flutterEngine = getOrCreateEngine(appContext)

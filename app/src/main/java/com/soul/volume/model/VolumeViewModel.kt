@@ -8,16 +8,16 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseViewModel
-import com.soul.volume.media.CacheFile
-import com.soul.volume.lrc.DefaultLrcBuilder
-import com.soul.volume.media.PlayMode
 import com.soul.volume.bean.SongInfo
+import com.soul.volume.lrc.DefaultLrcBuilder
 import com.soul.volume.lrc.LrcRow
+import com.soul.volume.media.CacheFile
 import com.soul.volume.media.MediaStatus
+import com.soul.volume.media.PlayMode
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 
 
 /**
@@ -228,7 +228,7 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mTimer = Timer()
         mTimerTask = object : TimerTask() {
             override fun run() {
-                MainScope().launch(Dispatchers.Main) {
+                viewModelScope.launch(Dispatchers.Main) {
                     if (mMediaPlayerStatusLiveData.value == MediaStatus.MEDIA_PLAYER_STATUS_START) {
                         val currentPosition = mMediaPlayer?.currentPosition ?: 0
                         mMusicProgressLiveData.postValue(currentPosition)
@@ -241,7 +241,10 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun stopTimerTask() {
+        mTimerTask?.cancel()
+        mTimerTask = null
         mTimer?.cancel()
+        mTimer = null
     }
 
     fun isMusicPlaying(): Boolean {
@@ -426,6 +429,13 @@ class VolumeViewModel(application: Application) : BaseViewModel(application) {
         mMediaPlayerStatusLiveData.postValue(MediaStatus.MEDIA_PLAYER_STATUS_END)
         mMediaPlayer = null
         stopTimerTask()
+    }
+
+    override fun onCleared() {
+        stopTimerTask()
+        mMediaPlayer?.release()
+        mMediaPlayer = null
+        super.onCleared()
     }
 
     fun setLeftChannel() {

@@ -1,6 +1,6 @@
 package com.soul.volume.media
 
-import android.app.Activity
+import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
@@ -26,13 +26,14 @@ class PlayThread() : Thread() {
 
     // 双声道（立体声）
 //    private val mChannelConfig = AudioFormat.CHANNEL_OUT_STEREO
-    private var mActivity: Activity? = null
+    private var mAppContext: Context? = null
     private var mAudioTrack: AudioTrack? = null
     private var data: ByteArray? = null
     private var mFileName: String? = null
 
-    constructor(activity: Activity?, fileName: String?) : this() {
-        mActivity = activity
+    constructor(context: Context?, fileName: String?) : this() {
+        // 仅持有 applicationContext，避免播放线程泄漏 Activity
+        mAppContext = context?.applicationContext
         mFileName = fileName
 
         val bufferSize = AudioTrack.getMinBufferSize(
@@ -57,7 +58,7 @@ class PlayThread() : Thread() {
             val byteArrayOutputStream = ByteArrayOutputStream()
 
             val inputStream: InputStream? = mFileName?.let {
-                mActivity?.resources?.assets?.open(it)
+                mAppContext?.assets?.open(it)
             }
             val buffer: ByteArray = byteArrayOf()
             var playIndex = 0
@@ -91,6 +92,8 @@ class PlayThread() : Thread() {
             Log.i(TAG, "run: play end")
         } catch (e: IOException) {
             e.printStackTrace()
+        } finally {
+            mAppContext = null
         }
     }
 
@@ -121,6 +124,7 @@ class PlayThread() : Thread() {
 
     fun stopp() {
         mAudioTrack?.stop()
+        mAppContext = null
     }
 
     private fun releaseAudioTrack() {
@@ -129,5 +133,6 @@ class PlayThread() : Thread() {
             mAudioTrack!!.release()
             mAudioTrack = null
         }
+        mAppContext = null
     }
 }

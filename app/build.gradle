@@ -187,9 +187,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.3'
 
-    // 内存泄漏工具 leakcanary
+    // 内存泄漏工具 leakcanary（仅 debug；安装逻辑在 src/debug LeakCanaryInstaller）
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
-//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
 
     // Flutter 依赖
     implementation "io.flutter:flutter_embedding_debug:1.0.0"

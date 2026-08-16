@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 关闭自动安装，改由 LeakCanaryInstaller.manualInstall -->
+    <bool name="leak_canary_watcher_auto_install">false</bool>
+    <!--
+      默认检测 org.junit.Test 在不在 classpath，在则认为正在跑测试并关闭 dump。
+      ServiceImpl 曾 implementation 了 junit-ktx，会导致 Leaks 永远 0 distinct leaks。
+    -->
+    <string name="leak_canary_test_class_name" translatable="false">leakcanary.disabled.DoNotDetectTests</string>
+</resources>

@@ -8,11 +8,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.Log
+import com.soul.leakcanary.LeakCanaryInstaller
 import com.soul.log.DOFLogUtil
 import com.soul.main.timeMonitor.TimeMonitorConfig
 import com.soul.main.timeMonitor.TimeMonitorManager
-import leakcanary.AppWatcher
-import leakcanary.LeakCanary
 import java.io.File
 
 
@@ -60,8 +59,7 @@ class SoulApplication : Application() {
             .recodingTimeTag("ApplicationCreate")
 
         application = this
-        leakCanaryConfig()
-//        LeakCanary.install(this)
+        LeakCanaryInstaller.install(this)
 //        MMKV.initialize(this);
         initComponents()
         DOFLogUtil.init()
@@ -74,15 +72,6 @@ class SoulApplication : Application() {
 //        }
 //        logger?.info("Initializing log4j") ?: Log.d(TAG, "init log4j fail")
 //        initLogger()
-    }
-
-    private fun leakCanaryConfig() {
-        //App 处于前台时检测保留对象的阈值，默认是 5
-        LeakCanary.config = LeakCanary.config.copy(retainedVisibleThreshold = 3)
-        //自定义要检测的保留对象类型，默认监测 Activity，Fragment，FragmentViews 和 ViewModels
-        AppWatcher.config = AppWatcher.config.copy(watchFragmentViews = false)
-        // 显示桌面「Leaks」入口（LeakLauncherActivity → LeakActivity），便于查看泄漏报告
-        LeakCanary.showLeakDisplayActivityLauncherIcon(true)
     }
 
     private fun initLogger() {

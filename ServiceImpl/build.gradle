@@ -39,7 +39,7 @@ dependencies {
 
     implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
     implementation 'com.squareup:javapoet:1.12.1'
-    implementation 'androidx.test.ext:junit-ktx:1.2.1'
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.2.1'
     androidTestImplementation 'org.testng:testng:6.9.6'
     testImplementation 'junit:junit:4.13.2'
     kapt 'com.google.auto.service:auto-service:1.1.1' //同上

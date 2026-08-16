@@ -80,10 +80,13 @@ class FlutterChannel(context: Context) {
 
         /**
          * 从 Cache 移除并销毁 Engine（全局只应调用一次）。
+         * 部分 Flutter Embedding 版本 remove() 返回 void，不能链式 ?.destroy()。
          */
         fun releaseCachedEngine() {
-            (FlutterEngineCache.getInstance()
-                .remove(FLUTTER_ENGINE_ID) as? FlutterChannel)?.destroy()
+            val cache = FlutterEngineCache.getInstance()
+            val engine = cache.get(FLUTTER_ENGINE_ID) ?: return
+            cache.remove(FLUTTER_ENGINE_ID)
+            engine.destroy()
         }
     }
 

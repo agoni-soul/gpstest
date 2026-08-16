@@ -3,11 +3,10 @@ package com.soul.waterfall
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import com.soul.gpstest.R
 import androidx.core.view.isGone
+import com.soul.gpstest.R
 
 
 /**
@@ -41,7 +40,7 @@ class WaterFallLayout(
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0, 0)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        Log.d(TAG, "haha: onMeasure")
+//        Log.d(TAG, "haha: onMeasure")
         // 会测量次
         allViews.clear()
         lineHeights.clear()
@@ -84,9 +83,9 @@ class WaterFallLayout(
 
             // 测量之后就能拿到子view的宽高，保存起来用于判断是否换行，以及需要的高度
             val measuredWidth = childView.measuredWidth
-            Log.d(TAG, "onMeasure measureWidth = $measuredWidth, width = ${childView.width}")
+//            Log.d(TAG, "onMeasure measureWidth = $measuredWidth, width = ${childView.width}")
             val measuredHeight = childView.measuredHeight
-            Log.d(TAG, "onMeasure measuredHeight = $measuredHeight, height = ${childView.height}")
+//            Log.d(TAG, "onMeasure measuredHeight = $measuredHeight, height = ${childView.height}")
 
             // 按行保存View 保存之前判断是否需要换行，如果需要则保存在下一行的list里面
             if (curLineHasUsedWidth + measuredWidth > selfWidth) { // 需要换行，先记录换行之前的数据
@@ -132,7 +131,7 @@ class WaterFallLayout(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        Log.d(TAG, "haha: onLayout")
+//        Log.d(TAG, "haha: onLayout")
         // 设置所有view的位置
         var curT = paddingTop
         for (i in allViews.indices) {
@@ -144,8 +143,8 @@ class WaterFallLayout(
             }
             for (j in everyLineView.indices) {
                 val view = everyLineView[j]
-                Log.d(TAG, "onLayout measureWidth = ${view.measuredWidth}, width = ${view.width}")
-                Log.d(TAG, "onLayout measuredHeight = ${view.measuredHeight}, height = ${view.height}")
+//                Log.d(TAG, "onLayout measureWidth = ${view.measuredWidth}, width = ${view.width}")
+//                Log.d(TAG, "onLayout measuredHeight = ${view.measuredHeight}, height = ${view.height}")
                 if (view.isGone) continue
                 val end = curS + view.measuredWidth
                 val bottom = curT + view.measuredHeight
@@ -158,6 +157,6 @@ class WaterFallLayout(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.d(TAG, "haha: onDraw")
+//        Log.d(TAG, "haha: onDraw")
     }
 }

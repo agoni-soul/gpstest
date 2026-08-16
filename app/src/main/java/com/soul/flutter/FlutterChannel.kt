@@ -9,26 +9,31 @@ import com.soul.flutter.FlutterChannel.Companion.MESSAGE_CALCULATE_SUM
 import com.soul.flutter.FlutterChannel.Companion.MESSAGE_ERROR_EXCEPTION
 import com.soul.flutter.FlutterChannel.Companion.MESSAGE_GET_FLUTTER_DATA
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
  * @auther: haha
  * @Date:   2026/1/7
- * @Detail:
+ * @Detail: 复用 FlutterEngineCache 中的 Engine；不负责销毁共享 Engine。
  */
-class FlutterChannel(private val context: Context) {
+class FlutterChannel(context: Context) {
 
-    private lateinit var flutterEngine: FlutterEngine
-    private lateinit var methodChannel: MethodChannel
+    private var mAppContext: Context? = context.applicationContext
+
+    private var mMethodChannel: MethodChannel? = null
+    private var flutterJob: Job? = null
 
     companion object {
         private val TAG = "FlutterChannel"
-        private const val CHANNEL_NAME = "com.haha.flutter_module/channel"
+        const val FLUTTER_ENGINE_ID = "soul_flutter_engine"
+        const val CHANNEL_NAME = "com.haha.flutter_module/channel"
 
         const val MESSAGE_CALCULATE_SUM = 101
         const val MESSAGE_GET_FLUTTER_DATA = 102
@@ -57,26 +62,43 @@ class FlutterChannel(private val context: Context) {
                 }
             }
         }
+
+        /**
+         * 从 Cache 获取或创建 Engine；仅在新建时执行 Dart 入口。
+         */
+        fun getOrCreateEngine(context: Context): FlutterEngine {
+            val cache = FlutterEngineCache.getInstance()
+            cache.get(FLUTTER_ENGINE_ID)?.let { return it }
+
+            val engine = FlutterEngine(context.applicationContext)
+            engine.dartExecutor.executeDartEntrypoint(
+                DartExecutor.DartEntrypoint.createDefault()
+            )
+            cache.put(FLUTTER_ENGINE_ID, engine)
+            return engine
+        }
+
+        /**
+         * 从 Cache 移除并销毁 Engine（全局只应调用一次）。
+         */
+        fun releaseCachedEngine() {
+            (FlutterEngineCache.getInstance()
+                .remove(FLUTTER_ENGINE_ID) as? FlutterChannel)?.destroy()
+        }
     }
 
-    // 初始化 FlutterEngine
     fun initialize() {
-        flutterEngine = FlutterEngine(context)
-
-        // 启动 FlutterEngine
-        flutterEngine.dartExecutor.executeDartEntrypoint(
-            DartExecutor.DartEntrypoint.createDefault()
-        )
-
-        // 创建 MethodChannel
-        methodChannel = MethodChannel(
+        val appContext = mAppContext ?: return
+        val flutterEngine = getOrCreateEngine(appContext)
+        mMethodChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL_NAME
         )
     }
 
     fun testFlutterCalls() {
-        CoroutineScope(Dispatchers.IO).launch {
+        flutterJob?.cancel()
+        flutterJob = CoroutineScope(Dispatchers.IO).launch {
             // 示例1：调用简单方法
             getFlutterData("Hello from Android")
 
@@ -90,14 +112,13 @@ class FlutterChannel(private val context: Context) {
                 mapOf("key" to "value")
             )
         }
-
     }
 
     // 调用 Flutter 方法
     suspend fun callFlutterMethod(methodName: String, arguments: Any?) {
         withContext(Dispatchers.Main) {
             try {
-                methodChannel.invokeMethod(methodName, arguments, object : MethodChannel.Result {
+                mMethodChannel?.invokeMethod(methodName, arguments, object : MethodChannel.Result {
                     override fun success(result: Any?) {
                         val message = mHandler.obtainMessage()
                         message.what = MessageType.getMessageValue(methodName)
@@ -136,10 +157,16 @@ class FlutterChannel(private val context: Context) {
         callFlutterMethod("calculateSum", numbers)
     }
 
-    // 释放资源
+    /**
+     * 仅解绑本实例资源，不销毁共享的 FlutterEngine。
+     */
     fun destroy() {
+        flutterJob?.cancel()
+        flutterJob = null
         mHandler.removeCallbacksAndMessages(null)
-        flutterEngine.destroy()
+        mMethodChannel?.setMethodCallHandler(null)
+        mMethodChannel = null
+        mAppContext = null
     }
 }
 

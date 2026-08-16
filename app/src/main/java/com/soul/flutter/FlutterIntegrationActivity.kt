@@ -5,17 +5,13 @@ import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.lifecycle.viewModelScope
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityFlutterIntegrationBinding
 import io.flutter.embedding.android.FlutterFragment
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartExecutor
 import io.flutter.plugin.common.MethodChannel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -26,13 +22,8 @@ import kotlinx.coroutines.launch
 class FlutterIntegrationActivity :
     BaseMvvmActivity<ActivityFlutterIntegrationBinding, BaseViewModel>() {
 
-    companion object {
-        const val FLUTTER_ENGINE_ID = "soul_flutter_engine"
-        const val CHANNEL_NAME = "com.haha.flutter_module/channel"
-    }
-
     private var mFlutterChannel: FlutterChannel? = null
-    private lateinit var mMethodChannel: MethodChannel
+    private var mMethodChannel: MethodChannel? = null
 
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
@@ -149,22 +140,17 @@ class FlutterIntegrationActivity :
     }
 
     private fun initFlutter() {
-        // 创建并缓存 FlutterEngine
-        val flutterEngine = FlutterEngine(this)
-        flutterEngine.dartExecutor.executeDartEntrypoint(
-            DartExecutor.DartEntrypoint.createDefault()
-        )
-        FlutterEngineCache.getInstance().put(FLUTTER_ENGINE_ID, flutterEngine)
+        // 统一 get-or-create，避免重复建 Engine / 重复执行 Dart 入口
+        val flutterEngine = FlutterChannel.getOrCreateEngine(applicationContext)
 
-        // 创建 MethodChannel
         mMethodChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            CHANNEL_NAME
+            FlutterChannel.CHANNEL_NAME
         )
 
-        // 添加 Flutter Fragment
         val flutterFragment =
-            FlutterFragment.withCachedEngine(FLUTTER_ENGINE_ID).build<FlutterFragment>()
+            FlutterFragment.withCachedEngine(FlutterChannel.FLUTTER_ENGINE_ID)
+                .build<FlutterFragment>()
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_flutter_container, flutterFragment)
@@ -172,17 +158,15 @@ class FlutterIntegrationActivity :
     }
 
     private fun callFlutterFunction() {
-        CoroutineScope(Dispatchers.Main).launch {
+        mViewModel.viewModelScope.launch {
             try {
-                mMethodChannel.invokeMethod(
+                mMethodChannel?.invokeMethod(
                     "getFlutterData",
                     "来自 Kotlin 的请求",
                     object : MethodChannel.Result {
                         override fun success(result: Any?) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                // 在主线程更新 UI
-                                println("收到 Flutter 响应: $result")
-                            }
+                            // MethodChannel 回调已在主线程
+                            println("收到 Flutter 响应: $result")
                         }
 
                         override fun error(
@@ -199,7 +183,6 @@ class FlutterIntegrationActivity :
                         override fun notImplemented() {
                             Log.i(TAG, "notImplemented")
                         }
-
                     }
                 )
             } catch (e: Exception) {
@@ -211,11 +194,9 @@ class FlutterIntegrationActivity :
     }
 
     private fun testFlutterCalls() {
-        // 初始化 Flutter Channel
-        mFlutterChannel = FlutterChannel(this)
-        mFlutterChannel?.apply {
-            initialize()
-            testFlutterCalls()
+        mFlutterChannel = FlutterChannel(applicationContext).also {
+            it.initialize()
+            it.testFlutterCalls()
         }
     }
 
@@ -226,7 +207,12 @@ class FlutterIntegrationActivity :
     override fun getLayoutId(): Int = R.layout.activity_flutter_integration
 
     override fun onDestroy() {
-        super.onDestroy()
+        mMethodChannel?.setMethodCallHandler(null)
+        mMethodChannel = null
+        // 先解绑 Channel / 取消协程，再统一销毁共享 Engine（只 destroy 一次）
         mFlutterChannel?.destroy()
+        mFlutterChannel = null
+        FlutterChannel.releaseCachedEngine()
+        super.onDestroy()
     }
 }

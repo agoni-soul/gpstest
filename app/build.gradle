@@ -8,6 +8,8 @@ android {
     namespace 'com.soul.gpstest'
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion "35.0.0"
+    // NDK r28+ defaults to 16 KB ELF LOAD alignment (Play requirement for targetSdk 35+)
+    ndkVersion "28.2.13676358"
 
 //    configurations {
 //        cleanedAnnotations

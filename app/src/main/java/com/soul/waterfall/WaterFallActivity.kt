@@ -277,6 +277,13 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
         mPopupWindow?.showAsDropDown(mViewCount, 0, 32, Gravity.START)
     }
 
+    override fun onDestroy() {
+        mWaterFallLayout.removeCallbacks(pendingPopupShow)
+        mPopupWindow?.dismiss()
+        mPopupWindow = null
+        super.onDestroy()
+    }
+
     override fun getNavigationBarColor(): Int {
         return R.color.black
     }

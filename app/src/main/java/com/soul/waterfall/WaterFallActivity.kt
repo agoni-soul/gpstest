@@ -70,6 +70,10 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
 
     private var loadJob: Job? = null
 
+    private var pendingPopupShow: Runnable? = null
+
+    private var popupShowGeneration = 0
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_waterfall
@@ -91,10 +95,17 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
         mTvParams.gravity = Gravity.CENTER
 
         mViewCount.setOnClickListener {
-            showPopupWindow()
+            if (mPopupWindow?.isShowing == true) {
+                cancelPendingPopupShow()
+                mPopupWindow?.dismiss()
+                return@setOnClickListener
+            }
 
-            val rawCount = etViewCount.text.toString().toIntOrNull() ?: return@setOnClickListener
-            if (rawCount <= 0) return@setOnClickListener
+            val rawCount = etViewCount.text.toString().toIntOrNull()
+            if (rawCount == null || rawCount <= 0) {
+                showPopupOnNextFrame()
+                return@setOnClickListener
+            }
 
             val viewCount = min(rawCount, MAX_VIEW_COUNT)
             if (rawCount > MAX_VIEW_COUNT) {
@@ -114,6 +125,7 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
 
     private fun loadWaterFallContent(viewCount: Int) {
         loadJob?.cancel()
+        cancelPendingPopupShow()
         loadJob = lifecycleScope.launch {
             mViewCount.isEnabled = false
             try {
@@ -147,6 +159,7 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
                 mCustomViewAdapter.notifyDataSetChanged()
 
                 bindWaterFallViews(sorted)
+                showPopupOnNextFrame()
 
                 withContext(Dispatchers.IO) {
                     readJson()
@@ -229,24 +242,39 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
         Log.d(this.javaClass.simpleName, sb.toString())
     }
 
-    private fun showPopupWindow() {
+    /**
+     * 等当前帧 traversal 结束后再 addView。
+     * 避免瀑布流 requestLayout 与 PopupWindow 新建窗口落在同一次 doFrame。
+     */
+    private fun showPopupOnNextFrame() {
+        cancelPendingPopupShow()
+        val generation = popupShowGeneration
+        val show = Runnable {
+            if (generation != popupShowGeneration) return@Runnable
+            showPopupWindowNow()
+        }
+        pendingPopupShow = show
+        mWaterFallLayout.postOnAnimation {
+            if (generation != popupShowGeneration) return@postOnAnimation
+            mWaterFallLayout.post(show)
+        }
+    }
+
+    private fun cancelPendingPopupShow() {
+        popupShowGeneration++
+        pendingPopupShow?.let { mWaterFallLayout.removeCallbacks(it) }
+        pendingPopupShow = null
+    }
+
+    private fun showPopupWindowNow() {
+        pendingPopupShow = null
+        if (isFinishing || isDestroyed) return
         if (mPopupWindow == null) {
             mPopupWindow = MaskPopupWindow(this)
             mPopupWindow?.animationStyle = R.style.add_popup_anim
         }
-        if (mPopupWindow?.isShowing == true) {
-            mPopupWindow?.dismiss()
-            return
-        }
-
-        mViewCount.postDelayed({
-            mPopupWindow?.showAsDropDown(
-                mViewCount as View,
-                0,
-                32,
-                Gravity.START
-            )
-        }, 100)
+        if (mPopupWindow?.isShowing == true) return
+        mPopupWindow?.showAsDropDown(mViewCount, 0, 32, Gravity.START)
     }
 
     override fun getNavigationBarColor(): Int {

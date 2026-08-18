@@ -8,16 +8,24 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.soul.base.BaseMvvmActivity
 import com.soul.base.BaseViewModel
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityWaterfallBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.Collator
-import java.util.*
+import java.util.Locale
+import kotlin.math.min
 import kotlin.random.Random
 
 
@@ -31,6 +39,9 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
 
     companion object {
         const val BASE_CONTENT = "你了解发号施令旅339ajk,]】；国妮啊后发交电话费盖提亚武器先擦"
+
+        /** 防止一次创建过多 TextView 卡死主线程 */
+        private const val MAX_VIEW_COUNT = 200
     }
 
     private val tvMap = mutableMapOf<View, Boolean>()
@@ -56,6 +67,9 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
     }
 
     private lateinit var mCustomViewAdapter: CustomViewAdapter
+
+    private var loadJob: Job? = null
+
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
 
     override fun getLayoutId(): Int = R.layout.activity_waterfall
@@ -79,46 +93,88 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
         mViewCount.setOnClickListener {
             showPopupWindow()
 
-//            mWaterFallLayout.removeAllViews()
-            tvMap.clear()
+            val rawCount = etViewCount.text.toString().toIntOrNull() ?: return@setOnClickListener
+            if (rawCount <= 0) return@setOnClickListener
 
-            contentList.clear()
-            val viewCount = etViewCount.text.toString().toIntOrNull() ?: return@setOnClickListener
-            val random = Random(0)
-            for (i in 0 until viewCount) {
-                var startIndex: Int = random.nextInt(BASE_CONTENT.length)
-                var endIndex: Int = random.nextInt(BASE_CONTENT.length)
-                while (startIndex == endIndex) {
-                    startIndex = random.nextInt(BASE_CONTENT.length)
-                    endIndex = random.nextInt(BASE_CONTENT.length)
-                }
-                if (startIndex > endIndex) {
-                    val temp = startIndex
-                    startIndex = endIndex
-                    endIndex = temp
-                }
-                contentList.add(BASE_CONTENT.substring(startIndex, endIndex))
+            val viewCount = min(rawCount, MAX_VIEW_COUNT)
+            if (rawCount > MAX_VIEW_COUNT) {
+                Toast.makeText(
+                    this,
+                    "数量过大，已限制为 $MAX_VIEW_COUNT",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
-            contentList.sortWith { o1, o2 ->
-                val compare = Collator.getInstance(Locale.CHINA)
-                compare.compare(o1, o2)
-            }
-            mCustomViewAdapter.notifyDataSetChanged()
-
-            for (i in contentList.indices) {
-                createSingleTextView(contentList[i], i)
-            }
-
-            readJson()
-
+            loadWaterFallContent(viewCount)
         }
     }
 
     override fun initData() {
     }
 
-    private fun createSingleTextView(content: String, i: Int = 0) {
+    private fun loadWaterFallContent(viewCount: Int) {
+        loadJob?.cancel()
+        loadJob = lifecycleScope.launch {
+            mViewCount.isEnabled = false
+            try {
+                val sorted = withContext(Dispatchers.Default) {
+                    val random = Random(0)
+                    val list = ArrayList<String>(viewCount)
+                    val len = BASE_CONTENT.length
+                    for (i in 0 until viewCount) {
+                        ensureActive()
+                        var startIndex = random.nextInt(len)
+                        var endIndex = random.nextInt(len)
+                        while (startIndex == endIndex) {
+                            startIndex = random.nextInt(len)
+                            endIndex = random.nextInt(len)
+                        }
+                        if (startIndex > endIndex) {
+                            val temp = startIndex
+                            startIndex = endIndex
+                            endIndex = temp
+                        }
+                        list.add(BASE_CONTENT.substring(startIndex, endIndex))
+                    }
+                    val collator = Collator.getInstance(Locale.CHINA)
+                    list.sortWith { o1, o2 -> collator.compare(o1, o2) }
+                    list
+                }
+
+                ensureActive()
+                contentList.clear()
+                contentList.addAll(sorted)
+                mCustomViewAdapter.notifyDataSetChanged()
+
+                bindWaterFallViews(sorted)
+
+                withContext(Dispatchers.IO) {
+                    readJson()
+                }
+            } finally {
+                mViewCount.isEnabled = true
+            }
+        }
+    }
+
+    /**
+     * 批量挂 View：removeAllViewsInLayout + addViewInLayout(preventRequestLayout=true)，
+     * 结束后只 requestLayout 一次，避免每个 addView 都触发全量 onMeasure。
+     * 不使用 API 29+ 的 [android.view.ViewGroup.suppressLayout]，以兼容 minSdk 24。
+     */
+    private fun bindWaterFallViews(contents: List<String>) {
+        mWaterFallLayout.removeAllViewsNoRequestLayout()
+        tvMap.clear()
+        for (content in contents) {
+            val tv = createSingleTextView(content)
+            val lp = LinearLayout.LayoutParams(mTvParams)
+            mWaterFallLayout.addViewNoRequestLayout(tv, lp)
+        }
+        mWaterFallLayout.requestLayout()
+        mWaterFallLayout.invalidate()
+    }
+
+    private fun createSingleTextView(content: String): TextView {
         val tv = TextView(this)
         tv.layoutParams = mTvParams
         tv.background = getDrawable(R.drawable.bg_28_gray)
@@ -140,7 +196,7 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
             }
         }
         tvMap[tv] = false
-        mWaterFallLayout.addView(tv)
+        return tv
     }
 
     private fun readJson() {

@@ -1,24 +1,12 @@
 package com.soul.animation
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.content.res.Resources
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.transition.Fade
-import android.transition.Slide
-import android.util.Log
 import android.view.View
-import android.view.animation.*
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -85,7 +73,7 @@ class AnimationActivity: AppCompatActivity() {
 
         mRvSubDevice.postDelayed(
             {
-                mIvLoading.animation.cancel()
+                mIvLoading.animation?.cancel()
                 val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce_anim)
                 mIvLoading.startAnimation(animationLoading)
 

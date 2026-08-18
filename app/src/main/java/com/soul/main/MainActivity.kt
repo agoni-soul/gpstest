@@ -798,7 +798,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
                         e.printStackTrace()
                     }
                     DOFLogUtil.d(TAG, "bean = $bean")
-                    startActivity(Intent(this, TestActivity::class.java))
+//                    startActivity(Intent(this, TestActivity::class.java))
                 }
 
                 R.id.btn_skip_remote_view -> {

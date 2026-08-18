@@ -171,7 +171,6 @@ class WaterFallActivity : BaseMvvmActivity<ActivityWaterfallBinding, BaseViewMod
             mWaterFallLayout.addViewNoRequestLayout(tv, lp)
         }
         mWaterFallLayout.requestLayout()
-        mWaterFallLayout.invalidate()
     }
 
     private fun createSingleTextView(content: String): TextView {

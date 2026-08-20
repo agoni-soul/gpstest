@@ -42,8 +42,10 @@ class MainAdapter(
     override fun onBindViewHolder(holder: DataViewHolder, position: Int) =
         holder.bind(users[position])
 
-    fun addData(list: List<User>) {
+    fun submitUsers(list: List<User>) {
+        users.clear()
         users.addAll(list)
+        notifyDataSetChanged()
     }
 
 }

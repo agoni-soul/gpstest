@@ -1,15 +1,13 @@
 package com.soul.mviFrame.main
 
-/**
- * @auther: soulagoni
- * @Date:   2025/12/7
- * @Detail:
- */
-sealed class MainState {
+import com.soul.mviFrame.base.IMviUiEffect
+import com.soul.mviFrame.base.IMviUiState
 
-    object Idle : MainState()
-    object Loading : MainState()
-    data class Users(val user: List<User>) : MainState()
-    data class Error(val error: String?) : MainState()
+data class MainUiState(
+    val isLoading: Boolean = false,
+    val users: List<User> = emptyList()
+) : IMviUiState
 
+sealed interface MainUiEffect : IMviUiEffect {
+    data class ShowToast(val message: String) : MainUiEffect
 }

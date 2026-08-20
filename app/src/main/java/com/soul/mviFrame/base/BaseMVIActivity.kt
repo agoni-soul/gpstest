@@ -1,51 +1,53 @@
 package com.soul.mviFrame.base
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.soul.base.BaseViewModel
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.soul.base.BaseMvvmActivity
 import kotlinx.coroutines.launch
 
 /**
- * @auther: soulagoni
- * @Date:   2025/12/10
- * @Detail:
+ * MVI Activity：在 STARTED 时收集 [BaseMVIViewModel.uiState] / [BaseMVIViewModel.uiEffect]，
+ * 停在后台时自动停止，避免无效刷新和重复消费副作用。
  */
-abstract class BaseMVIActivity<V: ViewDataBinding, VM: BaseMVIViewModel>: AppCompatActivity() {
-    protected val mViewDataBinding: V by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        DataBindingUtil.setContentView(this, getLayoutId())
+abstract class BaseMVIActivity<
+        VB : ViewDataBinding,
+        VM : BaseMVIViewModel<I, S, E>,
+        I : IMviIntent,
+        S : IMviUiState,
+        E : IMviUiEffect
+        > : BaseMvvmActivity<VB, VM>() {
+
+    override fun onContentReady() {
+        observeMvi()
+        super.onContentReady()
     }
 
-    protected val mViewModel: VM by lazy(LazyThreadSafetyMode.PUBLICATION) {
-        val modelClass: Class<VM> = getViewModelClass()
-        val viewModel = ViewModelProvider(this)[modelClass]
-        viewModel.viewModelScope.launch(Dispatchers.Main) {
-            lifecycle.addObserver(viewModel)
+    private fun observeMvi() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    mViewModel.uiState.collect { render(it) }
+                }
+                launch {
+                    mViewModel.uiEffect.collect { handleEffect(it) }
+                }
+            }
         }
-        viewModel
     }
 
-    protected abstract fun getLayoutId(): Int
-
-    protected abstract fun getViewModelClass(): Class<VM>
-
-    protected abstract fun initData()
-
-    protected abstract fun initView()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initView()
-        initData()
+    protected fun sendIntent(intent: I) {
+        mViewModel.sendIntent(intent)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mViewDataBinding.unbind()
-        lifecycle.removeObserver(mViewModel)
-    }
+    /**
+     * 根据最新 UiState 渲染界面。StateFlow 会先回放当前值。
+     */
+    protected abstract fun render(state: S)
+
+    /**
+     * 处理一次性副作用。无 Effect 的页面可保持空实现。
+     */
+    protected open fun handleEffect(effect: E) = Unit
 }

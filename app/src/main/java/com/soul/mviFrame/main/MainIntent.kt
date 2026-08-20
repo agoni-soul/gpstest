@@ -1,12 +1,7 @@
 package com.soul.mviFrame.main
 
-/**
- * @auther: soulagoni
- * @Date:   2025/12/7
- * @Detail:
- */
-sealed class MainIntent {
+import com.soul.mviFrame.base.IMviIntent
 
-    object FetchUser : MainIntent()
-
+sealed interface MainIntent : IMviIntent {
+    data object FetchUser : MainIntent
 }

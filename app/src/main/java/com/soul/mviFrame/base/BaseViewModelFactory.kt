@@ -4,20 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 /**
- * @auther: soulagoni
- * @Date:   2025/12/10
- * @Detail:
+ * 用于需要构造参数（Repository 等）的 ViewModel。
+ * 无参 / [android.app.Application] 构造的 ViewModel 不必使用。
  */
-abstract class BaseViewModelFactory<VM: BaseMVIViewModel>: ViewModelProvider.Factory {
+class BaseViewModelFactory<VM : ViewModel>(
+    private val creator: () -> VM
+) : ViewModelProvider.Factory {
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(getViewModelClass())) {
-            return getViewModel() as T
+        val viewModel = creator()
+        if (modelClass.isAssignableFrom(viewModel.javaClass)) {
+            return viewModel as T
         }
-        throw IllegalArgumentException("Unknown class name")
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
-
-    abstract fun getViewModelClass(): Class<VM>
-
-    abstract fun getViewModel(): VM
 }

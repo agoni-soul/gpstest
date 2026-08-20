@@ -1,44 +1,44 @@
 package com.soul.mviFrame.data
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import android.view.View
+import android.widget.Toast
 import com.soul.gpstest.R
 import com.soul.gpstest.databinding.ActivityDataBinding
 import com.soul.mviFrame.base.BaseMVIActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-/**
- * @auther: soulagoni
- * @Date:   2025/12/10
- * @Detail:
- */
-class DataActivity: BaseMVIActivity<ActivityDataBinding, DataMVIViewModel>() {
+class DataActivity : BaseMVIActivity<
+        ActivityDataBinding,
+        DataMVIViewModel,
+        DataIntent,
+        DataUiState,
+        DataUiEffect
+        >() {
+
     override fun getLayoutId(): Int = R.layout.activity_data
 
     override fun getViewModelClass(): Class<DataMVIViewModel> = DataMVIViewModel::class.java
 
-    override fun initData() {
-        mViewModel.viewModelScope.launch(Dispatchers.Main) {
-            mViewModel.dataState.collect {
-                render(it)
-            }
-        }
-    }
-
-    private fun render(dataViewState: DataViewState) {
-
-    }
-
     override fun initView() {
         mViewDataBinding.buttonFetchUser.setOnClickListener {
-            mViewModel.viewModelScope.launch {
-                mViewModel.dataIntent.send(DataIntent.RequestData("1"))
-            }
+            sendIntent(DataIntent.RequestData("1"))
         }
         mViewDataBinding.progressBar.setOnClickListener {
-            mViewModel.viewModelScope.launch {
-                mViewModel.dataIntent.send(DataIntent.RequestGuideInfo("12345678"))
+            sendIntent(DataIntent.RequestGuideInfo("12345678"))
+        }
+    }
+
+    override fun initData() = Unit
+
+    override fun render(state: DataUiState) {
+        mViewDataBinding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+        mViewDataBinding.buttonFetchUser.visibility =
+            if (state.isLoading) View.GONE else View.VISIBLE
+    }
+
+    override fun handleEffect(effect: DataUiEffect) {
+        when (effect) {
+            is DataUiEffect.ShowToast -> {
+                Toast.makeText(this, effect.message, Toast.LENGTH_LONG).show()
             }
         }
     }

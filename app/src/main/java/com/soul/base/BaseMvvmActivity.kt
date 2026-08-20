@@ -66,7 +66,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     /**
      * 内容 View 就绪后的 MVVM 初始化（背景、状态栏占位、权限、initView/initData）。
      */
-    protected fun onContentReady() {
+    protected open fun onContentReady() {
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseMvvmActivity_create")

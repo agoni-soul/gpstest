@@ -1,58 +1,34 @@
 package com.soul.mviFrame.main
 
 import android.app.Application
-import androidx.lifecycle.viewModelScope
 import com.soul.mviFrame.base.BaseMVIViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-/**
- * @auther: soulagoni
- * @Date:   2025/12/7
- * @Detail:
- */
-class MainViewModel(application: Application) : BaseMVIViewModel(application) {
+class MainViewModel(application: Application) :
+    BaseMVIViewModel<MainIntent, MainUiState, MainUiEffect>(
+        application,
+        MainUiState()
+    ) {
 
-    private val mService: ApiService by lazy {
-        ApiHelperImpl(RetrofitBuilder.apiService)
+    private val repository: MainRepository by lazy {
+        MainRepository(ApiHelperImpl(RetrofitBuilder.apiService))
     }
 
-    private val _sf = MutableStateFlow<MainState>(MainState.Idle)
-    val sf: StateFlow<MainState> = _sf
-
-    val userIntent = Channel<MainIntent>(Channel.UNLIMITED)
-    private val _state = MutableStateFlow<MainState>(MainState.Idle)
-    val state: StateFlow<MainState>
-        get() = _state
-
-    init {
-        handleIntent()
-    }
-
-    private fun handleIntent() {
-        viewModelScope.launch {
-            userIntent.consumeAsFlow().collect {
-                when (it) {
-                    is MainIntent.FetchUser -> fetchUser()
-                }
-            }
+    override suspend fun handleIntent(intent: MainIntent) {
+        when (intent) {
+            MainIntent.FetchUser -> fetchUser()
         }
     }
 
-    private fun fetchUser() {
-        viewModelScope.launch {
-            _state.value = MainState.Loading
-            _state.value = try {
-                MainState.Users(mService.getUsers())
-            } catch (e: Exception) {
-                MainState.Error(e.localizedMessage)
-            }
+    private suspend fun fetchUser() {
+        setState { copy(isLoading = true) }
+        try {
+            val users = withContext(Dispatchers.IO) { repository.getUsers() }
+            setState { copy(isLoading = false, users = users) }
+        } catch (e: Exception) {
+            setState { copy(isLoading = false) }
+            sendEffect(MainUiEffect.ShowToast(e.localizedMessage ?: "请求失败"))
         }
     }
 }
-
-

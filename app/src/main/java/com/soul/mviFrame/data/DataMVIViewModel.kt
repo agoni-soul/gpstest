@@ -1,62 +1,42 @@
 package com.soul.mviFrame.data
 
 import android.app.Application
-import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
 import com.soul.mviFrame.base.BaseMVIViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
-/**
- * @auther: soulagoni
- * @Date:   2025/12/11
- * @Detail:
- */
-class DataMVIViewModel(application: Application): BaseMVIViewModel(application) {
+class DataMVIViewModel(application: Application) :
+    BaseMVIViewModel<DataIntent, DataUiState, DataUiEffect>(
+        application,
+        DataUiState()
+    ) {
 
-    private val _dataState = MutableStateFlow<DataViewState>(DataViewState())
-    val dataState: StateFlow<DataViewState> = _dataState.asStateFlow()
-    val dataIntent = Channel<DataIntent>()
-
-    init {
-        viewModelScope.launch {
-            dataIntent.consumeAsFlow().collect {
-                when (it) {
-                    is DataIntent.RequestData -> {
-                        launch(Dispatchers.IO) {
-                            requestData()
-                        }
-                    }
-                    is DataIntent.RequestGuideInfo -> {
-                        requestGuideInfo()
-                    }
-                }
-            }
+    override suspend fun handleIntent(intent: DataIntent) {
+        when (intent) {
+            is DataIntent.RequestData -> requestData()
+            is DataIntent.RequestGuideInfo -> requestGuideInfo(intent.sn8)
         }
     }
 
     private suspend fun requestData() {
-        _dataState.update { current -> current.copy(isLoading = true)}
+        setState { copy(isLoading = true, error = null) }
         try {
             delay(100)
-            _dataState.update { current ->
-                current.copy(items = mutableListOf())
-            }
+            setState { copy(isLoading = false, items = emptyList()) }
         } catch (e: Exception) {
-            _dataState.update { current ->
-                current.copy(error = e.message)
-            }
+            setState { copy(isLoading = false, error = e.message) }
+            sendEffect(DataUiEffect.ShowToast(e.message ?: "请求失败"))
         }
     }
 
-    private fun requestGuideInfo() {
-
+    private suspend fun requestGuideInfo(sn8: String) {
+        setState { copy(isLoading = true, error = null) }
+        try {
+            delay(100)
+            setState { copy(isLoading = false) }
+            sendEffect(DataUiEffect.ShowToast("已请求引导信息: $sn8"))
+        } catch (e: Exception) {
+            setState { copy(isLoading = false, error = e.message) }
+            sendEffect(DataUiEffect.ShowToast(e.message ?: "请求失败"))
+        }
     }
 }

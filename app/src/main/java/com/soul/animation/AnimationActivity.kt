@@ -42,6 +42,22 @@ class AnimationActivity: AppCompatActivity() {
 
     private var mSubDeviceAdapter: SearchSubDeviceAdapter? = null
 
+    private val loadingRevealRunnable = Runnable {
+        mIvLoading.animation?.cancel()
+        val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce_anim)
+        mIvLoading.startAnimation(animationLoading)
+
+        val animationText = AnimationUtils.loadAnimation(this, R.anim.move_reduce_text_anim)
+        mTvTitle.startAnimation(animationText)
+
+        mRvSubDevice.visibility = View.VISIBLE
+    }
+
+    private val findDeviceRunnable = Runnable {
+        addData()
+        findSubDevice()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_animation)
@@ -71,27 +87,16 @@ class AnimationActivity: AppCompatActivity() {
         mRvSubDevice.adapter = mSubDeviceAdapter
         mRvSubDevice.layoutManager = LinearLayoutManager(this)
 
-        mRvSubDevice.postDelayed(
-            {
-                mIvLoading.animation?.cancel()
-                val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce_anim)
-                mIvLoading.startAnimation(animationLoading)
+        mRvSubDevice.postDelayed(loadingRevealRunnable, 2000)
+        mBtNext.postDelayed(findDeviceRunnable, 3000)
+    }
 
-                val animationText = AnimationUtils.loadAnimation(this, R.anim.move_reduce_text_anim)
-                mTvTitle.startAnimation(animationText)
-
-                mRvSubDevice.visibility = View.VISIBLE
-        }, 2000)
-
-        mBtNext.postDelayed(
-            {
-//                mIvLoading.animation.cancel()
-//                val animationLoading = AnimationUtils.loadAnimation(this, R.anim.move_reduce1_anim)
-//                mIvLoading.startAnimation(animationLoading)
-
-                addData()
-                findSubDevice()
-            }, 3000)
+    override fun onDestroy() {
+        mRvSubDevice.removeCallbacks(loadingRevealRunnable)
+        mBtNext.removeCallbacks(findDeviceRunnable)
+        mIvLoading.clearAnimation()
+        mTvTitle.clearAnimation()
+        super.onDestroy()
     }
 
     private fun addData() {

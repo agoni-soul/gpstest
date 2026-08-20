@@ -1,0 +1,148 @@
+
+import 'dart:collection';
+
+import 'package:dio/dio.dart';
+import 'package:flutter_study/common/net/result_data.dart';
+
+import 'code.dart';
+import 'interceptors/error_interceptor.dart';
+import 'interceptors/header_interceptor.dart';
+import 'interceptors/log_interceptor.dart';
+import 'interceptors/response_interceptor.dart';
+import 'interceptors/token_interceptor.dart';
+
+//import 'package:connectivity_plus/connectivity_plus.dart';
+
+///http请求
+class HttpManager {
+  static const CONTENT_TYPE_JSON = "application/json";
+  static const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
+  late final Dio _dio;
+  late final TokenInterceptors _tokenInterceptors;
+
+  HttpManager._internal() {
+    _dio = Dio(); // 使用默认配置
+    _tokenInterceptors = TokenInterceptors();
+
+    _dio.interceptors.addAll([
+      HeaderInterceptors(),
+      _tokenInterceptors,
+      LogsInterceptors(),
+      ErrorInterceptors(),
+      ResponseInterceptors(),
+    ]);
+  }
+
+  static final HttpManager _instance = HttpManager._internal();
+
+  ///发起网络请求
+  ///[ url] 请求url
+  ///[ params] 请求参数
+  ///[ header] 外加头
+  ///[ option] 配置
+  Future<ResultData?> netFetch(
+      url, params, Map<String, dynamic>? header, Options? option,
+      {noTip = false}) async {
+    Map<String, dynamic> headers = HashMap();
+    if (header != null) {
+      headers.addAll(header);
+    }
+
+    if (option != null) {
+      option.headers = headers;
+    } else {
+      option = Options(method: "get");
+      option.headers = headers;
+    }
+
+    resultError(DioException e) {
+      Response? errorResponse;
+      if (e.response != null) {
+        errorResponse = e.response;
+      } else {
+        errorResponse = Response(
+            statusCode: 666, requestOptions: RequestOptions(path: url));
+      }
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        errorResponse!.statusCode = Code.NETWORK_TIMEOUT;
+      }
+      return ResultData(
+          Code.errorHandleFunction(errorResponse!.statusCode, e.message, noTip),
+          false,
+          errorResponse.statusCode);
+    }
+
+    Response response;
+    try {
+      response = await _dio.request(url, data: params, options: option);
+    } on DioException catch (e) {
+      return resultError(e);
+    }
+    if (response.data is DioException) {
+      return resultError(response.data);
+    }
+    return response.data;
+  }
+
+  ///清除授权
+  clearAuthorization() {
+    _tokenInterceptors.clearAuthorization();
+  }
+
+  ///获取授权token
+  getAuthorization() async {
+    return _tokenInterceptors.getAuthorization();
+  }
+
+  /// 提供单例访问
+  static HttpManager get instance => _instance;
+}
+
+final HttpManager httpManager = HttpManager.instance;
+
+//
+//
+// initDio() {
+//   DioClient.getInstance();
+//   initializeNetworkListener();
+// }
+//
+// class DioClient {
+//   static Dio? _dio;
+//
+//   DioClient._();
+//
+//   static Future<Dio> getInstance() async {
+//     if (_dio == null) {
+//       await _initialize();
+//     }
+//     return _dio!;
+//   }
+//
+//   static Future<void> _initialize() async {
+//     _dio = Dio(BaseOptions(
+//       connectTimeout: const Duration(seconds: 10),
+//       receiveTimeout: const Duration(seconds: 10),
+//     ));
+//
+//     _dio!.interceptors.add(LogInterceptor(
+//       requestHeader: true,
+//       requestBody: true,
+//       responseHeader: true,
+//       responseBody: true,
+//     ));
+//   }
+//
+//   static void reset() {
+//     _dio?.close();
+//     _dio = null;
+//   }
+// }
+//
+// void initializeNetworkListener() {
+//   Connectivity().onConnectivityChanged.listen((result) {
+//     DioClient.reset();
+//   });
+// }

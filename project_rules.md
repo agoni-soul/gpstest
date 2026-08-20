@@ -27,7 +27,7 @@
 | NDK                    | 28.2.13676358（16 KB page 对齐）                                    |
 | CMake                  | 3.22.1，native so：`HahaLearn`                                      |
 | ABI                    | `arm64-v8a`                                                     |
-| Flutter 模块             | `fluttertest`（Dart SDK `^3.10.4`）                               |
+| Flutter 模块             | `flutterStudy/`（Dart 包名 `flutter_study`，SDK `^3.10.4`）        |
 | 历史 Flutter 对齐          | Flutter SDK 3.38.5 / Dart 3.10.4 / Flutter Gradle Plugin 88.2.0 |
 
 `buildFeatures`：`viewBinding`、`dataBinding`、`buildConfig` 已开；**Compose 未启用**（相关依赖与
@@ -49,7 +49,7 @@
 | `:ServiceAnnotationProcessor` | 注解处理器                                         |
 | `:ServiceAnnotationRuntime`   | 运行时绑定辅助                                       |
 | `:pluginapp`                  | 插件化 Demo                                      |
-| `:flutter` / `:fluttertest`   | Flutter add-to-app（`include_flutter.groovy`）  |
+| `:flutter` / `:flutterStudy`   | Flutter add-to-app（`include_flutter.groovy`）  |
 
 未启用（目录仍在，settings 已注释）：`:starrysky`、`:ServiceRouter*`。
 
@@ -166,10 +166,10 @@ AppCompatActivity
 
 ## 8. Flutter 混编
 
-- 模块目录：`fluttertest/`，由 `settings.gradle` 的 `include_flutter.groovy` 引入为 `:flutter`。
+- 模块目录：`flutterStudy/`，由 `settings.gradle` 的 `include_flutter.groovy` 引入为 `:flutter`。
 - Native 入口：`com.haha.flutter.FlutterIntegrationActivity`（`FlutterFragment` + `FlutterChannel` /
   `MethodChannel`）。
-- 改 Flutter 侧逻辑放 `fluttertest/lib/`；改宿主嵌入、通道、状态栏适配放 `app/.../flutter/`。
+- 改 Flutter 侧逻辑放 `flutterStudy/lib/`；改宿主嵌入、通道、状态栏适配放 `app/.../flutter/`。
 - 不要把 Flutter UI 逻辑写进 Kotlin Activity，通道协议变更需双侧同步。
 
 ---

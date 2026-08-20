@@ -27,11 +27,11 @@ include ':pluginapp'
 //include ':ServiceRouterAnnotation'
 //include ':ServiceRouterUtils'
 // 引入 Flutter 模块
-include ':fluttertest'
-//project(':fluttertest').projectDir = file('../fluttertest/.android/include_flutter.groovy') // 注意路径
+include ':flutterStudy'
+//project(':flutterStudy').projectDir = file('../flutterStudy/.android/include_flutter.groovy') // 注意路径
 
 setBinding(new Binding([gradle: this]))
 evaluate(new File(
         settingsDir,
-        'fluttertest/.android/include_flutter.groovy'
+        'flutterStudy/.android/include_flutter.groovy'
 ))

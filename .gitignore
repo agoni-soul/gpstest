@@ -23,6 +23,9 @@
 /build
 build/
 !**/src/**/build/
+**/bin/
+*.class
+.kotlin/
 /captures
 .externalNativeBuild
 .cxx

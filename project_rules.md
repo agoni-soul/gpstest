@@ -2,8 +2,8 @@
 
 个人 Android 实验工程：按功能分包演示系统能力（定位、蓝牙、网络、启动优化等），并沉淀 Activity 基建、MVI
 框架、Flutter 混编与自定义 SPI。  
-包名：`com.soul.gpstest`（代码根包 `com.soul`）。Application：`com.soul.SoulApplication`。首页：
-`com.soul.main.MainActivity`（`singleInstance`）。
+包名：`com.haha.gpstest`（代码根包 `com.haha`）。Application：`com.haha.HahaApplication`。首页：
+`com.haha.main.MainActivity`（`singleInstance`）。
 
 详细框架文档：
 
@@ -120,14 +120,14 @@ AppCompatActivity
 - 收集必须 `repeatOnLifecycle(STARTED)`（基类已做）。
 - IO 在 `handleIntent` 链里 `withContext(Dispatchers.IO)`。
 
-示例：`com.soul.mviFrame.main`（用户列表）、`com.soul.mviFrame.data`（数据页）。完整步骤见
+示例：`com.haha.mviFrame.main`（用户列表）、`com.haha.mviFrame.data`（数据页）。完整步骤见
 `docs/mvi-framework.md`。
 
 ---
 
 ## 6. `app` 功能包一览
 
-按 `com.soul.*` 分包，一个包一类 Demo，新增能力优先新建包而不是塞进 `main`。
+按 `com.haha.*` 分包，一个包一类 Demo，新增能力优先新建包而不是塞进 `main`。
 
 | 包                                                              | 内容                                                     |
 |----------------------------------------------------------------|--------------------------------------------------------|
@@ -154,7 +154,7 @@ AppCompatActivity
 
 ## 7. 启动与性能
 
-- 计时：`SoulApplication.attachBaseContext` 里 `TimeMonitor.startMonitor()`（**不含**
+- 计时：`HahaApplication.attachBaseContext` 里 `TimeMonitor.startMonitor()`（**不含**
   `System.loadLibrary("GPSTest")`）。Logcat tag：`TimeMonitor`。
 - 首页：`shouldInflateContentInOnCreate() = false` + `AsyncLayoutInflater`；等待期靠主题
   `windowBackground`（Splash 临时关闭）。
@@ -167,7 +167,7 @@ AppCompatActivity
 ## 8. Flutter 混编
 
 - 模块目录：`fluttertest/`，由 `settings.gradle` 的 `include_flutter.groovy` 引入为 `:flutter`。
-- Native 入口：`com.soul.flutter.FlutterIntegrationActivity`（`FlutterFragment` + `FlutterChannel` /
+- Native 入口：`com.haha.flutter.FlutterIntegrationActivity`（`FlutterFragment` + `FlutterChannel` /
   `MethodChannel`）。
 - 改 Flutter 侧逻辑放 `fluttertest/lib/`；改宿主嵌入、通道、状态栏适配放 `app/.../flutter/`。
 - 不要把 Flutter UI 逻辑写进 Kotlin Activity，通道协议变更需双侧同步。

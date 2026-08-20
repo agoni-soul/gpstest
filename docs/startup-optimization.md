@@ -2,7 +2,7 @@
 
 记录时间：2026-08-14  
 对象：`MainActivity` 冷启动白屏 / 首屏 inflate 过慢  
-计时零点：`SoulApplication.attachBaseContext()` 里 `TimeMonitor.startMonitor()`（**不含**
+计时零点：`HahaApplication.attachBaseContext()` 里 `TimeMonitor.startMonitor()`（**不含**
 `System.loadLibrary("GPSTest")`）
 
 本文所有耗时均来自 `TimeMonitor`（Logcat tag：`TimeMonitor`），单位毫秒。不同次冷启动有几十毫秒抖动，对比时看趋势与差值，不要死盯个位数。
@@ -39,7 +39,7 @@
 建议过滤：
 
 ```bash
-adb logcat -v time | grep -E "TimeMonitor|Displayed|SoulApplication|MainActivity"
+adb logcat -v time | grep -E "TimeMonitor|Displayed|HahaApplication|MainActivity"
 ```
 
 ---
@@ -202,8 +202,8 @@ Async 换的是等待形态，不是更短的 `contentReady`。
 ### 6.1 启动链路（首页）
 
 ```
-SoulApplication.attachBaseContext  → TimeMonitor.start
-SoulApplication.onCreate           → ApplicationCreate
+HahaApplication.attachBaseContext  → TimeMonitor.start
+HahaApplication.onCreate           → ApplicationCreate
 MainActivity.onCreate
   setTheme(Theme.GPSTest.NoActionBar)   // windowBackground 先亮
   extraConfig → AsyncLayoutInflater.inflate   // 后台

@@ -79,7 +79,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_ds_enable" />
 
-        <com.soul.selector.CheckButton
+        <com.haha.selector.CheckButton
             android:id="@+id/cb_select"
             android:layout_width="100dp"
             android:layout_height="100dp"

@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.soul.imageViewer.EnhancedImageView
+        <com.haha.imageViewer.EnhancedImageView
             android:id="@+id/imageview"
             android:layout_width="match_parent"
             android:layout_height="200dp"

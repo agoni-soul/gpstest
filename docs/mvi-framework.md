@@ -1,7 +1,7 @@
 # MVI Activity 框架说明
 
 记录时间：2026-08-21  
-包路径：`com.soul.mviFrame`  
+包路径：`com.haha.mviFrame`  
 示例页：`MainMVIActivity`、`DataActivity`  
 下层基建：[`base-mvvm-activity.md`](./base-mvvm-activity.md)（`BaseMvvmActivity` / `BaseActivity`）
 
@@ -83,7 +83,7 @@ AppCompatActivity
 
 ## 4. ViewModel：`BaseMVIViewModel<I, S, E>`
 
-继承 `com.soul.base.BaseViewModel`（`AndroidViewModel`）。
+继承 `com.haha.base.BaseViewModel`（`AndroidViewModel`）。
 
 ### 4.1 核心成员
 
@@ -334,16 +334,16 @@ ViewModelProvider(this, BaseViewModelFactory { XxxViewModel(repo) })[XxxViewMode
 ## 10. 相关源码快速索引
 
 ```text
-app/src/main/java/com/soul/mviFrame/base/
+app/src/main/java/com/haha/mviFrame/base/
   MviContract.kt
   BaseMVIViewModel.kt
   BaseMVIActivity.kt
   BaseViewModelFactory.kt
 
-app/src/main/java/com/soul/mviFrame/main/     # 完整示例
-app/src/main/java/com/soul/mviFrame/data/     # 第二示例
+app/src/main/java/com/haha/mviFrame/main/     # 完整示例
+app/src/main/java/com/haha/mviFrame/data/     # 第二示例
 
-app/src/main/java/com/soul/base/
+app/src/main/java/com/haha/base/
   BaseMvvmActivity.kt                         # onContentReady 已 open，供 MVI 先挂观察
 
 完整 MVVM 基建说明见 docs/base-mvvm-activity.md

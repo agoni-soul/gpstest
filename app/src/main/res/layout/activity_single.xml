@@ -8,7 +8,7 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <com.soul.main.glide.IntensifyImageView
+    <com.haha.main.glide.IntensifyImageView
         android:id="@+id/intensify_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"

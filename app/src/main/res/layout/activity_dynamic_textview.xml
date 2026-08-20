@@ -93,7 +93,7 @@
             android:textSize="24sp"
             app:layout_constraintTop_toBottomOf="@+id/ll_value" />
 
-        <com.soul.dynamicTextView.DynamicLayout
+        <com.haha.dynamicTextView.DynamicLayout
             android:id="@+id/dynamic_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
             app:unitText="立方米"
             app:unitWidth="wrap_content" />
 
-        <com.soul.dynamicTextView.DynamicFrameLayout
+        <com.haha.dynamicTextView.DynamicFrameLayout
             android:id="@+id/dynamic_frame_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,9 +151,9 @@
                 android:layout_margin="10dp"
                 android:src="@drawable/drawable_volume_high" />
 
-        </com.soul.dynamicTextView.DynamicFrameLayout>
+        </com.haha.dynamicTextView.DynamicFrameLayout>
 
-        <com.soul.dynamicTextView.DynamicView
+        <com.haha.dynamicTextView.DynamicView
             android:id="@+id/dynamic_view"
             android:layout_width="100dp"
             android:layout_height="100dp"

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.soul.blesdk'
+    namespace 'com.haha.blesdk'
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion "35.0.0"
 
@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-//        applicationId "com.soul.blesdk"
+//        applicationId "com.haha.blesdk"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 

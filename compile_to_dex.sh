@@ -1,10 +1,10 @@
-ANDROID_BUILD_TOOLS="/Users/soulagoni/Library/Android/sdk/build-tools/35.0.1"
+ANDROID_BUILD_TOOLS="$HOME/Library/Android/sdk/build-tools/35.0.1"
 D8="$ANDROID_BUILD_TOOLS/d8"
-#JAVA_CLASSES="/Users/soulagoni/Downloads/*.class"
-OUTPUT_DEX="/Users/soulagoni/Downloads"
-SEARCH_DIR="/Users/soulagoni/Downloads/"
-#/Users/soulagoni/Downloads/
-#chmod +r /Users/soulagoni/Downloads/*.class  # 添加读取权限
+#JAVA_CLASSES="$HOME/Downloads/*.class"
+OUTPUT_DEX="$HOME/Downloads"
+SEARCH_DIR="$HOME/Downloads/"
+#$HOME/Downloads/
+#chmod +r $HOME/Downloads/*.class  # 添加读取权限
 #CLASS_FILES=$(find "$SEARCH_DIR" -name "*.class" -print)
 #
 #if [ -z "$CLASS_FILES" ]; then

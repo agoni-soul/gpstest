@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.soul.gpstest">
+    package="com.haha.gpstest">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -35,7 +35,7 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <application
-        android:name="com.soul.SoulApplication"
+        android:name="com.haha.HahaApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -46,77 +46,77 @@
         android:theme="@style/AppNoTheme"
         android:usesNonSdkApi="true">
         <activity
-            android:name="com.soul.imageViewer.ImageViewerActivity"
+            android:name="com.haha.imageViewer.ImageViewerActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.main.glide.MultiPreviewActivity"
+            android:name="com.haha.main.glide.MultiPreviewActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.soul.main.glide.SinglePreviewActivity"
+            android:name="com.haha.main.glide.SinglePreviewActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.soul.flutter.FlutterIntegrationActivity"
+            android:name="com.haha.flutter.FlutterIntegrationActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.mviFrame.main.MainMVIActivity"
+            android:name="com.haha.mviFrame.main.MainMVIActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.coroutineScope.CoroutineScopeActivity"
+            android:name="com.haha.coroutineScope.CoroutineScopeActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.scene.CustomSceneSecondActivity"
+            android:name="com.haha.scene.CustomSceneSecondActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.scene.CustomSceneFirstActivity"
+            android:name="com.haha.scene.CustomSceneFirstActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.scene.SceneSecondActivity"
+            android:name="com.haha.scene.SceneSecondActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.scene.SceneFirstActivity"
+            android:name="com.haha.scene.SceneFirstActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.transparency.TransparencyActivity"
+            android:name="com.haha.transparency.TransparencyActivity"
             android:exported="true"
             android:theme="@android:style/Theme.Translucent" />
         <activity
-            android:name="com.soul.network.NetworkActivity"
+            android:name="com.haha.network.NetworkActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.remoteviews.ShowNotificationActivity"
+            android:name="com.haha.remoteviews.ShowNotificationActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.remoteviews.RemoteViewActivity"
+            android:name="com.haha.remoteviews.RemoteViewActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.gps.GpsActivity"
+            android:name="com.haha.gps.GpsActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.animation.AnimationActivity"
+            android:name="com.haha.animation.AnimationActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.util.PermissionTransparentActivity"
+            android:name="com.haha.util.PermissionTransparentActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.waterfall.WaterFallActivity"
+            android:name="com.haha.waterfall.WaterFallActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.main.TestActivity"
+            android:name="com.haha.main.TestActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.dynamicTextView.DynamicTextViewActivity"
+            android:name="com.haha.dynamicTextView.DynamicTextViewActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.liveData.LiveDataActivity"
+            android:name="com.haha.liveData.LiveDataActivity"
             android:exported="true" />
         <activity
-            android:name="com.soul.recyclerview.RecyclerViewActivity"
+            android:name="com.haha.recyclerview.RecyclerViewActivity"
             android:exported="true" />
-        <activity android:name="com.soul.main.plugin.RegisteredActivity" />
+        <activity android:name="com.haha.main.plugin.RegisteredActivity" />
         <activity
-            android:name="com.soul.main.MainActivity"
+            android:name="com.haha.main.MainActivity"
             android:exported="true"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.GPSTest.NoActionBar">
@@ -146,12 +146,12 @@
         </activity>
 
         <service
-            android:name="com.soul.service.accessibility.CustomAccessibilityService"
+            android:name="com.haha.service.accessibility.CustomAccessibilityService"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:enabled="true"
             android:exported="true"
             android:label="@string/accessibility_service"
-            android:packageNames="com.soul.gpstest"
+            android:packageNames="com.haha.gpstest"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
@@ -162,7 +162,7 @@
                 android:resource="@xml/accessibility" />
         </service>
         <service
-            android:name="com.soul.service.accessibility.AccessService"
+            android:name="com.haha.service.accessibility.AccessService"
             android:exported="true"
             android:label="暗黑魔心的无障碍服务"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
@@ -176,27 +176,27 @@
         </service>
 
         <activity
-            android:name="com.soul.wifi.WifiActivity"
+            android:name="com.haha.wifi.WifiActivity"
             android:exported="true" />
 
         <activity
-            android:name="com.soul.selector.SelectorActivity"
+            android:name="com.haha.selector.SelectorActivity"
             android:exported="true" />
 
         <activity
-            android:name="com.soul.volume.ui.VolumeActivity"
+            android:name="com.haha.volume.ui.VolumeActivity"
             android:exported="true" />
 
         <activity
-            android:name="com.soul.easyswipemenulayout.EasySwipeMenuActivity"
+            android:name="com.haha.easyswipemenulayout.EasySwipeMenuActivity"
             android:exported="true" />
 
         <activity
-            android:name="com.soul.bluetooth.BluetoothActivity"
+            android:name="com.haha.bluetooth.BluetoothActivity"
             android:exported="true" />
 
         <receiver
-            android:name="com.soul.receiver.MainReceiver"
+            android:name="com.haha.receiver.MainReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
@@ -204,7 +204,7 @@
         </receiver>
 
         <receiver
-            android:name="com.soul.receiver.VolumeBroadReceiver"
+            android:name="com.haha.receiver.VolumeBroadReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.media.VOLUME_CHANGED_ACTION" />
@@ -212,7 +212,7 @@
         </receiver>
 
         <receiver
-            android:name="com.soul.receiver.DownloadReceiver"
+            android:name="com.haha.receiver.DownloadReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />

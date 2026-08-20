@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.soul.gpstest'
+    namespace 'com.haha.gpstest'
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion "35.0.0"
     // NDK r28+ defaults to 16 KB ELF LOAD alignment (Play requirement for targetSdk 35+)
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.soul.gpstest"
+        applicationId "com.haha.gpstest"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

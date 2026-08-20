@@ -282,7 +282,7 @@
                     android:text="Flutter 框架"
                     app:layout_constraintTop_toBottomOf="@+id/btn_activity_mvi_frame" />
 
-                <!--                <com.soul.main.pieChartView.CircleSectorView-->
+                <!--                <com.haha.main.pieChartView.CircleSectorView-->
                 <!--                    android:id="@+id/csv"-->
                 <!--                    android:visibility="gone"-->
                 <!--                    android:layout_width="match_parent"-->

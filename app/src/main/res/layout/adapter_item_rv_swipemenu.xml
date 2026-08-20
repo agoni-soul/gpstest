@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.soul.easyswipemenulayout.EasySwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.haha.easyswipemenulayout.EasySwipeMenuLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/es_swipe"
     android:layout_width="match_parent"
@@ -42,4 +42,4 @@
             android:text="收藏" />
 
     </LinearLayout>
-</com.soul.easyswipemenulayout.EasySwipeMenuLayout>
+</com.haha.easyswipemenulayout.EasySwipeMenuLayout>

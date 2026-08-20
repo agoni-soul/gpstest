@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.soul.pluginapp'
+    namespace 'com.haha.pluginapp'
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.soul.pluginapp"
+        applicationId "com.haha.pluginapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

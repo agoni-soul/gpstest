@@ -1,7 +1,7 @@
 # BaseMvvmActivity 框架说明
 
 记录时间：2026-08-21  
-包路径：`com.soul.base`  
+包路径：`com.haha.base`  
 上层扩展：[`mvi-framework.md`](./mvi-framework.md)（`BaseMVIActivity`）  
 异步 inflate 实践：[`startup-optimization.md`](./startup-optimization.md)（`MainActivity`）
 
@@ -265,7 +265,7 @@ override fun extraConfig() {
 ## 11. 相关源码快速索引
 
 ```text
-app/src/main/java/com/soul/base/
+app/src/main/java/com/haha/base/
   BaseActivity.kt
   BaseMvvmActivity.kt
   BaseViewModel.kt
@@ -273,8 +273,8 @@ app/src/main/java/com/soul/base/
   ActivityCollector.kt
 
 # 典型用法
-app/src/main/java/com/soul/main/MainActivity.kt          # 异步 inflate
-app/src/main/java/com/soul/volume/ui/VolumeActivity.kt   # 自定义 ViewModel
-app/src/main/java/com/soul/gps/GpsActivity.kt            # 直接用 BaseViewModel
-app/src/main/java/com/soul/mviFrame/main/MainMVIActivity.kt  # MVI 扩展
+app/src/main/java/com/haha/main/MainActivity.kt          # 异步 inflate
+app/src/main/java/com/haha/volume/ui/VolumeActivity.kt   # 自定义 ViewModel
+app/src/main/java/com/haha/gps/GpsActivity.kt            # 直接用 BaseViewModel
+app/src/main/java/com/haha/mviFrame/main/MainMVIActivity.kt  # MVI 扩展
 ```

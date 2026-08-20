@@ -17,8 +17,8 @@ import com.haha.bluetooth.fragment.BleBondedFragment
 import com.haha.bluetooth.fragment.BleClientFragment
 import com.haha.bluetooth.fragment.BleScanFragment
 import com.haha.bluetooth.fragment.BleServerFragment
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityBluetoothBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityBluetoothBinding
 
 /**
  *     author : yangzy33

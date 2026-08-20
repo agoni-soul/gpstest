@@ -17,8 +17,8 @@ import com.haha.blesdk.scan.BaseBleScanDevice
 import com.haha.blesdk.scan.LowPowerBleScanDevice
 import com.haha.bluetooth.BluetoothActivity.Companion.REQUEST_CODE_BLUETOOTH_DISCOVERABLE
 import com.haha.bluetooth.adapter.BleScanAdapterV2
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.FragmentBleScanBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.FragmentBleScanBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

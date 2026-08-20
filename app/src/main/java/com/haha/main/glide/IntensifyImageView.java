@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.OverScroller;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 
 import java.io.File;
 import java.io.InputStream;

@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityLiveDataBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityLiveDataBinding
 
 /**
  *

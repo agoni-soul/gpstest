@@ -18,8 +18,8 @@ import com.haha.base.BaseViewModel
 import com.haha.blesdk.communication.BleServerImpl
 import com.haha.blesdk.constants.BleConstants
 import com.haha.blesdk.manager.BleScanManager
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.FragmentBleServerBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.FragmentBleServerBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

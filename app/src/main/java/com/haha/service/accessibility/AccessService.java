@@ -10,7 +10,7 @@ import java.util.List;
  * 操作类࿰c;在这里实现具体逻辑
  */
 public class AccessService extends BaseService {
-    private String appPackageName = "com.haha.gpstest";
+    private String appPackageName = "com.haha.hahalearn";
     private Boolean refresh = true; // 控制在未处理完逻辑前不要进入逻辑空间
 
     @Override
@@ -31,7 +31,7 @@ public class AccessService extends BaseService {
                             sleep(500);
                         }
                         // 有些view是没有text的࿰c;就可以通过ID、类名等属性来获取
-                        AccessibilityNodeInfo nodeAdd = findViewByID("com.haha.gpstest:id/op_add");
+                        AccessibilityNodeInfo nodeAdd = findViewByID("com.haha.hahalearn:id/op_add");
                         if (nodeOne != null) {
                             performViewClick(nodeAdd);
                             sleep(500);

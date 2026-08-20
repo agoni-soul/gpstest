@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.util.DpOrSpToPxTransfer
 
 

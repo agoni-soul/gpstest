@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.youth.banner.adapter.BannerAdapter
 
 /**

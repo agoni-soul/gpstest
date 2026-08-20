@@ -35,7 +35,7 @@ class HahaApplication : Application() {
 
         init {
             // Used to load the 'nativeTest' library on application startup.
-            System.loadLibrary("GPSTest")
+            System.loadLibrary("HahaLearn")
         }
     }
 

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.log.DOFLogUtil
 
 class EasySwipeMenuAdapter(private val context: Context) : RecyclerView.Adapter<EasySwipeMenuHolder>() {

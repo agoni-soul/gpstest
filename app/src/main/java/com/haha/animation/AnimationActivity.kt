@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.haha.bean.DeviceInfo
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 
 /**

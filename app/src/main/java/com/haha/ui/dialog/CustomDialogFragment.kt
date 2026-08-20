@@ -15,7 +15,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  * <pre>

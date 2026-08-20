@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.Log
 import androidx.appcompat.widget.AppCompatTextView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  * @auther: haha

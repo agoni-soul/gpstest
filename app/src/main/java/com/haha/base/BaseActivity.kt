@@ -15,7 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.log.DOFLogUtil
 import com.haha.main.timeMonitor.TimeMonitorConfig
 import com.haha.main.timeMonitor.TimeMonitorManager
@@ -83,7 +83,7 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     protected open fun requestFeature() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            setTheme(R.style.Theme_GPSTest_NoActionBar)
+            setTheme(R.style.Theme_HahaLearn_NoActionBar)
         }
     }
 

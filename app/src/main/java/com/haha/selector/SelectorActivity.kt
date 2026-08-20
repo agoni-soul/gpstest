@@ -4,8 +4,8 @@ import android.util.Log
 import android.view.MotionEvent
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivitySelectorBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivitySelectorBinding
 
 
 /**

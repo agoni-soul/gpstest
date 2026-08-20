@@ -13,7 +13,7 @@ import android.widget.ViewSwitcher;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 
 import java.io.IOException;
 import java.util.Locale;

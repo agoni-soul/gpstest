@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  * <pre>

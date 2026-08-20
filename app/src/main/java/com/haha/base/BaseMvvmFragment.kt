@@ -11,7 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

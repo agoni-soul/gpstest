@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Scroller;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 
 import java.util.ArrayList;
 /**

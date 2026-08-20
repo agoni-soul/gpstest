@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 import com.haha.main.plugin.system.DexClassLoader;
 
 import java.io.File;

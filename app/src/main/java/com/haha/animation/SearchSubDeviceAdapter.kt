@@ -13,7 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.haha.bean.DeviceInfo
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  *     author : yangzy33

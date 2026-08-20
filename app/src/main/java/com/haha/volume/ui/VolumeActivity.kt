@@ -21,8 +21,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haha.base.BaseMvvmActivity
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityVolumeBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityVolumeBinding
 import com.haha.util.DpOrSpToPxTransfer
 import com.haha.receiver.VolumeBroadReceiver
 import com.haha.volume.model.VolumeViewModel

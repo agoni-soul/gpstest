@@ -16,8 +16,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityGpsBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityGpsBinding
 
 class GpsActivity : BaseMvvmActivity<ActivityGpsBinding, BaseViewModel>() {
 

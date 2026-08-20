@@ -14,7 +14,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 
 /**

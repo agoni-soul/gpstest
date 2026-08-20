@@ -3,7 +3,7 @@ package com.haha.easyswipemenulayout
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 class EasySwipeMenuHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val rightMenu2: TextView

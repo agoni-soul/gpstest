@@ -18,7 +18,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
-import com.haha.gpstest.BuildConfig;
+import com.haha.hahalearn.BuildConfig;
 
 import java.lang.reflect.Method;
 import java.util.List;

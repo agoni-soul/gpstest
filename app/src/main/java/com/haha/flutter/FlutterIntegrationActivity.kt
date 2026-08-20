@@ -8,8 +8,8 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.lifecycleScope
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityFlutterIntegrationBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityFlutterIntegrationBinding
 import io.flutter.embedding.android.FlutterFragment
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.launch

@@ -1,5 +1,5 @@
 // IProcessStub.aidl
-package com.haha.gpstest;
+package com.haha.hahalearn;
 
 // Declare any non-default types here with import statements
 

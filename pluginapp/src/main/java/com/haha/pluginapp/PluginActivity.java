@@ -33,8 +33,8 @@ public class PluginActivity extends BaseActivity {
         // 动态设置资源
         getResources().getIdentifier("plugin_activity_plugin", "layout", "com.haha.pluginapp");
         setContentView(R.layout.plugin_activity_plugin); // 使用合并后的资源ID
-        getResources().getIdentifier("Base_Theme_GPSTest", "values/themes", "com.haha.pluginapp");
-        setTheme(R.style.Base_Theme_GPSTest);
+        getResources().getIdentifier("Base_Theme_HahaLearn", "values/themes", "com.haha.pluginapp");
+        setTheme(R.style.Base_Theme_HahaLearn);
 //        binding = PluginActivityPluginBinding.inflate(getLayoutInflater());
 //        setContentView(binding.getRoot());
 

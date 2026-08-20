@@ -8,7 +8,7 @@ import android.widget.Checkable
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.res.ResourcesCompat
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  *

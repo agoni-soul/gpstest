@@ -15,8 +15,8 @@ import android.widget.Button
 import androidx.lifecycle.viewModelScope
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityNetworkBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityNetworkBinding
 import com.haha.network.encrypt.Encryption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

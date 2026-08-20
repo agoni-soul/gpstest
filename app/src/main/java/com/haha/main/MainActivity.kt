@@ -1,10 +1,10 @@
 package com.haha.main
 
-//import com.haha.gpstest.IProcessStub
+//import com.haha.hahalearn.IProcessStub
 // TODO: 临时关闭 SplashScreen，恢复时取消下方注释
 //import androidx.core.splashscreen.SplashScreen
 //import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-//import com.haha.gpstest.BuildConfig
+//import com.haha.hahalearn.BuildConfig
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -63,8 +63,8 @@ import com.haha.dynamicTextView.DynamicTextViewActivity
 import com.haha.easyswipemenulayout.EasySwipeMenuActivity
 import com.haha.flutter.FlutterIntegrationActivity
 import com.haha.gps.GpsActivity
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityMainBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityMainBinding
 import com.haha.liveData.LiveDataActivity
 import com.haha.log.DOFLogUtil
 import com.haha.main.broadcast.MyReceiver
@@ -98,7 +98,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 //    }
 
     /**
-     * A native method that is implemented by the 'GPSTest' native library,
+     * A native method that is implemented by the 'HahaLearn' native library,
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String?
@@ -143,12 +143,12 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // TODO: 临时关闭 SplashScreen，启动直接进首页
-        setTheme(R.style.Theme_GPSTest_NoActionBar)
+        setTheme(R.style.Theme_HahaLearn_NoActionBar)
 //        if (mIsShowSplash) {
 //            setTheme(R.style.Theme_App_Starting)
 //            mSplashScreen = installSplashScreen()
 //        } else {
-//            setTheme(R.style.Theme_GPSTest_NoActionBar)
+//            setTheme(R.style.Theme_HahaLearn_NoActionBar)
 //        }
         super.onCreate(savedInstanceState)
     }

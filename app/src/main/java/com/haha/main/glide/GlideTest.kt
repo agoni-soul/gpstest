@@ -6,7 +6,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.cache.LruResourceCache
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  *

@@ -8,7 +8,7 @@ import android.widget.Button
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.haha.blesdk.bean.BleScanResult
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.ui.textView.FoldTextView
 
 /**

@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,8 +10,8 @@ import android.widget.TextView
 import android.widget.Toast
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityDynamicTextviewBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityDynamicTextviewBinding
 import com.haha.util.DpOrSpToPxTransfer
 
 /**

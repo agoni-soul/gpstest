@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.util.DpOrSpToPxTransfer
 
 

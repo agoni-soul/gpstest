@@ -2,8 +2,8 @@ package com.haha.mviFrame.data
 
 import android.view.View
 import android.widget.Toast
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityDataBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityDataBinding
 import com.haha.mviFrame.base.BaseMVIActivity
 
 class DataActivity : BaseMVIActivity<

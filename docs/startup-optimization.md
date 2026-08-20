@@ -3,7 +3,7 @@
 记录时间：2026-08-14  
 对象：`MainActivity` 冷启动白屏 / 首屏 inflate 过慢  
 计时零点：`HahaApplication.attachBaseContext()` 里 `TimeMonitor.startMonitor()`（**不含**
-`System.loadLibrary("GPSTest")`）
+`System.loadLibrary("HahaLearn")`）
 
 本文所有耗时均来自 `TimeMonitor`（Logcat tag：`TimeMonitor`），单位毫秒。不同次冷启动有几十毫秒抖动，对比时看趋势与差值，不要死盯个位数。
 
@@ -65,7 +65,7 @@ MVVM 只需要 Binding + ViewModel，不需要两次 `setContentView`。
 
 ### 3.3 主题预览窗
 
-Splash（`Theme.App.Starting`）被临时关掉；`Theme.GPSTest.NoActionBar` 原先无 `parent`、无
+Splash（`Theme.App.Starting`）被临时关掉；`Theme.HahaLearn.NoActionBar` 原先无 `parent`、无
 `windowBackground`，Preview Window 默认白底。
 
 ---
@@ -205,7 +205,7 @@ Async 换的是等待形态，不是更短的 `contentReady`。
 HahaApplication.attachBaseContext  → TimeMonitor.start
 HahaApplication.onCreate           → ApplicationCreate
 MainActivity.onCreate
-  setTheme(Theme.GPSTest.NoActionBar)   // windowBackground 先亮
+  setTheme(Theme.HahaLearn.NoActionBar)   // windowBackground 先亮
   extraConfig → AsyncLayoutInflater.inflate   // 后台
   跳过同步 inflateContentView
 onStart / onResume                 // binding 可能尚未就绪
@@ -225,7 +225,7 @@ onStart / onResume                 // binding 可能尚未就绪
 | `MainActivity.kt`                                           | 首页异步 inflate；`inflateHeavyCustomViews()`                                            |
 | `activity_main.xml`                                         | `FrameLayout` + `ScrollView` + 内层 Constraint；ViewStub 容器                            |
 | `view_stub_circle_progress.xml` / `view_stub_pie_chart.xml` | 延迟加载的自定义 View                                                                       |
-| `themes.xml`                                                | `Theme.GPSTest.NoActionBar` 的 `windowBackground`                                    |
+| `themes.xml`                                                | `Theme.HahaLearn.NoActionBar` 的 `windowBackground`                                    |
 | `TimeMonitor.kt`                                            | 打点；`end()` 会把 HashMap 再打一遍，不是又跑一轮                                                   |
 
 其它页面默认 `shouldInflateContentInOnCreate() = true`，仍走同步 DataBinding inflate。

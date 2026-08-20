@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 
 import java.io.IOException;
 

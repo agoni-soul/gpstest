@@ -9,7 +9,7 @@ import android.os.PersistableBundle
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.log.DOFLogUtil
 import com.haha.ui.dialog.CustomDialog
 

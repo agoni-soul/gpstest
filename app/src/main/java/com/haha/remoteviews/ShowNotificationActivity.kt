@@ -2,8 +2,8 @@ package com.haha.remoteviews
 
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityShowNotificationBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityShowNotificationBinding
 
 class ShowNotificationActivity : BaseMvvmActivity<ActivityShowNotificationBinding, BaseViewModel>() {
     override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java

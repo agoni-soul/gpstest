@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.haha.service.annotation.BindView;
 import com.haha.service.annotation.OnClick;
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 import com.haha.service.annotation.runtime.BindViewUtils;
 
 /**

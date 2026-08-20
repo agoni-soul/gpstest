@@ -7,8 +7,8 @@ import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityCustomSceneSecondBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityCustomSceneSecondBinding
 
 
 open class CustomSceneSecondActivity : BaseMvvmActivity<ActivityCustomSceneSecondBinding, BaseViewModel>() {

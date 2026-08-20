@@ -27,8 +27,8 @@ import com.haha.blesdk.manager.BleScanManager
 import com.haha.blesdk.scan.BaseBleScanDevice
 import com.haha.blesdk.scan.LowPowerBleScanDevice
 import com.haha.bluetooth.adapter.BleScanAdapterV2
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.FragmentBleClientBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.FragmentBleClientBinding
 
 
 /**

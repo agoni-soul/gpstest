@@ -12,7 +12,7 @@
 //        mavenCentral()
 //    }
 //}
-rootProject.name = "GPSTest"
+rootProject.name = "HahaLearn"
 include ':app'
 include ':BluetoothSdk'
 //include ':starrysky'

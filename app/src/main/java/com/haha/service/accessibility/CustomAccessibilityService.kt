@@ -110,8 +110,8 @@ class CustomAccessibilityService : AccessibilityService() {
     }
 
     private fun getNodeToOperate(packageName: String?): AccessibilityNodeInfo? {
-        if (packageName != null && packageName == "com.haha.gpstest") {
-            val nodes = AccessibilityOperator.instance.findNodesById("com.haha.gpstest:id/btn_skip_gps")
+        if (packageName != null && packageName == "com.haha.hahalearn") {
+            val nodes = AccessibilityOperator.instance.findNodesById("com.haha.hahalearn:id/btn_skip_gps")
             if (nodes != null && nodes.isNotEmpty()) {
                 return nodes[0]
             }

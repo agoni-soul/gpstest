@@ -1,8 +1,8 @@
-# GPSTest 项目说明与开发规范
+# HahaLearn 项目说明与开发规范
 
 个人 Android 实验工程：按功能分包演示系统能力（定位、蓝牙、网络、启动优化等），并沉淀 Activity 基建、MVI
 框架、Flutter 混编与自定义 SPI。  
-包名：`com.haha.gpstest`（代码根包 `com.haha`）。Application：`com.haha.HahaApplication`。首页：
+包名：`com.haha.hahalearn`（代码根包 `com.haha`）。Application：`com.haha.HahaApplication`。首页：
 `com.haha.main.MainActivity`（`singleInstance`）。
 
 详细框架文档：
@@ -17,7 +17,7 @@
 
 | 项                      | 当前值                                                             |
 |------------------------|-----------------------------------------------------------------|
-| 工程名                    | GPSTest                                                         |
+| 工程名                    | HahaLearn                                                         |
 | Gradle Wrapper         | 8.13-all                                                        |
 | Android Gradle Plugin  | 8.13.1                                                          |
 | Kotlin                 | 2.1.0（插件 classpath 2.2.0）                                       |
@@ -25,7 +25,7 @@
 | compileSdk / targetSdk | 36                                                              |
 | minSdk                 | 24                                                              |
 | NDK                    | 28.2.13676358（16 KB page 对齐）                                    |
-| CMake                  | 3.22.1，native so：`GPSTest`                                      |
+| CMake                  | 3.22.1，native so：`HahaLearn`                                      |
 | ABI                    | `arm64-v8a`                                                     |
 | Flutter 模块             | `fluttertest`（Dart SDK `^3.10.4`）                               |
 | 历史 Flutter 对齐          | Flutter SDK 3.38.5 / Dart 3.10.4 / Flutter Gradle Plugin 88.2.0 |
@@ -155,7 +155,7 @@ AppCompatActivity
 ## 7. 启动与性能
 
 - 计时：`HahaApplication.attachBaseContext` 里 `TimeMonitor.startMonitor()`（**不含**
-  `System.loadLibrary("GPSTest")`）。Logcat tag：`TimeMonitor`。
+  `System.loadLibrary("HahaLearn")`）。Logcat tag：`TimeMonitor`。
 - 首页：`shouldInflateContentInOnCreate() = false` + `AsyncLayoutInflater`；等待期靠主题
   `windowBackground`（Splash 临时关闭）。
 - 重自定义 View（`CircleProgressView` / `PieChartView`）用 ViewStub，首帧后再 inflate。

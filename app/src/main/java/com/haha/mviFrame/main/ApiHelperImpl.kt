@@ -14,7 +14,7 @@ class ApiHelperImpl(private val apiService: ApiService) : ApiService {
                 i,
                 "haha_$i",
                 "haha_nihao${i}@qq.com",
-                "/Users/soulagoni/AndroidStudioProjects/GPSTest/gpstest/app/src/main/res/drawable/ic_play_mode_shuffle.png"
+                "https://example.com/avatar_$i.png"
             )
             list.add(user)
         }

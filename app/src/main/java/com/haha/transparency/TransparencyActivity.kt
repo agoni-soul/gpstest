@@ -14,8 +14,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityTransparencyBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityTransparencyBinding
 
 class TransparencyActivity : BaseMvvmActivity<ActivityTransparencyBinding, BaseViewModel>() {
 

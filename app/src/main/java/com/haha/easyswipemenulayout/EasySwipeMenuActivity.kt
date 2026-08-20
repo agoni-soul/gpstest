@@ -7,8 +7,8 @@ import android.view.WindowManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityEasySwipeMenuBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityEasySwipeMenuBinding
 import com.haha.log.DOFLogUtil
 
 

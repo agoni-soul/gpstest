@@ -1,4 +1,4 @@
-package com.haha.gpstest
+package com.haha.hahalearn
 
 import org.junit.Test
 

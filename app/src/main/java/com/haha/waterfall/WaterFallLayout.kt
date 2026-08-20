@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 
 /**

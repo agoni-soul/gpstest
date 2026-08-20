@@ -19,8 +19,8 @@ import com.haha.blesdk.scan.BaseBleScanDevice
 import com.haha.blesdk.scan.ClassicBleScanDevice
 import com.haha.bluetooth.BleViewModel
 import com.haha.bluetooth.adapter.BleBondedAdapter
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.FragmentBleBondedBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.FragmentBleBondedBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

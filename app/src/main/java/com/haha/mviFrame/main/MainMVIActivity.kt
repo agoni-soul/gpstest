@@ -4,8 +4,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityMviBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityMviBinding
 import com.haha.mviFrame.base.BaseMVIActivity
 
 class MainMVIActivity : BaseMVIActivity<

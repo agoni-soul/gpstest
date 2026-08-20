@@ -9,8 +9,8 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityCustomSceneFirstBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityCustomSceneFirstBinding
 
 class CustomSceneFirstActivity : BaseMvvmActivity<ActivityCustomSceneFirstBinding, BaseViewModel>() {
     private val flContent: FrameLayout by lazy {

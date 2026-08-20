@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 /**
  * <pre>

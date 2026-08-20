@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 
 
 /**

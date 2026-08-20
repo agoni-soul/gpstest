@@ -5,8 +5,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.haha.base.BaseMvvmActivity
-import com.haha.gpstest.R
-import com.haha.gpstest.databinding.ActivityCoroutineScopeBinding
+import com.haha.hahalearn.R
+import com.haha.hahalearn.databinding.ActivityCoroutineScopeBinding
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay

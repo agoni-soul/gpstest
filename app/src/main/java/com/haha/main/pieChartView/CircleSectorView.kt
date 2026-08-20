@@ -13,7 +13,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Transformation
-import com.haha.gpstest.R
+import com.haha.hahalearn.R
 import com.haha.util.DpOrSpToPxTransfer
 import kotlin.math.atan2
 import kotlin.math.cos

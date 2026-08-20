@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.haha.gpstest.R;
+import com.haha.hahalearn.R;
 import com.haha.main.plugin.RegisteredActivity;
 
 import java.lang.reflect.Method;

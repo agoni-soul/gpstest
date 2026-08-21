@@ -21,6 +21,11 @@
         <item name="android:windowBackground">@color/green</item>
     </style>
 
+    <!-- KMP/CMP 页：windowBackground 与 Compose light Surface 对齐，避免跳转时闪绿 -->
+    <style name="Theme.HahaLearn.Kmp" parent="Theme.HahaLearn.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- 设置闪屏页的背景 -->
         <item name="windowSplashScreenBackground">@color/splash_background</item>

@@ -56,6 +56,7 @@ import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
 import com.haha.bean.SubDeviceResultBean
 import com.haha.binder.TestService
+import com.haha.binding.BindingAdapterActivity
 import com.haha.bluetooth.BluetoothActivity
 import com.haha.coroutineScope.CoroutineScopeActivity
 import com.haha.coroutineScope.EatGame
@@ -63,9 +64,9 @@ import com.haha.dynamicTextView.DynamicTextViewActivity
 import com.haha.easyswipemenulayout.EasySwipeMenuActivity
 import com.haha.flutter.FlutterIntegrationActivity
 import com.haha.gps.GpsActivity
-import com.haha.kmp.KmpLearnActivity
 import com.haha.hahalearn.R
 import com.haha.hahalearn.databinding.ActivityMainBinding
+import com.haha.kmp.KmpLearnActivity
 import com.haha.liveData.LiveDataActivity
 import com.haha.log.DOFLogUtil
 import com.haha.main.broadcast.MyReceiver
@@ -280,6 +281,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         mViewDataBinding.btnActivityMviFrame.setOnClickListener(this)
         mViewDataBinding.btnActivityFlutterIntegration.setOnClickListener(this)
         mViewDataBinding.btnActivityKmpLearn.setOnClickListener(this)
+        mViewDataBinding.btnActivityBindingAdapter.setOnClickListener(this)
 
         // 首帧后再加载自定义重控件，缩短 activity_main inflate 时间
         mViewDataBinding.root.post {
@@ -1075,6 +1077,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
                 R.id.btn_activity_kmp_learn -> {
                     startActivity(Intent(this, KmpLearnActivity::class.java))
+                }
+
+                R.id.btn_activity_binding_adapter -> {
+                    startActivity(Intent(this, BindingAdapterActivity::class.java))
                 }
 
                 else -> {

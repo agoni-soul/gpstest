@@ -35,6 +35,9 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
     private val _mSsidSecondData: MutableLiveData<String> = MutableLiveData()
     val mSsidSecondData: LiveData<String> = _mSsidSecondData
 
+    private val _mToastNotifyLiveData: SingleLiveData<String> = SingleLiveData()
+    val mToastNotifyLiveData: SingleLiveData<String> = _mToastNotifyLiveData
+
     private val _mediatorLiveData: MediatorLiveData<String> = MediatorLiveData()
     val mediatorLiveData: LiveData<String> = _mediatorLiveData
 
@@ -64,6 +67,7 @@ class CoroutineScopeViewModel(application: Application): BaseViewModel(applicati
             Log.d(TAG, "onChange1: ${it}")
         }
         _mSsidSecondData.postValue("haha")
+        mToastNotifyLiveData.value = "hello"
     }
 
     private fun initScanData(): MutableList<String> {

@@ -232,7 +232,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_bluetooth">
+                    app:layout_constraintTop_toBottomOf="@+id/btn_activity_live_data">
 
                     <ViewStub
                         android:id="@+id/stub_cpv"

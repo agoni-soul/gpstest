@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -376,6 +377,7 @@ class KotlinCoroutineTest constructor() {
             onBufferOverflow = BufferOverflow.DROP_OLDEST
         )
         sharedFlow.tryEmit(0)//设置初始值
+        stateFlow.update { current -> current + 1 }
 
         // 启动一个协程来更新状态
         launch {

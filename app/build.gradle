@@ -88,7 +88,7 @@ task createCoroutineExceptionHandlerServiceFile {
         // 定义服务文件
         def serviceFile = new File(serviceDir, "kotlinx.coroutines.CoroutineExceptionHandler")
         // 写入全局异常处理器全类名
-        serviceFile.text = "com.example.MyGlobalCoroutineExceptionHandler"
+        serviceFile.text = "com.haha.HahaGlobalCoroutineExceptionHandler"
     }
 }
 

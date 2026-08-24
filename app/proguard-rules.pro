@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ServiceLoader 全局 CoroutineExceptionHandler，避免 R8 裁掉无参构造
+-keep class com.haha.HahaGlobalCoroutineExceptionHandler { <init>(); }
+-keep class kotlinx.coroutines.CoroutineExceptionHandler

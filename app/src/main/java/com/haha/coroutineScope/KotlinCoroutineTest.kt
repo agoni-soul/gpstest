@@ -1,5 +1,6 @@
 package com.haha.coroutineScope
 
+import com.haha.HahaGlobalCoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -8,6 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.coroutineScope
@@ -41,9 +43,9 @@ class KotlinCoroutineTest constructor() {
 
     fun test() {
         getData()
-//        main6_1()
         GlobalScope.launch {
-            runnable()
+//            runnable()
+            main6_1()
 //            suspendingExample()
 //            flow()
 //            sharedFlow()
@@ -215,10 +217,13 @@ class KotlinCoroutineTest constructor() {
     }
 
     private fun main6_1() = runBlocking {
+        val exceptionHandler = CoroutineExceptionHandler { _, exception ->
+            println("Caught exception: $exception")
+        }
         try {
             supervisorScope {
                 print("1")
-                val job1 = launch {//第一个子协程
+                val job1 = launch(HahaGlobalCoroutineExceptionHandler()) {//第一个子协程
                     print("2")
                     throw NullPointerException()//抛出空指针异常
                 }
@@ -281,6 +286,7 @@ class KotlinCoroutineTest constructor() {
                 emit(i) // 发射值
             }
         }
+        Channel<String>(BUFFERED)
 
         val flow2 = (1..5)
             .asFlow()

@@ -10,6 +10,7 @@
 - [`docs/base-mvvm-activity.md`](docs/base-mvvm-activity.md) — MVVM Activity 基建
 - [`docs/mvi-framework.md`](docs/mvi-framework.md) — MVI 单向数据流
 - [`docs/startup-optimization.md`](docs/startup-optimization.md) — 首页冷启动优化
+- [`docs/retrofit-usage-guide.md`](docs/retrofit-usage-guide.md) — Retrofit 使用与源码流程（纯 Call）
 
 ---
 

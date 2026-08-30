@@ -12,17 +12,11 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Function
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.Cache
-import okhttp3.CacheControl
 import okhttp3.Dispatcher
 import okhttp3.FormBody
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.internal.cache.CacheInterceptor
-import okhttp3.internal.connection.ConnectInterceptor
-import okhttp3.internal.http.BridgeInterceptor
-import okhttp3.internal.http.CallServerInterceptor
-import okhttp3.internal.http.RetryAndFollowUpInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -33,6 +27,10 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import java.io.File
 import java.io.IOException
+import io.reactivex.Observable as Rx2Observable
+import io.reactivex.Observer as Rx2Observer
+import io.reactivex.disposables.Disposable as Rx2Disposable
+import io.reactivex.schedulers.Schedulers as Rx2Schedulers
 
 /**
  *
@@ -46,6 +44,7 @@ class RetrofitTest {
 
     fun test() {
         retrofitTest()
+        retrofitObservableTest()
         observerTest()
         methodTest()
     }
@@ -74,6 +73,40 @@ class RetrofitTest {
                 Log.e(TAG, "onFailure: $t")
             }
         })
+    }
+
+    private fun retrofitObservableTest() {
+        // 1. 创建retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.github.com/")
+            .addConverterFactory(GsonConverterFactory.create(Gson()))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
+
+        // 2. 创建代理对象
+        val service = retrofit.create(ApiService::class.java)
+
+        // 3. 调用请求方法
+        val reposObservable = service.listReposObservable("octocat")
+
+        // 4. 发起请求并订阅回调
+        reposObservable
+            .subscribeOn(Rx2Schedulers.io())
+            .subscribe(object : Rx2Observer<List<EatGame?>> {
+                override fun onSubscribe(d: Rx2Disposable) {
+                }
+
+                override fun onNext(t: List<EatGame?>) {
+                    Log.e(TAG, "result: $t")
+                }
+
+                override fun onError(e: Throwable) {
+                    Log.e(TAG, "onError: $e")
+                }
+
+                override fun onComplete() {
+                }
+            })
     }
 
     private fun observerTest() {
@@ -111,7 +144,8 @@ class RetrofitTest {
             }
         }
 
-        observable.observeOn(Schedulers.newThread())
+        observable.subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.newThread())
             .map(object: Function<Int, String> {
                 override fun apply(t: Int): String {
                     return t.toString()
@@ -234,4 +268,7 @@ class RetrofitTest {
 interface ApiService {
     @GET("users/{user}/repos")
     fun listRepos(@Path("user") user: List<String>?): Call<List<EatGame?>?>?
+
+    @GET("users/{user}/repos")
+    fun listReposObservable(@Path("user") user: String): Rx2Observable<List<EatGame?>>
 }

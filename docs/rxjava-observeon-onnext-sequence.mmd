@@ -1,0 +1,27 @@
+sequenceDiagram
+    autonumber
+    participant Lambda as ObservableOnSubscribe
+    participant Emitter as CreateEmitter
+    participant OO as ObserveOnObserver
+    participant Q as SpscLinkedArrayQueue
+    participant W as NewThreadWorker
+    participant MapO as MapObserver
+    participant You as Observer
+
+    rect rgb(255, 236, 209)
+        Note over Lambda,W: 上游线程  有 subscribeOn 则是 io
+        Lambda->>Emitter: onNext(1)
+        Emitter->>OO: onNext(1)
+        OO->>Q: offer(1)
+        OO->>W: schedule(this)
+        Note over OO,W: 切线程：事件入队后交给 newThread drain
+    end
+
+    rect rgb(220, 245, 220)
+        Note over W,You: newThread  出队 + map + 回调
+        W->>OO: run / drainNormal
+        OO->>Q: poll 得到 1
+        OO->>MapO: onNext(1)
+        MapO->>MapO: apply 得到 1
+        MapO->>You: onNext String 1
+    end

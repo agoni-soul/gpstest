@@ -1,0 +1,66 @@
+sequenceDiagram
+    autonumber
+    participant App as App
+    participant Map as ObservableMap
+    participant MO as MapObserver
+    participant ObOn as ObservableObserveOn
+    participant OO as ObserveOnObserver
+    participant SubOn as ObservableSubscribeOn
+    participant SO as SubscribeOnObserver
+    participant Io as IoScheduler
+    participant Task as SubscribeTask
+    participant ObsCreate as ObservableCreate
+    participant Emitter as CreateEmitter
+    participant Src as ObservableOnSubscribe
+    participant Q as SpscLinkedArrayQueue
+    participant W as NewThreadWorker
+    participant Fn as Function
+    participant Obs as Observer
+
+    rect rgb(226, 239, 255)
+        Note over App,Io: 主线程  只订链，不发业务数据
+        App->>Map: subscribe(observer)
+        Map->>Map: subscribeActual(observer)
+        Map->>MO: new MapObserver(observer, mapper)
+        Map->>ObOn: source.subscribe(MO)
+        ObOn->>ObOn: subscribeActual(MO)
+        ObOn->>W: NewThreadScheduler.createWorker()
+        ObOn->>OO: new ObserveOnObserver(MO, worker)
+        ObOn->>SubOn: source.subscribe(OO)
+        SubOn->>SubOn: subscribeActual(OO)
+        SubOn->>SO: new SubscribeOnObserver(OO)
+        SubOn->>OO: onSubscribe(SO)
+        OO->>MO: onSubscribe(OO)
+        MO->>Obs: onSubscribe(MO)
+        Note right of Obs: Disposable 实际是 MapObserver
+        SubOn->>Io: scheduleDirect(new SubscribeTask(SO))
+        Note over SubOn,Io: 第一次切线程：把订上游丢到 io
+    end
+
+    rect rgb(255, 236, 209)
+        Note over Io,W: io 线程  create 发射 + observeOn 入队
+        Io->>Task: run()
+        Task->>ObsCreate: source.subscribe(SO)
+        ObsCreate->>ObsCreate: subscribeActual(SO)
+        ObsCreate->>Emitter: new CreateEmitter(SO)
+        ObsCreate->>SO: onSubscribe(Emitter)
+        Note right of SO: 不再转发给 Observer，onSubscribe 已在主线程调过
+        ObsCreate->>Src: source.subscribe(Emitter)
+        Src->>Emitter: onNext(1)
+        Emitter->>SO: onNext(1)
+        SO->>OO: onNext(1)
+        Note over SO,OO: subscribeOn 不切事件线程，只原样转发
+        OO->>Q: offer(1)
+        OO->>W: schedule(this)
+        Note over OO,W: 第二次切线程：事件入队后交给 newThread drain
+    end
+
+    rect rgb(220, 245, 220)
+        Note over W,Obs: newThread  出队 + map + 回调
+        W->>OO: run / drainNormal()
+        OO->>Q: poll 得到 1
+        OO->>MO: onNext(1)
+        MO->>Fn: apply(1)
+        Fn-->>MO: 返回 "1"
+        MO->>Obs: onNext("1")
+    end

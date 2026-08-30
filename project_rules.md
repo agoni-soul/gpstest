@@ -11,6 +11,8 @@
 - [`docs/mvi-framework.md`](docs/mvi-framework.md) — MVI 单向数据流
 - [`docs/startup-optimization.md`](docs/startup-optimization.md) — 首页冷启动优化
 - [`docs/retrofit-usage-guide.md`](docs/retrofit-usage-guide.md) — Retrofit 使用与源码流程（纯 Call）
+- [`docs/rxjava-create-subscribe-operators.md`](docs/rxjava-create-subscribe-operators.md) — RxJava
+  create / subscribe / subscribeOn / observeOn / map 源码
 
 ---
 

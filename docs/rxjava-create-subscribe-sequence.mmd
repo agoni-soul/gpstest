@@ -1,0 +1,26 @@
+sequenceDiagram
+    autonumber
+    participant You as App
+    participant OC as Observable.create
+    participant ObsCreate as ObservableCreate
+    participant Sub as Observable.subscribe
+    participant Actual as subscribeActual
+    participant Emitter as CreateEmitter
+    participant Src as ObservableOnSubscribe
+    participant Obs as Observer
+
+    You->>OC: create(lambda)
+    OC->>ObsCreate: new ObservableCreate(lambda)
+    ObsCreate-->>You: observable
+
+    You->>Sub: subscribe(observer)
+    Sub->>Actual: subscribeActual(observer)
+    Actual->>Emitter: new CreateEmitter(observer)
+    Actual->>Obs: onSubscribe(emitter)
+    Actual->>Src: source.subscribe(emitter)
+
+    Src->>Emitter: onNext(1)
+    Emitter->>Obs: onNext(1)
+    Src->>Emitter: onComplete()
+    Emitter->>Obs: onComplete()
+    Emitter->>Emitter: dispose()

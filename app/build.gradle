@@ -150,6 +150,8 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'  // For Android Support Library
+    // Cronet：提供 QUIC / HTTP/3（OkHttp 4.9.1 原生不支持 h3）
+    implementation 'com.google.android.gms:play-services-cronet:18.1.1'
 //    implementation 'com.github.tbruyelle:rxpermissions:0.12'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     implementation 'com.android.support:support-annotations:28.0.0'
@@ -190,6 +192,9 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:2.6.2"
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.3'
+
+    // MQTT：Eclipse Paho 3.1.1 客户端（纯 Java，Demo 不用 Android Service）
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
 
     // 内存泄漏工具 leakcanary（仅 debug；安装逻辑在 src/debug LeakCanaryInstaller）
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'

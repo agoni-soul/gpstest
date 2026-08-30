@@ -6,8 +6,11 @@ import com.haha.main.collection.CollectionTest
 import com.haha.main.handler.HandlerTest
 import com.haha.main.leakCanary.LeakCanaryTest
 import com.haha.main.plugin.PluginTest
+import com.haha.main.retrofit.HttpsVersionTest
+import com.haha.main.retrofit.MqttTest
 import com.haha.main.retrofit.OkHttpTest
 import com.haha.main.retrofit.RetrofitTest
+import com.haha.main.retrofit.SocketTest
 import com.haha.main.service.ServiceTest
 import com.haha.main.thread.ThreadTest
 import java.util.Random
@@ -27,6 +30,18 @@ object TestLearnUtils {
 
     private val okHttpTest: OkHttpTest by lazy(LazyThreadSafetyMode.PUBLICATION) {
         OkHttpTest()
+    }
+
+    private val socketTest: SocketTest by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        SocketTest()
+    }
+
+    private val httpsVersionTest: HttpsVersionTest by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        HttpsVersionTest()
+    }
+
+    private val mqttTest: MqttTest by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        MqttTest()
     }
 
     private val threadTest: ThreadTest by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -51,6 +66,9 @@ object TestLearnUtils {
     fun test() {
         retrofitTest.test()
         okHttpTest.test()
+        socketTest.test()
+        httpsVersionTest.test()
+        mqttTest.test()
         threadTest.test()
         collectionTest.test()
         mapTest()

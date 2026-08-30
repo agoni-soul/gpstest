@@ -15,6 +15,8 @@
   create / subscribe / subscribeOn / observeOn / map 源码
 - [`docs/okhttp-call-to-response.md`](docs/okhttp-call-to-response.md) — OkHttp 从
   `newCall` 到读 body（主线 `OkHttpTest` enqueue GET/POST，对照 `CacheFile` / `RetrofitTest`）
+- [`docs/https-http-versions.md`](docs/https-http-versions.md) — HTTPS 上 HTTP/1.1、HTTP/2、HTTP/3
+  协议对比与 Demo（`SocketTest` / `HttpsVersionTest`）
 
 ---
 

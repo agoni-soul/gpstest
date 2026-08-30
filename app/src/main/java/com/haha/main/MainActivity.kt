@@ -126,13 +126,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         EatGame() // 非线程安全，但初始化更快
     }
 
-    private val receiver: MyReceiver by lazy {
-        MyReceiver()
-    }
-
-    private val receiver1: MyReceiver1 by lazy {
-        MyReceiver1()
-    }
+    private val receiver = MyReceiver()
+    private val receiver1 = MyReceiver1()
+    private var isBroadcastReceiverRegistered = false
 
     private var mWifiConnectCallback: ConnectivityManager.NetworkCallback? = null
     private var mAccessibilityStateListener: AccessibilityManager.AccessibilityStateChangeListener? =
@@ -490,6 +486,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             registerReceiver(receiver, filter)
             registerReceiver(receiver1, filter)
         }
+        isBroadcastReceiverRegistered = true
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             accessibilityTest()
@@ -1207,6 +1204,21 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         accessibilityManager.addAccessibilityStateChangeListener(listener)
     }
 
+    private fun unregisterBroadcastReceiversIfNeeded() {
+        if (!isBroadcastReceiverRegistered) {
+            return
+        }
+        try {
+            unregisterReceiver(receiver1)
+        } catch (_: IllegalArgumentException) {
+        }
+        try {
+            unregisterReceiver(receiver)
+        } catch (_: IllegalArgumentException) {
+        }
+        isBroadcastReceiverRegistered = false
+    }
+
     override fun onDestroy() {
         mWifiConnectCallback?.let {
             try {
@@ -1219,14 +1231,13 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             mAccessibilityManager.removeAccessibilityStateChangeListener(it)
             mAccessibilityStateListener = null
         }
+        unregisterBroadcastReceiversIfNeeded()
         super.onDestroy()
         val intent = Intent(this, CustomAccessibilityService::class.java)
         stopService(intent)
 
         val testIntent = Intent(this, TestService::class.java)
         stopService(testIntent)
-        unregisterReceiver(receiver1)
-        unregisterReceiver(receiver)
         TestLearnUtils.destroy()
 //        if (isSatisfiedAndroidVersion(Build.VERSION_CODES.R)) {
 //            mConnectivityDiagnosticsManager.unregisterConnectivityDiagnosticsCallback(

@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    participant CacheI as CacheInterceptor
+    participant Disk as okhttp3.Cache
+    participant Strat as CacheStrategy
+    participant Next as Connect plus CallServer
+
+    CacheI->>Disk: get(request)
+    Disk-->>CacheI: cacheCandidate or null
+    CacheI->>Strat: Factory.compute
+    alt cache hit networkRequest is null
+        Strat-->>CacheI: cacheResponse only
+        CacheI-->>CacheI: return cached Response
+    else cache miss cacheResponse is null
+        Strat-->>CacheI: networkRequest only
+        CacheI->>Next: proceed(networkRequest)
+        Next-->>CacheI: network Response
+        CacheI->>Disk: put if cacheable
+        CacheI-->>CacheI: return maybe wrapping cacheWritingSource
+    else conditional GET both non-null
+        Strat-->>CacheI: networkRequest plus cacheResponse
+        CacheI->>Next: proceed with If-None-Match
+        alt 304 Not Modified
+            Next-->>CacheI: 304
+            CacheI->>Disk: update headers
+            CacheI-->>CacheI: merged cached body
+        else full new body
+            Next-->>CacheI: 200
+            CacheI->>Disk: put new response
+        end
+    else only-if-cached and nothing usable
+        CacheI-->>CacheI: 504 Unsatisfiable Request
+    end

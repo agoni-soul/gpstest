@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    participant App as OkHttpTest.get
+    participant Client as OkHttpClient
+    participant Call as RealCall
+    participant Disp as Dispatcher
+    participant Pool as ExecutorService
+    participant Async as AsyncCall
+    participant AppInt as HeaderInterceptor
+    participant Retry as RetryAndFollowUp
+    participant Bridge as BridgeInterceptor
+    participant CacheI as CacheInterceptor
+    participant Connect as ConnectInterceptor
+    participant Server as CallServerInterceptor
+    participant Sock as RealConnection
+    participant Cb as Callback
+
+    App->>Client: lazy build Client
+    App->>App: Request.Builder GET url
+    App->>Client: newCall
+    Client->>Call: new RealCall
+    App->>Call: enqueue(callback)
+    Call->>Disp: enqueue AsyncCall
+    Disp->>Pool: execute
+
+    Pool->>Async: run
+    Async->>AppInt: getResponseWithInterceptorChain
+    AppInt->>AppInt: add Accept User-Agent
+    AppInt->>Retry: proceed
+    Retry->>Bridge: proceed
+    Bridge->>Bridge: Host Keep-Alive gzip
+    Bridge->>CacheI: proceed
+    CacheI->>Connect: cache is null passthrough
+    Connect->>Sock: pool or TCP TLS
+    Connect->>Server: proceed with Exchange
+    Server->>Sock: writeRequestHeaders
+    Server->>Sock: readResponseHeaders
+    Server->>Sock: openResponseBody
+    Server-->>Async: Response
+    Async->>Cb: onResponse
+    Cb->>Cb: body.string plus Log.d
+    Async->>Disp: finished

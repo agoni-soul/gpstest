@@ -1,0 +1,45 @@
+sequenceDiagram
+    autonumber
+    participant App as CacheFile
+    participant Client as OkHttpClient
+    participant Call as RealCall
+    participant Disp as Dispatcher
+    participant Chain as RealInterceptorChain
+    participant Retry as RetryAndFollowUp
+    participant Bridge as BridgeInterceptor
+    participant CacheI as CacheInterceptor
+    participant Connect as ConnectInterceptor
+    participant Finder as ExchangeFinder
+    participant Server as CallServerInterceptor
+    participant Sock as RealConnection
+
+    App->>Client: new OkHttpClient()
+    App->>App: Request.Builder.url.build
+    App->>Client: newCall(request)
+    Client->>Call: new RealCall(client, request)
+    App->>Call: execute()
+    Call->>Call: executed CAS true
+    Call->>Disp: executed(this) bookkeeping
+    Call->>Chain: getResponseWithInterceptorChain
+
+    Chain->>Retry: intercept
+    Retry->>Bridge: proceed
+    Bridge->>Bridge: add Host Connection gzip UA
+    Bridge->>CacheI: proceed
+    CacheI->>CacheI: cache is null so network only
+    CacheI->>Connect: proceed
+    Connect->>Finder: initExchange find
+    Finder->>Sock: TCP TLS if pool miss
+    Connect->>Server: proceed with Exchange
+    Server->>Sock: writeRequestHeaders
+    Server->>Sock: readResponseHeaders
+    Server->>Sock: openResponseBody
+    Server-->>Connect: Response
+    Connect-->>CacheI: Response
+    CacheI-->>Bridge: Response
+    Bridge->>Bridge: gunzip if needed
+    Bridge-->>Retry: Response
+    Retry-->>Call: return if no redirect
+    Call-->>App: Response
+    Call->>Disp: finished(this)
+    App->>App: body.bytes then close

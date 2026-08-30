@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    participant App as OkHttpTest
+    participant Call as RealCall
+    participant Disp as Dispatcher
+    participant Pool as ExecutorService
+    participant Async as AsyncCall
+    participant Chain as InterceptorChain
+    participant Cb as Callback
+
+    App->>Call: enqueue(callback)
+    Call->>Call: executed CAS true
+    Call->>Disp: enqueue(AsyncCall)
+    Disp->>Disp: readyAsyncCalls.add
+    Disp->>Disp: promoteAndExecute
+    Disp->>Pool: execute(AsyncCall)
+    Pool->>Async: run on OkHttp thread
+    Async->>Chain: getResponseWithInterceptorChain
+    Chain-->>Async: Response
+    Async->>Cb: onResponse(call, response)
+    Async->>Disp: finished then promote

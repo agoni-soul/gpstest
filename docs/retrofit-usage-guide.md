@@ -498,8 +498,8 @@ flowchart LR
     I --> J["逐层返回"]
 ```
 
-Retrofit 不实现网络 IO，最终都交给 OkHttp 这条链。项目 `RetrofitTest.okHttpTest()` 中有相关
-Interceptor 示例。
+Retrofit 不实现网络 IO，最终都交给 OkHttp 这条链。正式示例见 `OkHttpTest.kt`（共享 Client +
+`enqueue`）；拦截器链源码见 `docs/okhttp-call-to-response.md`。
 
 ---
 
@@ -762,6 +762,8 @@ api.listRepos("octocat").enqueue(object : Callback<List<Repo>> {
 ## 18. 延伸阅读
 
 - [Retrofit 官方文档](https://square.github.io/retrofit/)
+- 项目内 OkHttp 源码：[`docs/okhttp-call-to-response.md`](okhttp-call-to-response.md)（主线
+  `OkHttpTest` enqueue GET/POST）
 - 项目内 RxJava 相关：`app/src/main/java/com/haha/main/retrofit/RxJavaLearn.java`（本文未涉及）
 - 协程版接口示例：`app/src/main/java/com/haha/mviFrame/main/ApiService.kt`（`suspend fun getUsers()`）
 

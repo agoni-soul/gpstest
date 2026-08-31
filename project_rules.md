@@ -17,6 +17,9 @@
   `newCall` 到读 body（主线 `OkHttpTest` enqueue GET/POST，对照 `CacheFile` / `RetrofitTest`）
 - [`docs/https-http-versions.md`](docs/https-http-versions.md) — HTTPS 上 HTTP/1.1、HTTP/2、HTTP/3
   协议对比与 Demo（`SocketTest` / `HttpsVersionTest`）
+- [`docs/mqtt-sender-receiver.md`](docs/mqtt-sender-receiver.md) — MQTT Fixed Header 与发送方 /
+  接收方 Demo（`MqttTest` / `MqttSender` / `MqttReceiver`，附图
+  [`docs/mqtt-fixed-header.jpg`](docs/mqtt-fixed-header.jpg)）
 
 ---
 

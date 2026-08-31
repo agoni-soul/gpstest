@@ -193,9 +193,6 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.3'
 
-    // MQTT：Eclipse Paho 3.1.1 客户端（纯 Java，Demo 不用 Android Service）
-    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
-
     // 内存泄漏工具 leakcanary（仅 debug；安装逻辑在 src/debug LeakCanaryInstaller）
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 

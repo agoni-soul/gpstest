@@ -4,10 +4,10 @@
 示例代码：
 
 - `app/src/main/java/com/haha/main/retrofit/MqttTest.kt` — 导演：先订后发，按报文表逐项跑一遍
-- `app/src/main/java/com/haha/main/retrofit/MqttSender.kt` — 发送方（一条 TCP）
-- `app/src/main/java/com/haha/main/retrofit/MqttReceiver.kt` — 接收方（另一条 TCP）
-- `app/src/main/java/com/haha/main/retrofit/MqttConnection.kt` — 裸 TCP 读写
-- `app/src/main/java/com/haha/main/retrofit/MqttWire.kt` — Fixed Header + 16 种报文编解码
+- `app/src/main/java/com/haha/main/retrofit/mqtt/MqttSender.kt` — 发送方（一条 TCP）
+- `app/src/main/java/com/haha/main/retrofit/mqtt/MqttReceiver.kt` — 接收方（另一条 TCP）
+- `app/src/main/java/com/haha/main/retrofit/mqtt/MqttConnection.kt` — 裸 TCP 读写
+- `app/src/main/java/com/haha/main/retrofit/mqtt/MqttWire.kt` — Fixed Header + 16 种报文编解码
 
 入口：`TestLearnUtils.test()` → `MqttTest.test()`。Logcat 过滤 `MqttSender` / `MqttReceiver` /
 `MqttTest`。

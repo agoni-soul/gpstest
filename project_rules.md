@@ -18,7 +18,7 @@
 - [`docs/https-http-versions.md`](docs/https-http-versions.md) — HTTPS 上 HTTP/1.1、HTTP/2、HTTP/3
   协议对比与 Demo（`SocketTest` / `HttpsVersionTest`）
 - [`docs/mqtt-sender-receiver.md`](docs/mqtt-sender-receiver.md) — MQTT Fixed Header 与发送方 /
-  接收方 Demo（`MqttTest` / `MqttSender` / `MqttReceiver`，附图
+  接收方 Demo（入口 `MqttTest`，实现在 `retrofit.mqtt` 包，附图
   [`docs/mqtt-fixed-header.jpg`](docs/mqtt-fixed-header.jpg)）
 
 ---

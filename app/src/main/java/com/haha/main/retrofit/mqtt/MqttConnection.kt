@@ -1,8 +1,9 @@
-package com.haha.main.retrofit
+package com.haha.main.retrofit.mqtt
 
 import android.util.Log
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
+import java.io.EOFException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicInteger
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * Description: MQTT 裸 TCP 连接：写 Fixed Header + Remaining Length + body，按类型读回包。
  *
  **/
+
 /** 一条 MQTT TCP：写出/读入「第一字节 + Remaining Length + body」。 */
 class MqttConnection(
     private val role: String,
@@ -68,7 +70,7 @@ class MqttConnection(
     fun read(): MqttRawPacket {
         val inp = input ?: throw IllegalStateException("$role 未连接")
         val first = inp.read()
-        if (first < 0) throw java.io.EOFException("$role 连接已关")
+        if (first < 0) throw EOFException("$role 连接已关")
         val header = MqttFixedHeader.fromFirstByte(first)
         val remaining = MqttWire.readRemainingLength(inp)
         val body = readFully(inp, remaining)

@@ -3,7 +3,8 @@
 记录时间：2026-09-02  
 版本依据：OpenJDK 17 `java.util.concurrent.ThreadPoolExecutor`（Android 同套 Doug Lea
 实现，方法名一致）  
-说明：整理自连续问答中的第 1、2、3、5、6 题（跳过第 4 题「全项目几个池 / 第三方能否复用」）。  
+说明：整理自连续问答中的第 1、2、3、5、6 题（跳过第 4 题「全项目几个池 / 第三方能否复用」）。AQS
+两题见 [aqs-notes.md](aqs-notes.md)。  
 示例代码：
 
 - `app/src/main/java/com/haha/main/thread/ThreadTest.kt`
@@ -13,16 +14,15 @@
 
 ## 目录
 
-1. [七个形参、每个参数含义，以及 `execute` 底层](#1-七个形参每个参数含义以及-execute-底层)
-2. [
-   `core=10, max=20, ArrayBlockingQueue(5), CallerRunsPolicy`：第 5 / 15 / 23 / 26 个任务](#2-core10-max20-arrayblockingqueue5-callerrunspolicy第-5--15--23--26-个任务)
-3. [执行顺序怎么理解才对](#3-执行顺序怎么理解才对)
-4. [`ctl` 装的是什么、
-   `ctl.get()` 拿到哪一段、刚 init 是什么状态](#4-ctl-装的是什么ctlget-拿到哪一段刚-init-是什么状态)
-5. [内部类 `Worker`：核心线程、临时线程、
-   `workers` 里的线程怎么被拉起来跑](#5-内部类-worker核心线程临时线程workers-里的线程怎么被拉起来跑)
+1. [七个形参、每个参数含义，以及 `execute` 底层](#sec-params)
+2. [`core=10, max=20` 队列 5 + CallerRuns：第 5 / 15 / 23 / 26 个任务](#sec-example)
+3. [执行顺序怎么理解才对](#sec-order)
+4. [`ctl` 装的是什么、`ctl.get()` 拿到哪一段、刚 init 是什么状态](#sec-ctl)
+5. [内部类 `Worker`：核心线程、临时线程、`workers` 里的线程怎么被拉起来跑](#sec-worker)
 
 ---
+
+<a id="sec-params"></a>
 
 ## 1. 七个形参、每个参数含义，以及 `execute` 底层
 
@@ -36,7 +36,9 @@ public ThreadPoolExecutor(
         TimeUnit unit,
         BlockingQueue<Runnable> workQueue,
         ThreadFactory threadFactory,
-        RejectedExecutionHandler handler)
+        RejectedExecutionHandler handler) {
+    // 校验参数后赋值；keepAliveTime 转成纳秒
+}
 ```
 
 校验：`corePoolSize < 0`、`maximumPoolSize <= 0`、`maximumPoolSize < corePoolSize`、
@@ -55,23 +57,25 @@ public ThreadPoolExecutor(
 | 6 | `threadFactory`   | `new Thread`。`Worker` 自己是 `Runnable`，工厂造的 `Thread` 的 target 是 Worker，不是你提交的任务 |
 | 7 | `handler`         | 队列满且人数已到 max（或已 shutdown）时怎么处理这个 `Runnable`                                   |
 
-项目里两处对照：
+项目里两处对照（`ThreadTest.kt`）：
 
-```29:45:app/src/main/java/com/haha/main/thread/ThreadTest.kt
-        ThreadPoolExecutor(
-            3,
-            5,
-            60L,
-            TimeUnit.SECONDS,
-            ArrayBlockingQueue(4),
-            { r ->
-                val t = Thread(r, "ThreadTest-${taskSeq.incrementAndGet()}")
-                ...
-            },
-            { r, e ->
-                ThreadPoolExecutor.CallerRunsPolicy().rejectedExecution(r, e)
-            },
-        )
+```kotlin
+ThreadPoolExecutor(
+    3,
+    5,
+    60L,
+    TimeUnit.SECONDS,
+    ArrayBlockingQueue(4),
+    { r ->
+        val t = Thread(r, "ThreadTest-${taskSeq.incrementAndGet()}")
+        t.isDaemon = false
+        t.priority = Thread.NORM_PRIORITY
+        t
+    },
+    { r, e ->
+        ThreadPoolExecutor.CallerRunsPolicy().rejectedExecution(r, e)
+    },
+)
 ```
 
 `DefaultPoolExecutor`：`core == max == CPU+1`，`ArrayBlockingQueue(64)`，拒绝只打 log。此时 **max 形同虚设
@@ -119,6 +123,8 @@ CAS `workerCount++`，再 `new Worker(firstTask)`、`workers.add`、`t.start()`�
 `workQueue.take()` 永久阻塞；`workerCount > core` 时 `poll(keepAliveTime)`，超时退出。
 
 ---
+
+<a id="sec-example"></a>
 
 ## 2. `core=10, max=20, ArrayBlockingQueue(5), CallerRunsPolicy`：第 5 / 15 / 23 / 26 个任务
 
@@ -176,6 +182,8 @@ public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
 
 ---
 
+<a id="sec-order"></a>
+
 ## 3. 执行顺序怎么理解才对
 
 大方向对：**先核心 → 再队列 → 再临时线程到 max → 最后拒绝策略。** 有四处必须改口。
@@ -205,6 +213,8 @@ public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
 
 ---
 
+<a id="sec-ctl"></a>
+
 ## 4. `ctl` 装的是什么、`ctl.get()` 拿到哪一段、刚 init 是什么状态
 
 `ctl.get()` **不是在 5 个状态里挑一个返回**。它拿到的是 **一整颗打包过的 `int`**：高 3 位运行状态，低
@@ -222,11 +232,17 @@ private static final int STOP = 1 << COUNT_BITS;
 private static final int TIDYING = 2 << COUNT_BITS;
 private static final int TERMINATED = 3 << COUNT_BITS;
 
-runStateOf(c)    =c &~COUNT_MASK;   // 取出状态
+private static int runStateOf(int c) {
+    return c & ~COUNT_MASK;   // 取出状态
+}
 
-workerCountOf(c) =c &COUNT_MASK;   // 取出人数
+private static int workerCountOf(int c) {
+    return c & COUNT_MASK;    // 取出人数
+}
 
-ctlOf(rs, wc)    =rs |wc;           // 拼回去
+private static int ctlOf(int rs, int wc) {
+    return rs | wc;           // 拼回去
+}
 ```
 
 ```text
@@ -240,14 +256,12 @@ ctlOf(rs, wc)    =rs |wc;           // 拼回去
 
 ```java
 int c = ctl.get();                       // 整包
-if(
-
-workerCountOf(c) <corePoolSize)... // 用人数
-        if(
-
-isRunning(c) &&workQueue.
-
-offer(...))...  // 用状态；RUNNING 是唯一负数，c < SHUTDOWN 即还在跑
+if (workerCountOf(c) < corePoolSize) {
+    // 用人数
+}
+if (isRunning(c) && workQueue.offer(command)) {
+    // 用状态；RUNNING 是唯一负数，c < SHUTDOWN 即还在跑
+}
 ```
 
 CAS 改状态或改人数必须两半一起写：`ctl.compareAndSet(c, ctlOf(SHUTDOWN, workerCountOf(c)))`。
@@ -267,6 +281,8 @@ isRunning(ctl.get())     = true
 默认不预创建线程。第一条 `execute` 看到 `0 < core`，`addWorker` 把低 29 位 0→1，高 3 位仍是 RUNNING。
 
 ---
+
+<a id="sec-worker"></a>
 
 ## 5. 内部类 `Worker`：核心线程、临时线程、`workers` 里的线程怎么被拉起来跑
 
@@ -316,7 +332,7 @@ execute / prestart / processWorkerExit 补人
 addWorker(firstTask, core)
   ① CAS：ctl 里 workerCount++
   ② new Worker(firstTask)
-  ③ mainLock 下 workers.add(w)     // HashSet<Worker>
+  ③ mainLock 下 workers.add(w)     // HashSet of Worker
   ④ t.start()                      // 池线程真正启动的唯一时刻
 ```
 

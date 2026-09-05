@@ -15,11 +15,12 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -30,112 +31,147 @@ import javax.lang.model.type.TypeMirror;
 /**
  * @auther: haha
  * @Date: 2026/1/3
- * @Detail:
+ * @Detail: 扫描 @Route，按模块生成 IRouteLoader 实现
  */
 @AutoService(Processor.class)
-@SupportedAnnotationTypes({"com.midea.base.core.dofrouter.annotation.Route"})
+@SupportedAnnotationTypes("com.haha.servicerouterannotation.annotation.Route")
 public class RouteProcessor extends BaseProcessor {
 
-    private HashMap<String, RouteMetaData> routeMap = new HashMap<>();
-
-    @Override
-    public synchronized void init(ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
-
-        Logger.info(">>> RouteProcessor init. <<<");
-    }
+    private final HashMap<String, RouteMetaData> routeMap = new HashMap<>();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (!annotations.isEmpty()) {
-            Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Route.class);
-
-            try {
-                Logger.info(">>> Found routes, start... <<<");
-                this.parseRoutes(elements);
-
-            } catch (Exception e) {
-                Logger.error(e);
-            }
-
-            return true;
+        if (annotations == null || annotations.isEmpty()) {
+            Logger.info(">>> RouteProcessor annotations is empty. <<<");
+            return false;
         }
 
-        Logger.info(">>> annotations is empty. <<<");
-        return false;
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Route.class);
+        try {
+            Logger.info(">>> Found routes, start... <<<");
+            parseRoutes(elements);
+        } catch (Exception e) {
+            Logger.error(e);
+        }
+        return true;
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return new HashSet<>(Collections.singletonList(Route.class.getCanonicalName()));
     }
 
     private void parseRoutes(Set<? extends Element> elements) throws IOException {
-        if (!elements.isEmpty()) {
-            Logger.info(">>> Found routes, size is " + elements.size() + " <<<");
+        if (elements == null || elements.isEmpty()) {
+            Logger.info(">>> No @Route found. <<<");
+            return;
+        }
+        Logger.info(">>> Found routes, size is " + elements.size() + " <<<");
 
-            routeMap.clear();
+        routeMap.clear();
 
-            TypeMirror tmActivity = mElements.getTypeElement(RouteType.ACTIVITY.getClassName()).asType();
-            TypeMirror tmFragment = mElements.getTypeElement(RouteType.FRAGMENT.getClassName()).asType();
-            TypeMirror tmFragmentX = mElements.getTypeElement(RouteType.FRAGMENT_X.getClassName()).asType();
+        TypeMirror tmActivity = typeMirrorOf(RouteType.ACTIVITY.getClassName());
+        TypeMirror tmFragment = typeMirrorOf(RouteType.FRAGMENT.getClassName());
+        TypeMirror tmFragmentX = typeMirrorOf(RouteType.FRAGMENT_X.getClassName());
 
-            ParameterizedTypeName mapTypeOfRouteLoader = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class), ClassName.get(RouteMetaData.class));
-            ParameterSpec mapParamSpec = ParameterSpec.builder(mapTypeOfRouteLoader, "map").build();
+        ParameterizedTypeName mapTypeOfRouteLoader = ParameterizedTypeName.get(
+                ClassName.get(Map.class),
+                ClassName.get(String.class),
+                ClassName.get(RouteMetaData.class)
+        );
+        ParameterSpec mapParamSpec = ParameterSpec.builder(mapTypeOfRouteLoader, "map").build();
 
-            //Generate implement IRouteLoader interface class
-            MethodSpec.Builder routeLoaderFunSpecBuild = MethodSpec.methodBuilder(Consts.METHOD_LOAD)
-                    .addParameter(mapParamSpec)
-                    .addAnnotation(Override.class)
-                    .addModifiers(PUBLIC);
+        MethodSpec.Builder routeLoaderFunSpecBuild = MethodSpec.methodBuilder(Consts.METHOD_LOAD)
+                .addParameter(mapParamSpec)
+                .addAnnotation(Override.class)
+                .addModifiers(PUBLIC);
 
-            if (!elements.isEmpty()) {
-                for (Element element : elements) {
-                    Route routeAnn = element.getAnnotation(Route.class);
-
-                    RouteType routeType;
-                    if (mTypes.isSubtype(element.asType(), tmActivity)) {
-                        Logger.info("Found Activity " + element.asType());
-                        routeType = RouteType.ACTIVITY;
-                    } else if (mTypes.isSubtype(element.asType(), tmFragment)) {
-                        Logger.info("Found Fragment " + element.asType());
-                        routeType = RouteType.FRAGMENT;
-                    } else if (mTypes.isSubtype(element.asType(), tmFragmentX)) {
-                        Logger.info("Found Fragment_androidx " + element.asType());
-                        routeType = RouteType.FRAGMENT_X;
-                    } else {
-                        Logger.info("Unknown route " + element.asType());
-                        routeType = RouteType.UNKNOWN;
-                    }
-
-                    if (routeAnn.path().length() > 0) {
-                        if (routeMap.containsKey(routeAnn.path())) {
-                            Logger.warn("The route ${routeMap[routeAnn.path]?.name} already has Path { ${routeAnn.path} }, so skip route ${it.asType()}");
-                            continue;
-                        }
-                        routeMap.put(routeAnn.path(), new RouteMetaData(routeType, routeAnn.priority(), routeAnn.name(), routeAnn.path(), routeAnn.pathPrefix(), routeAnn.pathPattern(), Object.class));
-
-                        routeLoaderFunSpecBuild.addStatement(
-                                "map.put($S, new $T($T.$L, $L, $S, $S, $S, $S, $T.class))",
-                                routeAnn.path(),
-                                RouteMetaData.class,
-                                RouteType.class,
-                                routeType,
-                                routeAnn.priority(),
-                                routeAnn.name(),
-                                routeAnn.path(),
-                                routeAnn.pathPrefix(),
-                                routeAnn.pathPattern(),
-                                element.asType()
-                        );
-                    }
-                }
+        for (Element element : elements) {
+            Route routeAnn = element.getAnnotation(Route.class);
+            if (routeAnn == null) {
+                continue;
             }
 
-            String fileName = Consts.ROUTE_LOADER_NAME + "_" + moduleName;
-            TypeSpec typeIRouteLoader = TypeSpec.classBuilder(fileName)
-                    .addSuperinterface(ClassName.get(mElements.getTypeElement(Consts.PACKAGE + ".api.interfaces.IRouteLoader")))
-                    .addModifiers(PUBLIC)
-                    .addMethod(routeLoaderFunSpecBuild.build())
-                    .build();
-            JavaFile.builder(Consts.PACKAGE, typeIRouteLoader)
-                    .build()
-                    .writeTo(mFiler);
+            RouteType routeType;
+            if (tmActivity != null && mTypes.isSubtype(element.asType(), tmActivity)) {
+                Logger.info("Found Activity " + element.asType());
+                routeType = RouteType.ACTIVITY;
+            } else if (tmFragment != null && mTypes.isSubtype(element.asType(), tmFragment)) {
+                Logger.info("Found Fragment " + element.asType());
+                routeType = RouteType.FRAGMENT;
+            } else if (tmFragmentX != null && mTypes.isSubtype(element.asType(), tmFragmentX)) {
+                Logger.info("Found Fragment_androidx " + element.asType());
+                routeType = RouteType.FRAGMENT_X;
+            } else {
+                Logger.info("Unknown route " + element.asType());
+                routeType = RouteType.UNKNOWN;
+            }
+
+            String routeKey = resolveRouteKey(routeAnn);
+            if (routeKey.isEmpty()) {
+                Logger.warn("Skip route " + element.asType() + " : path / pathPrefix / pathPattern are empty");
+                continue;
+            }
+            if (routeMap.containsKey(routeKey)) {
+                Logger.warn("The route already has key { " + routeKey + " }, so skip " + element.asType());
+                continue;
+            }
+            routeMap.put(routeKey, new RouteMetaData(
+                    routeType,
+                    routeAnn.priority(),
+                    routeAnn.name(),
+                    routeAnn.path(),
+                    routeAnn.pathPrefix(),
+                    routeAnn.pathPattern(),
+                    Object.class
+            ));
+
+            routeLoaderFunSpecBuild.addStatement(
+                    "map.put($S, new $T($T.$L, $L, $S, $S, $S, $S, $T.class))",
+                    routeKey,
+                    RouteMetaData.class,
+                    RouteType.class,
+                    routeType,
+                    routeAnn.priority(),
+                    routeAnn.name(),
+                    routeAnn.path(),
+                    routeAnn.pathPrefix(),
+                    routeAnn.pathPattern(),
+                    element.asType()
+            );
         }
+
+        if (routeMap.isEmpty()) {
+            return;
+        }
+
+        String fileName = Consts.ROUTE_LOADER_NAME + "_" + moduleName;
+        TypeSpec typeIRouteLoader = TypeSpec.classBuilder(fileName)
+                .addSuperinterface(ClassName.bestGuess(Consts.IROUTE_LOADER))
+                .addModifiers(PUBLIC)
+                .addMethod(routeLoaderFunSpecBuild.build())
+                .build();
+        JavaFile.builder(Consts.PACKAGE, typeIRouteLoader)
+                .build()
+                .writeTo(mFiler);
+        Logger.info(">>> Generate " + Consts.PACKAGE + "." + fileName + " <<<");
+    }
+
+    private String resolveRouteKey(Route routeAnn) {
+        if (routeAnn.path().length() > 0) {
+            return routeAnn.path();
+        }
+        if (routeAnn.pathPrefix().length() > 0) {
+            return routeAnn.pathPrefix();
+        }
+        return routeAnn.pathPattern();
+    }
+
+    private TypeMirror typeMirrorOf(String className) {
+        if (className == null || className.isEmpty()) {
+            return null;
+        }
+        TypeElement element = mElements.getTypeElement(className);
+        return element == null ? null : element.asType();
     }
 }

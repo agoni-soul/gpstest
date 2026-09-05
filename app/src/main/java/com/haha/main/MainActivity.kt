@@ -84,10 +84,12 @@ import com.haha.main.timeMonitor.TimeMonitorManager
 import com.haha.mviFrame.main.MainMVIActivity
 import com.haha.network.NetworkActivity
 import com.haha.recyclerview.RecyclerViewActivity
+import com.haha.router.RoutePath
 import com.haha.scene.CustomSceneFirstActivity
 import com.haha.scene.SceneFirstActivity
 import com.haha.selector.SelectorActivity
 import com.haha.service.accessibility.CustomAccessibilityService
+import com.haha.servicerouter.core.DOFRouter
 import com.haha.splash.SplashAd
 import com.haha.splash.SplashAdCache
 import com.haha.splash.SplashAdLandingActivity
@@ -899,8 +901,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         v?.let {
             when (v.id) {
                 R.id.btn_skip_gps -> {
-                    val intent = Intent(this, GpsActivity::class.java);
-                    startActivity(intent)
+                    DOFRouter.create(RoutePath.GPS).navigate(this)
                     val resultList =
                         "{\"uid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"level\":\"0\",\"subDevices\":\"[{\\\"enterpriseCode\\\":\\\"0000\\\",\\\"modelId\\\":\\\"midea.switch.011.003\\\",\\\"errorCode\\\":0,\\\"subType\\\":\\\"1104\\\",\\\"sn\\\":\\\"9035EAFFFE842AEC\\\",\\\"type\\\":\\\"0x21\\\",\\\"spid\\\":10001698,\\\"deviceId\\\":177021372099829,\\\"deviceName\\\":\\\"midea\\\",\\\"errorMsg\\\":null}]\",\"transId\":\"DFB2190D5220A53DC35AAF2A1F4FD13B\",\"appId\":\"900\",\"pubTs\":\"1688024614\",\"targetUid\":\"469f7d2494b94b28ad5ce5edb61ef632\",\"exp\":\"2023-07-01 15:43:34\",\"pushTime\":\"2023-06-29 15:43:34\",\"gatewayId\":\"177021372100423\",\"pushType\":\"gateway\\/subAppliance\\/bind\"}"
                     var bean: SubDeviceResultBean? = null

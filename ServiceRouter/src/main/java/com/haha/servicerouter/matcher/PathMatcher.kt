@@ -1,5 +1,7 @@
 package com.haha.servicerouter.matcher
 
+import com.haha.servicerouterannotation.annotation.data.RouteMetaData
+
 /**
  * @auther: haha
  * @Date:   2026/1/3
@@ -7,5 +9,5 @@ package com.haha.servicerouter.matcher
  */
 interface PathMatcher {
 
-    fun match(path: String, path2: String): Boolean
+    fun match(routePath: String, requestPath: String, meta: RouteMetaData): Boolean
 }

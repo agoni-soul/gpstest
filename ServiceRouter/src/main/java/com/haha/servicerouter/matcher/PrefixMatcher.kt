@@ -3,14 +3,12 @@ package com.haha.servicerouter.matcher
 import com.haha.servicerouterannotation.annotation.data.RouteMetaData
 
 /**
- * @auther: haha
- * @Date:   2026/1/3
- * @Detail: 精确匹配 @Route.path
+ * 匹配 @Route.pathPrefix
  */
-object DefaultMatcher : PathMatcher {
+object PrefixMatcher : PathMatcher {
 
     override fun match(routePath: String, requestPath: String, meta: RouteMetaData): Boolean {
-        val path = meta.path.ifEmpty { routePath }
-        return path.isNotEmpty() && path == requestPath
+        val prefix = meta.pathPrefix
+        return prefix.isNotEmpty() && requestPath.startsWith(prefix)
     }
 }

@@ -14,5 +14,5 @@ data class RouteMetaData(
     val path: String,
     val pathPrefix: String,
     val pathPattern: String,
-    val clazz: Class<Any>
+    val clazz: Class<*>
 )

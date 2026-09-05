@@ -18,7 +18,10 @@ import com.haha.base.BaseMvvmActivity
 import com.haha.base.BaseViewModel
 import com.haha.hahalearn.R
 import com.haha.hahalearn.databinding.ActivityGpsBinding
+import com.haha.router.RoutePath
+import com.haha.servicerouterannotation.annotation.Route
 
+@Route(path = RoutePath.GPS, name = "Gps")
 class GpsActivity : BaseMvvmActivity<ActivityGpsBinding, BaseViewModel>() {
 
     companion object {

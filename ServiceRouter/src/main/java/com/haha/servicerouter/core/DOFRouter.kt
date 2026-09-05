@@ -15,6 +15,7 @@ import android.util.SizeF
 import android.util.SparseArray
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.IntDef
+import com.haha.servicerouterutils.utils.Logger
 import java.io.Serializable
 
 /**
@@ -56,7 +57,7 @@ object DOFRouter {
      */
     @JvmStatic
     fun openDebug() {
-//        Logger.openDebug()
+        Logger.openDebug()
     }
 
     @IntDef(

@@ -6,6 +6,8 @@ package com.haha.servicerouterannotation.annotation
  * @Detail:
  */
 enum class RouteType(val className: String) {
-    ACTIVITY("android.app.activity"), FRAGMENT("android.app.Fragment"),
-    FRAGMENT_X("androidx.fragment.app.Fragment"), UNKNOWN("")
+    ACTIVITY("android.app.Activity"),
+    FRAGMENT("android.app.Fragment"),
+    FRAGMENT_X("androidx.fragment.app.Fragment"),
+    UNKNOWN("")
 }

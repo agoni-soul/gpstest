@@ -13,10 +13,10 @@ import com.haha.servicerouter.interfaces.IInterceptorLoader
 import com.haha.servicerouter.interfaces.IRouteInterceptor
 import com.haha.servicerouter.interfaces.IRouteLoader
 import com.haha.servicerouter.table.RouteTable
+import com.haha.servicerouter.utils.ClassUtils
 import com.haha.servicerouterannotation.annotation.RouteType
 import com.haha.servicerouterannotation.annotation.data.RouteMetaData
 import com.haha.servicerouterannotation.annotation.utils.Consts
-import com.haha.servicerouter.utils.ClassUtils
 import com.haha.servicerouterutils.utils.Logger
 
 /**
@@ -54,24 +54,31 @@ internal class Router private constructor() {
 
         if (!registerByPlugin) {
             Logger.d("Load RouteTable by reflect")
-            val routerMap = ClassUtils.getFileNameByPackageName(context, Consts.PACKAGE)
-            if (routerMap != null && routerMap.isNotEmpty()) {
-                routerMap.forEach { className ->
-                    when {
-                        className.startsWith("${Consts.PACKAGE}.${Consts.ROUTE_LOADER_NAME}") -> {
-                            Logger.d("Load route: $className")
-                            (loadClassForName(className)?.newInstance() as? IRouteLoader)?.loadInto(
-                                RouteTable.routes)
-                        }
-                        className.startsWith("${Consts.PACKAGE}.${Consts.INTERCEPTOR_LOADER_NAME}") -> {
-                            Logger.d("Load interceptor: $className")
-                            (loadClassForName(className)?.newInstance() as? IInterceptorLoader)?.loadInto(RouteTable.interceptors)
+            try {
+                val routerMap = ClassUtils.getFileNameByPackageName(context, Consts.PACKAGE)
+                if (!routerMap.isNullOrEmpty()) {
+                    routerMap.forEach { className ->
+                        when {
+                            className.startsWith("${Consts.PACKAGE}.${Consts.ROUTE_LOADER_NAME}") -> {
+                                Logger.d("Load route: $className")
+                                (loadClassForName(className)?.newInstance() as? IRouteLoader)?.loadInto(
+                                    RouteTable.routes
+                                )
+                            }
+
+                            className.startsWith("${Consts.PACKAGE}.${Consts.INTERCEPTOR_LOADER_NAME}") -> {
+                                Logger.d("Load interceptor: $className")
+                                (loadClassForName(className)?.newInstance() as? IInterceptorLoader)
+                                    ?.loadInto(RouteTable.interceptors)
+                            }
                         }
                     }
                 }
+            } catch (e: Exception) {
+                Logger.e("Load RouteTable failed", e)
             }
         } else {
-            Logger.d(  "Load RouteTable by Auto-Register")
+            Logger.d("Load RouteTable by Auto-Register")
         }
     }
 
@@ -152,10 +159,10 @@ internal class Router private constructor() {
      */
     private fun addressingComponent(navigator: DOFRouter.Navigator): Map<String, RouteMetaData> {
         Logger.d(  "Addressing >> ${navigator.path}")
-        return RouteTable.routes.filterKeys {
-            RouteTable.matchers.find { matcher ->
-                matcher.match(it, navigator.path)
-            } != null
+        return RouteTable.routes.filter { (path, meta) ->
+            RouteTable.matchers.any { matcher ->
+                matcher.match(path, navigator.path, meta)
+            }
         }
     }
 

@@ -61,7 +61,10 @@
 | `:pluginapp`                  | 插件化 Demo                                      |
 | `:flutter` / `:flutterStudy`   | Flutter add-to-app（`include_flutter.groovy`）  |
 
-未启用（目录仍在，settings 已注释）：`:starrysky`、`:ServiceRouter*`。
+未启用（目录仍在，settings 已注释）：`:starrysky`。
+
+`:ServiceRouter` / `:ServiceRouterProcessor` / `:ServiceRouterAnnotation` / `:ServiceRouterUtils`
+已接入：页面路由 `DOFRouter`。
 
 ---
 

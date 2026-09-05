@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-kapt'
     id 'org.jetbrains.kotlin.android'
 }
 
@@ -38,6 +39,12 @@ android {
             // Filter for architectures supported by Flutter
             // "armeabi-v7a",
             abiFilters "arm64-v8a"
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["DOFROUTER_MODULE_NAME": project.getName()]
+            }
         }
     }
     lintOptions {
@@ -217,5 +224,13 @@ dependencies {
     annotationProcessor project(':ServiceAnnotationProcessor')
     implementation project(':ServiceAnnotation')
     implementation project(':ServiceAnnotationRuntime')
+    implementation project(':ServiceRouter')
+    kapt project(':ServiceRouterProcessor')
     implementation project(path: ':flutter')
+}
+
+kapt {
+    arguments {
+        arg("DOFROUTER_MODULE_NAME", project.getName())
+    }
 }

@@ -12,6 +12,7 @@ import com.haha.leakcanary.LeakCanaryInstaller
 import com.haha.log.DOFLogUtil
 import com.haha.main.timeMonitor.TimeMonitorConfig
 import com.haha.main.timeMonitor.TimeMonitorManager
+import com.haha.servicerouter.core.DOFRouter
 import java.io.File
 
 
@@ -80,6 +81,8 @@ class HahaApplication : Application() {
     }
 
     private fun initComponents() {
+        DOFRouter.openDebug()
+        DOFRouter.init(this)
     }
 
     override fun onTerminate() {

@@ -34,6 +34,13 @@ public final class Consts {
     public static final String IINTERCEPTOR_LOADER = "com.haha.servicerouter.interfaces.IInterceptorLoader";
     public static final String METHOD_LOAD = "loadInto";
 
+    /**
+     * Gradle 插件 ASM 注入的目标类 / 方法
+     */
+    public static final String GENERATE_TO_CLASS_NAME = "com.haha.servicerouter.core.Router";
+    public static final String GENERATE_TO_METHOD_NAME = "loadRouterMap";
+    public static final String REGISTER_METHOD_NAME = "register";
+
     private Consts() {
     }
 }

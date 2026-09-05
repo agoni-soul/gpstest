@@ -39,7 +39,7 @@ public abstract class BaseProcessor extends AbstractProcessor {
             moduleName = options.get(Consts.MODULE_NAME);
         }
 
-        if (moduleName != null && moduleName.length() > 0) {
+        if (moduleName != null && !moduleName.isEmpty()) {
             moduleName = moduleName.replaceAll("[^0-9a-zA-Z_]", "");
             Logger.info(">>> moduleName = " + moduleName + " <<<");
         } else {

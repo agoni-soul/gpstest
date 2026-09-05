@@ -1,3 +1,4 @@
+-keep class com.haha.servicerouter.core.Router { *; }
 -keep class com.haha.servicerouter.routes.** { *; }
 -keep class * implements com.haha.servicerouter.interfaces.IRouteLoader { *; }
 -keep class * implements com.haha.servicerouter.interfaces.IInterceptorLoader { *; }

@@ -74,7 +74,8 @@
 未启用（目录仍在，settings 已注释）：`:starrysky`。
 
 `:ServiceRouter` / `:ServiceRouterProcessor` / `:ServiceRouterAnnotation` / `:ServiceRouterUtils`
-已接入：页面路由 `DOFRouter`。
+已接入：页面路由 `DOFRouter`。`ServiceRouterPlugin`（includeBuild）在打包期 ASM 注入
+`Router.loadRouterMap`，启动不再扫 dex；未注入时回退扫 dex。
 
 ---
 

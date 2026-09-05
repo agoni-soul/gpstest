@@ -82,8 +82,32 @@ internal class Router private constructor() {
         }
     }
 
+    /**
+     * 插件插桩点（对齐 ARouter LogisticsCenter.loadRouterMap）。
+     * ServiceRouterPlugin 会在方法末尾插入 register("...RouteLoader_xxx")。
+     */
     private fun loadRouterMap() {
-        registerByPlugin = false
+        registerByPlugin = true
+    }
+
+    /**
+     * 给 Gradle 插件插桩调用：按全类名实例化并分发到路由表 / 拦截器表。
+     */
+    @Suppress("unused")
+    private fun register(className: String?) {
+        if (className.isNullOrEmpty()) {
+            return
+        }
+        try {
+            val obj = Class.forName(className).getDeclaredConstructor().newInstance()
+            when (obj) {
+                is IRouteLoader -> registerRouteRoot(obj)
+                is IInterceptorLoader -> registerInterceptor(obj)
+                else -> Logger.w("Unknown register class: $className")
+            }
+        } catch (e: Exception) {
+            Logger.e("register failed: $className", e)
+        }
     }
 
     private fun registerRouteRoot(routeLoader: IRouteLoader?) {

@@ -1,0 +1,38 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.2.0'
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+    google()
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation gradleApi()
+    compileOnly 'com.android.tools.build:gradle-api:8.13.1'
+    compileOnly 'com.android.tools.build:gradle:8.13.1'
+    implementation 'org.ow2.asm:asm:9.7'
+    implementation 'org.ow2.asm:asm-commons:9.7'
+}
+
+gradlePlugin {
+    plugins {
+        dofRouterRegister {
+            id = 'com.haha.servicerouter.register'
+            implementationClass = 'com.haha.servicerouter.plugin.RouterRegisterPlugin'
+        }
+    }
+}

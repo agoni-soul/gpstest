@@ -12,7 +12,8 @@ import io.reactivex.disposables.CompositeDisposable
  *     desc   :
  *     version: 1.0
  */
-open class BaseViewModel(application: Application): AndroidViewModel(application), LifecycleObserver {
+open class BaseViewModel(application: Application) : AndroidViewModel(application),
+    LifecycleObserver {
     protected val TAG = javaClass.simpleName
 
     protected val mApplication = application

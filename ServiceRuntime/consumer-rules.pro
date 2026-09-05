@@ -1,0 +1,4 @@
+-keep class com.haha.service.impl.service.ServiceLoader { *; }
+-keep class com.haha.service.impl.generated.service.** { *; }
+-keep class * implements com.haha.service.api.IUserService { *; }
+-keep class * implements com.haha.service.api.Service { *; }

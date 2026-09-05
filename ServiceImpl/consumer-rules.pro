@@ -1,0 +1,2 @@
+-keep class com.haha.service.impl.generated.service.** { *; }
+-keep class com.haha.service.impl.impl.** { *; }

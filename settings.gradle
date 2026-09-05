@@ -24,12 +24,14 @@ pluginManagement {
 //}
 rootProject.name = "HahaLearn"
 include ':app'
+include ':lib-common'
 include ':shared'
 include ':BluetoothSdk'
 //include ':starrysky'
 include ':ServiceAnnotationProcessor'
 include ':ServiceAnnotation'
 include ':ServiceApi'
+include ':ServiceRuntime'
 include ':ServiceImpl'
 include ':ServiceAnnotationRuntime'
 include ':pluginapp'

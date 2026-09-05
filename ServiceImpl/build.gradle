@@ -46,7 +46,8 @@ dependencies {
     annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
     implementation project(':ServiceAnnotation')
     implementation project(':ServiceApi')
-    implementation project(':ServiceAnnotationProcessor')
+    implementation project(':ServiceRuntime')
+    kapt project(':ServiceAnnotationProcessor')
     annotationProcessor project(':ServiceAnnotationProcessor')
 
 }

@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.haha.hahalearn.R
+import com.haha.common.R
 import com.haha.main.timeMonitor.TimeMonitorConfig
 import com.haha.main.timeMonitor.TimeMonitorManager
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +57,8 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseMvvmActivity_create")
 
-        mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, defaultBackgroundId())
+        mViewDataBinding.root.background =
+            ContextCompat.getDrawable(mContext, defaultBackgroundId())
         if (!isShowStatus()) {
             addStatusBarView()
         }

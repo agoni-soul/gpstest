@@ -24,7 +24,7 @@ public class DefaultFactory implements IFactory {
 //        if (t != null) {
 //            return t;
 //        } else {
-            return clazz.newInstance();
+        return clazz.newInstance();
 //        }
     }
 }

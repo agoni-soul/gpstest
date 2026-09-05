@@ -57,17 +57,19 @@
 
 `settings.gradle` 当前 include：
 
-| 模块                            | 职责                                            |
-|-------------------------------|-----------------------------------------------|
-| `:app`                        | 宿主 App，业务 Demo 与基建                            |
-| `:BluetoothSdk`               | BLE 扫描 / 连接 / GATT / RFCOMM / A2DP            |
-| `:ServiceApi`                 | SPI 接口（如 `IUserService`）                      |
-| `:ServiceImpl`                | SPI 实现                                        |
-| `:ServiceAnnotation`          | `@BindView` / `@OnClick` / `@ServiceImpl` 等注解 |
-| `:ServiceAnnotationProcessor` | 注解处理器                                         |
-| `:ServiceAnnotationRuntime`   | 运行时绑定辅助                                       |
-| `:pluginapp`                  | 插件化 Demo                                      |
-| `:flutter` / `:flutterStudy`   | Flutter add-to-app（`include_flutter.groovy`）  |
+| 模块                            | 职责                                                 |
+|-------------------------------|----------------------------------------------------|
+| `:app`                        | 宿主壳：业务 Demo，只编译依赖 api / runtime，不依赖 ServiceImpl 源码 |
+| `:lib-common`                 | BaseActivity / BaseMvvm* / 主题 / TimeMonitor        |
+| `:BluetoothSdk`               | BLE 扫描 / 连接 / GATT / RFCOMM / A2DP                 |
+| `:ServiceApi`                 | SPI 接口（如 `IUserService`）                           |
+| `:ServiceRuntime`             | ServiceLoader / ServiceLoaderHelper 运行时            |
+| `:ServiceImpl`                | SPI 实现，宿主 `runtimeOnly` 仅打包                        |
+| `:ServiceAnnotation`          | `@BindView` / `@OnClick` / `@ServiceImpl` 等注解      |
+| `:ServiceAnnotationProcessor` | 注解处理器                                              |
+| `:ServiceAnnotationRuntime`   | 运行时绑定辅助                                            |
+| `:pluginapp`                  | 插件化 Demo                                           |
+| `:flutter` / `:flutterStudy`  | Flutter add-to-app（`include_flutter.groovy`）       |
 
 未启用（目录仍在，settings 已注释）：`:starrysky`。
 

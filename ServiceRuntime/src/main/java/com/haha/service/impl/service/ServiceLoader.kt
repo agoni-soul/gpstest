@@ -1,10 +1,8 @@
 package com.haha.service.impl.service
 
 import android.util.Log
-import com.haha.service.annotation.processor.processor.ConstantUtils
 import com.haha.service.impl.ServiceImpl
 import com.haha.service.impl.utils.SingletonPool
-import com.haha.service.annotation.IServiceLoader
 
 /**
  *
@@ -30,8 +28,8 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
                 if (!mIsHasInit) {
                     try {
                         // 反射调用Init类，避免引用的类过多，导致main dex capacity exceeded问题
-                        Class.forName("${ConstantUtils.GEN_PKG_SERVICE}${ConstantUtils.DOT}ServiceInit${ConstantUtils.SPLITTER}")
-                            .getMethod(ConstantUtils.INIT_METHOD)
+                        Class.forName("com.haha.service.impl.generated.service.ServiceInit_")
+                            .getMethod("init")
                             .invoke(null)
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -47,13 +45,21 @@ open class ServiceLoader<I>(interfaceClass: Class<*>?) {
          * @param interfaceClass 接口类
          * @param implementClass 实现类
          */
-        fun put(interfaceClass: Class<*>, key: String, implementClass: Class<*>, singleton: Boolean) {
+        fun put(
+            interfaceClass: Class<*>,
+            key: String,
+            implementClass: Class<*>,
+            singleton: Boolean
+        ) {
             var loader: ServiceLoader<*>? = SERVICES[interfaceClass]
             if (loader == null) {
                 loader = ServiceLoader<Any>(interfaceClass)
                 SERVICES[interfaceClass] = loader
             }
-            Log.d(TAG, "interfaceClass = ${interfaceClass.name}\n key = ${key}\n implementClass = ${implementClass.name}")
+            Log.d(
+                TAG,
+                "interfaceClass = ${interfaceClass.name}\n key = ${key}\n implementClass = ${implementClass.name}"
+            )
             loader.putImpl(key, implementClass, singleton)
         }
 

@@ -1,45 +1,8 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.HahaLearn" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
-
-    <style name="Theme.HahaLearn.NoActionBar" parent="Theme.HahaLearn">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <!-- 开屏揭开后 / 无缓存广告时 Preview Window 底色 -->
-        <item name="android:windowBackground">@color/transparent</item>
-    </style>
-
-    <!-- KMP/CMP 页：windowBackground 与 Compose light Surface 对齐，避免跳转时闪绿 -->
-    <style name="Theme.HahaLearn.Kmp" parent="Theme.HahaLearn.NoActionBar">
-        <item name="android:windowBackground">@android:color/white</item>
-    </style>
-
+<resources>
+    <!-- 基础主题已抽到 :lib-common；宿主只保留开屏主题。 -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <!-- 设置闪屏页的背景 -->
         <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <!-- 设置中心图标的动画，可选 -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
-        <!-- 设置图标动画的持续时间，默认为1000毫秒 -->
-        <!--        <item name="windowSplashScreenAnimationDuration">1000</item>-->
-        <!-- 设置图标后面的背景，可选 -->
-<!--        <item name="windowSplashScreenIconBackgroundColor">@color/icon_background</item>-->
-
         <item name="postSplashScreenTheme">@style/Theme.HahaLearn.NoActionBar</item>
     </style>
-
-    <style name="Theme.HahaLearn.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.HahaLearn.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

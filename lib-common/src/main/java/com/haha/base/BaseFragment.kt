@@ -1,14 +1,17 @@
 package com.haha.base
 
 import android.R
-import android.app.ActionBar
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowInsetsController
+import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,7 +25,7 @@ import com.haha.log.DOFLogUtil
  *     desc   :
  *     version: 1.0
  */
-abstract class BaseFragment: Fragment() {
+abstract class BaseFragment : Fragment() {
     protected open val TAG = javaClass.simpleName
     protected lateinit var mRootView: View
     protected lateinit var mContext: Context
@@ -136,7 +139,8 @@ abstract class BaseFragment: Fragment() {
                 // TODO 顶部有黑边，暂时不生效，后续再研究
 //                hide(WindowInsetsCompat.Type.statusBars())
 //                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                val uiOption = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+                val uiOption =
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
                 requireActivity().window.decorView.systemUiVisibility = uiOption
                 Color.TRANSPARENT
                 requireActivity().window.statusBarColor = resources.getColor(getStatusBarColor())
@@ -196,7 +200,10 @@ abstract class BaseFragment: Fragment() {
                 // 在原来的位置上添加一个状态栏
                 val statusBarView = createStatusBarView(requireActivity())
                 statusBarView.fitsSystemWindows = true
-                DOFLogUtil.d(TAG, "statusBarView = $statusBarView, height = ${statusBarView.height}")
+                DOFLogUtil.d(
+                    TAG,
+                    "statusBarView = $statusBarView, height = ${statusBarView.height}"
+                )
                 rootView.addView(statusBarView, 0)
                 rootView.requestLayout()
             }

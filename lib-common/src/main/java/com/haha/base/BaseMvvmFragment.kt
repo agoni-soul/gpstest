@@ -11,7 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.haha.hahalearn.R
+import com.haha.common.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  *     desc   :
  *     version: 1.0
  */
-abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFragment() {
+abstract class BaseMvvmFragment<V : ViewDataBinding, VM : BaseViewModel> : BaseFragment() {
 
     protected lateinit var mViewDataBinding: V
 
@@ -58,7 +58,7 @@ abstract class BaseMvvmFragment<V: ViewDataBinding, VM: BaseViewModel>: BaseFrag
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         mViewDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
-        mViewDataBinding.root.background =  ContextCompat.getDrawable(mContext, R.color.white)
+        mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, R.color.white)
         mRootView = mViewDataBinding.root
         return mViewDataBinding.root
     }

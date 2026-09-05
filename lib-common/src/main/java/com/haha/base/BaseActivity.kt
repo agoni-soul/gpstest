@@ -15,7 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowInsetsCompat
-import com.haha.hahalearn.R
+import com.haha.common.R
 import com.haha.log.DOFLogUtil
 import com.haha.main.timeMonitor.TimeMonitorConfig
 import com.haha.main.timeMonitor.TimeMonitorManager
@@ -205,7 +205,8 @@ abstract class BaseActivity : AppCompatActivity() {
                 // TODO 顶部有黑边，暂时不生效，后续再研究
 //                hide(WindowInsetsCompat.Type.statusBars())
 //                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                val uiOption = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+                val uiOption =
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
                 window.decorView.systemUiVisibility = uiOption
                 Color.TRANSPARENT
                 window.statusBarColor = resources.getColor(getStatusBarColor())
@@ -265,7 +266,10 @@ abstract class BaseActivity : AppCompatActivity() {
                 // 在原来的位置上添加一个状态栏
                 val statusBarView = createStatusBarView(this)
                 statusBarView.fitsSystemWindows = true
-                DOFLogUtil.d(TAG, "statusBarView = $statusBarView, height = ${statusBarView.height}")
+                DOFLogUtil.d(
+                    TAG,
+                    "statusBarView = $statusBarView, height = ${statusBarView.height}"
+                )
                 rootView.addView(statusBarView, 0)
                 rootView.requestLayout()
             }

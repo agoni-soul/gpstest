@@ -2,8 +2,7 @@ package com.haha.main.plugin
 
 import android.app.Activity
 import android.content.Context
-import android.os.Environment
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import com.haha.main.MainActivity
 import com.haha.main.plugin.system.DexClassLoader
 import java.io.File
@@ -19,19 +18,19 @@ object PluginTest {
     private val TAG = javaClass.simpleName
 
     fun test(context: Context) {
-        Log.d(TAG, "String.classLoader = ${String::class.java.classLoader}")
-        Log.d(TAG, "Activity.classLoader = ${Activity::class.java.classLoader}")
-        Log.d(TAG, "MainActivity.classLoader = ${MainActivity::class.java.classLoader}")
-        Log.d(TAG, "PluginTest.classLoader = ${PluginTest::class.java.classLoader}")
+        DOFLogUtil.d(TAG, "String.classLoader = ${String::class.java.classLoader}")
+        DOFLogUtil.d(TAG, "Activity.classLoader = ${Activity::class.java.classLoader}")
+        DOFLogUtil.d(TAG, "MainActivity.classLoader = ${MainActivity::class.java.classLoader}")
+        DOFLogUtil.d(TAG, "PluginTest.classLoader = ${PluginTest::class.java.classLoader}")
 
         val file = File(context.filesDir, "classes.dex")
-        Log.d(TAG, "file = ${file.absolutePath}, exists = ${file.exists()}")
-        Log.d(TAG, "文件可读: ${file.canRead()}")
-        Log.d(TAG, "文件可写: ${file.canWrite()}")
+        DOFLogUtil.d(TAG, "file = ${file.absolutePath}, exists = ${file.exists()}")
+        DOFLogUtil.d(TAG, "文件可读: ${file.canRead()}")
+        DOFLogUtil.d(TAG, "文件可写: ${file.canWrite()}")
 
         // dex -> odex
         val dir = context.getDir("cache_plugin", Context.MODE_PRIVATE)
-        Log.d(TAG, "dir = ${dir.absolutePath}, exists = ${dir.exists()}")
+        DOFLogUtil.d(TAG, "dir = ${dir.absolutePath}, exists = ${dir.exists()}")
         // parent ? PathClassLoader 不是父类，是兄弟关系
         val dexClassLoader = DexClassLoader(file.absolutePath, dir.absolutePath, null, context.classLoader)
 

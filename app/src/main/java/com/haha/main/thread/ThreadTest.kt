@@ -1,6 +1,6 @@
 package com.haha.main.thread
 
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -44,17 +44,17 @@ class ThreadTest {
     }
 
     fun test() {
-        Log.d(TAG, "test() caller=${Thread.currentThread().name}")
+        DOFLogUtil.d(TAG, "test() caller=${Thread.currentThread().name}")
 
         // 同步：当前线程立刻跑完才返回（MainActivity 调 test() 时是主线程，任务不能 sleep / 发网）
         execute(newTask("execute", blockMs = 0))
-        Log.d(TAG, "execute() 已返回，说明调用线程被阻塞到任务结束")
+        DOFLogUtil.d(TAG, "execute() 已返回，说明调用线程被阻塞到任务结束")
 
         // 异步：丢给线程池，调用线程立刻返回。对照 RealCall.enqueue() → Dispatcher.enqueue()
         enqueue(newTask("enqueue-1"))
         enqueue(newTask("enqueue-2"))
         enqueue(newTask("enqueue-3"))
-        Log.d(TAG, "enqueue() 已返回，任务在池线程上跑 poolSize=${mExecutor.poolSize}")
+        DOFLogUtil.d(TAG, "enqueue() 已返回，任务在池线程上跑 poolSize=${mExecutor.poolSize}")
     }
 
     /**
@@ -62,7 +62,7 @@ class ThreadTest {
      * Dispatcher.executed() 只记账，不切线程。
      */
     fun execute(task: Runnable) {
-        Log.d(TAG, "execute() submit on ${Thread.currentThread().name}")
+        DOFLogUtil.d(TAG, "execute() submit on ${Thread.currentThread().name}")
         task.run()
     }
 
@@ -71,18 +71,18 @@ class ThreadTest {
      * `executorService.execute(AsyncCall)`。
      */
     fun enqueue(task: Runnable) {
-        Log.d(TAG, "enqueue() submit on ${Thread.currentThread().name}")
+        DOFLogUtil.d(TAG, "enqueue() submit on ${Thread.currentThread().name}")
         mExecutor.execute(task)
     }
 
     private fun newTask(kind: String, blockMs: Long = 200L): Runnable {
         return Runnable {
             val name = Thread.currentThread().name
-            Log.d(TAG, "$kind START on $name")
+            DOFLogUtil.d(TAG, "$kind START on $name")
             if (blockMs > 0) {
                 Thread.sleep(blockMs)
             }
-            Log.d(TAG, "$kind END on $name")
+            DOFLogUtil.d(TAG, "$kind END on $name")
         }
     }
 }

@@ -2,7 +2,7 @@ package com.haha.main.service
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import com.haha.service.api.IUserService
 import com.haha.service.impl.service.ServiceLoader
 import com.haha.service.loader.ServiceLoaderHelper
@@ -23,24 +23,29 @@ object ServiceTest {
 
     fun test(context: Context) {
         val iUserService = ServiceLoaderHelper.getService(IUserService::class.java)
-        Log.d(TAG, "iUserService == null: ${iUserService == null}, username = ${iUserService?.getUserName().toString()}")
+        DOFLogUtil.d(
+            TAG,
+            "iUserService == null: ${iUserService == null}, username = ${
+                iUserService?.getUserName().toString()
+            }"
+        )
         iUserService?.start()
 
         val service = ServiceLoader.load(IUserService::class.java)
-        Log.d(TAG, "service == null: ${service == null}")
+        DOFLogUtil.d(TAG, "service == null: ${service == null}")
         val serviceLoader = service?.getAll<IUserService>()
-        Log.d(TAG, "serviceLoader.size = ${serviceLoader?.size}")
+        DOFLogUtil.d(TAG, "serviceLoader.size = ${serviceLoader?.size}")
         serviceLoader?.forEach {
-            Log.d(TAG, "serviceLoader = $it")
-            Log.d(TAG, "username = ${it.getUserName()}")
-            Log.d(TAG, "start = ${it.start()}")
+            DOFLogUtil.d(TAG, "serviceLoader = $it")
+            DOFLogUtil.d(TAG, "username = ${it.getUserName()}")
+            DOFLogUtil.d(TAG, "start = ${it.start()}")
         }
         testOne(context)
     }
 
     private fun testOne(context: Context) {
         val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, 0)
-        Log.d(TAG, "testOne: applicationInfo.sourceDir = ${applicationInfo.sourceDir}")
+        DOFLogUtil.d(TAG, "testOne: applicationInfo.sourceDir = ${applicationInfo.sourceDir}")
         val sourceApk = File(applicationInfo.sourceDir)
         val sourcePaths = ArrayList<String>()
         sourcePaths.add(applicationInfo.sourceDir)
@@ -64,7 +69,7 @@ object ServiceTest {
                 }
             }
         }
-        Log.d(TAG, "testOne: sourcePaths.size = ${sourcePaths.size}")
+        DOFLogUtil.d(TAG, "testOne: sourcePaths.size = ${sourcePaths.size}")
     }
 
     private fun isVmMutidexCapable(): Boolean {
@@ -94,7 +99,10 @@ object ServiceTest {
             e.printStackTrace()
         }
 
-        Log.i(TAG, "isVmMutidexCapable: VM with name: $vmName, ${if (isMutidexCapable) " has multidex support" else " does not have multidex support"}")
+        DOFLogUtil.i(
+            TAG,
+            "isVmMutidexCapable: VM with name: $vmName, ${if (isMutidexCapable) " has multidex support" else " does not have multidex support"}"
+        )
         return isMutidexCapable
     }
 

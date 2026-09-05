@@ -1,7 +1,6 @@
 package com.haha.main.logMonitor
 
-import android.os.Looper
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import com.haha.main.logMonitor.UiPerfMonitorConfig.Companion.LOG_PATH
 import com.haha.main.logMonitor.UiPerfMonitorConfig.Companion.UI_PERF_LEVEL_1
 import com.haha.main.logMonitor.UiPerfMonitorConfig.Companion.UI_PERF_LEVEL_2
@@ -60,7 +59,7 @@ class UiPerfMonitor: UiPerfMonitorConfig, LogPrinterListener {
         val logPath = File(LOG_PATH)
         if (!logPath.exists()) {
             val mkdir = logPath.mkdir()
-            Log.d(TAG, "mkdir: ${mkdir}: $LOG_PATH")
+            DOFLogUtil.d(TAG, "mkdir: ${mkdir}: $LOG_PATH")
         }
     }
 
@@ -73,7 +72,7 @@ class UiPerfMonitor: UiPerfMonitorConfig, LogPrinterListener {
         when (level) {
             UI_PERF_LEVEL_1 -> {
                 val size = mCpuInfoSampler?.getStatCpuInfo()?.size ?: return
-                Log.d(TAG, "onEndLoop TIME_WARNING_LEVEL_! & cupsize: $size")
+                DOFLogUtil.d(TAG, "onEndLoop TIME_WARNING_LEVEL_! & cupsize: $size")
                 if (size > 0) {
                     val sb = StringBuilder("startTime: ")
                     sb.append(startTime)

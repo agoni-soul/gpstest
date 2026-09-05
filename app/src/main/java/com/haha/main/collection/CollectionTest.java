@@ -1,6 +1,6 @@
 package com.haha.main.collection;
 
-import android.util.Log;
+import com.haha.log.DOFLogUtil;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -25,7 +25,7 @@ public class CollectionTest {
         }
         while (!deque.isEmpty()) {
             int temp = deque.pop();
-            Log.d(TAG, "stack: value = " + temp);
+            DOFLogUtil.INSTANCE.d(TAG, "stack: value = " + temp);
         }
     }
 
@@ -36,7 +36,7 @@ public class CollectionTest {
         }
         while (!deque.isEmpty()) {
             int temp = deque.poll();
-            Log.d(TAG, "deque: value = " + temp);
+            DOFLogUtil.INSTANCE.d(TAG, "deque: value = " + temp);
         }
     }
 }

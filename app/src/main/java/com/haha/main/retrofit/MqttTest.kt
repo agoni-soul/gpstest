@@ -1,6 +1,6 @@
 package com.haha.main.retrofit
 
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import com.haha.main.retrofit.mqtt.MqttReceiver
 import com.haha.main.retrofit.mqtt.MqttSender
 import com.haha.main.retrofit.mqtt.MqttWire
@@ -37,13 +37,13 @@ class MqttTest {
                     return@launch
                 } catch (e: Exception) {
                     lastError = e
-                    Log.w(
+                    DOFLogUtil.w(
                         TAG,
                         "${broker.name} ${broker.host}:${broker.port} failed: ${e.message}, try next"
                     )
                 }
             }
-            Log.e(TAG, "MQTT onFailure: all brokers failed", lastError)
+            DOFLogUtil.e(TAG, "MQTT onFailure: all brokers failed", lastError)
         }
     }
 
@@ -93,7 +93,7 @@ class MqttTest {
             receiver.unsubscribe(topic)
             sender.disconnect()
             receiver.disconnect()
-            Log.d(TAG, "MQTT demo ok broker=${broker.name} topic=$topic")
+            DOFLogUtil.d(TAG, "MQTT demo ok broker=${broker.name} topic=$topic")
         } finally {
             sender.close()
             receiver.close()
@@ -106,13 +106,13 @@ class MqttTest {
         try {
             MqttWire.reserved()
         } catch (e: IllegalArgumentException) {
-            Log.d(TAG, "RESERVED: ${e.message}")
+            DOFLogUtil.d(TAG, "RESERVED: ${e.message}")
         }
     }
 
     /** 打印接收方读到的一条 PUBLISH，对照 qos / dup / retain。 */
     private fun logReceived(label: String, msg: MqttReceiver.Received) {
-        Log.d(
+        DOFLogUtil.d(
             TAG,
             "[5] $label topic=${msg.topic} qos=${msg.qos} dup=${msg.dup} retain=${msg.retain} body=${msg.payload}",
         )

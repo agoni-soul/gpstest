@@ -4,9 +4,9 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.haha.log.DOFLogUtil
 import java.lang.ref.WeakReference
 
 /**
@@ -38,7 +38,7 @@ object HandlerTest {
                 Looper.prepare()
                 val handler = object : Handler(Looper.myLooper()!!) {
                     override fun handleMessage(msg: Message) {
-                        Log.i(TAG, "handleMessage: ")
+                        DOFLogUtil.i(TAG, "handleMessage: ")
                         val ctx = mContextRef?.get() ?: return
                         // Toast 需在主线程展示
                         Handler(Looper.getMainLooper()).post {
@@ -74,10 +74,10 @@ object HandlerTest {
     }
 
     fun test() {
-        getHandler()?.postDelayed({ Log.d(TAG, "1000") }, 1000)
-        getHandler()?.postDelayed({ Log.d(TAG, "2000") }, 2000)
+        getHandler()?.postDelayed({ DOFLogUtil.d(TAG, "1000") }, 1000)
+        getHandler()?.postDelayed({ DOFLogUtil.d(TAG, "2000") }, 2000)
         Thread.sleep(2000)
-        getHandler()?.postDelayed({ Log.d(TAG, "0") }, 0)
+        getHandler()?.postDelayed({ DOFLogUtil.d(TAG, "0") }, 0)
     }
 
     fun destroy() {

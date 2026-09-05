@@ -36,7 +36,6 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.transition.Slide
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
@@ -368,7 +367,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
             val bitmap = BitmapFactory.decodeResource(resources, R.drawable.net_ic_phone, options)
             bitmap.setConfig(Bitmap.Config.RGB_565)
             val byteCount = bitmap.byteCount // 直接获取内存占用字节数
-            Log.d("Memory", "Bitmap size: $byteCount bytes")
+            DOFLogUtil.d("Memory", "Bitmap size: $byteCount bytes")
         }
         mViewDataBinding.btnActivityPlugin.setOnClickListener(this)
         mViewDataBinding.btnUiMonitor.setOnClickListener {
@@ -418,12 +417,12 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         mNetworkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
         super.onBlockedStatusChanged(network, blocked)
-        Log.d("haha", "onBlockedStatusChanged Network = $network \t blocked = $blocked")
+        DOFLogUtil.d("haha", "onBlockedStatusChanged Network = $network \t blocked = $blocked")
         }
 
         override fun onAvailable(network: Network) {
         super.onAvailable(network)
-        Log.d("haha", "onAvailable Network = $network")
+        DOFLogUtil.d("haha", "onAvailable Network = $network")
         }
 
         override fun onCapabilitiesChanged(
@@ -431,7 +430,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         networkCapabilities: NetworkCapabilities
         ) {
         super.onCapabilitiesChanged(network, networkCapabilities)
-        Log.d(
+        DOFLogUtil.d(
         "haha",
         "onCapabilitiesChanged Network = $network \t networkCapabilities = $networkCapabilities"
         )
@@ -447,14 +446,14 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         for (address in addresses) {
         if (address.address.hostAddress.contains(".") == true) {
         hostAddress = address.address.hostAddress
-        Log.d(TAG, "hostAddress = $hostAddress")
+        DOFLogUtil.d(TAG, "hostAddress = $hostAddress")
         break
         }
         }
-        Log.d(TAG, "linkProperties: ${linkProperties.linkAddresses}")
+        DOFLogUtil.d(TAG, "linkProperties: ${linkProperties.linkAddresses}")
         pingforInetAddresss(hostAddress ?: "")
         //                pingForCMD("163.177.151.110")
-        Log.d(
+        DOFLogUtil.d(
         "haha",
         "onLinkPropertiesChanged Network = $network \t linkProperties = $linkProperties"
         )
@@ -462,17 +461,17 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 
         override fun onLosing(network: Network, maxMsToLive: Int) {
         super.onLosing(network, maxMsToLive)
-        Log.d("haha", "onLosing Network = $network \t maxMsToLive = $maxMsToLive")
+        DOFLogUtil.d("haha", "onLosing Network = $network \t maxMsToLive = $maxMsToLive")
         }
 
         override fun onLost(network: Network) {
         super.onLost(network)
-        Log.d("haha", "onLost Network = $network")
+        DOFLogUtil.d("haha", "onLost Network = $network")
         }
 
         override fun onUnavailable() {
         super.onUnavailable()
-        Log.d("haha", "onUnavailable")
+        DOFLogUtil.d("haha", "onUnavailable")
         }
         }
 
@@ -545,7 +544,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 
     private fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
         permissionResultMap.forEach { (k, v) ->
-            Log.d(TAG, "$k ----->>>>>  $v")
+            DOFLogUtil.d(TAG, "$k ----->>>>>  $v")
         }
     }
 
@@ -590,7 +589,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             accessibilityTest()
         }
-        Log.d(TAG, "C++ = ${stringFromJNI()}")
+        DOFLogUtil.d(TAG, "C++ = ${stringFromJNI()}")
 //        Thread {
 //            synchronizedTest()
 //        }.start()
@@ -607,9 +606,12 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     private fun synchronizedTest() {
         synchronized(this) {
             val startTime = System.currentTimeMillis()
-            Log.d(TAG, "synchronizedTest: start time = $startTime")
+            DOFLogUtil.d(TAG, "synchronizedTest: start time = $startTime")
             Thread.sleep(21000)
-            Log.d(TAG, "synchronizedTest: end time = ${System.currentTimeMillis() - startTime}")
+            DOFLogUtil.d(
+                TAG,
+                "synchronizedTest: end time = ${System.currentTimeMillis() - startTime}"
+            )
         }
     }
 
@@ -777,7 +779,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         try {
             val pm = context.packageManager
             val ai = pm.getApplicationInfo(context.packageName, PackageManager.GET_ACTIVITIES)
-            Log.d("UID", "getUid:" + ai.uid + "\t ${context.packageName}")
+            DOFLogUtil.d("UID", "getUid:" + ai.uid + "\t ${context.packageName}")
             return ai.uid
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
@@ -830,7 +832,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         for (i in list.indices) {
             val scanResult = list[i]
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Log.d(
+                DOFLogUtil.d(
                     "haha", "ssid = " + scanResult.SSID +
                             ", capabilities = " + scanResult.capabilities + ", wifiStandard = " + scanResult.wifiStandard
                 )
@@ -839,7 +841,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun connect(ssid: String, context: Context) {
-        Log.i("haha", "try connect to $ssid")
+        DOFLogUtil.i("haha", "try connect to $ssid")
         val appContext = context.applicationContext
         val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nr = NetworkRequest.Builder()
@@ -857,7 +859,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                Log.i("haha", "onAvailable $network ${network.javaClass.name}")
+                DOFLogUtil.i("haha", "onAvailable $network ${network.javaClass.name}")
             }
 
             override fun onCapabilitiesChanged(
@@ -865,7 +867,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
                 networkCapabilities: NetworkCapabilities
             ) {
                 try {
-                    Log.i(
+                    DOFLogUtil.i(
                         "haha",
                         "onCapabilitiesChanged ${networkCapabilities.linkDownstreamBandwidthKbps}"
                     )
@@ -876,14 +878,14 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 
             override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
                 try {
-                    Log.i("haha", "onLinkPropertiesChanged " + linkProperties.interfaceName)
+                    DOFLogUtil.i("haha", "onLinkPropertiesChanged " + linkProperties.interfaceName)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
         }
         mWifiConnectCallback = callback
-        Log.i("haha", "requestNetwork!")
+        DOFLogUtil.i("haha", "requestNetwork!")
         cm.registerNetworkCallback(nr, callback)
     }
 
@@ -892,7 +894,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         val ns = connectivity.allNetworks
         for (n in ns) {
             val c = connectivity.getNetworkCapabilities(n)
-            Log.i("haha", "inspectNetworks: network = $n \t capabilities = $c")
+            DOFLogUtil.i("haha", "inspectNetworks: network = $n \t capabilities = $c")
         }
     }
 
@@ -954,8 +956,8 @@ class MainActivity : BaseActivity(), View.OnClickListener {
                         applicationContext.getSystemService(WIFI_SERVICE) as WifiManager
                     val wifiInfo = wifiManager.connectionInfo
                     val wifiName = wifiInfo.ssid
-                    Log.d("haha", wifiName)
-                    Log.d("haha", "speed: ${wifiInfo.linkSpeed}")
+                    DOFLogUtil.d("haha", wifiName)
+                    DOFLogUtil.d("haha", "speed: ${wifiInfo.linkSpeed}")
                      */
 
                     val intent = Intent(this, CustomAccessibilityService::class.java)
@@ -973,29 +975,32 @@ class MainActivity : BaseActivity(), View.OnClickListener {
                         val networkInfo =
                             mConnectivityManager.getNetworkInfo(mConnectivityManager.activeNetwork)
                         networkInfo?.let {
-                            Log.d("haha", "${it.isConnectedOrConnecting} \t ${it.detailedState}")
+                            DOFLogUtil.d(
+                                "haha",
+                                "${it.isConnectedOrConnecting} \t ${it.detailedState}"
+                            )
                         }
                         val networkCapabilities = mConnectivityManager.getNetworkCapabilities(
                             mConnectivityManager.activeNetwork
                         )
 
                         val b = mConnectivityManager.isDefaultNetworkActive
-                        Log.d("haha", "isDefaultNetworkActive = $b")
+                        DOFLogUtil.d("haha", "isDefaultNetworkActive = $b")
 
                         val networkInfo1 = mConnectivityManager.activeNetworkInfo
                         networkInfo1?.let { info ->
-                            Log.d(TAG, "detailedState = " + info.detailedState.toString())
+                            DOFLogUtil.d(TAG, "detailedState = " + info.detailedState.toString())
                         }
 
                         if (isSatisfiedAndroidVersion(Build.VERSION_CODES.M)) {
                             mConnectivityManager.activeNetwork?.let { network ->
-                                Log.d(TAG, "netId = $network")
+                                DOFLogUtil.d(TAG, "netId = $network")
                             }
                         }
 
                         val proxy = mConnectivityManager.defaultProxy
                         proxy?.let { proxy ->
-                            Log.d(
+                            DOFLogUtil.d(
                                 TAG,
                                 "proxy: host = ${proxy.host} \t port = ${proxy.port} \t isValid = ${proxy.isValid}"
                             )
@@ -1012,9 +1017,9 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 //                            }
 //                            bucket.let {
 //                                val total = it.rxBytes + it.txBytes
-//                                Log.d("haha", "Total = $total")
-//                                Log.d("haha", "rxBytes = ${it.rxBytes}")
-//                                Log.d("haha", "txBytes = ${it.txBytes}")
+//                                DOFLogUtil.d("haha", "Total = $total")
+//                                DOFLogUtil.d("haha", "rxBytes = ${it.rxBytes}")
+//                                DOFLogUtil.d("haha", "txBytes = ${it.txBytes}")
 //                            }
 //                        }.start()
 //                    }
@@ -1032,12 +1037,12 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 //                InetSocketAddress(InetAddress.getByName("10.74.35.6"), 80),
 //                InetSocketAddress(InetAddress.getByName("163.177.151.110"), 80)
 //            )
-//            Log.d("haha", "isConnect = $isConnect")
+//            DOFLogUtil.d("haha", "isConnect = $isConnect")
 //        }.start()
 
                     Thread {
                         val network = mConnectivityManager.boundNetworkForProcess
-                        Log.d("haha", "boundNetworkForProcess = $network")
+                        DOFLogUtil.d("haha", "boundNetworkForProcess = $network")
 
                         mNetworkIp?.pingforInetAddresss("163.177.151.110")
                         mNetworkIp?.pingForCMD("163.177.151.110")
@@ -1053,7 +1058,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 //                    NetWorkUtils.requestNetwork(this)
 //                    val b =
 //                        mConnectivityManager.bindProcessToNetwork(mConnectivityManager.activeNetwork)
-//                    Log.d("haha", "bindProcessToNetwork: $b")
+//                    DOFLogUtil.d("haha", "bindProcessToNetwork: $b")
                     createMemoryChurn()
 //                    testANRService()
 //                    createRunnableChurn()
@@ -1228,7 +1233,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
             }
         } catch (e: OutOfMemoryError) {
             // 捕获到OOM，进行后续处理或日志记录
-            Log.e("OOM_TEST", "OutOfMemoryError caught!")
+            DOFLogUtil.e("OOM_TEST", "OutOfMemoryError caught!")
         }
     }
 

@@ -2,7 +2,7 @@ package com.haha.main.logMonitor
 
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import com.haha.main.logMonitor.UiPerfMonitorConfig.Companion.FILENAME
 import com.haha.main.logMonitor.UiPerfMonitorConfig.Companion.LOG_PATH
 import java.io.BufferedWriter
@@ -12,7 +12,6 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.io.RandomAccessFile
 import java.text.SimpleDateFormat
-import kotlin.math.log
 
 /**
  * @auther: haha
@@ -73,7 +72,7 @@ class LogWriteThread: UiPerfMonitorConfig {
         mSb.append(TIME_FORMATTER.format(time))
         mSb.append("\r\n/**********************************/\r\n")
         mSb.append(info + "\r\n")
-        Log.d(TAG, "saveLogTOSDCard: ${mSb}")
+        DOFLogUtil.d(TAG, "saveLogTOSDCard: ${mSb}")
         if (!logFile.exists()) {
             writeLog4SameFile(logFile.path, mSb.toString())
         } else {
@@ -86,7 +85,7 @@ class LogWriteThread: UiPerfMonitorConfig {
                 writer.close()
                 writer = null
             } catch (t: Throwable) {
-                Log.e(TAG, "saveLogToSDCard: ${t.printStackTrace()}")
+                DOFLogUtil.e(TAG, "saveLogToSDCard: ${t.printStackTrace()}")
             } finally {
                 try {
                     writer?.let {
@@ -94,7 +93,7 @@ class LogWriteThread: UiPerfMonitorConfig {
                         writer = null
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "saveLogToSDCard: ${e.printStackTrace()}")
+                    DOFLogUtil.e(TAG, "saveLogToSDCard: ${e.printStackTrace()}")
                 }
             }
         }

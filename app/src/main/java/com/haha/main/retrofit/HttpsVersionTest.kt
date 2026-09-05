@@ -1,10 +1,10 @@
 package com.haha.main.retrofit
 
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.net.CronetProviderInstaller
 import com.google.android.gms.tasks.Tasks
 import com.haha.HahaApplication
+import com.haha.log.DOFLogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -91,7 +91,7 @@ class HttpsVersionTest {
     fun httpsHttp3(url: String) {
         val context = HahaApplication.getContext()
         if (context == null) {
-            Log.e(TAG, "httpsHttp3 skip: Application Context 为空")
+            DOFLogUtil.e(TAG, "httpsHttp3 skip: Application Context 为空")
             return
         }
         scope.launch {
@@ -108,7 +108,7 @@ class HttpsVersionTest {
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "[$expectHint] onFailure: ${e.message}", e)
+                DOFLogUtil.e(TAG, "[$expectHint] onFailure: ${e.message}", e)
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -116,22 +116,22 @@ class HttpsVersionTest {
                     val protocol = it.protocol
                     val body = it.body?.string().orEmpty()
                     val preview = body.take(200)
-                    Log.d(
+                    DOFLogUtil.d(
                         TAG,
                         "[$expectHint] code=${it.code} negotiated=$protocol " +
                                 "len=${body.length} preview=$preview",
                     )
                     when {
                         expectHint == "http/1.1" && protocol != Protocol.HTTP_1_1 ->
-                            Log.w(TAG, "[$expectHint] 期望 HTTP_1_1，实际 $protocol")
+                            DOFLogUtil.w(TAG, "[$expectHint] 期望 HTTP_1_1，实际 $protocol")
 
                         expectHint == "h2" && protocol != Protocol.HTTP_2 ->
-                            Log.w(
+                            DOFLogUtil.w(
                                 TAG,
                                 "[$expectHint] 期望 HTTP_2，实际 $protocol（服务端可能未开 h2）"
                             )
 
-                        else -> Log.d(TAG, "[$expectHint] 协议符合预期: $protocol")
+                        else -> DOFLogUtil.d(TAG, "[$expectHint] 协议符合预期: $protocol")
                     }
                 }
             }
@@ -146,14 +146,14 @@ class HttpsVersionTest {
                 proxy: Proxy,
                 protocol: Protocol?,
             ) {
-                Log.d(
+                DOFLogUtil.d(
                     TAG,
                     "[$label] TCP/TLS connectEnd addr=$inetSocketAddress alpnProtocol=$protocol",
                 )
             }
 
             override fun connectionAcquired(call: Call, connection: Connection) {
-                Log.d(TAG, "[$label] connectionAcquired protocol=${connection.protocol()}")
+                DOFLogUtil.d(TAG, "[$label] connectionAcquired protocol=${connection.protocol()}")
             }
         }
     }
@@ -163,9 +163,12 @@ class HttpsVersionTest {
             val install = CronetProviderInstaller.installProvider(context)
             try {
                 Tasks.await(install, 15, TimeUnit.SECONDS)
-                Log.d(TAG, "[HTTP/3] CronetProviderInstaller success")
+                DOFLogUtil.d(TAG, "[HTTP/3] CronetProviderInstaller success")
             } catch (e: Exception) {
-                Log.w(TAG, "[HTTP/3] CronetProviderInstaller: ${e.message}, 继续尝试本地 Provider")
+                DOFLogUtil.w(
+                    TAG,
+                    "[HTTP/3] CronetProviderInstaller: ${e.message}, 继续尝试本地 Provider"
+                )
             }
 
             val host = java.net.URI(url).host ?: "cloudflare-quic.com"
@@ -183,7 +186,7 @@ class HttpsVersionTest {
                     info: UrlResponseInfo,
                     newLocationUrl: String,
                 ) {
-                    Log.d(
+                    DOFLogUtil.d(
                         TAG,
                         "[HTTP/3] redirect -> $newLocationUrl negotiated=${info.negotiatedProtocol}"
                     )
@@ -191,7 +194,7 @@ class HttpsVersionTest {
                 }
 
                 override fun onResponseStarted(request: UrlRequest, info: UrlResponseInfo) {
-                    Log.d(
+                    DOFLogUtil.d(
                         TAG,
                         "[HTTP/3] responseStarted code=${info.httpStatusCode} " +
                                 "negotiated=${info.negotiatedProtocol} (h3/quic 即 HTTP/3)",
@@ -215,7 +218,7 @@ class HttpsVersionTest {
                 override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo) {
                     val text = bodyBuffer.toString(StandardCharsets.UTF_8.name())
                     val negotiated = info.negotiatedProtocol
-                    Log.d(
+                    DOFLogUtil.d(
                         TAG,
                         "[HTTP/3] onSucceeded negotiated=$negotiated " +
                                 "code=${info.httpStatusCode} len=${text.length} preview=${
@@ -227,9 +230,12 @@ class HttpsVersionTest {
                     if (negotiated.contains("h3", ignoreCase = true) ||
                         negotiated.contains("quic", ignoreCase = true)
                     ) {
-                        Log.d(TAG, "[HTTP/3] 已走 QUIC/HTTP/3（UDP），与 SocketTest 的 TCP+TLS 不同")
+                        DOFLogUtil.d(
+                            TAG,
+                            "[HTTP/3] 已走 QUIC/HTTP/3（UDP），与 SocketTest 的 TCP+TLS 不同"
+                        )
                     } else {
-                        Log.w(
+                        DOFLogUtil.w(
                             TAG,
                             "[HTTP/3] 实际落到 $negotiated（可能被网络降级到 h2/http1.1，或 UDP/443 被拦）",
                         )
@@ -242,7 +248,7 @@ class HttpsVersionTest {
                     info: UrlResponseInfo?,
                     error: CronetException,
                 ) {
-                    Log.e(
+                    DOFLogUtil.e(
                         TAG,
                         "[HTTP/3] onFailed negotiated=${info?.negotiatedProtocol} err=${error.message}",
                         error,
@@ -255,9 +261,9 @@ class HttpsVersionTest {
                 .addHeader("Accept", "text/html,application/json")
                 .build()
                 .start()
-            Log.d(TAG, "[HTTP/3] UrlRequest started url=$url (QUIC hint host=$host)")
+            DOFLogUtil.d(TAG, "[HTTP/3] UrlRequest started url=$url (QUIC hint host=$host)")
         } catch (e: Exception) {
-            Log.e(TAG, "[HTTP/3] Cronet 不可用: ${e.message}", e)
+            DOFLogUtil.e(TAG, "[HTTP/3] Cronet 不可用: ${e.message}", e)
         }
     }
 }

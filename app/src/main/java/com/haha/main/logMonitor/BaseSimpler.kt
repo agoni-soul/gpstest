@@ -2,7 +2,7 @@ package com.haha.main.logMonitor
 
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -31,12 +31,12 @@ abstract class BaseSimpler {
     }
 
     constructor() {
-        Log.d(TAG, "Init BaseSampler")
+        DOFLogUtil.d(TAG, "Init BaseSampler")
     }
 
     open fun start() {
         if (!mIsSampling.get()) {
-            Log.d(TAG, "start Sampler")
+            DOFLogUtil.d(TAG, "start Sampler")
             getControlHandler().removeCallbacks(mRunnable)
             getControlHandler().post(mRunnable)
             mIsSampling.set(true)
@@ -45,7 +45,7 @@ abstract class BaseSimpler {
 
     open fun stop() {
         if (mIsSampling.get()) {
-            Log.d(TAG, "stop Sampler")
+            DOFLogUtil.d(TAG, "stop Sampler")
             getControlHandler().removeCallbacks(mRunnable)
             mIsSampling.set(false)
         }

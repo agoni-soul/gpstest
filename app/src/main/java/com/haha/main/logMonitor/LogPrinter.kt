@@ -1,8 +1,8 @@
 package com.haha.main.logMonitor
 
 import android.os.Looper
-import android.util.Log
 import android.util.Printer
+import com.haha.log.DOFLogUtil
 import com.haha.main.logMonitor.LogPrinterListener.Companion.UI_PERF_LEVEL_1
 import com.haha.main.logMonitor.LogPrinterListener.Companion.UI_PERF_LEVEL_2
 import com.haha.main.logMonitor.UiPerfMonitorConfig.Companion.TIME_WARNING_LEVEL_1
@@ -35,7 +35,7 @@ class LogPrinter: Printer, UiPerfMonitorConfig {
             //执行消息，同时复位ANR线程状态
             val endTime = System.currentTimeMillis()
 
-            Log.d(TAG, "dispatch handler time: ${endTime - startTime}")
+            DOFLogUtil.d(TAG, "dispatch handler time: ${endTime - startTime}")
             execuTime(logInfo, startTime, endTime)
             startTime = 0
         }
@@ -46,10 +46,10 @@ class LogPrinter: Printer, UiPerfMonitorConfig {
         var level = 0
         val time = endTime - startTime
         if (time > TIME_WARNING_LEVEL_2) {
-            Log.d(TAG, "Warning_LEVEL_2:\r\nprintln: $logInfo")
+            DOFLogUtil.d(TAG, "Warning_LEVEL_2:\r\nprintln: $logInfo")
             level = UI_PERF_LEVEL_2
         } else if (time > TIME_WARNING_LEVEL_1) {
-            Log.d(TAG, "Warning_LEVEL_2:\r\nprintln: $logInfo")
+            DOFLogUtil.d(TAG, "Warning_LEVEL_2:\r\nprintln: $logInfo")
             level = UI_PERF_LEVEL_1
         }
         mLogPrinter?.onEndLoop(startTime, endTime, logInfo, level)

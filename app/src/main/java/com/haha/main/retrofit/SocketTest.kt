@@ -1,7 +1,7 @@
 package com.haha.main.retrofit
 
 import android.os.Build
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,9 +48,9 @@ class SocketTest {
         scope.launch {
             try {
                 val body = httpsRequest(method = "GET", url = url, body = null)
-                Log.d(TAG, "httpsGet result: $body")
+                DOFLogUtil.d(TAG, "httpsGet result: $body")
             } catch (e: Exception) {
-                Log.e(TAG, "httpsGet onFailure: ${e.message}", e)
+                DOFLogUtil.e(TAG, "httpsGet onFailure: ${e.message}", e)
             }
         }
     }
@@ -70,9 +70,9 @@ class SocketTest {
                     body = form.toByteArray(StandardCharsets.UTF_8),
                     contentType = "application/x-www-form-urlencoded; charset=utf-8",
                 )
-                Log.d(TAG, "httpsPost result: $body")
+                DOFLogUtil.d(TAG, "httpsPost result: $body")
             } catch (e: Exception) {
-                Log.e(TAG, "httpsPost onFailure: ${e.message}", e)
+                DOFLogUtil.e(TAG, "httpsPost onFailure: ${e.message}", e)
             }
         }
     }
@@ -93,7 +93,7 @@ class SocketTest {
                         val query = buildDnsQuery(host, id)
                         val server = InetAddress.getByName(dnsServer)
                         ds.send(DatagramPacket(query, query.size, server, 53))
-                        Log.d(
+                        DOFLogUtil.d(
                             TAG,
                             "udpDns send $host A? -> $dnsServer:53, ${query.size} bytes, 无 TCP 三次握手",
                         )
@@ -102,15 +102,18 @@ class SocketTest {
                         val incoming = DatagramPacket(buf, buf.size)
                         ds.receive(incoming)
                         val ips = parseDnsARecords(incoming.data, incoming.length)
-                        Log.d(TAG, "udpDns recv from $dnsServer, ${incoming.length} bytes, A=$ips")
+                        DOFLogUtil.d(
+                            TAG,
+                            "udpDns recv from $dnsServer, ${incoming.length} bytes, A=$ips"
+                        )
                         return@launch
                     }
                 } catch (e: Exception) {
                     lastError = e
-                    Log.w(TAG, "udpDns $dnsServer failed: ${e.message}, try next")
+                    DOFLogUtil.w(TAG, "udpDns $dnsServer failed: ${e.message}, try next")
                 }
             }
-            Log.e(TAG, "udpDns onFailure: all servers failed", lastError)
+            DOFLogUtil.e(TAG, "udpDns onFailure: all servers failed", lastError)
         }
     }
 
@@ -132,15 +135,15 @@ class SocketTest {
 
         // ① DNS：Socket 只能连 IP。系统解析多数走 UDP 53。
         val addresses = InetAddress.getAllByName(host)
-        Log.d(TAG, "[1] DNS $host -> ${addresses.joinToString { it.hostAddress ?: "?" }}")
+        DOFLogUtil.d(TAG, "[1] DNS $host -> ${addresses.joinToString { it.hostAddress ?: "?" }}")
         val address = addresses.first()
 
         Socket().use { tcp ->
             tcp.soTimeout = READ_TIMEOUT_MS
             // ② TCP：connect() 阻塞到三次握手完成（SYN / SYN-ACK / ACK）或超时。
-            Log.d(TAG, "[2] TCP connect start ${address.hostAddress}:$port （三次握手）")
+            DOFLogUtil.d(TAG, "[2] TCP connect start ${address.hostAddress}:$port （三次握手）")
             tcp.connect(InetSocketAddress(address, port), CONNECT_TIMEOUT_MS)
-            Log.d(
+            DOFLogUtil.d(
                 TAG,
                 "[2] TCP ESTABLISHED local=${tcp.localSocketAddress} remote=${tcp.remoteSocketAddress}",
             )
@@ -150,7 +153,7 @@ class SocketTest {
                 // ③ TLS：证书校验 + 密钥协商。失败时还没写出任何 HTTP。
                 ssl.startHandshake()
                 val session = ssl.session
-                Log.d(
+                DOFLogUtil.d(
                     TAG,
                     "[3] TLS ${session.protocol} ${session.cipherSuite} peer=${session.peerHost}"
                 )
@@ -172,11 +175,14 @@ class SocketTest {
                 output.write(header)
                 if (body != null) output.write(body)
                 output.flush()
-                Log.d(TAG, "[4] write $method $path, header=${header.size} body=${body?.size ?: 0}")
+                DOFLogUtil.d(
+                    TAG,
+                    "[4] write $method $path, header=${header.size} body=${body?.size ?: 0}"
+                )
 
                 val input = BufferedInputStream(ssl.inputStream)
                 val (code, responseBody) = readHttpResponse(input)
-                Log.d(TAG, "[5] HTTP $code, body ${responseBody.length} chars")
+                DOFLogUtil.d(TAG, "[5] HTTP $code, body ${responseBody.length} chars")
                 if (code !in 200..299) {
                     throw IllegalStateException("http $code, body=$responseBody")
                 }

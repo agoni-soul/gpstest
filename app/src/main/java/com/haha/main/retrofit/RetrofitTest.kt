@@ -1,9 +1,9 @@
 package com.haha.main.retrofit
 
 import android.content.Context
-import android.util.Log
 import com.google.gson.Gson
 import com.haha.coroutineScope.EatGame
+import com.haha.log.DOFLogUtil
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableEmitter
 import io.reactivex.rxjava3.core.ObservableOnSubscribe
@@ -66,11 +66,11 @@ class RetrofitTest {
         // 4. 发起请求并获取回调
         repos?.enqueue(object : Callback<List<EatGame?>?> {
             override fun onResponse(call: Call<List<EatGame?>?>, response: Response<List<EatGame?>?>) {
-                Log.e(TAG, "result: " + response.body())
+                DOFLogUtil.e(TAG, "result: " + response.body())
             }
 
             override fun onFailure(call: Call<List<EatGame?>?>, t: Throwable) {
-                Log.e(TAG, "onFailure: $t")
+                DOFLogUtil.e(TAG, "onFailure: $t")
             }
         })
     }
@@ -97,11 +97,11 @@ class RetrofitTest {
                 }
 
                 override fun onNext(t: List<EatGame?>) {
-                    Log.e(TAG, "result: $t")
+                    DOFLogUtil.e(TAG, "result: $t")
                 }
 
                 override fun onError(e: Throwable) {
-                    Log.e(TAG, "onError: $e")
+                    DOFLogUtil.e(TAG, "onError: $e")
                 }
 
                 override fun onComplete() {
@@ -127,7 +127,7 @@ class RetrofitTest {
             private var disposable: Disposable? = null
 
             override fun onNext(value: String) {
-                Log.d(TAG, value.toString())
+                DOFLogUtil.d(TAG, value.toString())
                 if (value.toInt() >= 2) {   // >=2  时为异常数据，解除订阅
                     disposable?.dispose()
                 }
@@ -186,7 +186,7 @@ class RetrofitTest {
 
             // 获取响应
             val body = response.body
-            Log.d(TAG, "$body")
+            DOFLogUtil.d(TAG, "$body")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -234,7 +234,7 @@ class RetrofitTest {
 
             // 获取响应
             val body = response.body
-            Log.d(TAG, "$body")
+            DOFLogUtil.d(TAG, "$body")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -244,21 +244,21 @@ class RetrofitTest {
         try {
             val clazz = Class.forName("com.haha.main.retrofit.ApiService")
             val method = clazz.getDeclaredMethod("listRepos", List::class.java)
-            Log.d(TAG, " --------------  annotation --------------  ")
+            DOFLogUtil.d(TAG, " --------------  annotation --------------  ")
             for (annotation in method.annotations) {
-                Log.d(TAG, "$annotation")
+                DOFLogUtil.d(TAG, "$annotation")
             }
-            Log.d(TAG, " --------------  parameterTypes --------------  ")
+            DOFLogUtil.d(TAG, " --------------  parameterTypes --------------  ")
             for (type in method.parameterTypes) {
-                Log.d(TAG, "${type.simpleName}")
+                DOFLogUtil.d(TAG, "${type.simpleName}")
             }
-            Log.d(TAG, " --------------  genericParameterTypes --------------  ")
+            DOFLogUtil.d(TAG, " --------------  genericParameterTypes --------------  ")
             for (type in method.genericParameterTypes) {
-                Log.d(TAG, "${type.typeName}")
+                DOFLogUtil.d(TAG, "${type.typeName}")
             }
-            Log.d(TAG, " --------------  genericReturnType --------------  ")
-            Log.d(TAG, "${method.genericReturnType.typeName}")
-            Log.d(TAG, " --------------  end --------------  ")
+            DOFLogUtil.d(TAG, " --------------  genericReturnType --------------  ")
+            DOFLogUtil.d(TAG, "${method.genericReturnType.typeName}")
+            DOFLogUtil.d(TAG, " --------------  end --------------  ")
         } catch (e: Exception) {
             e.printStackTrace()
         }

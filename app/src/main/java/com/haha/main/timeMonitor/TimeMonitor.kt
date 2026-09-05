@@ -1,6 +1,6 @@
 package com.haha.main.timeMonitor
 
-import android.util.Log
+import com.haha.log.DOFLogUtil
 
 /**
  * @auther: haha
@@ -17,7 +17,7 @@ class TimeMonitor {
     private var mStartTime: Long = 0
 
     constructor(id: Int) {
-        Log.d(TAG, "init TimeMonitor id: $id")
+        DOFLogUtil.d(TAG, "init TimeMonitor id: $id")
         monitorId = id
     }
 
@@ -39,7 +39,7 @@ class TimeMonitor {
             mTimeTag.remove(tag)
         }
         val time = System.currentTimeMillis() - mStartTime
-        Log.d(TAG, "$tag: $time")
+        DOFLogUtil.d(TAG, "$tag: $time")
         mTimeTag[tag] = time
     }
 
@@ -57,14 +57,14 @@ class TimeMonitor {
 
     fun testShowData() {
         if (mTimeTag.isEmpty()) {
-            Log.e(TAG, "mTimeTag is empty!")
+            DOFLogUtil.e(TAG, "mTimeTag is empty!")
             return
         }
 
         val iterator = mTimeTag.keys.iterator()
         while (iterator.hasNext()) {
             val tag = iterator.next()
-            Log.d(TAG, tag + ": " + mTimeTag[tag])
+            DOFLogUtil.d(TAG, tag + ": " + mTimeTag[tag])
         }
     }
 

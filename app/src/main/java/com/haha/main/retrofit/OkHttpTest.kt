@@ -1,6 +1,6 @@
 package com.haha.main.retrofit
 
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody
@@ -47,17 +47,17 @@ class OkHttpTest {
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "get onFailure: ${e.message}")
+                DOFLogUtil.e(TAG, "get onFailure: ${e.message}")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     val body = it.body?.string()
                     if (!it.isSuccessful) {
-                        Log.e(TAG, "get http ${it.code}, body=$body")
+                        DOFLogUtil.e(TAG, "get http ${it.code}, body=$body")
                         return
                     }
-                    Log.d(TAG, "get result: $body")
+                    DOFLogUtil.d(TAG, "get result: $body")
                 }
             }
         })
@@ -74,17 +74,17 @@ class OkHttpTest {
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e(TAG, "post onFailure: ${e.message}")
+                DOFLogUtil.e(TAG, "post onFailure: ${e.message}")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     val body = it.body?.string()
                     if (!it.isSuccessful) {
-                        Log.e(TAG, "post http ${it.code}, body=$body")
+                        DOFLogUtil.e(TAG, "post http ${it.code}, body=$body")
                         return
                     }
-                    Log.d(TAG, "post result: $body")
+                    DOFLogUtil.d(TAG, "post result: $body")
                 }
             }
         })

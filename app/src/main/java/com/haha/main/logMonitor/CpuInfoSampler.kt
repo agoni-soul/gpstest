@@ -1,6 +1,6 @@
 package com.haha.main.logMonitor
 
-import android.util.Log
+import com.haha.log.DOFLogUtil
 import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.IOException
@@ -22,7 +22,7 @@ class CpuInfoSampler: BaseSimpler() {
     private var mAppCpuTimePre = 0L
 
     override fun doSample() {
-        Log.d(TAG, "doSample")
+        DOFLogUtil.d(TAG, "doSample")
         dumpCpuInfo()
     }
 
@@ -40,13 +40,13 @@ class CpuInfoSampler: BaseSimpler() {
             val pidCpuRate = pidReader.readLine() ?: ""
             parseCpuRate(cpuRate, pidCpuRate)
         } catch (ex: Throwable) {
-            Log.e(TAG, "doSample: $ex")
+            DOFLogUtil.e(TAG, "doSample: $ex")
         } finally {
             try {
                 cpuReader?.close()
                 pidReader?.close()
             } catch (e: IOException) {
-                Log.e(TAG, "doSample: $e")
+                DOFLogUtil.e(TAG, "doSample: $e")
             }
         }
     }
@@ -77,7 +77,7 @@ class CpuInfoSampler: BaseSimpler() {
             mCi.mIoWait = (ioWait_time - mIoWaitPre) * 100L / totalTime
             synchronized(mCpuInfoList) {
                 mCpuInfoList.add(mCi)
-                Log.d(TAG, "cpu info: $mCi")
+                DOFLogUtil.d(TAG, "cpu info: $mCi")
             }
         }
         mUserPre = user_time

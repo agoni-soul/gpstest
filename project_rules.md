@@ -152,24 +152,24 @@ AppCompatActivity
 
 按 `com.haha.*` 分包，一个包一类 Demo，新增能力优先新建包而不是塞进 `main`。
 
-| 包                                                              | 内容                                                     |
-|----------------------------------------------------------------|--------------------------------------------------------|
-| `base`                                                         | Activity / Fragment / ViewModel 基建、`ActivityCollector` |
-| `main`                                                         | 首页入口、TimeMonitor、Glide 预览、广播、插件 Demo                   |
-| `mviFrame`                                                     | MVI 基类与示例                                              |
-| `gps`                                                          | 定位                                                     |
-| `bluetooth`                                                    | BLE UI，依赖 `:BluetoothSdk`                              |
-| `wifi` / `network`                                             | Wi-Fi、网络监听与加密                                          |
-| `flutter`                                                      | `FlutterIntegrationActivity` + MethodChannel           |
-| `volume`                                                       | 音量 / 歌词 / 媒体                                           |
-| `waterfall`                                                    | 瀑布流自定义布局                                               |
-| `animation` / `scene` / `transparency`                         | 动画、Scene、透明 Activity                                   |
-| `liveData` / `coroutineScope` / `room`                         | 组件与协程、Room 示例                                          |
-| `recyclerview` / `easyswipemenulayout`                         | 列表与侧滑菜单                                                |
-| `remoteviews` / `dynamicTextView` / `imageViewer` / `selector` | 通知栏、动态文字、大图、Banner 选择                                  |
-| `log` / `permission` / `pluincore` / `binder`                  | 日志、权限、插件 Hook、Binder                                   |
-| `service.accessibility`                                        | 无障碍 Service                                            |
-| `ui`                                                           | Dialog、可折叠 TextView 等通用控件                              |
+| 包                                                              | 内容                                                   |
+|----------------------------------------------------------------|------------------------------------------------------|
+| `base`                                                         | Activity / Fragment / ViewModel 基建、`ActivityManager` |
+| `main`                                                         | 首页入口、TimeMonitor、Glide 预览、广播、插件 Demo                 |
+| `mviFrame`                                                     | MVI 基类与示例                                            |
+| `gps`                                                          | 定位                                                   |
+| `bluetooth`                                                    | BLE UI，依赖 `:BluetoothSdk`                            |
+| `wifi` / `network`                                             | Wi-Fi、网络监听与加密                                        |
+| `flutter`                                                      | `FlutterIntegrationActivity` + MethodChannel         |
+| `volume`                                                       | 音量 / 歌词 / 媒体                                         |
+| `waterfall`                                                    | 瀑布流自定义布局                                             |
+| `animation` / `scene` / `transparency`                         | 动画、Scene、透明 Activity                                 |
+| `liveData` / `coroutineScope` / `room`                         | 组件与协程、Room 示例                                        |
+| `recyclerview` / `easyswipemenulayout`                         | 列表与侧滑菜单                                              |
+| `remoteviews` / `dynamicTextView` / `imageViewer` / `selector` | 通知栏、动态文字、大图、Banner 选择                                |
+| `log` / `permission` / `pluincore` / `binder`                  | 日志、权限、插件 Hook、Binder                                 |
+| `service.accessibility`                                        | 无障碍 Service                                          |
+| `ui`                                                           | Dialog、可折叠 TextView 等通用控件                            |
 
 首页按钮跳转到上述 Activity；新增 Demo 需：包 + 布局 + Manifest 注册 + 首页入口。
 

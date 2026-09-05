@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.Log
+import com.haha.base.ActivityManager
 import com.haha.leakcanary.LeakCanaryInstaller
 import com.haha.log.DOFLogUtil
 import com.haha.main.timeMonitor.TimeMonitorConfig
@@ -45,6 +46,8 @@ class HahaApplication : Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         mContext = this
+        // 进程启动立刻注册，覆盖后续全部 Activity，替代 BaseActivity 内 ActivityCollector
+        ActivityManager.init(this)
         TimeMonitorManager.getInstance()
             .resetTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
         TimeMonitorManager.getInstance()

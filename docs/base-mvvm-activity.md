@@ -34,13 +34,13 @@ AppCompatActivity
         └── BaseMVIActivity<VB, VM, I, S, E>  // Intent / UiState / UiEffect（见 mvi-framework.md）
 ```
 
-| 文件                          | 职责                                                                  |
-|-----------------------------|---------------------------------------------------------------------|
-| `base/BaseActivity.kt`      | 布局 inflate 开关、状态栏 / 导航栏、`ActivityCollector`、`TimeMonitor` 打点        |
-| `base/BaseMvvmActivity.kt`  | DataBinding、lazy ViewModel、权限 Launcher、`onContentReady`             |
-| `base/BaseViewModel.kt`     | `AndroidViewModel` + `LifecycleObserver` + Rx `CompositeDisposable` |
-| `base/BaseMvvmFragment.kt`  | Fragment 侧同款 MVVM（无异步 inflate 分支）                                   |
-| `base/ActivityCollector.kt` | Activity 栈收集                                                        |
+| 文件                         | 职责                                                                  |
+|----------------------------|---------------------------------------------------------------------|
+| `base/BaseActivity.kt`     | 布局 inflate 开关、状态栏 / 导航栏、`TimeMonitor` 打点                            |
+| `base/BaseMvvmActivity.kt` | DataBinding、lazy ViewModel、权限 Launcher、`onContentReady`             |
+| `base/BaseViewModel.kt`    | `AndroidViewModel` + `LifecycleObserver` + Rx `CompositeDisposable` |
+| `base/BaseMvvmFragment.kt` | Fragment 侧同款 MVVM（无异步 inflate 分支）                                   |
+| `base/ActivityManager.kt`  | Application 启动即注册，Activity 栈与前后台切换                                  |
 
 配套（MVI 包，非必须）：
 
@@ -83,7 +83,6 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
 ```text
 BaseActivity.onCreate
   ├─ requestFeature / extraConfig
-  ├─ ActivityCollector.addActivity
   ├─ hideTitleAndActionBar
   ├─ inflateContentView()          ← BaseMvvm：DataBinding.setContentView + lifecycleOwner
   ├─ setStatusBar / NavigationBar
@@ -237,7 +236,7 @@ app/src/main/java/com/haha/base/
   BaseMvvmActivity.kt
   BaseViewModel.kt
   BaseMvvmFragment.kt
-  ActivityCollector.kt
+  ActivityManager.kt
 
 # 典型用法
 app/src/main/java/com/haha/main/MainActivity.kt          # 首页：BaseActivity + 开屏

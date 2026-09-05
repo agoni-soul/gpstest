@@ -112,7 +112,6 @@ abstract class BaseActivity : AppCompatActivity() {
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_extraConfig_before")
         extraConfig()
-        ActivityCollector.addActivity(this)
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_hideTitleAndActionBar_before")
@@ -300,10 +299,5 @@ abstract class BaseActivity : AppCompatActivity() {
         }
         DOFLogUtil.d(TAG, "getStatusBarHeight = $result")
         return result
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        ActivityCollector.removeActivity(this)
     }
 }

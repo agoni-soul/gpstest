@@ -37,6 +37,7 @@ include ':ServiceRouter'
 include ':ServiceRouterProcessor'
 include ':ServiceRouterAnnotation'
 include ':ServiceRouterUtils'
+include ':DOFLog'
 // 引入 Flutter 模块
 include ':flutterStudy'
 //project(':flutterStudy').projectDir = file('../flutterStudy/.android/include_flutter.groovy') // 注意路径

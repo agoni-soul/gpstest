@@ -1,0 +1,5 @@
+-keep class com.haha.log.DOFLogUtil { *; }
+-keep class com.haha.log.LogHelper { *; }
+-keep class com.haha.log.adapter.** { *; }
+-keep class com.haha.log.strategy.** { *; }
+-keep class com.haha.log.utils.** { *; }

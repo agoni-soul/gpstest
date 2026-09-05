@@ -226,6 +226,7 @@ dependencies {
     implementation project(':ServiceAnnotationRuntime')
     implementation project(':ServiceRouter')
     kapt project(':ServiceRouterProcessor')
+    implementation project(':DOFLog')
     implementation project(path: ':flutter')
 }
 

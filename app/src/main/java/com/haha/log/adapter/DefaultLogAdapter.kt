@@ -17,7 +17,7 @@ import org.json.JSONObject
  */
 open class DefaultLogAdapter : ILogAdapter {
     protected var mLogStrategy: ILogFormat? = AndroidLogFormat()
-    protected var originLogLevel: Int = LogHelper.DEBUG
+    protected var originLogLevel: Int = LogHelper.VERBOSE
     protected var enable = true
     override fun log(logType: Int, modelName: String?, tag: String?, msg: String?) {}
     override fun log(logType: Int, modelName: String?, tag: String?, throwable: Throwable?) {}
@@ -38,6 +38,8 @@ open class DefaultLogAdapter : ILogAdapter {
     }
 
     override fun filter(logType: Int, tag: String?): Boolean {
-        return logType >= originLogLevel
+        return enable && logType >= originLogLevel
     }
+
+    override fun flush(timeoutMs: Long) {}
 }

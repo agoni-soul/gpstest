@@ -63,7 +63,7 @@ class HahaApplication : Application() {
         LeakCanaryInstaller.install(this)
 //        MMKV.initialize(this);
         initComponents()
-        DOFLogUtil.init()
+        DOFLogUtil.init(this)
 //        val pluginManager = PluginManager.getInStance(this)
 //        pluginManager.init()
 //        try {

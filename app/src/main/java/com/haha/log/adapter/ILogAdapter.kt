@@ -34,4 +34,6 @@ open interface ILogAdapter {
 
     // 过滤日志，level or tag
     fun filter(logType: Int, tag: String?): Boolean
+
+    fun flush(timeoutMs: Long) {}
 }

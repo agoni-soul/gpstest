@@ -1,10 +1,9 @@
 package com.haha.log
 
-import android.annotation.SuppressLint
-import android.text.TextUtils
 import com.haha.log.adapter.ILogAdapter
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * <pre>
@@ -12,29 +11,27 @@ import org.json.JSONObject
  *     e-mail : yangzy33@midea.com
  *     time   : 2023/03/28
  *     desc   :
- *     version: 1.0
+ *     version: 1.1
  * </pre>
  */
-class LogHelper {
+class LogHelper private constructor() {
 
     companion object {
-        val VERBOSE = 2
-        val DEBUG = 3
-        val INFO = 4
-        val WARN = 5
-        val ERROR = 6
-        val ASSERT = 7
+        const val VERBOSE = 2
+        const val DEBUG = 3
+        const val INFO = 4
+        const val WARN = 5
+        const val ERROR = 6
+        const val ASSERT = 7
 
-        private val sInstance by lazy(LazyThreadSafetyMode.NONE) {
+        private val sInstance by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
             LogHelper()
         }
 
         fun getInstance(): LogHelper = sInstance
     }
 
-    private val mList: MutableList<ILogAdapter> = ArrayList()
-
-    private constructor()
+    private val mList: MutableList<ILogAdapter> = CopyOnWriteArrayList()
 
     fun add(logAdapter: ILogAdapter) {
         mList.add(logAdapter)
@@ -113,7 +110,7 @@ class LogHelper {
     }
 
     fun i(modelName: String?, tag: String?, msg: Throwable?) {
-        log(WARN, modelName, tag, null, msg, null, null, null, null)
+        log(INFO, modelName, tag, null, msg, null, null, null, null)
     }
 
     fun w(tag: String?, msg: Throwable?) {
@@ -172,6 +169,15 @@ class LogHelper {
         log(DEBUG, modelName, tag, null, null, null, null, null, msg)
     }
 
+    fun log(
+        logType: Int,
+        tag: String?,
+        msg: String?,
+        throwable: Throwable?
+    ) {
+        log(logType, "", tag, msg, throwable, null, null, null, null)
+    }
+
     private fun log(
         logType: Int,
         tag: String?,
@@ -196,21 +202,31 @@ class LogHelper {
         map: Map<String?, Any?>?,
         list: List<*>?
     ) {
-        for (i in mList.indices) {
-            val adapter: ILogAdapter = mList[i]
+        val hasStructured = throwable != null || jsonObject != null || jsonArray != null
+                || map != null || list != null
+        val text = when {
+            !msg.isNullOrEmpty() -> msg
+            hasStructured -> null
+            else -> "null"
+        }
+        for (adapter in mList) {
             if (!adapter.filter(logType, tag)) continue
-            if (!TextUtils.isEmpty(msg)) {
-                adapter.log(logType, modelName, tag, msg)
-            } else if (throwable != null) {
-                adapter.log(logType, modelName, tag, throwable)
-            } else if (jsonObject != null) {
-                adapter.log(logType, modelName, tag, jsonObject)
-            } else if (jsonArray != null) {
-                adapter.log(logType, modelName, tag, jsonArray)
-            } else if (map != null) {
-                adapter.log(logType, modelName, tag, map)
-            } else if (list != null) {
-                adapter.log(logType, modelName, tag, list)
+            try {
+                when {
+                    text != null && throwable != null -> {
+                        adapter.log(logType, modelName, tag, text)
+                        adapter.log(logType, modelName, tag, throwable)
+                    }
+
+                    text != null -> adapter.log(logType, modelName, tag, text)
+                    throwable != null -> adapter.log(logType, modelName, tag, throwable)
+                    jsonObject != null -> adapter.log(logType, modelName, tag, jsonObject)
+                    jsonArray != null -> adapter.log(logType, modelName, tag, jsonArray)
+                    map != null -> adapter.log(logType, modelName, tag, map)
+                    list != null -> adapter.log(logType, modelName, tag, list)
+                }
+            } catch (_: Exception) {
+                // 单个 adapter 失败不影响其它输出通道
             }
         }
     }
@@ -224,6 +240,15 @@ class LogHelper {
     fun setLogLevel(logType: Int) {
         for (adapter in mList) {
             adapter.setLogLevel(logType)
+        }
+    }
+
+    fun flush(timeoutMs: Long = 1000L) {
+        for (adapter in mList) {
+            try {
+                adapter.flush(timeoutMs)
+            } catch (_: Exception) {
+            }
         }
     }
 }

@@ -14,31 +14,48 @@ import org.json.JSONObject
  * </pre>
  */
 class AndroidLogAdapter : DefaultLogAdapter() {
-    override fun filter(logType: Int, tag: String?): Boolean {
-        return enable && super.filter(logType, tag)
-    }
 
     override fun log(logType: Int, modelName: String?, tag: String?, msg: String?) {
-        Log.println(logType, tag, mLogStrategy!!.format(modelName, tag, msg)!!)
+        printSplit(logType, tag, mLogStrategy?.format(modelName, tag, msg))
     }
 
     override fun log(logType: Int, modelName: String?, tag: String?, throwable: Throwable?) {
-        log(logType, modelName, tag, mLogStrategy!!.format(throwable))
+        log(logType, modelName, tag, mLogStrategy?.format(throwable))
     }
 
     override fun log(logType: Int, modelName: String?, tag: String?, json: JSONObject?) {
-        log(logType, modelName, tag, mLogStrategy!!.format(json))
+        log(logType, modelName, tag, mLogStrategy?.format(json))
     }
 
     override fun log(logType: Int, modelName: String?, tag: String?, jsonArray: JSONArray?) {
-        log(logType, modelName, tag, mLogStrategy!!.format(jsonArray))
+        log(logType, modelName, tag, mLogStrategy?.format(jsonArray))
     }
 
     override fun log(logType: Int, modelName: String?, tag: String?, map: Map<String?, Any?>?) {
-        log(logType, modelName, tag, mLogStrategy!!.format(map))
+        log(logType, modelName, tag, mLogStrategy?.format(map))
     }
 
     override fun log(logType: Int, modelName: String?, tag: String?, list: List<*>?) {
-        log(logType, modelName, tag, mLogStrategy!!.format(list))
+        log(logType, modelName, tag, mLogStrategy?.format(list))
+    }
+
+    private fun printSplit(logType: Int, tag: String?, msg: String?) {
+        val safeTag = if (tag.isNullOrEmpty()) "DOFLog" else tag
+        val content = if (msg.isNullOrEmpty()) "null" else msg
+        val type = logType.coerceIn(Log.VERBOSE, Log.ASSERT)
+        if (content.length <= MAX_LOG_LENGTH) {
+            Log.println(type, safeTag, content)
+            return
+        }
+        var start = 0
+        while (start < content.length) {
+            val end = minOf(start + MAX_LOG_LENGTH, content.length)
+            Log.println(type, safeTag, content.substring(start, end))
+            start = end
+        }
+    }
+
+    companion object {
+        private const val MAX_LOG_LENGTH = 3500
     }
 }

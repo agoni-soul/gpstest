@@ -12,7 +12,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /**
  * <pre>
@@ -66,23 +67,27 @@ class AndroidLogFormat : ILogFormat {
     }
 
     override fun format(json: JSONObject?): String {
-        return """
-               $json
-               
-               """.trimIndent()
+        return try {
+            json?.toString(2) ?: "null"
+        } catch (_: Exception) {
+            json?.toString() ?: "null"
+        }
     }
 
     override fun format(jsonArray: JSONArray?): String {
-        return """
-               -----------------JsonArrayStart---------------
-               $jsonArray
-               -----------------JsonArrayEnd-----------------
-               
-               """.trimIndent()
+        return try {
+            """
+            -----------------JsonArrayStart---------------
+            ${jsonArray?.toString(2) ?: "null"}
+            -----------------JsonArrayEnd-----------------
+            """.trimIndent()
+        } catch (_: Exception) {
+            jsonArray?.toString() ?: "null"
+        }
     }
 
-    override fun format(map: Map<*, *>?): String? {
-        if (map == null) return null
+    override fun format(map: Map<*, *>?): String {
+        if (map == null) return "null"
         val sb = StringBuilder()
         sb.append("-----------------MapStart---------------")
         sb.append("\n")
@@ -95,18 +100,18 @@ class AndroidLogFormat : ILogFormat {
         return sb.toString()
     }
 
-    override fun format(list: List<*>?): String? {
-        if (list == null) return null
+    override fun format(list: List<*>?): String {
+        if (list == null) return "null"
         val sb = StringBuilder()
         sb.append("-----------------ListStart---------------")
         sb.append("\n")
         var i = 0
         val size = list.size
         while (i < size) {
-            val `object` = list[i]!!
-            sb.append(String.format("|%s", `object`.javaClass.simpleName))
+            val item = list[i]
+            sb.append(String.format("|%s", item?.javaClass?.simpleName ?: "null"))
             sb.append(String.format("[%d]:", i))
-            sb.append(`object`.toString())
+            sb.append(item?.toString() ?: "null")
             sb.append("\n")
             i++
         }
@@ -116,27 +121,27 @@ class AndroidLogFormat : ILogFormat {
 
     companion object {
         /**
-         * log 库包名
+         * log 库包名，用于栈回溯时跳过日志框架自身
          */
-        private const val PACKAGE_NAME = "com.midea.base.log"
+        private const val PACKAGE_NAME = "com.haha.log"
 
         /**
          * 对外暴露 各组件log工具类名后缀
          */
-        private const val CLASS_SUFFIX = "DOFLog"
+        private const val CLASS_SUFFIX = "DOFLogUtil"
 
         private var sProcessName: String? = null
 
         private fun getInfoTag(modelName: String?, tag: String?): String {
             val autoJumpLogInfos = autoJumpLogInfos
-            return "[" + SimpleDateFormat("yyyyMMddHHmmss").format(Date()) + "]" +  // modelName
-                    "[" + modelName + "]" +  // tag
-                    "[" + tag + "]" +  // fileName
-                    "[" + autoJumpLogInfos[0] + "]" +  // methodName
-                    "[" + autoJumpLogInfos[1] + "]" +  // line log产生行号
-                    "[" + autoJumpLogInfos[2] + "]" +  // pid 进程名
-                    "[" + currentProcessName.toString() + "]" +  // tid
-                    "[" + Thread.currentThread().name.toString() + "]"
+            return "[" + SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH).format(Date()) + "]" +
+                    "[" + (modelName ?: "") + "]" +
+                    "[" + (tag ?: "") + "]" +
+                    "[" + autoJumpLogInfos[0] + "]" +
+                    "[" + autoJumpLogInfos[1] + "]" +
+                    "[" + autoJumpLogInfos[2] + "]" +
+                    "[" + (currentProcessName ?: "") + "]" +
+                    "[" + Thread.currentThread().name + "]"
         }
 
         private val currentProcessName: String?
@@ -162,9 +167,11 @@ class AndroidLogFormat : ILogFormat {
                 }
                 for (i in 2 until elements.size) {
                     elements[i].className
-                    if (TextUtils.isEmpty(elements[i].className) ||
-                        (elements[i].className.contains(PACKAGE_NAME)
-                                || elements[i].className.contains(CLASS_SUFFIX))
+                    val className = elements[i].className
+                    if (TextUtils.isEmpty(className) ||
+                        className == PACKAGE_NAME ||
+                        className.startsWith("$PACKAGE_NAME.") ||
+                        className.contains(CLASS_SUFFIX)
                     ) {
                         continue
                     }
@@ -177,6 +184,10 @@ class AndroidLogFormat : ILogFormat {
             }
 
         fun getCurrentProcessName1(): String? {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                val name = Application.getProcessName()
+                if (!TextUtils.isEmpty(name)) return name
+            }
             var name = getCurrentProcessNameByFile()
             if (!TextUtils.isEmpty(name)) return name
             name = getCurrentProcessNameByAms()

@@ -88,27 +88,27 @@
 
 ```text
 AppCompatActivity
- └── BaseActivity                 // 系统栏、主题、Activity 栈、TimeMonitor、inflate 开关
-      └── BaseMvvmActivity<VB, VM>   // DataBinding、ViewModel、权限、onContentReady
-           └── BaseMVIActivity<VB, VM, I, S, E>  // State/Effect 收集 + sendIntent
+ └── BaseActivity                    // 系统栏、主题、Activity 栈、TimeMonitor
+      ├── MainActivity               // 首页：开屏 + 异步预热，不走 MVVM 基类
+      └── BaseMvvmActivity<VB, VM>   // 普通页 DataBinding、ViewModel、权限、onContentReady
+           └── BaseMVIActivity<VB, VM, I, S, E>
 ```
 
-| 场景     | 继承                                                                                                                 | 必写                                                            |
-|--------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| 普通业务页  | `BaseMvvmActivity<XxxBinding, XxxViewModel>`                                                                       | `getLayoutId` / `getViewModelClass` / `initView` / `initData` |
-| 无独立 VM | 同上，VM 用 `BaseViewModel`                                                                                            | 同上                                                            |
-| 首页等重布局 | 覆盖 `shouldInflateContentInOnCreate() = false`，`AsyncLayoutInflater` 后 `bindInflatedContentView` + `onContentReady` | 仅 `MainActivity` 当前这样做                                        |
-| MVI 页  | `BaseMVIActivity`                                                                                                  | 另加 `render`；点击只 `sendIntent`；副作用放 `handleEffect`              |
+| 场景     | 继承                                           | 必写                                                            |
+|--------|----------------------------------------------|---------------------------------------------------------------|
+| 首页     | `BaseActivity`（`MainActivity`）               | 开屏 / 异步 inflate / 权限都写在本页，不要改 `BaseMvvmActivity`              |
+| 普通业务页  | `BaseMvvmActivity<XxxBinding, XxxViewModel>` | `getLayoutId` / `getViewModelClass` / `initView` / `initData` |
+| 无独立 VM | 同上，VM 用 `BaseViewModel`                      | 同上                                                            |
+| MVI 页  | `BaseMVIActivity`                            | 另加 `render`；点击只 `sendIntent`；副作用放 `handleEffect`              |
 
 约定：
 
-1. 布局根节点必须是 `<layout>`，否则 DataBinding bind 失败。
-2. `onContentReady()` 是内容就绪唯一入口；MVI 必须先 `observeMvi` 再 `super`。
+1. 普通页布局根节点必须是 `<layout>`，否则 DataBinding bind 失败。
+2. `onContentReady()` 只服务 MVVM / MVI 页；MVI 必须先 `observeMvi` 再 `super`。
 3. 权限 `registerForActivityResult` 固定在 `onCreate`，不能等到异步 inflate 回调。
-4. 异步 inflate 下 `onResume` 可能早于 bind，访问 Binding 前用 `isBindingInitialized()`。
-5. 默认 `ViewModelProvider(this)[clazz]`，仅无参 / `Application` 单参；带 Repository 用
+4. 默认 `ViewModelProvider(this)[clazz]`，仅无参 / `Application` 单参；带 Repository 用
    `BaseViewModelFactory`。
-6. 其它页面保持同步 inflate（`shouldInflateContentInOnCreate() = true`），不要随意套 Async。
+5. 不要把首页开屏 / Async inflate 钩子加回 `BaseMvvmActivity`。
 
 ---
 
@@ -166,8 +166,10 @@ AppCompatActivity
 
 - 计时：`HahaApplication.attachBaseContext` 里 `TimeMonitor.startMonitor()`（**不含**
   `System.loadLibrary("HahaLearn")`）。Logcat tag：`TimeMonitor`。
-- 首页：`shouldInflateContentInOnCreate() = false` + `AsyncLayoutInflater`；等待期靠主题
-  `windowBackground`（Splash 临时关闭）。
+- 首页：`MainActivity` 继承 `BaseActivity`，在 `onWindowReady()` 里挂容器 + 开屏 overlay，
+  `AsyncLayoutInflater` 把首页挂到底下预热。不要改 `BaseMvvmActivity`。
+- 开屏：本地缓存（`SplashAdCache`）有物料才展示；跳过立刻揭开；点素材进
+  `SplashAdLandingActivity`（站内 WebView）。品牌 `Theme.App.Starting` 只盖进程创建。
 - 重自定义 View（`CircleProgressView` / `PieChartView`）用 ViewStub，首帧后再 inflate。
 - **不要**在 `BaseActivity` + `BaseMvvmActivity` 各 `setContentView` 一次。
 - 其它页默认同步 DataBinding inflate。优化细节与数据见 `docs/startup-optimization.md`。

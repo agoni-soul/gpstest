@@ -1,10 +1,6 @@
 package com.haha.main
 
 //import com.haha.hahalearn.IProcessStub
-// TODO: 临时关闭 SplashScreen，恢复时取消下方注释
-//import androidx.core.splashscreen.SplashScreen
-//import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-//import com.haha.hahalearn.BuildConfig
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -42,18 +38,26 @@ import android.text.style.ForegroundColorSpan
 import android.transition.Slide
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.blankj.utilcode.util.GsonUtils
 import com.haha.animation.AnimationActivity
-import com.haha.base.BaseMvvmActivity
-import com.haha.base.BaseViewModel
+import com.haha.base.BaseActivity
 import com.haha.bean.SubDeviceResultBean
 import com.haha.binder.TestService
 import com.haha.binding.BindingAdapterActivity
@@ -84,6 +88,11 @@ import com.haha.scene.CustomSceneFirstActivity
 import com.haha.scene.SceneFirstActivity
 import com.haha.selector.SelectorActivity
 import com.haha.service.accessibility.CustomAccessibilityService
+import com.haha.splash.SplashAd
+import com.haha.splash.SplashAdCache
+import com.haha.splash.SplashAdLandingActivity
+import com.haha.splash.SplashAdOverlay
+import com.haha.splash.SplashAdSession
 import com.haha.transparency.TransparencyActivity
 import com.haha.util.DpOrSpToPxTransfer
 import com.haha.util.PermissionUtils
@@ -92,12 +101,12 @@ import com.haha.waterfall.WaterFallActivity
 import com.haha.wifi.WifiActivity
 
 
-class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), View.OnClickListener {
+class MainActivity : BaseActivity(), View.OnClickListener {
 
-    // TODO: 临时关闭 SplashScreen；恢复时取消下方注释
-//    companion object {
-//        private const val SPLASH_DURATION = 1500L
-//    }
+    companion object {
+        private const val KEY_SPLASH_SHOWING = "key_splash_showing"
+        private const val KEY_SPLASH_REMAIN_SEC = "key_splash_remain_sec"
+    }
 
     /**
      * A native method that is implemented by the 'HahaLearn' native library,
@@ -115,12 +124,16 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     private var mNetworkIp: NetworkIp? = null
 
-    // TODO: 临时关闭 SplashScreen，启动直接进首页；恢复时取消下方注释
-//    private var keepSplashOnScreen = true
-//
-//    private var mSplashScreen: SplashScreen? = null
-//
-//    private val mIsShowSplash: Boolean = BuildConfig.IS_SHOW_SPLASH
+    /** 品牌系统 Splash 只盖进程创建，开屏层挂上后立刻放开。 */
+    private var splashBrandReleased = false
+    private var splashRestoreState: Bundle? = null
+    private var homeContainer: FrameLayout? = null
+    private var splashAdCache: SplashAdCache? = null
+    private var splashOverlay: SplashAdOverlay? = null
+    private var _binding: ActivityMainBinding? = null
+    private val mViewDataBinding: ActivityMainBinding
+        get() = _binding ?: error("首页 binding 未就绪")
+    private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
     val config: EatGame by lazy(LazyThreadSafetyMode.NONE) {
         EatGame() // 非线程安全，但初始化更快
@@ -134,85 +147,171 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     private var mAccessibilityStateListener: AccessibilityManager.AccessibilityStateChangeListener? =
         null
 
-    override fun getViewModelClass(): Class<BaseViewModel> = BaseViewModel::class.java
     override fun getLayoutId(): Int = R.layout.activity_main
 
     override fun shouldInflateContentInOnCreate(): Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // TODO: 临时关闭 SplashScreen，启动直接进首页
-        setTheme(R.style.Theme_HahaLearn_NoActionBar)
-//        if (mIsShowSplash) {
-//            setTheme(R.style.Theme_App_Starting)
-//            mSplashScreen = installSplashScreen()
-//        } else {
-//            setTheme(R.style.Theme_HahaLearn_NoActionBar)
-//        }
+        splashRestoreState = savedInstanceState
+        setTheme(R.style.Theme_App_Starting)
+        installSplashScreen().setKeepOnScreenCondition { !splashBrandReleased }
         super.onCreate(savedInstanceState)
+        permissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+                handlePermissionResult(result)
+            }
     }
 
     override fun hideTitleAndActionBar() {
-        // TODO: 临时关闭 SplashScreen；恢复 Splash 时改回按 API 分支处理
-        super.hideTitleAndActionBar()
-        // Android 12 以上，SplashScreen会自行处理隐藏顶部状态栏的逻辑
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-//            super.hideTitleAndActionBar()
-//        }
+        // Android 12 以上由 SplashScreen 处理标题栏
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            super.hideTitleAndActionBar()
+        }
     }
 
     override fun extraConfig() {
         super.extraConfig()
-
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AppStartActivity_create")
+    }
+
+    override fun onWindowReady() {
+        val container = FrameLayout(this).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+        }
+        homeContainer = container
+        setContentView(container)
+
+        val cache = SplashAdCache(this)
+        splashAdCache = cache
+        attachCachedSplashIfNeeded(container, cache)
 
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("AsyncLayoutInflater_start")
-        // 后台 inflate，回调在主线程；等待期间窗口靠 theme.windowBackground
-        AsyncLayoutInflater(this).inflate(R.layout.activity_main, null) { view, _, _ ->
+        // 首页在开屏底下预热；等待期由开屏层 / windowBackground 顶住
+        AsyncLayoutInflater(this).inflate(R.layout.activity_main, container) { view, _, _ ->
             if (isFinishing || isDestroyed) {
                 return@inflate
             }
             TimeMonitorManager.getInstance()
                 .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
                 .recodingTimeTag("AsyncLayoutInflater_callback")
-            bindInflatedContentView(view)
+            bindHomeContentView(view, container)
             TimeMonitorManager.getInstance()
                 .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
                 .recodingTimeTag("AsyncLayoutInflater_bind_done")
-            onContentReady()
-            // setContentView 发生在 onResume 之后，补跑依赖 binding 的 resume 逻辑
+            onHomeContentReady()
             runResumeBindingTasks()
             TimeMonitorManager.getInstance()
                 .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
                 .end("AppStartActivity_contentReady", false)
         }
 
-        // TODO: 临时关闭 SplashScreen 保持与延迟初始化逻辑
-//        // 设置保持条件，当keepSplashOnScreen为false时，闪屏页会消失
-//        mSplashScreen?.setKeepOnScreenCondition { keepSplashOnScreen }
-//
-//        // 模拟一些初始化工作
-//        simulateInitialization {
-//            val processors = Runtime.getRuntime().availableProcessors()
-//            keepSplashOnScreen = false
-//        }
+        splashBrandReleased = true
+        registerSplashBackCallback()
     }
 
-//    private fun simulateInitialization(onInitializationComplete: () -> Unit) {
-//        if (!mIsShowSplash) {
-//            keepSplashOnScreen = false
-//            return
-//        }
-//        // 模拟延迟，比如网络请求或数据加载
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            onInitializationComplete()
-//        }, 2000)
-//    }
+    private fun attachCachedSplashIfNeeded(container: FrameLayout, cache: SplashAdCache) {
+        val restore = splashRestoreState
+        val restoreShowing = restore?.getBoolean(KEY_SPLASH_SHOWING, false) == true
+        val restoreRemain = restore?.getInt(KEY_SPLASH_REMAIN_SEC, 0) ?: 0
+        val ad = cache.getReadyAd() ?: return
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("SplashAd_show")
+        cache.markShown()
+        val overlay = SplashAdOverlay(this, lifecycleScope)
+        overlay.callback = object : SplashAdOverlay.Callback {
+            override fun onSkip() = onSplashClosed("skip")
+            override fun onTimeout() = onSplashClosed("timeout")
+            override fun onAdClick(ad: SplashAd) {
+                onSplashClosed("click")
+                SplashAdLandingActivity.start(this@MainActivity, ad.landingUrl)
+            }
+        }
+        splashOverlay = overlay
+        overlay.attach(
+            parent = container,
+            ad = ad,
+            remainingSec = if (restoreShowing) restoreRemain else null,
+        )
+    }
 
-    override fun initView() {
+    private fun onSplashClosed(reason: String) {
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("SplashAd_close_$reason")
+        SplashAdSession.dismissed = true
+        splashAdCache?.preloadNext()
+        splashOverlay = null
+        if (_binding != null) {
+            launchHomePermissions()
+        }
+    }
+
+    private fun bindHomeContentView(contentView: View, container: FrameLayout) {
+        _binding = DataBindingUtil.bind(contentView)
+            ?: error("DataBinding bind 失败，确认 activity_main 根节点是 <layout>")
+        _binding?.lifecycleOwner = this
+        container.addView(
+            contentView,
+            0,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
+        handleNavigationVAndStatusVisibility()
+    }
+
+    private fun onHomeContentReady() {
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("MainActivity_homeReady")
+        mViewDataBinding.root.background = ContextCompat.getDrawable(mContext, R.color.white)
+        if (!isShowStatus()) {
+            addStatusBarView()
+        }
+        if (splashOverlay?.isShowing != true) {
+            launchHomePermissions()
+        }
+        initView()
+        initData()
+    }
+
+    private fun launchHomePermissions() {
+        permissionLauncher?.launch(requestPermissionArray())
+    }
+
+    private fun registerSplashBackCallback() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val overlay = splashOverlay
+                if (overlay?.isShowing == true) {
+                    overlay.skip()
+                    return
+                }
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        })
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val showing = splashOverlay?.isShowing == true
+        outState.putBoolean(KEY_SPLASH_SHOWING, showing)
+        if (showing) {
+            outState.putInt(KEY_SPLASH_REMAIN_SEC, splashOverlay?.remainingSec ?: 0)
+        }
+    }
+
+    private fun initView() {
         mViewDataBinding.btnSkipGps.setOnClickListener(this)
         mViewDataBinding.btnSkipRemoteView.setOnClickListener(this)
         mViewDataBinding.btnSkipNetwork.setOnClickListener(this)
@@ -427,9 +526,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
-    override fun isUsedEncapsulatedPermissions(): Boolean = true
-
-    override fun requestPermissionArray(): Array<String> {
+    private fun requestPermissionArray(): Array<String> {
         return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
             arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -444,7 +541,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
-    override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
+    private fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
         permissionResultMap.forEach { (k, v) ->
             Log.d(TAG, "$k ----->>>>>  $v")
         }
@@ -475,7 +572,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
         }
     }
 
-    override fun initData() {
+    private fun initData() {
         setupWindowAnimations()
 
         val filter = IntentFilter("com.haha.main.broadcast.intent.action.MyReceiver")
@@ -526,7 +623,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
     }
 
     private fun runResumeBindingTasks() {
-        if (!isBindingInitialized()) {
+        if (_binding == null) {
             return
         }
         TestLearnUtils.test(mContext)
@@ -632,8 +729,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun test1() {
-        mViewDataBinding ?: return
-        val accessibilityNodeInfo = AccessibilityNodeInfo(mViewDataBinding!!.clMain)
+        val binding = _binding ?: return
+        val accessibilityNodeInfo = AccessibilityNodeInfo(binding.clMain)
         val list = accessibilityNodeInfo.actionList
 
         list.let {
@@ -1232,6 +1329,11 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, BaseViewModel>(), Vie
             mAccessibilityStateListener = null
         }
         unregisterBroadcastReceiversIfNeeded()
+        splashOverlay?.destroy()
+        splashOverlay = null
+        homeContainer = null
+        _binding?.unbind()
+        _binding = null
         super.onDestroy()
         val intent = Intent(this, CustomAccessibilityService::class.java)
         stopService(intent)

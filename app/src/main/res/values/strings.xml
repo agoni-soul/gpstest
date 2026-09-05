@@ -41,4 +41,10 @@
     <string name="scale_type">ScaleType</string>
     <string name="background">背景</string>
     <string name="scale_value">缩放</string>
+
+    <string name="splash_skip_seconds">跳过 %1$ds</string>
+    <string name="splash_ad_label">广告</string>
+    <string name="splash_ad_demo_title">点击进入百度</string>
+    <string name="splash_landing_title">广告详情</string>
+    <string name="splash_landing_close">关闭</string>
 </resources>

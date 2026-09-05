@@ -91,6 +91,13 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * [hideTitleAndActionBar] 之后、同步 inflate 之前。
+     * 首页开屏容器须在这里 [setContentView]，避免 extraConfig 过早加 content 导致 requestFeature 崩溃。
+     */
+    protected open fun onWindowReady() {
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
@@ -110,6 +117,10 @@ abstract class BaseActivity : AppCompatActivity() {
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_hideTitleAndActionBar_before")
         hideTitleAndActionBar()
+        TimeMonitorManager.getInstance()
+            .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
+            .recodingTimeTag("BaseActivity_onWindowReady_before")
+        onWindowReady()
         TimeMonitorManager.getInstance()
             .getTimeMonitor(TimeMonitorConfig.TIME_MONITOR_ID_APPLICATION_START)
             .recodingTimeTag("BaseActivity_inflateContentView_before")

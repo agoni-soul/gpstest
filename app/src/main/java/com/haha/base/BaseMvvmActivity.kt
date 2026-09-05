@@ -3,7 +3,6 @@ package com.haha.base
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
-import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -29,7 +28,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     private var _binding: V? = null
     protected val mViewDataBinding: V
         get() = _binding
-            ?: error("binding 未初始化，须先走 inflateContentView / bindInflatedContentView")
+            ?: error("binding 未初始化，须先走 inflateContentView")
 
     protected fun isBindingInitialized(): Boolean = _binding != null
 
@@ -48,19 +47,6 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
     override fun inflateContentView() {
         _binding = DataBindingUtil.setContentView(this, getLayoutId())
         _binding?.lifecycleOwner = this
-    }
-
-    /**
-     * 异步 inflate 完成后，在主线程 bind + setContentView。
-     * 不可在后台线程调用。
-     */
-    protected fun bindInflatedContentView(contentView: View) {
-        _binding = DataBindingUtil.bind(contentView)
-            ?: error("DataBinding bind 失败，确认布局根节点是 <layout>")
-        _binding?.lifecycleOwner = this
-        setContentView(contentView)
-        // 异步 inflate 时 onCreate 里跳过了系统栏处理，此处 DecorView 已就绪再补上
-        handleNavigationVAndStatusVisibility()
     }
 
     /**
@@ -107,16 +93,13 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate")
 
-        // registerForActivityResult 必须在 STARTED 之前，不能等到异步 inflate 回调
         if (isUsedEncapsulatedPermissions()) {
             mRequestPermissionLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionResultMap ->
                     handlePermissionResult(permissionResultMap)
                 }
         }
-        if (shouldInflateContentInOnCreate()) {
-            onContentReady()
-        }
+        onContentReady()
     }
 
     override fun onStart() {

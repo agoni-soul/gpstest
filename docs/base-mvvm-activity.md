@@ -3,7 +3,8 @@
 记录时间：2026-08-21  
 包路径：`com.haha.base`  
 上层扩展：[`mvi-framework.md`](./mvi-framework.md)（`BaseMVIActivity`）  
-异步 inflate 实践：[`startup-optimization.md`](./startup-optimization.md)（`MainActivity`）
+首页开屏 / 异步预热不走本基类，见 [`startup-optimization.md`](./startup-optimization.md)（
+`MainActivity` : `BaseActivity`）
 
 本文描述项目内 **MVVM Activity 基类** 的继承关系、启动流程、可覆盖钩子，以及普通页 / 异步首页 / MVI
 页的接入方式。
@@ -12,14 +13,14 @@
 
 ## 1. 设计目标
 
-| 目标                     | 做法                                                           |
-|------------------------|--------------------------------------------------------------|
-| 统一 Binding + ViewModel | 泛型 `V : ViewDataBinding`、`VM : BaseViewModel`                |
-| 统一内容就绪入口               | `onContentReady()`：背景、权限、`initView` / `initData`             |
-| 支持同步 / 异步 inflate      | `shouldInflateContentInOnCreate` + `bindInflatedContentView` |
-| 系统栏与主题下沉               | 由 `BaseActivity` 处理，子类按需覆盖                                   |
-| 可选权限封装                 | `registerForActivityResult` 固定在 `onCreate`（早于 STARTED）       |
-| 可叠加 MVI                | `BaseMVIActivity` 在 `onContentReady` 里先挂观察再 `super`          |
+| 目标                     | 做法                                                                 |
+|------------------------|--------------------------------------------------------------------|
+| 统一 Binding + ViewModel | 泛型 `V : ViewDataBinding`、`VM : BaseViewModel`                      |
+| 统一内容就绪入口               | `onContentReady()`：背景、权限、`initView` / `initData`                   |
+| 普通页同步 inflate          | `BaseActivity.inflateContentView()` → DataBinding `setContentView` |
+| 系统栏与主题下沉               | 由 `BaseActivity` 处理，子类按需覆盖                                         |
+| 可选权限封装                 | `registerForActivityResult` 固定在 `onCreate`（早于 STARTED）             |
+| 可叠加 MVI                | `BaseMVIActivity` 在 `onContentReady` 里先挂观察再 `super`                |
 
 ---
 
@@ -28,6 +29,7 @@
 ```text
 AppCompatActivity
 └── BaseActivity                              // 系统栏、主题、Activity 栈、启动打点
+    ├── MainActivity                          // 首页专用，不走本基类
     └── BaseMvvmActivity<V, VM>               // DataBinding、ViewModel、权限、initView/initData
         └── BaseMVIActivity<VB, VM, I, S, E>  // Intent / UiState / UiEffect（见 mvi-framework.md）
 ```
@@ -69,7 +71,7 @@ abstract class BaseMvvmActivity<V : ViewDataBinding, VM : BaseViewModel> : BaseA
 |--------------------------|-------------------------------------------------------------------------|
 | `mViewDataBinding`       | Binding；未初始化时 `error`（须先 inflate / bind）                                |
 | `mViewModel`             | lazy 创建；首次访问时 `ViewModelProvider(this)[clazz]`，并注册为 `LifecycleObserver` |
-| `isBindingInitialized()` | 异步场景下判断 Binding 是否已就绪                                                   |
+| `isBindingInitialized()` | Binding 是否已就绪                                                           |
 | `mContext`               | 来自 `BaseActivity`，`onCreate` 中赋为 `this`                                 |
 
 ---
@@ -96,38 +98,20 @@ BaseMvvmActivity.onCreate
        └─ initData()
 ```
 
-### 4.2 异步 inflate（首页等重布局）
+### 4.2 首页不走本基类
 
-子类覆盖：
-
-```kotlin
-override fun shouldInflateContentInOnCreate(): Boolean = false
-```
-
-效果：
-
-1. `BaseActivity` **跳过**同步 `inflateContentView` 与系统栏 insets 处理（DecorView 尚未就绪）。
-2. 子类用 `AsyncLayoutInflater` 后台 inflate；回调在**主线程**。
-3. 回调中依次：
-
-```kotlin
-bindInflatedContentView(view)  // DataBinding.bind + setContentView + 补系统栏
-onContentReady()               // 背景 / 权限 / initView / initData
-```
-
-权限 `registerForActivityResult` 仍在 `BaseMvvmActivity.onCreate` 注册，不依赖 Binding。
-
-参考实现：`MainActivity`；耗时与背景策略见 [`startup-optimization.md`](./startup-optimization.md)。
+`MainActivity` 只继承 `BaseActivity`，开屏、异步 inflate、权限都写在首页自己。  
+不要再往 `BaseMvvmActivity` 加 `bindInflatedContentView` / 异步开关。细节见
+[`startup-optimization.md`](./startup-optimization.md)。
 
 ---
 
 ## 5. Binding 与销毁
 
-| 时机          | 行为                                                                          |
-|-------------|-----------------------------------------------------------------------------|
-| 同步          | `inflateContentView()` → `DataBindingUtil.setContentView`                   |
-| 异步          | `bindInflatedContentView(view)` → `DataBindingUtil.bind` + `setContentView` |
-| `onDestroy` | `_binding?.unbind()` 并置空，防泄漏                                                |
+| 时机          | 行为                                                        |
+|-------------|-----------------------------------------------------------|
+| 同步          | `inflateContentView()` → `DataBindingUtil.setContentView` |
+| `onDestroy` | `_binding?.unbind()` 并置空，防泄漏                              |
 
 布局根节点须是 `<layout>`，否则 `bind` 会失败。
 
@@ -146,6 +130,7 @@ onContentReady()               // 背景 / 权限 / initView / initData
 | `getRootViewId()`                                 | `0`                           | 沉浸时插入状态栏占位的根布局 id                 |
 | `requestFeature()`                                | Android 14+ 可切 NoActionBar 主题 | 窗口特性 / 主题                         |
 | `extraConfig()`                                   | 空                             | `super.onCreate` 后、inflate 前的额外配置 |
+| `onWindowReady()`                                 | 空                             | 标题栏处理之后；首页在此 `setContentView` 容器  |
 | `hideTitleAndActionBar()`                         | 隐藏 ActionBar                  | 标题栏                               |
 
 ### 6.2 来自 `BaseMvvmActivity`
@@ -214,22 +199,9 @@ override fun handlePermissionResult(permissionResultMap: Map<String, Boolean>) {
 }
 ```
 
-### 8.2 异步 inflate 首页
+### 8.2 首页
 
-```kotlin
-override fun shouldInflateContentInOnCreate(): Boolean = false
-
-override fun extraConfig() {
-    super.extraConfig()
-    AsyncLayoutInflater(this).inflate(R.layout.activity_main, null) { view, _, _ ->
-        if (isFinishing || isDestroyed) return@inflate
-        bindInflatedContentView(view)
-        onContentReady()
-    }
-}
-```
-
-等待期间窗口背景依赖 theme `windowBackground`，避免白屏。
+继承 `BaseActivity`，不要继承本基类。见 [`startup-optimization.md`](./startup-optimization.md)。
 
 ### 8.3 MVI 页面
 
@@ -244,21 +216,16 @@ override fun extraConfig() {
 
 - Binding 在 `onCreateView` 中 `DataBindingUtil.inflate`
 - 初始化在 `onViewCreated`
-- **无** `shouldInflateContentInOnCreate` / `bindInflatedContentView` 分支
 
 ---
 
 ## 10. 设计要点与注意
 
-1. **分层清晰**：系统 UI（`BaseActivity`）→ Binding/VM（`BaseMvvmActivity`）→ 可选 MVI。
-2. **内容就绪统一入口**：同步 / 异步都最终走 `onContentReady`，避免两套 init。
-3. **权限注册时机**：固定在 `onCreate`，不能等到异步 inflate 回调。
-4. **异步时系统栏**：须在 `setContentView` 之后调 `handleNavigationVAndStatusVisibility`（
-   `bindInflatedContentView` 已内含）。
-5. **访问 Binding 前先确认就绪**：异步路径下 `onResume` 可能早于 bind，需 `isBindingInitialized()`
-   或延后依赖 Binding 的逻辑。
-6. **启动可观测**：`TimeMonitor` 打点含 `BaseActivity_*`、`BaseMvvmActivity_*`、
-   `AsyncLayoutInflater_*`。
+1. **分层清晰**：系统 UI（`BaseActivity`）→ Binding/VM（`BaseMvvmActivity`）→ 可选 MVI。首页单独挂在
+   `BaseActivity` 下。
+2. **内容就绪统一入口**：MVVM / MVI 页走 `onContentReady`。
+3. **权限注册时机**：固定在 `onCreate`。
+4. **启动可观测**：`TimeMonitor` 打点含 `BaseActivity_*`、`BaseMvvmActivity_*`。
 
 ---
 
@@ -273,7 +240,7 @@ app/src/main/java/com/haha/base/
   ActivityCollector.kt
 
 # 典型用法
-app/src/main/java/com/haha/main/MainActivity.kt          # 异步 inflate
+app/src/main/java/com/haha/main/MainActivity.kt          # 首页：BaseActivity + 开屏
 app/src/main/java/com/haha/volume/ui/VolumeActivity.kt   # 自定义 ViewModel
 app/src/main/java/com/haha/gps/GpsActivity.kt            # 直接用 BaseViewModel
 app/src/main/java/com/haha/mviFrame/main/MainMVIActivity.kt  # MVI 扩展

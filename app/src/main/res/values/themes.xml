@@ -17,8 +17,8 @@
     <style name="Theme.HahaLearn.NoActionBar" parent="Theme.HahaLearn">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <!-- 异步 inflate 期间 Preview Window 用此背景，避免白屏；不用 Splash -->
-        <item name="android:windowBackground">@color/green</item>
+        <!-- 开屏揭开后 / 无缓存广告时 Preview Window 底色 -->
+        <item name="android:windowBackground">@color/transparent</item>
     </style>
 
     <!-- KMP/CMP 页：windowBackground 与 Compose light Surface 对齐，避免跳转时闪绿 -->

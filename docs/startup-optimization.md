@@ -148,8 +148,9 @@ Kotlin 零改动（`getRootViewId()` 仍指向 `cl_main`）。
 
 ### 4.5 AsyncLayoutInflater + `windowBackground`（当前方案）
 
-仅 `MainActivity`：`shouldInflateContentInOnCreate() = false`，`extraConfig()` 里后台 inflate；回调在*
-*主线程** `DataBindingUtil.bind` + `setContentView` + `onContentReady()`。
+仅 `MainActivity`（继承 `BaseActivity`，不走 `BaseMvvmActivity`）：
+`shouldInflateContentInOnCreate() = false`，`onWindowReady()` 里后台 inflate；回调在**主线程**
+`DataBindingUtil.bind` 后挂到开屏容器底下。
 
 异步等待期间用主题 `android:windowBackground`（**不用 Splash**）。  
 `registerForActivityResult` 仍在 `onCreate`（必须在 STARTED 前）。
@@ -205,28 +206,35 @@ Async 换的是等待形态，不是更短的 `contentReady`。
 HahaApplication.attachBaseContext  → TimeMonitor.start
 HahaApplication.onCreate           → ApplicationCreate
 MainActivity.onCreate
-  setTheme(Theme.HahaLearn.NoActionBar)   // windowBackground 先亮
-  extraConfig → AsyncLayoutInflater.inflate   // 后台
-  跳过同步 inflateContentView
+  Theme.App.Starting + installSplashScreen   // 品牌窗，只盖进程创建
+  onWindowReady
+    setContentView(FrameLayout 容器)
+    SplashAdCache 有物料 → overlay 盖上，倒计时可立即跳过
+    AsyncLayoutInflater.inflate → 首页挂到容器 index=0（底下预热）
+    放开系统 Splash
 onStart / onResume                 // binding 可能尚未就绪
 [主线程回调]
-  DataBindingUtil.bind + setContentView
-  onContentReady → initView / initData
+  DataBindingUtil.bind + addView(容器)
+  onContentReady → initView / initData（权限等开屏揭开后再申请）
   root.post → ViewStub inflate 自定义 View
-  TimeMonitor.end(contentReady)
+  TimeMonitor.end(contentReady)    // 不含 5s 广告，广告看 SplashAd_*
+跳过 / 倒计时结束 → 揭开首页
+点素材 → SplashAdLandingActivity（站内 WebView）+ 揭开首页
 ```
 
 ### 6.2 关键文件
 
-| 文件                                                          | 作用                                                                                  |
-|-------------------------------------------------------------|-------------------------------------------------------------------------------------|
-| `BaseActivity.kt`                                           | `inflateContentView()` / `shouldInflateContentInOnCreate()`                         |
-| `BaseMvvmActivity.kt`                                       | 同步：`DataBindingUtil.setContentView`；异步：`bindInflatedContentView` + `onContentReady` |
-| `MainActivity.kt`                                           | 首页异步 inflate；`inflateHeavyCustomViews()`                                            |
-| `activity_main.xml`                                         | `FrameLayout` + `ScrollView` + 内层 Constraint；ViewStub 容器                            |
-| `view_stub_circle_progress.xml` / `view_stub_pie_chart.xml` | 延迟加载的自定义 View                                                                       |
-| `themes.xml`                                                | `Theme.HahaLearn.NoActionBar` 的 `windowBackground`                                    |
-| `TimeMonitor.kt`                                            | 打点；`end()` 会把 HashMap 再打一遍，不是又跑一轮                                                   |
+| 文件                                                          | 作用                                                                              |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------|
+| `BaseActivity.kt`                                           | `inflateContentView()` / `shouldInflateContentInOnCreate()` / `onWindowReady()` |
+| `BaseMvvmActivity.kt`                                       | 普通业务页同步 DataBinding，首页不要改这里                                                     |
+| `MainActivity.kt`                                           | 继承 `BaseActivity`；容器 + 开屏 overlay + 首页异步预热                                      |
+| `splash/SplashAdCache.kt` / `SplashAdOverlay.kt`            | 本地缓存决策、倒计时跳过、点素材落地                                                              |
+| `splash/SplashAdLandingActivity.kt`                         | 站内 WebView 落地页                                                                  |
+| `activity_main.xml`                                         | `FrameLayout` + `ScrollView` + 内层 Constraint；ViewStub 容器                        |
+| `view_stub_circle_progress.xml` / `view_stub_pie_chart.xml` | 延迟加载的自定义 View                                                                   |
+| `themes.xml`                                                | `Theme.App.Starting` 品牌窗；`NoActionBar.windowBackground` 兜底                      |
+| `TimeMonitor.kt`                                            | 打点；`end()` 会把 HashMap 再打一遍，不是又跑一轮                                               |
 
 其它页面默认 `shouldInflateContentInOnCreate() = true`，仍走同步 DataBinding inflate。
 
@@ -235,6 +243,7 @@ onStart / onResume                 // binding 可能尚未就绪
 - `end()` 之后同一批 tag 会再打印一次，忽略重复即可。
 - 计时从 `attachBaseContext` 开始，**统计不到 so 加载**。
 - 异步方案不要拿 `AppStartActivity_start` 和优化前对比，用 `AppStartActivity_contentReady`。
+- 开屏 5s 不要和首页 inflate 比：看 `SplashAd_show` / `SplashAd_close_*`。
 
 ---
 

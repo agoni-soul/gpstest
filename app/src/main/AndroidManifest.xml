@@ -123,12 +123,14 @@
             android:exported="true" />
         <activity android:name="com.haha.main.plugin.RegisteredActivity" />
         <activity
+            android:name="com.haha.splash.SplashAdLandingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.HahaLearn.NoActionBar" />
+        <activity
             android:name="com.haha.main.MainActivity"
             android:exported="true"
             android:launchMode="singleInstance"
-            android:theme="@style/Theme.HahaLearn.NoActionBar">
-            <!-- TODO: 临时关闭 SplashScreen，原主题 Theme.App.Starting -->
-            <!-- android:theme="@style/Theme.App.Starting" -->
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

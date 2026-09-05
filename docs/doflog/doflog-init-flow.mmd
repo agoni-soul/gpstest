@@ -1,0 +1,14 @@
+flowchart TD
+    A[HahaApplication.onCreate] --> B[DOFLogUtil.init this]
+    B --> C[LogFileUtil.appContext = applicationContext]
+    C --> D[解析 log 目录]
+    D --> E{外部存储可用且 getExternalFilesDir 非空?}
+    E -->|是| F["/sdcard/Android/data/com.haha.hahalearn/files/log/"]
+    E -->|否| G["/data/data/com.haha.hahalearn/files/log/"]
+    F --> H[mkdirs]
+    G --> H
+    H --> I[创建 4 个 Adapter]
+    I --> J[Disk 启动 HandlerThread]
+    I --> K[Crash 安装 UncaughtExceptionHandler]
+    J --> L[DOFLogUtil.d 初始化成功]
+    K --> L

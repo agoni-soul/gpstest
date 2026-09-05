@@ -1,0 +1,11 @@
+flowchart TD
+    S[一条 log 请求] --> A{text 非空 且 有 throwable?}
+    A -->|是| B[先 log 文本 再 log 异常]
+    A -->|否| C{text 非空?}
+    C -->|是| D[adapter.log 文本]
+    C -->|否| E{throwable?}
+    E -->|是| F[adapter.log 异常]
+    E -->|否| G{JSONObject?}
+    G -->|是| H[log json]
+    G -->|否| I{JSONArray / Map / List}
+    I --> J[对应重载]

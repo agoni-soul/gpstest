@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant App as MainActivity
+    participant F as DOFLogUtil
+    participant H as LogHelper
+    participant Fmt as AndroidLogFormat
+    participant Cat as AndroidLogAdapter
+    participant Disk as DiskLogAdapter
+    participant Plugin as PluginDiskLogAdapter
+    participant Sys as android.util.Log
+    participant File as 本地 txt
+
+    App->>F: d(TAG, msg)
+    F->>H: d(TAG, msg)
+    H->>H: 级别 DEBUG, 组装 text
+    H->>Cat: filter 通过
+    Cat->>Fmt: format(model, tag, msg)
+    Fmt-->>Cat: [时间][tag][文件][行号]...
+    Cat->>Sys: Log.println
+    H->>Disk: filter 通过
+    Disk->>Fmt: format
+    Disk->>File: HandlerThread 异步 append
+    H->>Plugin: tag 不是 weex/h5/plugin
+    Note over Plugin: filter 失败, 不写

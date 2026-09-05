@@ -1,0 +1,18 @@
+flowchart LR
+    subgraph 入口
+        V[v/d/i/w/e/a]
+        TH[throwable 重载]
+        VAR[vararg objects]
+        JSON[logJson]
+        MAP[logMap / logList]
+        LV[log level, tag, msg, tr]
+    end
+
+    V --> H[LogHelper.log]
+    TH --> H
+    VAR --> GM[getMsgs 空格拼接]
+    GM --> H
+    JSON --> H
+    MAP --> H
+    LV --> H
+    H --> AD[Adapters]

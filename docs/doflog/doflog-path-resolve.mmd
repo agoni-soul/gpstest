@@ -1,0 +1,8 @@
+flowchart TD
+    A[getLogFolder] --> B[主进程? 目录名 log : log_子进程名]
+    B --> C{SD 可用?}
+    C -->|是| D[getExternalFilesDir]
+    D --> E{返回 null?}
+    E -->|否| F[外部专属目录]
+    E -->|是| G[filesDir/log]
+    C -->|否| G

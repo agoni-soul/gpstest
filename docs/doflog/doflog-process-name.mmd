@@ -1,0 +1,7 @@
+flowchart TD
+    P[getCurrentProcessName1] --> A{API >= 28?}
+    A -->|有结果| Z[返回]
+    A -->|空| B["proc cmdline 文件"]
+    B -->|空| C[ActivityManager]
+    C -->|空| D[反射 mLoadedApk]
+    D --> Z

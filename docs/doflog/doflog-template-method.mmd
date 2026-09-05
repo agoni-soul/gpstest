@@ -1,0 +1,6 @@
+flowchart TD
+    A[LogHelper 调用 filter] --> B[DefaultLogAdapter.filter]
+    B --> C{PluginDiskLogAdapter?}
+    C -->|是| D[再判断 tag 是否 weex/h5/plugin]
+    C -->|否| E[通过则调用子类 log]
+    D --> E

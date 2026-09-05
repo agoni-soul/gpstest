@@ -1,0 +1,10 @@
+flowchart TD
+    A[format modelName, tag, msg] --> B[getInfoTag]
+    B --> C[当前时间]
+    C --> D[拼 modelName / tag]
+    D --> E[Thread.stackTrace]
+    E --> F{类名是 com.haha.log.* 或含 DOFLogUtil?}
+    F -->|是| E
+    F -->|否| G[取 fileName / method / line]
+    G --> H[拼进程名 + 线程名]
+    H --> I["前缀 + : + msg"]

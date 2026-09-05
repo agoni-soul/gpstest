@@ -1,0 +1,10 @@
+flowchart TD
+    I[DOFLogUtil.init] --> C[LogFileUtil.init 缓存 Context]
+    C --> CL[helper.clear]
+    CL --> D{isDebug?}
+    D -->|是| L[add AndroidLogAdapter]
+    D -->|否| F
+    L --> F[add DiskLogAdapter]
+    F --> P[add PluginDiskLogAdapter]
+    P --> CR[add CrashAdapter]
+    CR --> OK["initialized = true / 打一条初始化日志"]

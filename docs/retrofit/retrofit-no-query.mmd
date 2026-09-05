@@ -1,0 +1,5 @@
+flowchart TD
+    A["只有 @GET + @Path"] --> B["Path 替换完成"]
+    B --> C["从未 addQueryParam，urlBuilder 为 null"]
+    C --> D["url = baseUrl.resolve(relativeUrl)"]
+    D --> E["https://api.github.com/users/octocat/repos"]

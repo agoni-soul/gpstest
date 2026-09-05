@@ -1,0 +1,15 @@
+flowchart TD
+    A["Retrofit.Builder"] --> B["baseUrl() 必填"]
+    A --> C["addConverterFactory(Gson/Moshi)"]
+    A --> D["client(OkHttpClient) 可选"]
+    A --> E["callbackExecutor() 可选"]
+
+    B & C & D & E --> F["build()"]
+
+    F --> G["callFactory = OkHttpClient"]
+    F --> H["callbackExecutor = 主线程 Handler<br/>Android 默认"]
+    F --> I["自动添加 BuiltInConverters"]
+    F --> J["自动添加 DefaultCallAdapterFactory"]
+    F --> K["Retrofit 实例"]
+
+    style K fill:#d4edda

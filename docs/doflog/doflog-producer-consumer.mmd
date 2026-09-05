@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant UI as 业务线程
+    participant Disk as DiskLogAdapter
+    participant HT as DOFLog_write
+    participant FS as 文件系统
+
+    UI->>Disk: log(type, model, tag, msg)
+    Disk->>Disk: AndroidLogFormat.format
+    Disk->>HT: sendMessage(MsgEntry)
+    Note over UI: 立刻返回
+    HT->>FS: FileIOUtils.append 写 txt

@@ -1,0 +1,16 @@
+flowchart TB
+  Start[Engine.load<br/>skipMemoryCache=true] --> MemSkip[跳过 Active + Lru]
+  MemSkip --> DJ[DecodeJob]
+
+  subgraph 首次
+    DJ --> R1[RESOURCE 盘 miss]
+    R1 --> D1[DATA 盘 miss]
+    D1 --> S1[SOURCE 网络]
+    S1 --> W1[写 DATA + 解码 + 写 RESOURCE]
+    W1 --> UI1[上屏，不进内存]
+  end
+
+  subgraph 再次
+    DJ2[DecodeJob] --> R2[RESOURCE 盘 命中]
+    R2 --> UI2[解码文件 → 上屏，不进内存]
+  end

@@ -1,0 +1,9 @@
+flowchart TD
+    A["配置阶段<br/>Retrofit.Builder baseUrl + Converter + build"]
+    B["retrofit.create(ApiService)<br/>JDK 动态代理"]
+    C["api.listRepos(octocat)<br/>loadServiceMethod + new OkHttpCall + adapt<br/>返回 Call，尚未发网"]
+    D["call.enqueue(Callback)<br/>RequestFactory.create + OkHttp Dispatcher"]
+    E["OkHttp 拦截器链 → Socket → ResponseBody JSON"]
+    F["OkHttpCall.parseResponse()<br/>2xx Gson.convert / 4xx Response.error"]
+    G["Handler.post → 主线程 Callback.onResponse<br/>response.body 业务数据"]
+    A --> B --> C --> D --> E --> F --> G

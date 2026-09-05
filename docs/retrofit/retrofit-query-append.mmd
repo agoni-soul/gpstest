@@ -1,0 +1,7 @@
+flowchart TD
+    A["relativeUrl = 'users/octocat/repos'"] --> B{"第一次 addQueryParam?"}
+    B -->|是| C["urlBuilder = baseUrl.newBuilder(relativeUrl)"]
+    C --> D["relativeUrl = null"]
+    D --> E["urlBuilder.addQueryParameter(name, value)"]
+    B -->|否| E
+    E --> F["RequestBuilder.get() → urlBuilder.build()"]

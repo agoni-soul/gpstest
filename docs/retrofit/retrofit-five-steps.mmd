@@ -1,0 +1,11 @@
+flowchart LR
+    S1["① Builder 配置<br/>baseUrl + Converter"]
+    S2["② create 接口<br/>动态代理"]
+    S3["③ 调用方法<br/>得到 Call"]
+    S4["④ enqueue / execute<br/>触发请求"]
+    S5["⑤ Callback<br/>拿到数据"]
+
+    S1 --> S2 --> S3 --> S4 --> S5
+
+    style S3 fill:#fff3cd
+    style S4 fill:#d4edda

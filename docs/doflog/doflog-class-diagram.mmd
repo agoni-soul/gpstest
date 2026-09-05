@@ -1,0 +1,28 @@
+classDiagram
+    class ILogAdapter {
+        +log(...)
+        +filter(logType, tag)
+        +enable(bool)
+        +setLogLevel(int)
+        +flush(timeout)
+    }
+    class DefaultLogAdapter {
+        #mLogStrategy
+        #originLogLevel
+        #enable
+        +filter()
+    }
+    class AndroidLogAdapter
+    class DiskLogAdapter
+    class PluginDiskLogAdapter
+    class CrashAdapter
+    class ILogFormat
+    class AndroidLogFormat
+
+    ILogAdapter <|-- DefaultLogAdapter
+    DefaultLogAdapter <|-- AndroidLogAdapter
+    DefaultLogAdapter <|-- DiskLogAdapter
+    DefaultLogAdapter <|-- CrashAdapter
+    DiskLogAdapter <|-- PluginDiskLogAdapter
+    ILogFormat <|-- AndroidLogFormat
+    DefaultLogAdapter --> ILogFormat

@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant RF as RequestFactory
+    participant RB as RequestBuilder
+    participant PH as ParameterHandler[]
+    participant OK as okhttp3.Request
+
+    RF->>RB: new RequestBuilder(GET, baseUrl, "users/{user}/repos")
+    RF->>PH: PathHandler.apply(rb, "octocat")
+    PH->>RB: addPathParam → users/octocat/repos
+    RF->>PH: QueryHandler.apply(rb, "owner")
+    PH->>RB: addQueryParam → 首次合并 baseUrl
+    RF->>PH: QueryHandler.apply(rb, 1)
+    PH->>RB: addQueryParam page=1
+    RF->>RB: get().build()
+    RB->>OK: GET .../users/octocat/repos?type=owner&page=1

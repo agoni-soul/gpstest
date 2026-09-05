@@ -1,0 +1,10 @@
+flowchart LR
+    A["Request"] --> B["应用 Interceptor<br/>Token/日志"]
+    B --> C["RetryAndFollowUp<br/>重试/重定向"]
+    C --> D["BridgeInterceptor<br/>Header/Gzip"]
+    D --> E["CacheInterceptor<br/>缓存"]
+    E --> F["ConnectInterceptor<br/>建连/连接池"]
+    F --> G["NetworkInterceptor"]
+    G --> H["CallServerInterceptor<br/>读写 Socket"]
+    H --> I["Response"]
+    I --> J["逐层返回"]

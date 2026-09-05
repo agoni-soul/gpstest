@@ -1,0 +1,5 @@
+flowchart LR
+    H[LogHelper] -->|广播| A1[AndroidLogAdapter]
+    H -->|广播| A2[DiskLogAdapter]
+    H -->|广播| A3[PluginDiskLogAdapter]
+    H -->|广播| A4[CrashAdapter 不处理普通 log]

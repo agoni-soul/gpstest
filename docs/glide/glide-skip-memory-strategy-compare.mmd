@@ -1,0 +1,14 @@
+flowchart LR
+  subgraph NONE["skipMemory + NONE"]
+    N1[跳过内存] --> N2[跳过磁盘]
+    N2 --> N3[SOURCE 每次]
+    N3 --> N4[解码上屏]
+  end
+
+  subgraph DATA["skipMemory + DATA"]
+    D1[跳过内存] --> D2[读 DATA 盘]
+    D2 -->|miss| D3[SOURCE + 写 DATA]
+    D2 -->|hit| D4[解码+变换]
+    D3 --> D4
+    D4 --> D5[上屏]
+  end

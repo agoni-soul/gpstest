@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph 业务层
+        A[ApiService 接口<br/>@GET @Path @Body]
+    end
+
+    subgraph Retrofit层
+        B[动态代理 Proxy]
+        C[ServiceMethod<br/>注解解析 + 缓存]
+        D[RequestFactory<br/>拼 OkHttp Request]
+        E[OkHttpCall]
+        F[Converter<br/>Gson/Moshi]
+        G[DefaultCallAdapterFactory<br/>Call 包装]
+    end
+
+    subgraph OkHttp层
+        H[OkHttpClient]
+        I[拦截器链]
+        J[Socket 网络 IO]
+    end
+
+    A --> B --> C
+    C --> D & F & G
+    G --> E
+    E --> H --> I --> J
+    J --> I --> E
+    E --> F
+    F --> K[retrofit2.Response&lt;T&gt;]
+    K --> L[Callback.onResponse]

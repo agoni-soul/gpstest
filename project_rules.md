@@ -10,16 +10,24 @@
 - [`docs/base-mvvm-activity.md`](docs/base-mvvm-activity.md) — MVVM Activity 基建
 - [`docs/mvi-framework.md`](docs/mvi-framework.md) — MVI 单向数据流
 - [`docs/startup-optimization.md`](docs/startup-optimization.md) — 首页冷启动优化
-- [`docs/retrofit-usage-guide.md`](docs/retrofit-usage-guide.md) — Retrofit 使用与源码流程（纯 Call）
-- [`docs/rxjava-create-subscribe-operators.md`](docs/rxjava-create-subscribe-operators.md) — RxJava
+- [`docs/retrofit/retrofit-usage-guide.md`](docs/retrofit/retrofit-usage-guide.md) — Retrofit
+  使用与源码流程（纯 Call）
+- [`docs/glide/glide-cache-engine-notes.md`](docs/glide/glide-cache-engine-notes.md) — Glide 缓存与
+  Engine 链路
+- [
+  `docs/rxjava/rxjava-create-subscribe-operators.md`](docs/rxjava/rxjava-create-subscribe-operators.md) —
+  RxJava
   create / subscribe / subscribeOn / observeOn / map 源码
-- [`docs/okhttp-call-to-response.md`](docs/okhttp-call-to-response.md) — OkHttp 从
+- [`docs/okhttp/okhttp-call-to-response.md`](docs/okhttp/okhttp-call-to-response.md) — OkHttp 从
   `newCall` 到读 body（主线 `OkHttpTest` enqueue GET/POST，对照 `CacheFile` / `RetrofitTest`）
+- [`docs/doflog/doflog-design-and-flow.md`](docs/doflog/doflog-design-and-flow.md) — DOFLog
+  设计模式与打印流程
 - [`docs/https-http-versions.md`](docs/https-http-versions.md) — HTTPS 上 HTTP/1.1、HTTP/2、HTTP/3
   协议对比与 Demo（`SocketTest` / `HttpsVersionTest`）
-- [`docs/mqtt-sender-receiver.md`](docs/mqtt-sender-receiver.md) — MQTT Fixed Header 与发送方 /
+- [`docs/mqtt/mqtt-sender-receiver.md`](docs/mqtt/mqtt-sender-receiver.md) — MQTT Fixed Header
+  与发送方 /
   接收方 Demo（入口 `MqttTest`，实现在 `retrofit.mqtt` 包，附图
-  [`docs/mqtt-fixed-header.jpg`](docs/mqtt-fixed-header.jpg)）
+  [`docs/mqtt/mqtt-fixed-header.jpg`](docs/mqtt/mqtt-fixed-header.jpg)）
 
 ---
 

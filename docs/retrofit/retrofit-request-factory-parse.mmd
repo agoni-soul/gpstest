@@ -1,0 +1,22 @@
+flowchart TD
+    START["RequestFactory.Builder.build()"] --> M1["遍历 method.getAnnotations()"]
+
+    M1 --> GET{"注解是 @GET?"}
+    GET -->|是| G1["parseHttpMethodAndPath('GET', value, hasBody=false)"]
+    G1 --> G2["httpMethod = 'GET'"]
+    G1 --> G3["relativeUrl = 'users/{user}/repos'"]
+    G1 --> G4["relativeUrlParamNames = {'user'}<br/>正则匹配 \\{xxx\\}"]
+
+    G4 --> P1["遍历每个方法参数"]
+    P1 --> P2["parseParameter(p, type, annotations)"]
+
+    P2 --> PATH{"参数有 @Path?"}
+    PATH -->|是| PH1["校验 name='user' 在 relativeUrlParamNames 中"]
+    PH1 --> PH2["创建 ParameterHandler.Path<br/>+ stringConverter"]
+    PH2 --> PH3["parameterHandlers[0] = PathHandler"]
+
+    P2 --> QUERY{"参数有 @Query?"}
+    QUERY -->|是| QH1["创建 ParameterHandler.Query"]
+    QH1 --> QH2["parameterHandlers[1/2] = QueryHandler"]
+
+    PH3 & QH2 --> END1["return new RequestFactory(...)"]

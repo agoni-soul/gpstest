@@ -1,0 +1,9 @@
+flowchart TD
+    A[AndroidLogAdapter.log] --> B[mLogStrategy.format]
+    B --> C[printSplit]
+    C --> D["tag 空 → DOFLog"]
+    D --> E["msg 空 → null"]
+    E --> F[level 夹到 VERBOSE~ASSERT]
+    F --> G{长度 > 3500?}
+    G -->|否| H[Log.println 一次]
+    G -->|是| I[循环切片 3500 多次 println]

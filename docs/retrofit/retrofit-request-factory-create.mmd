@@ -1,0 +1,17 @@
+flowchart TD
+    START["RequestFactory.create(args)<br/>args = ['octocat', 'owner', 1]"]
+
+    START --> RB["new RequestBuilder(<br/>  method='GET',<br/>  baseUrl, relativeUrl)"]
+
+    RB --> LOOP["for each handler:<br/>handlers[p].apply(requestBuilder, args[p])"]
+
+    LOOP --> H0["PathHandler: addPathParam('user', 'octocat')"]
+    H0 --> R0["relativeUrl:<br/>'users/{user}/repos'<br/>→ 'users/octocat/repos'"]
+
+    R0 --> H1["QueryHandler: addQueryParam('type', 'owner')"]
+    H1 --> U1["首次 addQuery → urlBuilder = baseUrl.newBuilder(relativeUrl)"]
+
+    U1 --> H2["QueryHandler: addQueryParam('page', '1')"]
+
+    H2 --> BUILD["requestBuilder.get().build()"]
+    BUILD --> URL["GET https://api.github.com/users/octocat/repos?type=owner&page=1"]

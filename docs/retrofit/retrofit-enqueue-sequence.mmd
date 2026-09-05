@@ -1,0 +1,29 @@
+sequenceDiagram
+    participant UI as 主线程
+    participant ECC as ExecutorCallbackCall
+    participant OKC as OkHttpCall
+    participant RF as RequestFactory
+    participant OH as OkHttp/RealCall
+    participant Gson as GsonConverter
+    participant CB as 你的 Callback
+
+    UI->>ECC: enqueue(callback)
+    ECC->>OKC: delegate.enqueue(wrappedCallback)
+
+    OKC->>OKC: createRawCall()
+    OKC->>RF: requestFactory.create(args)
+    RF-->>OKC: OkHttp Request<br/>GET .../users/octocat/repos
+    OKC->>OH: call.enqueue()
+
+    Note over OH: OkHttp Dispatcher 线程池
+
+    OH->>OH: 拦截器链发 HTTP 请求
+    OH-->>OKC: onResponse(rawResponse)
+
+    OKC->>Gson: responseConverter.convert(body)
+    Gson-->>OKC: List<EatGame>
+    OKC->>OKC: Response.success(body)
+    OKC-->>ECC: onResponse(response)
+
+    ECC->>UI: Handler.post(callback)
+    UI->>CB: onResponse(response.body())

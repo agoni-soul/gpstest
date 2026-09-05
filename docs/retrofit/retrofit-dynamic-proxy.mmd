@@ -1,0 +1,19 @@
+flowchart TD
+    A["retrofit.create(ApiService.class)"] --> B["Proxy.newProxyInstance()"]
+    B --> C["返回 service 代理对象"]
+
+    D["service.listRepos(args)"] --> E["InvocationHandler.invoke()"]
+    E --> F{method 来自 Object?}
+    F -->|是| G["toString/equals 等"]
+    F -->|否| H["loadServiceMethod(method)"]
+
+    H --> I{缓存中有?}
+    I -->|有| J["直接 invoke(args)"]
+    I -->|无| K["ServiceMethod.parseAnnotations()"]
+    K --> L["解析 @GET @Path 等"]
+    K --> M["找 CallAdapter → DefaultCallAdapterFactory"]
+    K --> N["找 Converter → GsonConverterFactory"]
+    K --> O["存入 serviceMethodCache"]
+    O --> J
+
+    J --> P["返回 Call 对象"]

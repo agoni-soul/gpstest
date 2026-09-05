@@ -1,0 +1,6 @@
+flowchart LR
+    A["relativeUrl<br/>users/{user}/repos"] --> B["addPathParam('user', 'octocat')"]
+    B --> C["canonicalizeForPath<br/>URL 编码"]
+    C --> D["replace('{user}', 'octocat')"]
+    D --> E["users/octocat/repos"]
+    E --> F["校验禁止 .. 路径穿越"]

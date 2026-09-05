@@ -1,0 +1,38 @@
+flowchart TB
+    subgraph 业务层
+        A[MainActivity / TestLearnUtils / logMonitor]
+    end
+
+    subgraph 门面层
+        B[DOFLogUtil object]
+    end
+
+    subgraph 分发层
+        C[LogHelper 单例]
+    end
+
+    subgraph 适配器通道
+        D1[AndroidLogAdapter<br/>Logcat]
+        D2[DiskLogAdapter<br/>小时文件]
+        D3[PluginDiskLogAdapter<br/>插件文件]
+        D4[CrashAdapter<br/>未捕获异常]
+    end
+
+    subgraph 策略与工具
+        E[ILogFormat / AndroidLogFormat]
+        F[LogFileUtil]
+    end
+
+    A --> B --> C
+    C --> D1
+    C --> D2
+    C --> D3
+    C --> D4
+    D1 --> E
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    D2 --> F
+    D3 --> F
+    D4 --> F
+    B --> F

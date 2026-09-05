@@ -1,0 +1,10 @@
+flowchart TD
+    A[DiskLogAdapter.log] --> B[format 得到字符串]
+    B --> C{字符串空?}
+    C -->|是| Z[丢弃]
+    C -->|否| D[封装 MsgEntry]
+    D --> E[HandlerThread 排队]
+    E --> F[ensureDir]
+    F --> G["文件名: log[_进程]_yyyyMMddHH.txt"]
+    G --> H[FileIOUtils.append]
+    H --> I[按小时滚动 同一小时追加]

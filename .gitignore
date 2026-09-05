@@ -30,3 +30,4 @@ build/
 .externalNativeBuild
 .cxx
 local.properties
+node_modules

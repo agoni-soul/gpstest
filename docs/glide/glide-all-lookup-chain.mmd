@@ -1,0 +1,15 @@
+flowchart TD
+  A[Engine.load] --> B{Active?}
+  B -->|命中| Z[上屏]
+  B -->|miss| C{Lru?}
+  C -->|命中| Z
+  C -->|miss| D{Resource 盘?}
+  D -->|命中| Z
+  D -->|miss| E{Data 盘?}
+  E -->|命中| F[解码+变换]
+  E -->|miss| G[SOURCE 网络]
+  G --> H[写 DATA 盘]
+  H --> I[从 DATA 文件读]
+  I --> F
+  F --> Z[上屏]
+  Z --> J[写 RESOURCE 盘]

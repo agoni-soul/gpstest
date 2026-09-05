@@ -1,0 +1,32 @@
+flowchart TD
+    A["业务: DOFLogUtil.d(tag, msg)"] --> B[命中重载 d String, String]
+    B --> C["LogHelper.d(tag, msg)"]
+    C --> D["log DEBUG=3"]
+    D --> E[补 modelName 为空串]
+    E --> F{msg 是否为空?}
+    F -->|有内容| G["text = msg"]
+    F -->|空且无结构化数据| H["text = 字符串 null"]
+    F -->|空但有 throwable 或 json| I[走结构化分支]
+    G --> J[遍历 mList]
+    H --> J
+    I --> J
+
+    J --> K1[AndroidLogAdapter]
+    J --> K2[DiskLogAdapter]
+    J --> K3[PluginDiskLogAdapter]
+    J --> K4[CrashAdapter]
+
+    K1 --> F1{filter 通过?}
+    F1 -->|否| X1[跳过]
+    F1 -->|是| L1[format 后 Log.println]
+
+    K2 --> F2{filter 通过?}
+    F2 -->|否| X2[跳过]
+    F2 -->|是| L2[format 后异步写文件]
+
+    K3 --> F3{插件 tag?}
+    F3 -->|否| X3[跳过]
+    F3 -->|是| L3[写入 plugin_log]
+
+    K4 --> F4{filter 通过?}
+    F4 -->|是| L4[空实现]

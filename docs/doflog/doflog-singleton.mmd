@@ -1,0 +1,6 @@
+flowchart TD
+    A[第一次 getInstance] --> B{sInstance 已创建?}
+    B -->|否| C[加锁创建 LogHelper]
+    B -->|是| D[直接返回]
+    C --> D
+    E[DOFLogUtil / LogFileUtil] --> F[Kotlin object 类加载时唯一实例]

@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant JVM as 崩溃线程
+    participant CA as CrashAdapter Handler
+    participant CU as CrashUtils
+    participant Disk as 本地文件
+
+    Note over CA: init 时包装 defaultHandler
+    JVM->>CA: uncaughtException
+    CA->>CA: AndroidLogFormat.format(throwable)
+    CA->>Disk: crash_时间戳.txt 同步写
+    CA->>Disk: 追加到当小时 log_yyyyMMddHH.txt
+    CA->>CU: previous.uncaughtException
+    CU->>Disk: CrashUtils 自己的 crash 目录

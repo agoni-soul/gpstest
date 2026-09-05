@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph 阶段1["阶段 1：解析阶段（只做一次，结果缓存）"]
+        A1["RequestFactory.parseAnnotations()"] --> A2["Builder.build()"]
+        A2 --> A3["解析方法注解 @GET"]
+        A2 --> A4["解析参数注解 @Path @Query"]
+        A2 --> A5["生成 ParameterHandler[]"]
+        A2 --> A6["生成 RequestFactory 对象<br/>存入 serviceMethodCache"]
+    end
+
+    subgraph 阶段2["阶段 2：运行时（每次请求都执行）"]
+        B1["RequestFactory.create(args)"] --> B2["new RequestBuilder(...)"]
+        B2 --> B3["遍历 ParameterHandler.apply()"]
+        B3 --> B4["RequestBuilder.get().build()"]
+        B4 --> B5["okhttp3.Request"]
+    end
+
+    阶段1 --> 阶段2
+
+    style 阶段1 fill:#e3f2fd
+    style 阶段2 fill:#fff3e0

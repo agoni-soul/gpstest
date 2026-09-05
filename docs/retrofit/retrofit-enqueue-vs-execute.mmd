@@ -1,0 +1,16 @@
+flowchart TB
+    subgraph enqueue异步
+        E1["call.enqueue(callback)"] --> E2["OkHttp 线程池执行"]
+        E2 --> E3["解析 Response"]
+        E3 --> E4["Handler 切主线程"]
+        E4 --> E5["callback.onResponse"]
+    end
+
+    subgraph execute同步
+        X1["call.execute()"] --> X2["当前线程阻塞"]
+        X2 --> X3["解析 Response"]
+        X3 --> X4["直接返回 Response<br/>无 Callback"]
+    end
+
+    W["⚠️ execute 不能在主线程调用"]
+    X1 -.-> W

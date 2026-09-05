@@ -1,0 +1,34 @@
+flowchart TD
+  Start["RequestBuilder.into()<br/>RequestManager.track()"] --> Begin["SingleRequest.begin()"]
+  Begin --> Size["SingleRequest.onSizeReady()<br/>或 ViewTarget.getSize()"]
+  Size --> Load["Engine.load()<br/>EngineKeyFactory.buildKey()"]
+
+  Load --> Mem["Engine.loadFromMemory()"]
+  Mem --> Active["Engine.loadFromActiveResources()<br/>ActiveResources.get()"]
+  Active -->|miss| Lru["Engine.loadFromCache()<br/>LruResourceCache.remove()<br/>→ ActiveResources.activate()"]
+  Lru -->|miss| Job["Engine.waitForExistingOrStartNewJob()<br/>EngineJob.start(decodeJob)<br/>DecodeJobFactory.build()"]
+
+  Job --> Run["DecodeJob.run() → runWrapped()"]
+  Run --> Gen["DecodeJob.runGenerators()<br/>getNextStage() / getNextGenerator()"]
+
+  Gen --> RGen["ResourceCacheGenerator.startNext()<br/>DiskLruCacheWrapper.get(ResourceCacheKey)"]
+  RGen -->|miss| DGen["DataCacheGenerator.startNext()<br/>DiskLruCacheWrapper.get(DataCacheKey)"]
+  DGen -->|miss| SGen["SourceGenerator.startNext()<br/>ModelLoader.buildLoadData()<br/>DataFetcher.loadData()"]
+
+  SGen --> Ready["SourceGenerator.onDataReadyInternal()<br/>diskCacheStrategy.isDataCacheable(REMOTE)=true"]
+  Ready --> Cache["SourceGenerator.cacheData()<br/>StreamEncoder.encode()<br/>DiskLruCacheWrapper.put(DataCacheKey)"]
+  Cache --> ReRead["DataCacheGenerator.startNext()<br/>从刚写入的 DATA 文件读"]
+
+  ReRead --> FetchCB["DecodeJob.onDataFetcherReady()<br/>→ decodeFromRetrievedData()"]
+  FetchCB --> Decode["DecodeJob.decodeFromData()<br/>decodeFromFetcher() → runLoadPath()<br/>ResourceDecoder + Transformation.transform()"]
+
+  Decode --> EncodeRel["DecodeJob.notifyEncodeAndRelease()"]
+  EncodeRel --> UI["DecodeJob.notifyComplete()<br/>→ EngineJob.onResourceReady()<br/>→ SingleRequest.onResourceReady()<br/>→ DrawableImageViewTarget.setResource()<br/>→ ImageView.setImageDrawable()"]
+
+  UI --> Act["Engine.onEngineJobComplete()<br/>ActiveResources.activate()"]
+  UI --> ResWrite["DeferredEncodeManager.encode()<br/>BitmapEncoder.encode()<br/>DiskLruCacheWrapper.put(ResourceCacheKey)"]
+
+  Active -->|hit| UI2["cb.onResourceReady(MEMORY_CACHE)<br/>SingleRequest.onResourceReady()"]
+  Lru -->|hit| UI2
+  RGen -->|hit| FetchCB
+  DGen -->|hit| FetchCB

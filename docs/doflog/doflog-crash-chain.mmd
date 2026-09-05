@@ -1,0 +1,3 @@
+flowchart LR
+    Crash[未捕获异常] --> Ours[CrashAdapter.writeCrashSync]
+    Ours --> Prev["previous handler / CrashUtils / 系统"]

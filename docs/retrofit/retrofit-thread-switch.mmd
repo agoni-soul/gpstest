@@ -1,0 +1,22 @@
+flowchart TD
+    subgraph 主线程
+        A["service.listRepos()"]
+        B["call.enqueue(callback)"]
+        H["Callback.onResponse()<br/>response.body()"]
+    end
+
+    subgraph OkHttp线程池
+        C["createRawCall()"]
+        D["拦截器链发请求"]
+        E["parseResponse()"]
+        F["Gson 解析 JSON"]
+    end
+
+    subgraph 主线程Handler
+        G["callbackExecutor.execute()<br/>Handler.post"]
+    end
+
+    A --> B
+    B --> C
+    C --> D --> E --> F
+    F --> G --> H

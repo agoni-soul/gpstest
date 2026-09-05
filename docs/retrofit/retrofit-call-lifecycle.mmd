@@ -1,0 +1,17 @@
+stateDiagram-v2
+    [*] --> Created: service.listRepos()<br/>得到 Call
+    Created --> Enqueued: enqueue()
+    Created --> Executing: execute()
+    Enqueued --> Completed: onResponse/onFailure
+    Executing --> Completed: 返回 Response/抛异常
+    Created --> Canceled: cancel()
+    Enqueued --> Canceled: cancel()
+    Executing --> Canceled: cancel()
+    Completed --> [*]
+    Canceled --> [*]
+
+    note right of Created
+        Call 只能 execute/enqueue 一次
+        再次调用会抛 IllegalStateException
+        需要 call.clone() 重新请求
+    end note

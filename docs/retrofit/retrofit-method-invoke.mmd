@@ -1,0 +1,10 @@
+flowchart TD
+    A["ServiceMethod.invoke(args)"] --> B["new OkHttpCall(<br/>requestFactory, args,<br/>callFactory, responseConverter)"]
+    B --> C["CallAdapter.adapt(call)"]
+    C --> D{Android 平台?}
+    D -->|是| E["ExecutorCallbackCall<br/>包一层主线程回调"]
+    D -->|否| F["直接返回 OkHttpCall"]
+    E --> G["返回 Call 给业务层"]
+    F --> G
+
+    style B fill:#fff3cd

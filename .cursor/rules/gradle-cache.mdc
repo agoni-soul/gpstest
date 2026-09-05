@@ -1,0 +1,42 @@
+---
+description: 避免重复下载 Gradle 发行包与依赖缓存，优先复用本机已有 wrapper dists
+alwaysApply: true
+---
+
+# Gradle 缓存与下载
+
+本项目 `gradle/wrapper/gradle-wrapper.properties` 使用：
+
+`https://mirrors.aliyun.com/macports/distfiles/gradle/gradle-8.13-all.zip`
+
+改 URL、清 dists 或换 hash 目录都会触发整包重新下载（约数百 MB），应尽量避免。
+
+## 必须遵守
+
+- **不要修改** `distributionUrl` / `distributionBase` / `distributionPath` / `zipStore*`，除非用户明确要求升级或更换镜像。
+- **不要删除** `~/.gradle/wrapper/dists/`、项目 `.gradle/`、或其中未完成的 `*.zip` / `*.part`，除非用户明确要求清缓存。
+- **不要**为“修构建”默认执行 `rm -rf ~/.gradle`、`--reinit`、或清空 wrapper dists。
+- 运行 `./gradlew` 时优先复用本机 `GRADLE_USER_HOME`（默认 `~/.gradle`）；需要权限时申请能访问该目录的权限，避免沙箱导致“缓存不可见 → 再次下载”。
+- 依赖已缓存且仅编译/跑任务时，可优先加 `--offline`；不要默认加 `--refresh-dependencies`。
+- 不要无故 `./gradlew --stop` 后立刻换另一套 Gradle home 或临时目录跑构建。
+
+## 允许的操作
+
+- 正常 `./gradlew <task>` 构建、测试、依赖查看。
+- 用户明确要求时再升级 Gradle 版本、换镜像、或清理缓存。
+- 仅删除明确损坏的单个 dist 子目录（用户确认后），不要整目录清空。
+
+## 反例
+
+```bash
+# ❌ 会导致重新 Downloading .../gradle-8.13-all.zip
+rm -rf ~/.gradle/wrapper/dists
+# 或擅自把 distributionUrl 改成 services.gradle.org / 另一镜像
+```
+
+```bash
+# ✅ 复用已下载发行包
+./gradlew assembleDebug
+# 或（依赖已齐时）
+./gradlew assembleDebug --offline
+```

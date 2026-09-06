@@ -1,0 +1,21 @@
+flowchart TB
+    Start(["整条链路对比"])
+    Start --> A1
+    Start --> B1
+
+    A1["优化前: @IServiceLoader"] --> A2["APT 固定生成 ServiceInit_"]
+    A2 --> A3["运行时 forName 这一个类"]
+    A3 --> A4["mMap 登记默认 key 和类名 key"]
+    A4 --> A5["Helper get 魔法默认 key"]
+    A5 --> A6{"命中?"}
+    A6 -->|否| A7["getAll 全量 new 再数 size"]
+    A6 -->|是| A8["返回实例"]
+    A7 --> A8
+
+    B1["优化后: @IServiceLoader"] --> B2["APT 生成 ServiceInit_模块名"]
+    B2 --> B3["插件扫 IServiceInit 并查冲突"]
+    B3 --> B4["ASM 注入 ServiceLoaderInit"]
+    B4 --> B5["Application.init 灌表"]
+    B5 --> B6["ServiceRecord 一条实现一份"]
+    B6 --> B7["Helper getDefault 或按 Class 去重"]
+    B7 --> B8["SingletonPool / Factory"]

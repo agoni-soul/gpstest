@@ -1,0 +1,19 @@
+flowchart TB
+    Start(["查找对比"])
+    Start --> X1
+    Start --> Y1
+
+    X1["优化前: get 魔法默认 key"] --> X2{"命中?"}
+    X2 -->|是| X3["返回实例"]
+    X2 -->|否| X4["getAll 全量 new"]
+    X4 --> X5{"size 等于 1?"}
+    X5 -->|是| X3
+    X5 -->|否| X6["返回 null"]
+    X7["双 key 使 size 变成 2"] -.-> X5
+
+    Y1["优化后: getDefault"] --> Y2{"有 defaultRecord?"}
+    Y2 -->|是| Y3["createInstance"]
+    Y2 -->|否| Y4["getAllClasses 去重且不 new"]
+    Y4 --> Y5{"实现类个数"}
+    Y5 -->|1| Y3
+    Y5 -->|0 或多个| Y6["null 或 debug 抛异常"]

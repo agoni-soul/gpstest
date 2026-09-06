@@ -1,0 +1,12 @@
+flowchart TB
+    A["@IServiceLoader on UserService"] --> B["kapt 扫注解"]
+    B --> C["MirroredTypesException 取出 IUserService"]
+    C --> D{"实现了声明接口?"}
+    D -->|否| E["编译失败"]
+    D -->|是| F["写入 Entity / ImplSpec"]
+    F --> G{"本模块该接口仅一个实现?"}
+    G -->|是| H["自动 defaultImpl = true"]
+    G -->|否| I["保留注解显式值"]
+    H --> J["生成 ServiceInit_模块名"]
+    I --> J
+    J --> K["put 一次: 接口 / key / 实现 / 单例 / 默认 / 优先级 / 进程"]

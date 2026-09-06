@@ -1,5 +1,9 @@
 # 第 1 问：`@IServiceLoader` 与 `getService` 底层实现
 
+> **定位**：本文记录优化前的实现（固定 `ServiceInit_`、魔法默认 key、`getAll().size` 兜底）。  
+> 当前仓库已落地模块化 Init + 插件聚合 + `ServiceRecord`，请以
+> [优化后设计与流程](service-loader-optimized-design.md) 为准。
+
 记录时间：2026-09-06  
 入口：`ServiceLoaderHelper.getService(IUserService::class.java)`  
 示例：`UserService` 上

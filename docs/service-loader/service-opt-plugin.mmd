@@ -1,0 +1,10 @@
+flowchart TB
+    A["打包扫全部 CLASSES"] --> B{"包名是 generated/service?"}
+    B -->|否| C["原样写入输出 jar"]
+    B -->|是| D{"实现 IServiceInit?"}
+    D -->|是| E["加入 serviceInits"]
+    E --> F["解析 init 中的 ServiceLoader.put"]
+    F --> G{"跨模块 key 或 default 冲突?"}
+    G -->|是| H["GradleException 构建失败"]
+    G -->|否| I["改写 ServiceLoaderInit.loadServiceMap"]
+    I --> J["RETURN 前插入 register 每个 ServiceInit_xxx"]

@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Test as ServiceTest
+    participant Helper as ServiceLoaderHelper
+    participant Loader as ServiceLoader
+    participant Init as ServiceLoaderInit
+    participant Mod as ServiceInit_ServiceImpl
+    participant Pool as SingletonPool
+    participant User as UserService
+
+    Test->>Helper: getService(IUserService.class)
+    Helper->>Loader: load(IUserService.class)
+    Loader->>Loader: lazyInit()
+    Loader->>Init: Class.forName + init()
+    Init->>Init: loadServiceMap()
+    Init->>Mod: register + init()
+    Mod->>Loader: put(IUserService, "", UserService, true, true, 0, "")
+    Helper->>Loader: getDefault()
+    Loader->>Pool: SingletonPool.get(UserService)
+    Pool->>User: newInstance 并缓存
+    Pool-->>Helper: UserService
+    Helper-->>Test: IUserService

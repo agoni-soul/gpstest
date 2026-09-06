@@ -1,0 +1,11 @@
+flowchart TB
+    S["getService 接口"] --> L["ServiceLoader.load"]
+    L --> D["getDefault"]
+    D --> H{"defaultRecord 非空?"}
+    H -->|是| R["createInstance 返回"]
+    H -->|否| A["getAllClasses 去重计数 不 new"]
+    A --> C{"实现类个数"}
+    C -->|1| R2["getByImplClass 创建"]
+    C -->|0| N["返回 null / debug 抛异常"]
+    C -->|大于 1| W["警告: 指定 key 或 defaultImpl"]
+    W --> N

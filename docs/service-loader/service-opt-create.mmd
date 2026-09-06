@@ -1,0 +1,15 @@
+flowchart TB
+    A["createInstance record"] --> B{"singleton?"}
+    B -->|是| C["SingletonPool.get"]
+    B -->|否| D["InstanceCreator.create"]
+    C --> E{"缓存命中?"}
+    E -->|是| F["返回缓存实例"]
+    E -->|否| D
+    D --> G["DefaultFactory 无参构造"]
+    G --> H{"实现 IApplicationAware?"}
+    H -->|是| I["onAttach Application"]
+    H -->|否| J{"实现 IServiceLifecycle?"}
+    I --> J
+    J -->|是| K["onCreate"]
+    J -->|否| L["返回实例"]
+    K --> L

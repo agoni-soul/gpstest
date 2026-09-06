@@ -1,0 +1,15 @@
+flowchart TB
+    Start(["启动灌表对比"])
+    Start --> P1
+    Start --> Q1
+
+    P1["优化前: 第一次 getService"] --> P2["lazyInit"]
+    P2 --> P3["forName 固定 ServiceInit_"]
+    P3 --> P4["只能灌一个模块"]
+    P4 --> P5["多模块会类名冲突或漏注册"]
+
+    Q1["优化后: Application.onCreate"] --> Q2["ServiceLoader.init"]
+    Q2 --> Q3["ServiceLoaderInit.init"]
+    Q3 --> Q4["register 每个 ServiceInit_xxx"]
+    Q4 --> Q5["多模块全部灌表"]
+    Q5 --> Q6["process 不匹配则跳过"]

@@ -13,6 +13,9 @@ internal object ScanSetting {
     const val ROUTES_PACKAGE = "com/haha/servicerouter/routes/"
     const val IROUTE_LOADER = "com/haha/servicerouter/interfaces/IRouteLoader"
     const val IINTERCEPTOR_LOADER = "com/haha/servicerouter/interfaces/IInterceptorLoader"
+    const val ROUTE_LOAD_INTO = "loadInto"
+    const val ROUTE_LOAD_INTO_DESC = "(Ljava/util/Map;)V"
+    const val ROUTE_MAP_PUT = "put"
 
     const val SERVICE_GENERATE_TO_CLASS = "com/haha/service/impl/generated/ServiceLoaderInit"
     const val SERVICE_GENERATE_TO_CLASS_FILE = "$SERVICE_GENERATE_TO_CLASS.class"

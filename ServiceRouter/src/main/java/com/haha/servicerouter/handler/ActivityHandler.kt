@@ -1,6 +1,7 @@
 package com.haha.servicerouter.handler
 
 import android.app.Activity
+import android.app.Fragment
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
@@ -31,55 +32,29 @@ internal class ActivityHandler(routeMetaData: RouteMetaData) : RouteHandler(rout
                 navigator.resultLauncher != null -> {
                     navigator.resultLauncher!!.launch(intent)
                 }
+
                 navigator.activity != null -> {
-                    navigator.activity!!.startActivityForResult(
-                        intent,
-                        navigator.requestCode,
-                        navigator.options
-                    )
-                    if (navigator.enterAnim > -1 || navigator.exitAnim > -1) {
-                        navigator.activity?.overridePendingTransition(
-                            navigator.enterAnim,
-                            navigator.exitAnim
-                        )
-                    }
+                    startFromActivity(navigator.activity!!, intent, navigator)
                 }
+
                 navigator.fragment != null -> {
-                    navigator.fragment?.startActivityForResult(
-                        intent,
-                        navigator.requestCode,
-                        navigator.options
-                    )
+                    startFromFragment(navigator.fragment!!, intent, navigator)
                 }
+
                 navigator.fragmentX != null -> {
-                    navigator.fragmentX?.startActivityForResult(
-                        intent,
-                        navigator.requestCode,
-                        navigator.options
-                    )
+                    startFromFragmentX(navigator.fragmentX!!, intent, navigator)
                 }
+
                 navigator.context is Activity -> {
-                    (navigator.context as Activity).startActivityForResult(
-                        intent,
-                        navigator.requestCode,
-                        navigator.options
-                    )
-                    if (navigator.enterAnim > -1 || navigator.exitAnim > -1) {
-                        (navigator.context as Activity).overridePendingTransition(
-                            navigator.enterAnim,
-                            navigator.exitAnim
-                        )
-                    }
+                    startFromActivity(navigator.context as Activity, intent, navigator)
                 }
+
                 else -> {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     val tmpContext = navigator.context ?: context
                     ActivityCompat.startActivity(tmpContext, intent, navigator.options)
-                    if (tmpContext is Activity && (navigator.enterAnim > -1 || navigator.exitAnim > -1)) {
-                        tmpContext.overridePendingTransition(
-                            navigator.enterAnim,
-                            navigator.exitAnim
-                        )
+                    if (tmpContext is Activity) {
+                        applyTransition(tmpContext, navigator)
                     }
                 }
             }
@@ -87,5 +62,48 @@ internal class ActivityHandler(routeMetaData: RouteMetaData) : RouteHandler(rout
             throw RouteNotFoundException(e)
         }
         return null
+    }
+
+    private fun startFromActivity(
+        activity: Activity,
+        intent: Intent,
+        navigator: DOFRouter.Navigator
+    ) {
+        if (navigator.requestCode >= 0) {
+            activity.startActivityForResult(intent, navigator.requestCode, navigator.options)
+        } else {
+            ActivityCompat.startActivity(activity, intent, navigator.options)
+        }
+        applyTransition(activity, navigator)
+    }
+
+    private fun startFromFragment(
+        fragment: Fragment,
+        intent: Intent,
+        navigator: DOFRouter.Navigator
+    ) {
+        if (navigator.requestCode >= 0) {
+            fragment.startActivityForResult(intent, navigator.requestCode, navigator.options)
+        } else {
+            fragment.startActivity(intent, navigator.options)
+        }
+    }
+
+    private fun startFromFragmentX(
+        fragment: androidx.fragment.app.Fragment,
+        intent: Intent,
+        navigator: DOFRouter.Navigator
+    ) {
+        if (navigator.requestCode >= 0) {
+            fragment.startActivityForResult(intent, navigator.requestCode, navigator.options)
+        } else {
+            fragment.startActivity(intent, navigator.options)
+        }
+    }
+
+    private fun applyTransition(activity: Activity, navigator: DOFRouter.Navigator) {
+        if (navigator.enterAnim > -1 || navigator.exitAnim > -1) {
+            activity.overridePendingTransition(navigator.enterAnim, navigator.exitAnim)
+        }
     }
 }

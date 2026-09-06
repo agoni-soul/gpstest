@@ -18,17 +18,16 @@ import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import java.io.BufferedOutputStream
-import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
 /**
- * 扫描全部 CLASSES：
+ * 单次遍历全部 CLASSES：
  * 1. 收集 Route / Interceptor Loader，改写 Router.loadRouterMap
- * 2. 收集 IServiceInit，改写 ServiceLoaderInit.loadServiceMap，并检查全局 key / 默认实现冲突
+ * 2. 收集 IServiceInit，改写 ServiceLoaderInit.loadServiceMap
+ * 3. 检查跨模块 route path / service key / defaultImpl 冲突
  */
 abstract class RouterRegisterTask : DefaultTask() {
 
@@ -49,127 +48,163 @@ abstract class RouterRegisterTask : DefaultTask() {
         val interceptorLoaders = linkedSetOf<String>()
         val serviceInits = linkedSetOf<String>()
         val servicePuts = mutableListOf<ServicePut>()
+        val routePuts = mutableListOf<RoutePut>()
         val written = hashSetOf<String>()
 
-        collectFromInputs(routeLoaders, interceptorLoaders, serviceInits, servicePuts)
-        checkServiceConflicts(servicePuts)
-
-        logger.lifecycle("[DOFRouter] Auto-register routes: $routeLoaders")
-        logger.lifecycle("[DOFRouter] Auto-register interceptors: $interceptorLoaders")
-        logger.lifecycle("[DOFService] Auto-register inits: $serviceInits")
-
-        val routerInject = ArrayList<String>(routeLoaders.size + interceptorLoaders.size).apply {
-            addAll(routeLoaders)
-            addAll(interceptorLoaders)
-        }
+        var routerBytes: ByteArray? = null
+        var serviceInitBytes: ByteArray? = null
 
         JarOutputStream(BufferedOutputStream(FileOutputStream(output.get().asFile))).use { jos ->
             allJars.get().forEach { file ->
-                copyJar(file.asFile, jos, written, routerInject, serviceInits)
-            }
-            allDirectories.get().forEach { dir ->
-                copyDirectory(dir.asFile, jos, written, routerInject, serviceInits)
-            }
-        }
-    }
-
-    private fun collectFromInputs(
-        routeLoaders: MutableSet<String>,
-        interceptorLoaders: MutableSet<String>,
-        serviceInits: MutableSet<String>,
-        servicePuts: MutableList<ServicePut>
-    ) {
-        allJars.get().forEach { file ->
-            JarFile(file.asFile).use { jar ->
-                jar.entries().asSequence()
-                    .filter { !it.isDirectory && it.name.endsWith(".class") }
-                    .forEach { entry ->
+                JarFile(file.asFile).use { jar ->
+                    jar.entries().asSequence().forEach { entry ->
+                        if (entry.isDirectory || !written.add(entry.name)) {
+                            return@forEach
+                        }
+                        val bytes = jar.getInputStream(entry).use { it.readBytes() }
                         classifyLoader(
                             entry.name,
-                            jar.getInputStream(entry),
+                            bytes,
                             routeLoaders,
                             interceptorLoaders,
                             serviceInits,
-                            servicePuts
+                            servicePuts,
+                            routePuts
                         )
+                        when (entry.name) {
+                            ScanSetting.GENERATE_TO_CLASS_FILE -> routerBytes = bytes
+                            ScanSetting.SERVICE_GENERATE_TO_CLASS_FILE -> serviceInitBytes = bytes
+                            else -> writeEntry(jos, entry.name, bytes)
+                        }
                     }
+                }
             }
-        }
-        allDirectories.get().forEach { dir ->
-            dir.asFile.walkTopDown()
-                .filter { it.isFile && it.extension == "class" }
-                .forEach { classFile ->
-                    val relative = classFile.relativeTo(dir.asFile).invariantSeparatorsPath
+            allDirectories.get().forEach { dir ->
+                dir.asFile.walkTopDown().filter { it.isFile }.forEach { file ->
+                    val relative = file.relativeTo(dir.asFile).invariantSeparatorsPath
+                    if (!written.add(relative)) {
+                        return@forEach
+                    }
+                    val bytes = file.readBytes()
                     classifyLoader(
                         relative,
-                        classFile.inputStream(),
+                        bytes,
                         routeLoaders,
                         interceptorLoaders,
                         serviceInits,
-                        servicePuts
+                        servicePuts,
+                        routePuts
                     )
+                    when (relative) {
+                        ScanSetting.GENERATE_TO_CLASS_FILE -> routerBytes = bytes
+                        ScanSetting.SERVICE_GENERATE_TO_CLASS_FILE -> serviceInitBytes = bytes
+                        else -> writeEntry(jos, relative, bytes)
+                    }
                 }
+            }
+
+            checkRouteConflicts(routePuts)
+            checkServiceConflicts(servicePuts)
+
+            logger.lifecycle("[DOFRouter] Auto-register routes: $routeLoaders")
+            logger.lifecycle("[DOFRouter] Auto-register interceptors: $interceptorLoaders")
+            logger.lifecycle("[DOFService] Auto-register inits: $serviceInits")
+
+            val routerInject =
+                ArrayList<String>(routeLoaders.size + interceptorLoaders.size).apply {
+                    addAll(routeLoaders)
+                    addAll(interceptorLoaders)
+                }
+            routerBytes?.let { origin ->
+                writeEntry(
+                    jos,
+                    ScanSetting.GENERATE_TO_CLASS_FILE,
+                    injectInstanceRegister(origin, routerInject)
+                )
+            }
+            serviceInitBytes?.let { origin ->
+                writeEntry(
+                    jos,
+                    ScanSetting.SERVICE_GENERATE_TO_CLASS_FILE,
+                    injectStaticRegister(origin, serviceInits)
+                )
+            }
         }
     }
 
     private fun classifyLoader(
         entryName: String,
-        input: InputStream,
+        bytes: ByteArray,
         routeLoaders: MutableSet<String>,
         interceptorLoaders: MutableSet<String>,
         serviceInits: MutableSet<String>,
-        servicePuts: MutableList<ServicePut>
+        servicePuts: MutableList<ServicePut>,
+        routePuts: MutableList<RoutePut>
     ) {
         val isRoute = entryName.startsWith(ScanSetting.ROUTES_PACKAGE)
         val isService = entryName.startsWith(ScanSetting.SERVICE_INIT_PACKAGE)
         if ((!isRoute && !isService) || !entryName.endsWith(".class")) {
-            input.close()
             return
         }
-        input.use { stream ->
-            val skip =
-                if (isService) 0 else ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES
-            val reader = ClassReader(stream)
-            var className: String? = null
-            var interfaces: List<String> = emptyList()
-            reader.accept(object : ClassVisitor(Opcodes.ASM9) {
-                override fun visit(
-                    version: Int,
-                    access: Int,
-                    name: String,
-                    signature: String?,
-                    superName: String?,
-                    ifaces: Array<out String>?
-                ) {
-                    className = name
-                    interfaces = ifaces?.toList() ?: emptyList()
-                }
+        val reader = ClassReader(bytes)
+        var className: String? = null
+        var interfaces: List<String> = emptyList()
+        reader.accept(object : ClassVisitor(Opcodes.ASM9) {
+            override fun visit(
+                version: Int,
+                access: Int,
+                name: String,
+                signature: String?,
+                superName: String?,
+                ifaces: Array<out String>?
+            ) {
+                className = name
+                interfaces = ifaces?.toList() ?: emptyList()
+            }
 
-                override fun visitMethod(
-                    access: Int,
-                    name: String,
-                    descriptor: String,
-                    signature: String?,
-                    exceptions: Array<out String>?
-                ): MethodVisitor? {
-                    if (!isService || name != "init" || descriptor != "()V") {
-                        return null
-                    }
-                    if (access and Opcodes.ACC_STATIC != 0) {
-                        return null
-                    }
+            override fun visitMethod(
+                access: Int,
+                name: String,
+                descriptor: String,
+                signature: String?,
+                exceptions: Array<out String>?
+            ): MethodVisitor? {
+                if (isService && name == "init" && descriptor == "()V" &&
+                    access and Opcodes.ACC_STATIC == 0
+                ) {
                     return PutCollector(servicePuts)
                 }
-            }, skip)
-            val name = className ?: return
-            val dotted = name.replace('/', '.')
-            when {
-                interfaces.contains(ScanSetting.IROUTE_LOADER) -> routeLoaders.add(dotted)
-                interfaces.contains(ScanSetting.IINTERCEPTOR_LOADER) -> interceptorLoaders.add(
-                    dotted
-                )
+                if (isRoute &&
+                    name == ScanSetting.ROUTE_LOAD_INTO &&
+                    descriptor == ScanSetting.ROUTE_LOAD_INTO_DESC &&
+                    access and Opcodes.ACC_STATIC == 0
+                ) {
+                    return RoutePutCollector(routePuts)
+                }
+                return null
+            }
+        }, 0)
+        val name = className ?: return
+        val dotted = name.replace('/', '.')
+        when {
+            interfaces.contains(ScanSetting.IROUTE_LOADER) -> routeLoaders.add(dotted)
+            interfaces.contains(ScanSetting.IINTERCEPTOR_LOADER) -> interceptorLoaders.add(dotted)
+            interfaces.contains(ScanSetting.ISERVICE_INIT) -> serviceInits.add(dotted)
+        }
+    }
 
-                interfaces.contains(ScanSetting.ISERVICE_INIT) -> serviceInits.add(dotted)
+    private fun checkRouteConflicts(puts: List<RoutePut>) {
+        val byPath = linkedMapOf<String, RoutePut>()
+        puts.forEach { put ->
+            if (put.path.isEmpty()) {
+                return@forEach
+            }
+            val prev = byPath.put(put.path, put)
+            if (prev != null && prev.implName != put.implName) {
+                throw GradleException(
+                    "Route path conflict: path=${put.path} " +
+                            "${prev.implName} vs ${put.implName}"
+                )
             }
         }
     }
@@ -197,59 +232,6 @@ abstract class RouterRegisterTask : DefaultTask() {
                     )
                 }
             }
-        }
-    }
-
-    private fun copyJar(
-        jarFile: File,
-        jos: JarOutputStream,
-        written: MutableSet<String>,
-        routerInject: List<String>,
-        serviceInits: Collection<String>
-    ) {
-        JarFile(jarFile).use { jar ->
-            jar.entries().asSequence().forEach { entry ->
-                if (entry.isDirectory || !written.add(entry.name)) {
-                    return@forEach
-                }
-                jar.getInputStream(entry).use { input ->
-                    val bytes = when (entry.name) {
-                        ScanSetting.GENERATE_TO_CLASS_FILE ->
-                            injectInstanceRegister(input.readBytes(), routerInject)
-
-                        ScanSetting.SERVICE_GENERATE_TO_CLASS_FILE ->
-                            injectStaticRegister(input.readBytes(), serviceInits)
-
-                        else -> input.readBytes()
-                    }
-                    writeEntry(jos, entry.name, bytes)
-                }
-            }
-        }
-    }
-
-    private fun copyDirectory(
-        dir: File,
-        jos: JarOutputStream,
-        written: MutableSet<String>,
-        routerInject: List<String>,
-        serviceInits: Collection<String>
-    ) {
-        dir.walkTopDown().filter { it.isFile }.forEach { file ->
-            val relative = file.relativeTo(dir).invariantSeparatorsPath
-            if (!written.add(relative)) {
-                return@forEach
-            }
-            val bytes = when (relative) {
-                ScanSetting.GENERATE_TO_CLASS_FILE ->
-                    injectInstanceRegister(file.readBytes(), routerInject)
-
-                ScanSetting.SERVICE_GENERATE_TO_CLASS_FILE ->
-                    injectStaticRegister(file.readBytes(), serviceInits)
-
-                else -> file.readBytes()
-            }
-            writeEntry(jos, relative, bytes)
         }
     }
 
@@ -343,6 +325,40 @@ abstract class RouterRegisterTask : DefaultTask() {
         }
     }
 
+    private class RoutePutCollector(
+        private val out: MutableList<RoutePut>
+    ) : MethodVisitor(Opcodes.ASM9) {
+        private val strings = mutableListOf<String>()
+        private var lastType: Type? = null
+
+        override fun visitLdcInsn(value: Any?) {
+            when (value) {
+                is String -> strings.add(value)
+                is Type -> lastType = value
+            }
+        }
+
+        override fun visitMethodInsn(
+            opcode: Int,
+            owner: String,
+            name: String,
+            descriptor: String,
+            isInterface: Boolean
+        ) {
+            if (name == ScanSetting.ROUTE_MAP_PUT &&
+                (owner == "java/util/Map" || owner.endsWith("HashMap"))
+            ) {
+                val path = strings.firstOrNull().orEmpty()
+                val implName = lastType?.className.orEmpty()
+                if (path.isNotEmpty() && implName.isNotEmpty()) {
+                    out.add(RoutePut(path = path, implName = implName))
+                }
+            }
+            strings.clear()
+            lastType = null
+        }
+    }
+
     private class PutCollector(
         private val out: MutableList<ServicePut>
     ) : MethodVisitor(Opcodes.ASM9) {
@@ -395,6 +411,11 @@ abstract class RouterRegisterTask : DefaultTask() {
             args.clear()
         }
     }
+
+    private data class RoutePut(
+        val path: String,
+        val implName: String
+    )
 
     private data class ServicePut(
         val interfaceName: String,

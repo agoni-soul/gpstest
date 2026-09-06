@@ -27,6 +27,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 
 /**
  * @auther: haha
@@ -103,8 +104,13 @@ public class RouteProcessor extends BaseProcessor {
                 Logger.info("Found Fragment_androidx " + element.asType());
                 routeType = RouteType.FRAGMENT_X;
             } else {
-                Logger.info("Unknown route " + element.asType());
-                routeType = RouteType.UNKNOWN;
+                mMessager.printMessage(
+                        Diagnostic.Kind.ERROR,
+                        "@Route only supports Activity / Fragment / androidx.Fragment, but found "
+                                + element.asType(),
+                        element
+                );
+                continue;
             }
 
             String routeKey = resolveRouteKey(routeAnn);

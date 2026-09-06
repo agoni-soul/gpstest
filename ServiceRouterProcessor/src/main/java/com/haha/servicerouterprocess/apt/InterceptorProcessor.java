@@ -16,8 +16,8 @@ import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -35,7 +35,7 @@ import javax.lang.model.type.TypeMirror;
 @SupportedAnnotationTypes("com.haha.servicerouterannotation.annotation.Interceptor")
 public class InterceptorProcessor extends BaseProcessor {
 
-    private final TreeMap<Integer, InterceptorMetaData> interceptorMap = new TreeMap<>();
+    private final Set<String> interceptorClasses = new HashSet<>();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -66,19 +66,18 @@ public class InterceptorProcessor extends BaseProcessor {
         }
         Logger.info(">>> Found interceptors, size is " + elements.size() + " <<<");
 
-        interceptorMap.clear();
+        interceptorClasses.clear();
 
         TypeMirror tmInterceptor = typeMirrorOf(Consts.INTERCEPTOR);
 
-        ParameterizedTypeName mapTypeOfInterceptorLoader = ParameterizedTypeName.get(
-                ClassName.get(TreeMap.class),
-                ClassName.get(Integer.class),
+        ParameterizedTypeName listTypeOfInterceptorLoader = ParameterizedTypeName.get(
+                ClassName.get(List.class),
                 ClassName.get(InterceptorMetaData.class)
         );
-        ParameterSpec mapParamSpec = ParameterSpec.builder(mapTypeOfInterceptorLoader, "map").build();
+        ParameterSpec listParamSpec = ParameterSpec.builder(listTypeOfInterceptorLoader, "list").build();
 
         MethodSpec.Builder interceptorLoaderFunBuilder = MethodSpec.methodBuilder(Consts.METHOD_LOAD)
-                .addParameter(mapParamSpec)
+                .addParameter(listParamSpec)
                 .addAnnotation(Override.class)
                 .addModifiers(PUBLIC);
 
@@ -93,19 +92,14 @@ public class InterceptorProcessor extends BaseProcessor {
                 Logger.warn("Interceptor " + element.getSimpleName() + " does not impl IRouteInterceptor");
                 continue;
             }
-            if (interceptorMap.containsKey(interceptorAnn.priority())) {
-                Logger.warn("Interceptor priority " + interceptorAnn.priority() + " already exists, skip "
-                        + element.getSimpleName());
+            String className = element.asType().toString();
+            if (!interceptorClasses.add(className)) {
+                Logger.warn("Interceptor " + element.getSimpleName() + " already registered, skip");
                 continue;
             }
 
-            interceptorMap.put(
-                    interceptorAnn.priority(),
-                    new InterceptorMetaData(interceptorAnn.priority(), element.asType().toString(), Object.class)
-            );
             interceptorLoaderFunBuilder.addStatement(
-                    "map.put($L, new $T($L, $S, $T.class))",
-                    interceptorAnn.priority(),
+                    "list.add(new $T($L, $S, $T.class))",
                     InterceptorMetaData.class,
                     interceptorAnn.priority(),
                     interceptorAnn.name().trim(),
@@ -113,7 +107,7 @@ public class InterceptorProcessor extends BaseProcessor {
             );
         }
 
-        if (interceptorMap.isEmpty()) {
+        if (interceptorClasses.isEmpty()) {
             return;
         }
 

@@ -19,7 +19,7 @@ internal class FragmentXHandler(routeMetaData: RouteMetaData) : RouteHandler(rou
         Logger.d("Handle by FragmentXHandler, route to ${routeMetadata.clazz.simpleName}")
         try {
             val clz = routeMetadata.clazz
-            val fragment = clz.newInstance() as Fragment
+            val fragment = clz.getDeclaredConstructor().newInstance() as Fragment
             fragment.arguments = navigator.extras
             return fragment
         } catch (e: ClassNotFoundException) {

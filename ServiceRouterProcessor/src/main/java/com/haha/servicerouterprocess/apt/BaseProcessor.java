@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.util.Elements;
@@ -24,6 +25,7 @@ public abstract class BaseProcessor extends AbstractProcessor {
     Filer mFiler;
     Elements mElements;
     Types mTypes;
+    Messager mMessager;
     String moduleName;
 
     @Override
@@ -33,6 +35,7 @@ public abstract class BaseProcessor extends AbstractProcessor {
         mFiler = processingEnv.getFiler();
         mElements = processingEnv.getElementUtils();
         mTypes = processingEnv.getTypeUtils();
+        mMessager = processingEnv.getMessager();
 
         Map<String, String> options = processingEnv.getOptions();
         if (!options.isEmpty()) {

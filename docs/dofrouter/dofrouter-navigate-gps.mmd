@@ -1,0 +1,11 @@
+flowchart TB
+    A["MainActivity 点 btn_skip_gps"] --> B["DOFRouter.create /gps/main"]
+    B --> C["Navigator.path = /gps/main"]
+    C --> D["Router.navigator"]
+    D --> E["LogInterceptor 打日志，放行"]
+    E --> F["addressingComponent"]
+    F --> G["DefaultMatcher: /gps/main == /gps/main"]
+    G --> H["ActivityHandler"]
+    H --> I["Intent ComponentName = GpsActivity"]
+    I --> J["MainActivity.startActivityForResult"]
+    J --> K["打开 Gps 页"]

@@ -1,0 +1,9 @@
+flowchart LR
+    subgraph unknown ["启动时不知道类名"]
+        A["扫全部 dex 类名"] --> B["过滤 routes 包"]
+        B --> C["Class.forName + loadInto"]
+    end
+    subgraph known ["打包时已写入类名"]
+        D["loadRouterMap 里已有 ldc 字符串"] --> E["register 两次"]
+        E --> F["Class.forName + loadInto"]
+    end

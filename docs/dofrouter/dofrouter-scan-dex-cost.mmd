@@ -1,0 +1,6 @@
+flowchart TB
+    S1["getApplicationInfo"] --> S2["new DexFile base.apk"]
+    S2 --> S3["entries 遍历数万类名"]
+    S3 --> S4["startsWith routes 包"]
+    S4 --> S5["Class.forName 那 2 个 Loader"]
+    S5 --> S6["loadInto"]

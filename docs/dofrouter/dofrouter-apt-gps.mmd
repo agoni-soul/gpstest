@@ -1,0 +1,10 @@
+flowchart TB
+    A["kapt 启动 RouteProcessor"] --> B["读 DOFROUTER_MODULE_NAME = app"]
+    B --> C["roundEnv 拿到 GpsActivity"]
+    C --> D{"是 Activity / Fragment?"}
+    D -->|Activity| E["routeType = ACTIVITY"]
+    E --> F["key = path = /gps/main"]
+    F --> G{"key 已存在?"}
+    G -->|否| H["JavaPoet 写 map.put"]
+    H --> I["写出 RouteLoader_app.java"]
+    I --> J["编译进 app 的 CLASSES"]

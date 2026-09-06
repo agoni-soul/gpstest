@@ -1,0 +1,16 @@
+flowchart TB
+    subgraph compile ["编译期"]
+        A["ServiceRouterAnnotation @Route"] --> B["ServiceRouterProcessor RouteProcessor"]
+        B --> C["RouteLoader_模块名"]
+    end
+    subgraph package ["打包期"]
+        D["ServiceRouterPlugin"] --> E["ASM 注入 Router.loadRouterMap"]
+    end
+    subgraph runtime ["运行时"]
+        F["DOFRouter 门面"] --> G["Router 单例"]
+        G --> H["RouteTable"]
+        H --> I["Matcher / Handler"]
+    end
+    C --> D
+    E --> F
+    C --> G

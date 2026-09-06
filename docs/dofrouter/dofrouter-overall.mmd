@@ -1,0 +1,10 @@
+flowchart TB
+    A["GpsActivity 写 @Route"] --> B["kapt: RouteProcessor"]
+    B --> C["生成 RouteLoader_app"]
+    C --> D["打包: ServiceRouterPlugin 扫 CLASSES"]
+    D --> E["ASM 改写 Router.loadRouterMap"]
+    E --> F["启动: DOFRouter.init"]
+    F --> G["RouteTable.routes 装入 GPS"]
+    G --> H["首页 create /gps/main .navigate"]
+    H --> I["DefaultMatcher 命中"]
+    I --> J["ActivityHandler startActivity GpsActivity"]

@@ -1,0 +1,12 @@
+flowchart TB
+    A["HahaApplication.onCreate"] --> B["DOFRouter.init"]
+    B --> C["Router.loadRouteTable"]
+    C --> D["loadRouterMap"]
+    D --> E{"插件插入了 register?"}
+    E -->|是| F["register RouteLoader_app"]
+    F --> G["RouteTable.routes /gps/main = GpsActivity"]
+    G --> H["registerByPlugin = true"]
+    H --> I["跳过扫 dex"]
+    E -->|否| J["ClassUtils 扫 routes 包"]
+    J --> K["反射 new RouteLoader_app"]
+    K --> G

@@ -1,0 +1,4 @@
+flowchart TB
+    P1["loadRouterMap"] --> P2["register 2 次"]
+    P2 --> P3["Class.forName 那 2 个 Loader"]
+    P3 --> P4["loadInto"]

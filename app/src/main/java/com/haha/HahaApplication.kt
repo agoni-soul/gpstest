@@ -7,6 +7,7 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.os.Looper
 import android.util.Log
 import com.haha.base.ActivityManager
 import com.haha.hahalearn.BuildConfig
@@ -48,6 +49,8 @@ class HahaApplication : Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         mContext = this
+        // 早于 TimeMonitor / ActivityManager，启动点与崩溃才能落盘
+        DOFLogUtil.init(this)
         // 进程启动立刻注册，覆盖后续全部 Activity，替代 BaseActivity 内 ActivityCollector
         ActivityManager.init(this)
         TimeMonitorManager.getInstance()
@@ -65,10 +68,13 @@ class HahaApplication : Application() {
             .recodingTimeTag("ApplicationCreate")
 
         application = this
-        LeakCanaryInstaller.install(this)
-//        MMKV.initialize(this);
         initComponents()
-        DOFLogUtil.init(this)
+        // debug LeakCanary 不挡 onCreate；release 为空实现。Idle 时首个 Activity 已 create，
+        // AppWatcher 仍能在 onDestroy 时 watch。
+        Looper.myQueue().addIdleHandler {
+            LeakCanaryInstaller.install(this)
+            false
+        }
 //        val pluginManager = PluginManager.getInStance(this)
 //        pluginManager.init()
 //        try {

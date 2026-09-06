@@ -203,8 +203,9 @@ Async 换的是等待形态，不是更短的 `contentReady`。
 ### 6.1 启动链路（首页）
 
 ```
-HahaApplication.attachBaseContext  → TimeMonitor.start
-HahaApplication.onCreate           → ApplicationCreate
+HahaApplication.attachBaseContext  → DOFLogUtil.init + TimeMonitor.start
+HahaApplication.onCreate           → ApplicationCreate + DOFRouter/ServiceLoader
+                                   → Idle 后 LeakCanary（debug）
 MainActivity.onCreate
   Theme.App.Starting + installSplashScreen   // 品牌窗，只盖进程创建
   onWindowReady

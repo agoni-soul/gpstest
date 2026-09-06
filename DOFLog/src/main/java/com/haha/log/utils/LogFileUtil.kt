@@ -25,9 +25,11 @@ object LogFileUtil {
     private var appContext: Context? = null
 
     fun init(context: Context?) {
-        if (context != null) {
-            appContext = context.applicationContext
+        if (context == null) {
+            return
         }
+        // attachBaseContext 时 applicationContext 可能仍为 null，回退用传入的 Context
+        appContext = context.applicationContext ?: context
     }
 
     /**

@@ -27,6 +27,12 @@ object DOFLogUtil {
 
     @JvmOverloads
     fun init(context: Context? = null, isDebug: Boolean = true) {
+        if (initialized) {
+            if (context != null) {
+                LogFileUtil.init(context)
+            }
+            return
+        }
         if (context != null) {
             LogFileUtil.init(context)
         }

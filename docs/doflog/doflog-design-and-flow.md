@@ -3,7 +3,7 @@
 记录时间：2026-09-06  
 模块：独立 Android Library `:DOFLog`（包名 `com.haha.log`）  
 入口：`DOFLogUtil`  
-启动：`HahaApplication.onCreate()` → `DOFLogUtil.init(this)`
+启动：`HahaApplication.attachBaseContext()` → `DOFLogUtil.init(this)`
 
 配套流程图（PNG 可直接预览）：
 
@@ -198,7 +198,7 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 
 ## 3. 初始化流程
 
-启动点：`HahaApplication.onCreate()` → `DOFLogUtil.init(this)`。
+启动点：`HahaApplication.attachBaseContext()` → `DOFLogUtil.init(this)`。
 
 ![初始化流程](assets/doflog-init-flow.png)
 
@@ -314,7 +314,7 @@ index 2 开始扫并过滤。
 - `TestLearnUtils.test()` 拉起的测试类：`PluginTest`、`ServiceTest`、`HandlerTest`、`ThreadTest`、
   `CollectionTest`、`RetrofitTest`、`OkHttpTest`、`SocketTest`、`HttpsVersionTest`、`MqttTest`
 
-初始化仍在 `HahaApplication`：`DOFLogUtil.init(this)`。
+初始化仍在 `HahaApplication.attachBaseContext()`：`DOFLogUtil.init(this)`。
 
 ---
 

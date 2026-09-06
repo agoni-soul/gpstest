@@ -1,5 +1,5 @@
 flowchart TD
-    A[HahaApplication.onCreate] --> B[DOFLogUtil.init this]
+    A[HahaApplication.attachBaseContext] --> B[DOFLogUtil.init this]
     B --> C[LogFileUtil.appContext = applicationContext]
     C --> D[解析 log 目录]
     D --> E{外部存储可用且 getExternalFilesDir 非空?}

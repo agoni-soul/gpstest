@@ -1,0 +1,7 @@
+flowchart TB
+    C1["@IServiceLoader 标在实现类"] --> C2["APT 生成 ServiceInit_"]
+    C2 --> C3["运行时反射 init 填 HashMap"]
+    C3 --> C4["按默认 key 或业务 key 查找"]
+    C4 --> C5{"singleton?"}
+    C5 -->|是| C6["SingletonPool 复用"]
+    C5 -->|否| C7["每次 new"]

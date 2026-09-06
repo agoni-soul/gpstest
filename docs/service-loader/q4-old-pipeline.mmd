@@ -1,0 +1,9 @@
+flowchart TB
+    A["@IServiceLoader"] --> B["APT 固定生成 ServiceInit_"]
+    B --> C["运行时 forName 这一个类"]
+    C --> D["mMap 登记默认 key + 类名 key"]
+    D --> E["Helper get 魔法默认 key"]
+    E --> F{"命中?"}
+    F -->|否| G["getAll 全量 new 再数 size"]
+    F -->|是| H["返回实例"]
+    G --> H

@@ -1,0 +1,9 @@
+flowchart LR
+    App["app 调用 getService"] --> Api["ServiceApi<br/>IUserService"]
+    App --> Runtime["ServiceRuntime<br/>Helper / ServiceLoader"]
+    App -->|"runtimeOnly"| Impl["ServiceImpl<br/>UserService"]
+    Impl --> Ann["ServiceAnnotation<br/>@IServiceLoader"]
+    Impl --> Apt["ServiceAnnotationProcessor<br/>生成 ServiceInit_"]
+    Runtime --> Ann
+    Impl --> Api
+    Impl --> Runtime

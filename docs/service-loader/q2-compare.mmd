@@ -1,0 +1,9 @@
+flowchart LR
+    subgraph jdk ["java.util.ServiceLoader"]
+        A1["标准 SPI"] --> A2["运行时扫 META-INF"]
+        A2 --> A3["无 key / 无默认 / 无单例"]
+    end
+    subgraph custom ["@IServiceLoader"]
+        B1["组件化注解"] --> B2["编译期写死映射"]
+        B2 --> B3["有 key / 默认实现 / 单例"]
+    end

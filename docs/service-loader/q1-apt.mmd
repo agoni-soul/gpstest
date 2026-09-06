@@ -1,0 +1,9 @@
+flowchart TB
+    A["UserService 标 @IServiceLoader"] --> B["kapt 扫注解"]
+    B --> C["MirroredTypesException 取出 IUserService"]
+    C --> D{"实现了声明的接口?"}
+    D -->|否| E["编译失败"]
+    D -->|是| F["defaultImpl: 登记 _service_default_impl"]
+    F --> G["key 为空: 再登记类名 key"]
+    G --> H["生成 ServiceInit_.init()"]
+    H --> I["put(IUserService, key, UserService, singleton)"]

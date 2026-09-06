@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Test as ServiceTest
+    participant Helper as ServiceLoaderHelper
+    participant Loader as ServiceLoader
+    participant Init as ServiceInit_
+    participant Pool as SingletonPool
+    participant User as UserService
+
+    Test->>Helper: getService(IUserService.class)
+    Helper->>Loader: load(IUserService.class)
+    Loader->>Loader: lazyInit()
+    Loader->>Init: Class.forName + init()
+    Init->>Loader: put 默认 key 与类名 key
+    Helper->>Loader: get("_service_default_impl")
+    Loader->>Pool: singleton=true
+    Pool->>User: newInstance 并缓存
+    Pool-->>Helper: UserService
+    Helper-->>Test: IUserService

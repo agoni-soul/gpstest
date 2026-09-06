@@ -1,0 +1,13 @@
+flowchart TB
+    subgraph oldMap ["原来 mMap"]
+        K1["_service_default_impl"] --> U1["UserService"]
+        K2["类名 key"] --> U1
+        G1["getAll size = 2"] --> U1
+    end
+    subgraph newMap ["改后 ServiceRecord"]
+        R1["records: 一条 UserService"]
+        R2["defaultRecord 指向同一条"]
+        R3["byKey 仅用户写了 key 才有"]
+        G2["getAll size = 1"]
+        R1 --> G2
+    end

@@ -1,0 +1,7 @@
+flowchart TB
+    J1["@AutoService(Service) 或手写文件"] --> J2["META-INF/services/接口全名"]
+    J2 --> J3["运行时 ClassLoader 扫资源"]
+    J3 --> J4["读出实现类全名列表"]
+    J4 --> J5["iterator 懒创建"]
+    J5 --> J6["Class.forName + newInstance"]
+    J6 --> J7["遍历得到全部 Provider"]

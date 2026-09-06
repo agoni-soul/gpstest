@@ -1,0 +1,7 @@
+flowchart TB
+    C1["打包扫 CLASSES"] --> C2{"实现 IServiceInit?"}
+    C2 -->|是| C3["加入 serviceInits"]
+    C3 --> C4["解析 put 检查全局冲突"]
+    C4 -->|冲突| C5["构建失败"]
+    C4 -->|通过| C6["改写 ServiceLoaderInit.loadServiceMap"]
+    C6 --> C7["register 每个 ServiceInit_xxx"]

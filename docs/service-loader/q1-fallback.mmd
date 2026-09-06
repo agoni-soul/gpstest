@@ -1,0 +1,8 @@
+flowchart TB
+    S["getService(接口)"] --> D["get(_service_default_impl)"]
+    D --> H{"实例非空?"}
+    H -->|是| R["返回默认实现"]
+    H -->|否| A["getAll 实例化全部"]
+    A --> C{"list.size"}
+    C -->|1| R2["返回唯一实现"]
+    C -->|0 或大于 1| N["返回 null"]

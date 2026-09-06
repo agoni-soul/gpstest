@@ -1,6 +1,9 @@
 # 组件化 ServiceLoader 优化后设计与流程
 
 记录时间：2026-09-06  
+包目录：`docs/service-loader/`  
+本包两篇：本文（当前实现）+ [优化前笔记](service-legacy-notes.md)（原三问合并）。
+
 入口：`ServiceLoaderHelper.getService(IUserService::class.java)`  
 示例：`UserService` 上 `@IServiceLoader(interfaces = [IUserService::class], defaultImpl = true)`
 
@@ -325,9 +328,7 @@ Debug 下找不到实现应尽早失败，避免组件化里「以为注册了�
 
 ## 10. 和本包其它文档的关系
 
-| 文档                                                            | 现在怎么读                |
-|---------------------------------------------------------------|----------------------|
-| 本文                                                            | **当前实现**的总结 + 优化前后对比 |
-| [getService 底层实现](service-loader-getservice-impl.md)          | 优化前实现备忘，便于对照         |
-| [原框架与改动方案对照](service-loader-old-vs-new.md)                    | 条目对照底稿，方案已落地         |
-| [JDK SPI 与 IServiceLoader](service-loader-jdk-vs-iservice.md) | 和 JDK SPI 的概念对比      |
+| 文档                               | 现在怎么读                                  |
+|----------------------------------|----------------------------------------|
+| 本文                               | **当前实现**的总结 + 优化前后对比                   |
+| [优化前笔记](service-legacy-notes.md) | 原三问合并：优化前 `getService`、JDK SPI 对照、改动条目 |

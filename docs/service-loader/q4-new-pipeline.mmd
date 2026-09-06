@@ -1,9 +1,0 @@
-flowchart TB
-    A["@IServiceLoader"] --> B["APT 生成 ServiceInit_模块名"]
-    B --> C["实现 IServiceInit"]
-    C --> D["插件扫全部 Init 并查冲突"]
-    D --> E["ASM 注入 ServiceLoaderInit"]
-    E --> F["Application.init 灌表"]
-    F --> G["ServiceRecord 一条实现一份"]
-    G --> H["Helper getDefault 或 get key"]
-    H --> I["SingletonPool / Factory"]

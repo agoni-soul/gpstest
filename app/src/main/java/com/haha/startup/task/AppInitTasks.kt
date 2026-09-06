@@ -1,16 +1,19 @@
 package com.haha.startup.task
 
 import android.app.Application
+import com.bumptech.glide.Glide
 import com.haha.base.ActivityManager
 import com.haha.hahalearn.BuildConfig
 import com.haha.leakcanary.LeakCanaryInstaller
 import com.haha.log.DOFLogUtil
 import com.haha.main.timeMonitor.TimeMonitorConfig
 import com.haha.main.timeMonitor.TimeMonitorManager
+import com.haha.network.HttpClient
 import com.haha.service.impl.service.ServiceLoader
 import com.haha.servicerouter.core.DOFRouter
 import com.haha.startup.AppInitTask
 import com.haha.startup.InitStage
+import com.haha.storage.MmkvHolder
 
 object LogInitTask : AppInitTask {
     override val name = "log"
@@ -63,6 +66,36 @@ object ServiceLoaderInitTask : AppInitTask {
 
     override fun run(app: Application) {
         ServiceLoader.init(app, BuildConfig.DEBUG)
+    }
+}
+
+object MmkvInitTask : AppInitTask {
+    override val name = "mmkv"
+    override val stage = InitStage.ON_CREATE
+    override val dependsOn = listOf("log")
+
+    override fun run(app: Application) {
+        MmkvHolder.init(app)
+    }
+}
+
+object NetworkInitTask : AppInitTask {
+    override val name = "network"
+    override val stage = InitStage.ON_CREATE
+    override val dependsOn = listOf("log")
+
+    override fun run(app: Application) {
+        HttpClient.init(app)
+    }
+}
+
+object GlideInitTask : AppInitTask {
+    override val name = "glide"
+    override val stage = InitStage.IDLE
+    override val dependsOn = listOf("network")
+
+    override fun run(app: Application) {
+        Glide.get(app)
     }
 }
 

@@ -204,8 +204,9 @@ Async 换的是等待形态，不是更短的 `contentReady`。
 
 ```
 HahaApplication.attachBaseContext  → AppInitTable ATTACH_BASE（log / ActivityManager / TimeMonitor）
-HahaApplication.onCreate           → ApplicationCreate + AppInitTable ON_CREATE（Router / ServiceLoader）
-                                   → Idle 后 AppInitTable IDLE（LeakCanary）
+HahaApplication.onCreate           → ApplicationCreate + AppInitTable ON_CREATE
+                                   （MMKV / Retrofit+RxJava / Router / ServiceLoader）
+                                   → Idle 后 AppInitTable IDLE（Glide 预热 / LeakCanary）
 MainActivity.onCreate
   Theme.App.Starting + installSplashScreen   // 品牌窗，只盖进程创建
   onWindowReady

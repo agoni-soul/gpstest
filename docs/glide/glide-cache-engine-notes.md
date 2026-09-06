@@ -7,14 +7,15 @@
 
 配套流程图（PNG / SVG / mermaid 源文件）：
 
-| 图                         | 对应章节 | PNG                                           | SVG                                           | 源文件                                           |
-|---------------------------|------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
-| skipMemory + ALL 首次 vs 再次 | §1.6 | [png](glide-skip-memory-all-flow.png)         | [svg](glide-skip-memory-all-flow.svg)         | [mmd](glide-skip-memory-all-flow.mmd)         |
-| NONE vs DATA 流程图对比        | §2.5 | [png](glide-skip-memory-strategy-compare.png) | [svg](glide-skip-memory-strategy-compare.svg) | [mmd](glide-skip-memory-strategy-compare.mmd) |
-| ALL 首次网络多级查找链             | §3.5 | [png](glide-all-lookup-chain.png)             | [svg](glide-all-lookup-chain.svg)             | [mmd](glide-all-lookup-chain.mmd)             |
-| ALL 首次网络加载总流程（含源码）        | §4.1 | [png](glide-all-first-load.png)               | [svg](glide-all-first-load.svg)               | [mmd](glide-all-first-load.mmd)               |
+| 图                         | 对应章节 | PNG                                                  | SVG                                                  | 源文件                                                  |
+|---------------------------|------|------------------------------------------------------|------------------------------------------------------|------------------------------------------------------|
+| skipMemory + ALL 首次 vs 再次 | §1.6 | [png](assets/glide-skip-memory-all-flow.png)         | [svg](assets/glide-skip-memory-all-flow.svg)         | [mmd](assets/glide-skip-memory-all-flow.mmd)         |
+| NONE vs DATA 流程图对比        | §2.5 | [png](assets/glide-skip-memory-strategy-compare.png) | [svg](assets/glide-skip-memory-strategy-compare.svg) | [mmd](assets/glide-skip-memory-strategy-compare.mmd) |
+| ALL 首次网络多级查找链             | §3.5 | [png](assets/glide-all-lookup-chain.png)             | [svg](assets/glide-all-lookup-chain.svg)             | [mmd](assets/glide-all-lookup-chain.mmd)             |
+| ALL 首次网络加载总流程（含源码）        | §4.1 | [png](assets/glide-all-first-load.png)               | [svg](assets/glide-all-first-load.svg)               | [mmd](assets/glide-all-first-load.mmd)               |
 
-流程图已渲染为 PNG，Android Studio Markdown 预览可直接看图；源文件是同名 `.mmd`。
+流程图已渲染为 PNG，放在 `assets/`；Android Studio Markdown 预览可直接看图；图与源文件在 `assets/`，同名
+`.mmd`。
 
 ---
 
@@ -184,9 +185,9 @@ DataCacheGenerator 读原图文件
 
 ### 1.6 流程图（首次 vs 再次）
 
-![skipMemory + ALL 首次 vs 再次](glide-skip-memory-all-flow.png)
+![skipMemory + ALL 首次 vs 再次](assets/glide-skip-memory-all-flow.png)
 
-[SVG](glide-skip-memory-all-flow.svg) · [mermaid 源文件](glide-skip-memory-all-flow.mmd)
+[SVG](assets/glide-skip-memory-all-flow.svg) · [mermaid 源文件](assets/glide-skip-memory-all-flow.mmd)
 
 ### 1.7 与「只开磁盘、关内存」的设计意图
 
@@ -345,9 +346,9 @@ DATA 盘命中（DataCacheKey 相同，只认 url+signature）
 
 ### 2.5 流程图对比
 
-![NONE vs DATA 流程图对比](glide-skip-memory-strategy-compare.png)
+![NONE vs DATA 流程图对比](assets/glide-skip-memory-strategy-compare.png)
 
-[SVG](glide-skip-memory-strategy-compare.svg) · [mermaid 源文件](glide-skip-memory-strategy-compare.mmd)
+[SVG](assets/glide-skip-memory-strategy-compare.svg) · [mermaid 源文件](assets/glide-skip-memory-strategy-compare.mmd)
 
 ### 2.6 选型建议
 
@@ -467,9 +468,9 @@ SOURCE 拉到 InputStream
 
 ### 3.5 总流程图（ALL，首次网络）
 
-![ALL 首次网络多级查找链](glide-all-lookup-chain.png)
+![ALL 首次网络多级查找链](assets/glide-all-lookup-chain.png)
 
-[SVG](glide-all-lookup-chain.svg) · [mermaid 源文件](glide-all-lookup-chain.mmd)
+[SVG](assets/glide-all-lookup-chain.svg) · [mermaid 源文件](assets/glide-all-lookup-chain.mmd)
 
 **DATA only**：去掉 Resource 盘读写、去掉写 RESOURCE。  
 **RESOURCE only**：去掉 Data 盘读写、SOURCE 不写 DATA。
@@ -515,9 +516,9 @@ SOURCE 拉到 InputStream
 
 ### 4.1 总流程图（含源码类/方法）
 
-![ALL 首次网络加载总流程（含源码）](glide-all-first-load.png)
+![ALL 首次网络加载总流程（含源码）](assets/glide-all-first-load.png)
 
-[SVG](glide-all-first-load.svg) · [mermaid 源文件](glide-all-first-load.mmd)
+[SVG](assets/glide-all-first-load.svg) · [mermaid 源文件](assets/glide-all-first-load.mmd)
 
 ### 4.2 按阶段文字说明（与图一一对应）
 

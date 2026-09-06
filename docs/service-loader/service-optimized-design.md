@@ -12,19 +12,19 @@
 
 配套流程图（PNG 可直接预览）：
 
-| 图             | PNG                                 | 源文件                                 |
-|---------------|-------------------------------------|-------------------------------------|
-| 优化后整体三期       | [png](service-opt-overview.png)     | [mmd](service-opt-overview.mmd)     |
-| 模块分层          | [png](service-opt-modules.png)      | [mmd](service-opt-modules.mmd)      |
-| APT 生成本模块注册表  | [png](service-opt-apt.png)          | [mmd](service-opt-apt.mmd)          |
-| 插件聚合与冲突检查     | [png](service-opt-plugin.png)       | [mmd](service-opt-plugin.mmd)       |
-| getService 时序 | [png](service-opt-getservice.png)   | [mmd](service-opt-getservice.mmd)   |
-| getService 决策 | [png](service-opt-lookup.png)       | [mmd](service-opt-lookup.mmd)       |
-| 实例创建          | [png](service-opt-create.png)       | [mmd](service-opt-create.mmd)       |
-| 优化前后整条链路      | [png](service-compare-pipeline.png) | [mmd](service-compare-pipeline.mmd) |
-| 优化前后注册表       | [png](service-compare-registry.png) | [mmd](service-compare-registry.mmd) |
-| 优化前后查找        | [png](service-compare-lookup.png)   | [mmd](service-compare-lookup.mmd)   |
-| 优化前后启动灌表      | [png](service-compare-init.png)     | [mmd](service-compare-init.mmd)     |
+| 图             | PNG                                        | 源文件                                        |
+|---------------|--------------------------------------------|--------------------------------------------|
+| 优化后整体三期       | [png](assets/service-opt-overview.png)     | [mmd](assets/service-opt-overview.mmd)     |
+| 模块分层          | [png](assets/service-opt-modules.png)      | [mmd](assets/service-opt-modules.mmd)      |
+| APT 生成本模块注册表  | [png](assets/service-opt-apt.png)          | [mmd](assets/service-opt-apt.mmd)          |
+| 插件聚合与冲突检查     | [png](assets/service-opt-plugin.png)       | [mmd](assets/service-opt-plugin.mmd)       |
+| getService 时序 | [png](assets/service-opt-getservice.png)   | [mmd](assets/service-opt-getservice.mmd)   |
+| getService 决策 | [png](assets/service-opt-lookup.png)       | [mmd](assets/service-opt-lookup.mmd)       |
+| 实例创建          | [png](assets/service-opt-create.png)       | [mmd](assets/service-opt-create.mmd)       |
+| 优化前后整条链路      | [png](assets/service-compare-pipeline.png) | [mmd](assets/service-compare-pipeline.mmd) |
+| 优化前后注册表       | [png](assets/service-compare-registry.png) | [mmd](assets/service-compare-registry.mmd) |
+| 优化前后查找        | [png](assets/service-compare-lookup.png)   | [mmd](assets/service-compare-lookup.mmd)   |
+| 优化前后启动灌表      | [png](assets/service-compare-init.png)     | [mmd](assets/service-compare-init.mmd)     |
 
 ---
 
@@ -52,7 +52,7 @@ demo，但撑不住多 impl 模块，也会把「一个实现登记两条 key」
 
 ## 2. 优化后整体架构
 
-![优化后整体三期](service-opt-overview.png)
+![优化后整体三期](assets/service-opt-overview.png)
 
 | 阶段                 | 谁干活                                     | 产物                                                        |
 |--------------------|-----------------------------------------|-----------------------------------------------------------|
@@ -60,7 +60,7 @@ demo，但撑不住多 impl 模块，也会把「一个实现登记两条 key」
 | 打包期（AGP Transform） | `RouterRegisterTask`                    | 往 `ServiceLoaderInit.loadServiceMap()` 插入 `register(...)` |
 | 运行期                | `ServiceLoader` + `ServiceLoaderHelper` | 查 `SERVICES` 表，按默认实现 / key 创建实例                           |
 
-![模块分层](service-opt-modules.png)
+![模块分层](assets/service-opt-modules.png)
 
 | 模块                           | 职责                                                                              |
 |------------------------------|---------------------------------------------------------------------------------|
@@ -106,7 +106,7 @@ class UserService : IUserService
 arg("SERVICE_MODULE_NAME", project.getName())  // → ServiceImpl
 ```
 
-![APT 生成本模块注册表](service-opt-apt.png)
+![APT 生成本模块注册表](assets/service-opt-apt.png)
 
 `ServiceAnnotationProcessor.process()` 分两轮：
 
@@ -147,7 +147,7 @@ public final class ServiceInit_ServiceImpl implements IServiceInit {
 `app` 应用了 `com.haha.servicerouter.register`。`RouterRegisterPlugin` 对每个 variant 注册
 `RouterRegisterTask`，对全部 CLASSES（含依赖 jar / 本模块 class）做 Transform。
 
-![插件聚合与冲突检查](service-opt-plugin.png)
+![插件聚合与冲突检查](assets/service-opt-plugin.png)
 
 只看这个包：`com/haha/service/impl/generated/service/`。ASM 读 class：
 
@@ -213,9 +213,9 @@ ServiceLoaderHelper.getService<IUserService>()
 ServiceLoaderHelper.getService(IUserService::class.java)
 ```
 
-![getService 时序](service-opt-getservice.png)
+![getService 时序](assets/service-opt-getservice.png)
 
-![getService 决策](service-opt-lookup.png)
+![getService 决策](assets/service-opt-lookup.png)
 
 ### 第 1 步：拿到该接口的 loader
 
@@ -239,7 +239,7 @@ ServiceLoaderHelper.getService(IUserService::class.java)
 
 ### 第 4 步：实例创建
 
-![实例创建](service-opt-create.png)
+![实例创建](assets/service-opt-create.png)
 
 `singleton = true` 走 `SingletonPool`：双重检查，按 **实现 Class** 缓存，不是按接口、也不是按 key。  
 真正 `new` 用 `DefaultFactory` 的无参构造。若实现了 `IApplicationAware` / `IServiceLifecycle`，创建后调用
@@ -263,11 +263,11 @@ ServiceLoaderHelper.getService(IUserService::class.java)
 优化前：编译 → 运行时反射一个类 → HashMap 双 key → Helper 猜。  
 优化后：编译 → 打包聚合 → 启动灌表 → Helper 查默认 / key。
 
-![优化前后整条链路](service-compare-pipeline.png)
+![优化前后整条链路](assets/service-compare-pipeline.png)
 
 ### 8.2 启动灌表
 
-![优化前后启动灌表](service-compare-init.png)
+![优化前后启动灌表](assets/service-compare-init.png)
 
 |      | 优化前                                      | 优化后                                         |
 |------|------------------------------------------|---------------------------------------------|
@@ -278,7 +278,7 @@ ServiceLoaderHelper.getService(IUserService::class.java)
 
 ### 8.3 注册表
 
-![优化前后注册表](service-compare-registry.png)
+![优化前后注册表](assets/service-compare-registry.png)
 
 |            | 优化前                                   | 优化后                                      |
 |------------|---------------------------------------|------------------------------------------|
@@ -290,7 +290,7 @@ ServiceLoaderHelper.getService(IUserService::class.java)
 
 ### 8.4 查找
 
-![优化前后查找](service-compare-lookup.png)
+![优化前后查找](assets/service-compare-lookup.png)
 
 |     | 优化前                                          | 优化后                                                |
 |-----|----------------------------------------------|----------------------------------------------------|

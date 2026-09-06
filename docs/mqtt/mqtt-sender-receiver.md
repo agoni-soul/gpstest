@@ -22,9 +22,9 @@
 
 ## 1. 对照图：Fixed Header 第一字节
 
-图源为学习笔记截图，保存在同目录 [`mqtt-fixed-header.jpg`](mqtt-fixed-header.jpg)。
+图源为学习笔记截图，见 [`assets/mqtt-fixed-header.jpg`](assets/mqtt-fixed-header.jpg)。
 
-![MQTT Fixed Header 第一字节：类型、DUP、QoS、RETAIN，以及 0～15 号控制报文](mqtt-fixed-header.jpg)
+![MQTT Fixed Header 第一字节：类型、DUP、QoS、RETAIN，以及 0～15 号控制报文](assets/mqtt-fixed-header.jpg)
 
 ```text
   7 6 5 4 |  3  | 2 1 |  0

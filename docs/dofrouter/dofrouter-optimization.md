@@ -9,20 +9,20 @@
 
 配套流程图（PNG 可直接预览）：
 
-| 图                        | PNG                                  | SVG                                  | 源文件                                  |
-|--------------------------|--------------------------------------|--------------------------------------|--------------------------------------|
-| 优化后四段总览                  | [png](dofrouter-opt-overview.png)    | [svg](dofrouter-opt-overview.svg)    | [mmd](dofrouter-opt-overview.mmd)    |
-| `registerByPlugin` 回退对比  | [png](dofrouter-opt-register.png)    | [svg](dofrouter-opt-register.svg)    | [mmd](dofrouter-opt-register.mmd)    |
-| 优化后 `init` 装表            | [png](dofrouter-opt-init.png)        | [svg](dofrouter-opt-init.svg)        | [mmd](dofrouter-opt-init.mmd)        |
-| 寻址：全表 Matcher vs `find`  | [png](dofrouter-opt-addressing.png)  | [svg](dofrouter-opt-addressing.svg)  | [mmd](dofrouter-opt-addressing.mmd)  |
-| 拦截器：TreeMap vs List + 缓存 | [png](dofrouter-opt-interceptor.png) | [svg](dofrouter-opt-interceptor.svg) | [mmd](dofrouter-opt-interceptor.mmd) |
-| 插件：双遍 I/O vs 单次遍历        | [png](dofrouter-opt-plugin.png)      | [svg](dofrouter-opt-plugin.svg)      | [mmd](dofrouter-opt-plugin.mmd)      |
-| 优化后 `navigate`           | [png](dofrouter-opt-navigate.png)    | [svg](dofrouter-opt-navigate.svg)    | [mmd](dofrouter-opt-navigate.mmd)    |
+| 图                        | PNG                                         | SVG                                         | 源文件                                         |
+|--------------------------|---------------------------------------------|---------------------------------------------|---------------------------------------------|
+| 优化后四段总览                  | [png](assets/dofrouter-opt-overview.png)    | [svg](assets/dofrouter-opt-overview.svg)    | [mmd](assets/dofrouter-opt-overview.mmd)    |
+| `registerByPlugin` 回退对比  | [png](assets/dofrouter-opt-register.png)    | [svg](assets/dofrouter-opt-register.svg)    | [mmd](assets/dofrouter-opt-register.mmd)    |
+| 优化后 `init` 装表            | [png](assets/dofrouter-opt-init.png)        | [svg](assets/dofrouter-opt-init.svg)        | [mmd](assets/dofrouter-opt-init.mmd)        |
+| 寻址：全表 Matcher vs `find`  | [png](assets/dofrouter-opt-addressing.png)  | [svg](assets/dofrouter-opt-addressing.svg)  | [mmd](assets/dofrouter-opt-addressing.mmd)  |
+| 拦截器：TreeMap vs List + 缓存 | [png](assets/dofrouter-opt-interceptor.png) | [svg](assets/dofrouter-opt-interceptor.svg) | [mmd](assets/dofrouter-opt-interceptor.mmd) |
+| 插件：双遍 I/O vs 单次遍历        | [png](assets/dofrouter-opt-plugin.png)      | [svg](assets/dofrouter-opt-plugin.svg)      | [mmd](assets/dofrouter-opt-plugin.mmd)      |
+| 优化后 `navigate`           | [png](assets/dofrouter-opt-navigate.png)    | [svg](assets/dofrouter-opt-navigate.svg)    | [mmd](assets/dofrouter-opt-navigate.mmd)    |
 
 模块分层、APT 生成 `RouteLoader_app`、插件往 `loadRouterMap` 插 `register(String)` 这三件**没换骨架**
 。变的是：标志位语义、冲突检查、寻址算法、拦截器容器、启动补索引、跳转只处理一条。
 
-![优化后四段总览](dofrouter-opt-overview.png)
+![优化后四段总览](assets/dofrouter-opt-overview.png)
 
 ---
 
@@ -82,7 +82,7 @@ dex。插件若没扫到 Loader，会 keep 原方法——标志已经是 true�
 3. `register()` → `registerRouteRoot` / `registerInterceptor` → `markRegisteredByPlugin()`
 4. 只有真正 `loadInto` 成功过，才跳过扫 dex
 
-![registerByPlugin 回退对比](dofrouter-opt-register.png)
+![registerByPlugin 回退对比](assets/dofrouter-opt-register.png)
 
 没打 `id 'com.haha.servicerouter.register'`、插桩失败、或 debug 未走到 transform 时，启动仍可用
 `ClassUtils.getFileNameByPackageName` 找回 Loader。插件成功时启动只做几次 `Class.forName`，这条快路径没变。
@@ -99,7 +99,7 @@ dex。插件若没扫到 Loader，会 keep 原方法——标志已经是 true�
 4. **`warmInterceptors()`**：按 `priority` 再按类名排序，`getDeclaredConstructor().newInstance()`
    一次，放进 `interceptorInstances`
 
-![优化后 init 装表](dofrouter-opt-init.png)
+![优化后 init 装表](assets/dofrouter-opt-init.png)
 
 对 GPS：`RouteLoader_app.loadInto` 仍写入
 
@@ -140,7 +140,7 @@ interface IInterceptorLoader {
 生成代码是 `list.add(new InterceptorMetaData(0, "LogInterceptor", LogInterceptor.class))`。APT 只对*
 *同一 Class 注册两次**去重。运行时排序：`priority` 升序，相同再比类名。
 
-![拦截器 TreeMap vs List + 缓存](dofrouter-opt-interceptor.png)
+![拦截器 TreeMap vs List + 缓存](assets/dofrouter-opt-interceptor.png)
 
 `LogInterceptor.intercept` 仍只打日志、返回 `false`。差别是实例在 `init` 就建好，每次 `navigate` 复用，不再
 `newInstance()`。
@@ -164,7 +164,7 @@ Loader 全类名，并解析 `RouteLoader.loadInto` 里的 `map.put(path, new Ro
 - Service 的 key / `defaultImpl` 冲突检查保留
 - 再对缓冲的两个 class 做原来的 ASM `register(...)` 注入
 
-![插件双遍 vs 单次](dofrouter-opt-plugin.png)
+![插件双遍 vs 单次](assets/dofrouter-opt-plugin.png)
 
 Service 冲突本来就能在打包期失败；路由现在对齐。本模块内 APT 仍会 warn 并 skip 后写的那条，跨模块只能靠插件看见
 **合并后的全部 Loader**。
@@ -207,7 +207,7 @@ RouteTable.routes.filter { (path, meta) ->
 GPS 只有 `path = "/gps/main"`，走第一档，不再碰 Matcher 列表。`RouteTable.matchers` 仍保留，给 `clear()`
 和旧语义留口，热路径不走它。
 
-![寻址对比](dofrouter-opt-addressing.png)
+![寻址对比](assets/dofrouter-opt-addressing.png)
 
 ---
 
@@ -223,7 +223,7 @@ GPS 只有 `path = "/gps/main"`，走第一档，不再碰 Matcher 列表。`Rou
    `startActivity`
 6. `onArrived` **一次**
 
-![优化后 navigate](dofrouter-opt-navigate.png)
+![优化后 navigate](assets/dofrouter-opt-navigate.png)
 
 优化前 `navigate(this)` 只设了 `navigator.context`，会走进 `context is Activity` 分支，调用
 `startActivityForResult(intent, -1, options)`。系统把负数 requestCode 当普通 `startActivity`

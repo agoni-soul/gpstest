@@ -7,11 +7,11 @@
 
 配套流程图（PNG 可直接预览）：
 
-| 图           | PNG                                 | 源文件                                 |
-|-------------|-------------------------------------|-------------------------------------|
-| 发现 vs 已知    | [png](dofrouter-scan-vs-plugin.png) | [mmd](dofrouter-scan-vs-plugin.mmd) |
-| 扫 dex 启动期步骤 | [png](dofrouter-scan-dex-cost.png)  | [mmd](dofrouter-scan-dex-cost.mmd)  |
-| 插桩启动期步骤     | [png](dofrouter-plugin-runtime.png) | [mmd](dofrouter-plugin-runtime.mmd) |
+| 图           | PNG                                        | 源文件                                        |
+|-------------|--------------------------------------------|--------------------------------------------|
+| 发现 vs 已知    | [png](assets/dofrouter-scan-vs-plugin.png) | [mmd](assets/dofrouter-scan-vs-plugin.mmd) |
+| 扫 dex 启动期步骤 | [png](assets/dofrouter-scan-dex-cost.png)  | [mmd](assets/dofrouter-scan-dex-cost.mmd)  |
+| 插桩启动期步骤     | [png](assets/dofrouter-plugin-runtime.png) | [mmd](assets/dofrouter-plugin-runtime.mmd) |
 
 ---
 
@@ -41,7 +41,7 @@ register("com.haha.servicerouter.routes.RouteLoader_app")
 
 插桩更快，是因为把「O(全量 class)」从启动挪到了编译。
 
-![发现 vs 已知](dofrouter-scan-vs-plugin.png)
+![发现 vs 已知](assets/dofrouter-scan-vs-plugin.png)
 
 ---
 
@@ -119,7 +119,7 @@ secondary-dex 路径。老设备这条更长。
 经验数量级（随机型和包体变化很大）：扫 dex 常见 **几十到几百毫秒**；极端低端机 + 大包可以到秒级。插桩路径通常是
 **1～5ms 量级**（几次 `Class.forName` + 几次 `HashMap.put`）。
 
-![扫 dex 启动期步骤](dofrouter-scan-dex-cost.png)
+![扫 dex 启动期步骤](assets/dofrouter-scan-dex-cost.png)
 
 ---
 
@@ -148,7 +148,7 @@ ART 的 `Class.forName` 是按名字在已加载 dex 里查符号，**只碰这�
 
 复杂度从 **O(dex 内全部 class)** 变成 **O(Loader 个数)**。本工程 Loader 通常就是 2 个。
 
-![插桩启动期步骤](dofrouter-plugin-runtime.png)
+![插桩启动期步骤](assets/dofrouter-plugin-runtime.png)
 
 ---
 

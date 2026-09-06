@@ -6,11 +6,11 @@
 
 配套时序图（PNG / SVG / mermaid 源文件）：
 
-| 图                                       | 对应章节   | PNG                                              | SVG                                              | 源文件                                              |
-|-----------------------------------------|--------|--------------------------------------------------|--------------------------------------------------|--------------------------------------------------|
-| 最简 `create().subscribe()`               | §4.6   | [png](rxjava-create-subscribe-sequence.png)      | [svg](rxjava-create-subscribe-sequence.svg)      | [mmd](rxjava-create-subscribe-sequence.mmd)      |
-| `observeOn` 一个 `onNext(1)`              | §5.2.1 | [png](rxjava-observeon-onnext-sequence.png)      | [svg](rxjava-observeon-onnext-sequence.svg)      | [mmd](rxjava-observeon-onnext-sequence.mmd)      |
-| `subscribeOn` + `observeOn` + `map` 全链路 | §6     | [png](rxjava-subscribe-observe-map-sequence.png) | [svg](rxjava-subscribe-observe-map-sequence.svg) | [mmd](rxjava-subscribe-observe-map-sequence.mmd) |
+| 图                                       | 对应章节   | PNG                                                     | SVG                                                     | 源文件                                                     |
+|-----------------------------------------|--------|---------------------------------------------------------|---------------------------------------------------------|---------------------------------------------------------|
+| 最简 `create().subscribe()`               | §4.6   | [png](assets/rxjava-create-subscribe-sequence.png)      | [svg](assets/rxjava-create-subscribe-sequence.svg)      | [mmd](assets/rxjava-create-subscribe-sequence.mmd)      |
+| `observeOn` 一个 `onNext(1)`              | §5.2.1 | [png](assets/rxjava-observeon-onnext-sequence.png)      | [svg](assets/rxjava-observeon-onnext-sequence.svg)      | [mmd](assets/rxjava-observeon-onnext-sequence.mmd)      |
+| `subscribeOn` + `observeOn` + `map` 全链路 | §6     | [png](assets/rxjava-subscribe-observe-map-sequence.png) | [svg](assets/rxjava-subscribe-observe-map-sequence.svg) | [mmd](assets/rxjava-subscribe-observe-map-sequence.mmd) |
 
 本文从 **使用步骤 → 源码链路 → 流程图** 三个维度，先讲最简的 `Observable.create().subscribe()`
 ，再按同样风格拆 `subscribeOn`、`observeOn`、`map`，全程对照 `observerTest()`。
@@ -302,9 +302,9 @@ flowchart LR
 
 ### 4.6 最简时序（一个 `onNext(1)`）
 
-![最简 create().subscribe() 时序](rxjava-create-subscribe-sequence.png)
+![最简 create().subscribe() 时序](assets/rxjava-create-subscribe-sequence.png)
 
-[SVG](rxjava-create-subscribe-sequence.svg) · [mermaid 源文件](rxjava-create-subscribe-sequence.mmd)
+[SVG](assets/rxjava-create-subscribe-sequence.svg) · [mermaid 源文件](assets/rxjava-create-subscribe-sequence.mmd)
 
 对象关系：
 
@@ -491,9 +491,9 @@ flowchart TB
 
 #### 5.2.1 时序（一个 `onNext(1)`，只看 observeOn）
 
-![observeOn 一个 onNext(1) 时序](rxjava-observeon-onnext-sequence.png)
+![observeOn 一个 onNext(1) 时序](assets/rxjava-observeon-onnext-sequence.png)
 
-[SVG](rxjava-observeon-onnext-sequence.svg) · [mermaid 源文件](rxjava-observeon-onnext-sequence.mmd)
+[SVG](assets/rxjava-observeon-onnext-sequence.svg) · [mermaid 源文件](assets/rxjava-observeon-onnext-sequence.mmd)
 
 ---
 
@@ -584,9 +584,9 @@ A。
 create → subscribeOn(io) → observeOn(newThread) → map → subscribe(observer)
 ```
 
-![subscribeOn + observeOn + map 全链路时序](rxjava-subscribe-observe-map-sequence.png)
+![subscribeOn + observeOn + map 全链路时序](assets/rxjava-subscribe-observe-map-sequence.png)
 
-[SVG](rxjava-subscribe-observe-map-sequence.svg) · [mermaid 源文件](rxjava-subscribe-observe-map-sequence.mmd)
+[SVG](assets/rxjava-subscribe-observe-map-sequence.svg) · [mermaid 源文件](assets/rxjava-subscribe-observe-map-sequence.mmd)
 
 ### 6.1 两次切线程
 

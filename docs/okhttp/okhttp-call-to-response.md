@@ -15,12 +15,12 @@
 
 配套时序图（PNG / SVG / mermaid 源文件）：
 
-| 图                                | 对应章节 | PNG                                            | SVG                                            | 源文件                                            |
-|----------------------------------|------|------------------------------------------------|------------------------------------------------|------------------------------------------------|
-| `OkHttpTest.get()` `enqueue` 全链路 | §9   | [png](okhttp-enqueue-interceptor-sequence.png) | [svg](okhttp-enqueue-interceptor-sequence.svg) | [mmd](okhttp-enqueue-interceptor-sequence.mmd) |
-| `enqueue()` + Dispatcher         | §5   | [png](okhttp-enqueue-dispatcher-sequence.png)  | [svg](okhttp-enqueue-dispatcher-sequence.svg)  | [mmd](okhttp-enqueue-dispatcher-sequence.mmd)  |
-| `CacheFile.execute()` 同步全链路      | §10  | [png](okhttp-execute-interceptor-sequence.png) | [svg](okhttp-execute-interceptor-sequence.svg) | [mmd](okhttp-execute-interceptor-sequence.mmd) |
-| CacheInterceptor 命中策略            | §7.4 | [png](okhttp-cache-strategy-sequence.png)      | [svg](okhttp-cache-strategy-sequence.svg)      | [mmd](okhttp-cache-strategy-sequence.mmd)      |
+| 图                                | 对应章节 | PNG                                                   | SVG                                                   | 源文件                                                   |
+|----------------------------------|------|-------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------|
+| `OkHttpTest.get()` `enqueue` 全链路 | §9   | [png](assets/okhttp-enqueue-interceptor-sequence.png) | [svg](assets/okhttp-enqueue-interceptor-sequence.svg) | [mmd](assets/okhttp-enqueue-interceptor-sequence.mmd) |
+| `enqueue()` + Dispatcher         | §5   | [png](assets/okhttp-enqueue-dispatcher-sequence.png)  | [svg](assets/okhttp-enqueue-dispatcher-sequence.svg)  | [mmd](assets/okhttp-enqueue-dispatcher-sequence.mmd)  |
+| `CacheFile.execute()` 同步全链路      | §10  | [png](assets/okhttp-execute-interceptor-sequence.png) | [svg](assets/okhttp-execute-interceptor-sequence.svg) | [mmd](assets/okhttp-execute-interceptor-sequence.mmd) |
+| CacheInterceptor 命中策略            | §7.4 | [png](assets/okhttp-cache-strategy-sequence.png)      | [svg](assets/okhttp-cache-strategy-sequence.svg)      | [mmd](assets/okhttp-cache-strategy-sequence.mmd)      |
 
 本文从 **使用步骤 → 源码链路 → 流程图** 三个维度，以 `OkHttpTest` 为主，把 OkHttp 从调用到 `Log.d` 输出
 body 的过程拆开。GET / POST 共用同一条链，差别只在 Request 有没有 body。
@@ -300,7 +300,7 @@ GET 和 POST 都进 **同一个** `getResponseWithInterceptorChain()`。失败�
 `onResponse` 跑在 **OkHttp 线程**，不是主线程。Retrofit 的 `Call.enqueue` 才会再 `callbackExecutor`
 切回主线程。
 
-[SVG](okhttp-enqueue-dispatcher-sequence.svg) · [mermaid 源文件](okhttp-enqueue-dispatcher-sequence.mmd)
+[SVG](assets/okhttp-enqueue-dispatcher-sequence.svg) · [mermaid 源文件](assets/okhttp-enqueue-dispatcher-sequence.mmd)
 
 ```mermaid
 sequenceDiagram
@@ -669,7 +669,7 @@ fun string(): String = source().use { source ->
 
 ## 9. 一张图串起来：`OkHttpTest.get()` 全链路
 
-[SVG](okhttp-enqueue-interceptor-sequence.svg) · [mermaid 源文件](okhttp-enqueue-interceptor-sequence.mmd)
+[SVG](assets/okhttp-enqueue-interceptor-sequence.svg) · [mermaid 源文件](assets/okhttp-enqueue-interceptor-sequence.mmd)
 
 ```mermaid
 sequenceDiagram
@@ -724,7 +724,7 @@ sequenceDiagram
 业务先扫 `externalCacheDir/songCache`，没有同名文件才进入 OkHttp。HTTP 部分是同步 `execute()`，拦截器链比
 `OkHttpTest` 少最外层 Header 拦截器。
 
-[SVG](okhttp-execute-interceptor-sequence.svg) · [mermaid 源文件](okhttp-execute-interceptor-sequence.mmd)
+[SVG](assets/okhttp-execute-interceptor-sequence.svg) · [mermaid 源文件](assets/okhttp-execute-interceptor-sequence.mmd)
 
 ---
 

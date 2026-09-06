@@ -11,14 +11,14 @@
 
 配套流程图（PNG 可直接预览）：
 
-| 图                      | PNG                                | 源文件                                |
-|------------------------|------------------------------------|------------------------------------|
-| 编译到跳转总览                | [png](dofrouter-overall.png)       | [mmd](dofrouter-overall.mmd)       |
-| 模块分层                   | [png](dofrouter-architecture.png)  | [mmd](dofrouter-architecture.mmd)  |
-| `@Route` GPS 的 APT     | [png](dofrouter-apt-gps.png)       | [mmd](dofrouter-apt-gps.mmd)       |
-| 插件 ASM 注入              | [png](dofrouter-plugin-inject.png) | [mmd](dofrouter-plugin-inject.mmd) |
-| `init` 装表              | [png](dofrouter-init-load.png)     | [mmd](dofrouter-init-load.mmd)     |
-| `create(GPS).navigate` | [png](dofrouter-navigate-gps.png)  | [mmd](dofrouter-navigate-gps.mmd)  |
+| 图                      | PNG                                       | 源文件                                       |
+|------------------------|-------------------------------------------|-------------------------------------------|
+| 编译到跳转总览                | [png](assets/dofrouter-overall.png)       | [mmd](assets/dofrouter-overall.mmd)       |
+| 模块分层                   | [png](assets/dofrouter-architecture.png)  | [mmd](assets/dofrouter-architecture.mmd)  |
+| `@Route` GPS 的 APT     | [png](assets/dofrouter-apt-gps.png)       | [mmd](assets/dofrouter-apt-gps.mmd)       |
+| 插件 ASM 注入              | [png](assets/dofrouter-plugin-inject.png) | [mmd](assets/dofrouter-plugin-inject.mmd) |
+| `init` 装表              | [png](assets/dofrouter-init-load.png)     | [mmd](assets/dofrouter-init-load.mmd)     |
+| `create(GPS).navigate` | [png](assets/dofrouter-navigate-gps.png)  | [mmd](assets/dofrouter-navigate-gps.mmd)  |
 
 ---
 
@@ -41,7 +41,7 @@ DOFRouter.create(RoutePath.GPS).navigate(this)  // "/gps/main"
     - **扫 dex 回退**（`registerByPlugin` 仍为 `false`）：遍历 apk 里
       `com.haha.servicerouter.routes` 包下的类再反射装表。
 
-![编译到跳转总览](dofrouter-overall.png)
+![编译到跳转总览](assets/dofrouter-overall.png)
 
 ---
 
@@ -64,7 +64,7 @@ DOFRouter.create(RoutePath.GPS).navigate(this)  // "/gps/main"
 - `kapt project(':ServiceRouterProcessor')` + `arg("DOFROUTER_MODULE_NAME", project.getName())`
 - `HahaApplication.initComponents()` 里 `DOFRouter.init(this)`
 
-![模块分层](dofrouter-architecture.png)
+![模块分层](assets/dofrouter-architecture.png)
 
 ---
 
@@ -153,7 +153,7 @@ public class RouteLoader_app implements IRouteLoader {
 拦截器走平行的 `InterceptorProcessor`，生成 `InterceptorLoader_app`，把 `LogInterceptor` 放进
 `TreeMap<priority, InterceptorMetaData>`。
 
-![APT 处理 GPS](dofrouter-apt-gps.png)
+![APT 处理 GPS](assets/dofrouter-apt-gps.png)
 
 这是 **每个业务模块各生成一份 Loader**。多模块时会有 `RouteLoader_login`、`RouteLoader_shop`
 ，插件会全部扫出来再注入。
@@ -246,7 +246,7 @@ invokespecial Router.register(String)
 
 没扫到任何 Loader 时，插件保持原方法。
 
-![插件 ASM 注入](dofrouter-plugin-inject.png)
+![插件 ASM 注入](assets/dofrouter-plugin-inject.png)
 
 ### 5.5 为什么要比扫 dex 快
 
@@ -270,7 +270,7 @@ DOFRouter.init(this)
 
 `DOFRouter.init` → `Router.init`：保存 `Application`，调 `loadRouteTable()`。
 
-![init 装表](dofrouter-init-load.png)
+![init 装表](assets/dofrouter-init-load.png)
 
 装完后内存里：
 
@@ -327,7 +327,7 @@ DOFRouter.create(RoutePath.GPS).navigate(this)
 
 Activity 路径返回 `null`；只有 Fragment 路由才把实例返回给调用方。
 
-![GPS 跳转](dofrouter-navigate-gps.png)
+![GPS 跳转](assets/dofrouter-navigate-gps.png)
 
 ---
 

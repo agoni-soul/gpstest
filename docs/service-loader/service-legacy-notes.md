@@ -8,18 +8,18 @@
 
 配套流程图：
 
-| 图                     | PNG                                     | 源文件                                     |
-|-----------------------|-----------------------------------------|-----------------------------------------|
-| 优化前模块分层               | [png](service-legacy-modules.png)       | [mmd](service-legacy-modules.mmd)       |
-| 优化前 APT               | [png](service-legacy-apt.png)           | [mmd](service-legacy-apt.mmd)           |
-| 优化前 getService 时序     | [png](service-legacy-getservice.png)    | [mmd](service-legacy-getservice.mmd)    |
-| 优化前无默认 key 兜底         | [png](service-legacy-fallback.png)      | [mmd](service-legacy-fallback.mmd)      |
-| JDK SPI 流程            | [png](service-legacy-jdk-flow.png)      | [mmd](service-legacy-jdk-flow.mmd)      |
-| 优化前 IServiceLoader 流程 | [png](service-legacy-iservice-flow.png) | [mmd](service-legacy-iservice-flow.mmd) |
-| JDK 与自研对照             | [png](service-legacy-spi-compare.png)   | [mmd](service-legacy-spi-compare.mmd)   |
-| 优化前后整条链路              | [png](service-compare-pipeline.png)     | [mmd](service-compare-pipeline.mmd)     |
-| 优化前后注册表               | [png](service-compare-registry.png)     | [mmd](service-compare-registry.mmd)     |
-| 插件聚合                  | [png](service-opt-plugin.png)           | [mmd](service-opt-plugin.mmd)           |
+| 图                     | PNG                                            | 源文件                                            |
+|-----------------------|------------------------------------------------|------------------------------------------------|
+| 优化前模块分层               | [png](assets/service-legacy-modules.png)       | [mmd](assets/service-legacy-modules.mmd)       |
+| 优化前 APT               | [png](assets/service-legacy-apt.png)           | [mmd](assets/service-legacy-apt.mmd)           |
+| 优化前 getService 时序     | [png](assets/service-legacy-getservice.png)    | [mmd](assets/service-legacy-getservice.mmd)    |
+| 优化前无默认 key 兜底         | [png](assets/service-legacy-fallback.png)      | [mmd](assets/service-legacy-fallback.mmd)      |
+| JDK SPI 流程            | [png](assets/service-legacy-jdk-flow.png)      | [mmd](assets/service-legacy-jdk-flow.mmd)      |
+| 优化前 IServiceLoader 流程 | [png](assets/service-legacy-iservice-flow.png) | [mmd](assets/service-legacy-iservice-flow.mmd) |
+| JDK 与自研对照             | [png](assets/service-legacy-spi-compare.png)   | [mmd](assets/service-legacy-spi-compare.mmd)   |
+| 优化前后整条链路              | [png](assets/service-compare-pipeline.png)     | [mmd](assets/service-compare-pipeline.mmd)     |
+| 优化前后注册表               | [png](assets/service-compare-registry.png)     | [mmd](assets/service-compare-registry.mmd)     |
+| 插件聚合                  | [png](assets/service-opt-plugin.png)           | [mmd](assets/service-opt-plugin.mmd)           |
 
 ---
 
@@ -37,7 +37,7 @@
 `app` 编译期只认 `IUserService`，不能 `new UserService()`，否则必须依赖实现模块。  
 `ServiceImpl` 用 `runtimeOnly` 打进 APK。运行时只做一件事：给我接口 Class，返回实现实例。
 
-![优化前模块分层](service-legacy-modules.png)
+![优化前模块分层](assets/service-legacy-modules.png)
 
 | 模块                           | 职责                                                        |
 |------------------------------|-----------------------------------------------------------|
@@ -84,7 +84,7 @@ ServiceLoader.put(IUserService.class, "com.haha.service.impl.impl.UserService", 
 
 这里已经是 Class 字面量，运行时不再扫 dex、不再读注解。
 
-![优化前 APT](service-legacy-apt.png)
+![优化前 APT](assets/service-legacy-apt.png)
 
 ### 1.4 运行时：`getService` 五步
 
@@ -96,7 +96,7 @@ ServiceLoader.load(clazz)?.get(ServiceImpl.DEFAULT_IMPL_KEY)
 
 未命中再 `getAll()`，仅当 size == 1 时返回那一个。
 
-![优化前 getService 时序](service-legacy-getservice.png)
+![优化前 getService 时序](assets/service-legacy-getservice.png)
 
 **第 1 步：`load` 先 `lazyInit`**
 
@@ -114,7 +114,7 @@ ServiceLoader.load(clazz)?.get(ServiceImpl.DEFAULT_IMPL_KEY)
 
 未标默认时的兜底：
 
-![优化前无默认 key 兜底](service-legacy-fallback.png)
+![优化前无默认 key 兜底](assets/service-legacy-fallback.png)
 
 `getAll()` 按 **map 条目** 计数。`defaultImpl + 类名 key` 会得到 size ==
 2，兜底会把「一个实现」误判成多个。  
@@ -159,7 +159,7 @@ JDK 1.6 起的标准 SPI：接口提供方只定义接口，实现方把实现�
   `META-INF/services/com.haha.service.api.Service`。`@AutoService` 只负责写文件，加载仍是 JDK。APT
   自己也靠这套：`@AutoService(Processor::class)`。
 
-![JDK SPI 流程](service-legacy-jdk-flow.png)
+![JDK SPI 流程](assets/service-legacy-jdk-flow.png)
 
 要点：查找发生在运行时；`load()` 只建迭代器，第一次遍历才实例化；每次遍历默认都 `new`；没有
 key、没有默认实现；Android 上要 keep `META-INF`，老 Multidex 可能扫不全。
@@ -179,7 +179,7 @@ key、没有默认实现；Android 上要 keep `META-INF`，老 Multidex 可能�
 
 `Retention.BINARY`：只给 APT 用。调用的是 `ServiceLoaderHelper`，内部是自研 `ServiceLoader`。
 
-![优化前 IServiceLoader 流程](service-legacy-iservice-flow.png)
+![优化前 IServiceLoader 流程](assets/service-legacy-iservice-flow.png)
 
 作用：Android 组件化跨模块服务发现——`app` 只依赖接口，实现 `runtimeOnly`；按默认实现 / key
 取服务，并可单例、编译期查冲突。
@@ -198,7 +198,7 @@ key、没有默认实现；Android 上要 keep `META-INF`，老 Multidex 可能�
 
 ### 2.4 区别逐项
 
-![JDK 与自研对照](service-legacy-spi-compare.png)
+![JDK 与自研对照](assets/service-legacy-spi-compare.png)
 
 **所属层级**  
 JDK 是语言标准。`@IServiceLoader` 只有接了 Processor + Runtime 才生效。
@@ -260,7 +260,7 @@ Processor、`CoroutineExceptionHandler`、JDBC 只认 JDK SPI。组件化默认�
 原来：编译 → 运行时反射一个类 → HashMap 双 key → Helper 猜。  
 改后：编译 → 打包聚合 → 启动灌表 → Helper 查默认 / key。
 
-![优化前后整条链路](service-compare-pipeline.png)
+![优化前后整条链路](assets/service-compare-pipeline.png)
 
 ### 3.3 注解协议
 
@@ -296,7 +296,7 @@ true 后不再重试。
 `register("...ServiceInit_xxx")`。  
 同时解析 `put` 字节码，**全局** default / 同 key 冲突会让构建失败。
 
-![插件聚合](service-opt-plugin.png)
+![插件聚合](assets/service-opt-plugin.png)
 
 ### 3.6 注册表
 
@@ -307,7 +307,7 @@ true 后不再重试。
 **改后**一条实现一条 `ServiceRecord`：`records` 按 Class 去重，`byKey` 只放业务 key，`defaultRecord`
 表示默认。`getAll()` 只遍历 `records`，按 `priority` 排序。miss 不写入 `SERVICES`。
 
-![优化前后注册表](service-compare-registry.png)
+![优化前后注册表](assets/service-compare-registry.png)
 
 ### 3.7 Helper 查找
 

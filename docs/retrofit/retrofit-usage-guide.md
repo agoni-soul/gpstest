@@ -13,29 +13,30 @@
 
 配套流程图（PNG / SVG / mermaid 源文件）：
 
-| 图                        | 对应章节  | PNG                                           | SVG                                           | 源文件                                           |
-|--------------------------|-------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
-| 整体架构图                    | §1.1  | [png](retrofit-architecture.png)              | [svg](retrofit-architecture.svg)              | [mmd](retrofit-architecture.mmd)              |
-| 五步总览                     | §2.2  | [png](retrofit-five-steps.png)                | [svg](retrofit-five-steps.svg)                | [mmd](retrofit-five-steps.mmd)                |
-| Builder 组装流程             | §3.3  | [png](retrofit-builder-assemble.png)          | [svg](retrofit-builder-assemble.svg)          | [mmd](retrofit-builder-assemble.mmd)          |
-| 动态代理流程                   | §4.2  | [png](retrofit-dynamic-proxy.png)             | [svg](retrofit-dynamic-proxy.svg)             | [mmd](retrofit-dynamic-proxy.mmd)             |
-| 单次方法调用内部流程               | §5.3  | [png](retrofit-method-invoke.png)             | [svg](retrofit-method-invoke.svg)             | [mmd](retrofit-method-invoke.mmd)             |
-| enqueue vs execute       | §6.1  | [png](retrofit-enqueue-vs-execute.png)        | [svg](retrofit-enqueue-vs-execute.svg)        | [mmd](retrofit-enqueue-vs-execute.mmd)        |
-| enqueue 完整时序             | §7.1  | [png](retrofit-enqueue-sequence.png)          | [svg](retrofit-enqueue-sequence.svg)          | [mmd](retrofit-enqueue-sequence.mmd)          |
-| 线程切换                     | §8    | [png](retrofit-thread-switch.png)             | [svg](retrofit-thread-switch.svg)             | [mmd](retrofit-thread-switch.mmd)             |
-| OkHttp 拦截器链              | §9    | [png](retrofit-okhttp-interceptor.png)        | [svg](retrofit-okhttp-interceptor.svg)        | [mmd](retrofit-okhttp-interceptor.mmd)        |
-| 响应解析流程                   | §10.1 | [png](retrofit-parse-response.png)            | [svg](retrofit-parse-response.svg)            | [mmd](retrofit-parse-response.mmd)            |
-| Call 生命周期                | §11   | [png](retrofit-call-lifecycle.png)            | [svg](retrofit-call-lifecycle.svg)            | [mmd](retrofit-call-lifecycle.mmd)            |
-| 端到端一图流                   | §13   | [png](retrofit-e2e-flow.png)                  | [svg](retrofit-e2e-flow.svg)                  | [mmd](retrofit-e2e-flow.mmd)                  |
-| RequestFactory 两阶段模型     | §19.2 | [png](retrofit-request-factory-two-phase.png) | [svg](retrofit-request-factory-two-phase.svg) | [mmd](retrofit-request-factory-two-phase.mmd) |
-| 解析 @GET / @Path / @Query | §19.3 | [png](retrofit-request-factory-parse.png)     | [svg](retrofit-request-factory-parse.svg)     | [mmd](retrofit-request-factory-parse.mmd)     |
-| 运行时拼 Request             | §19.4 | [png](retrofit-request-factory-create.png)    | [svg](retrofit-request-factory-create.svg)    | [mmd](retrofit-request-factory-create.mmd)    |
-| @Path 替换流程               | §19.5 | [png](retrofit-path-replace.png)              | [svg](retrofit-path-replace.svg)              | [mmd](retrofit-path-replace.mmd)              |
-| @Query 拼接流程              | §19.6 | [png](retrofit-query-append.png)              | [svg](retrofit-query-append.svg)              | [mmd](retrofit-query-append.mmd)              |
-| 无 @Query 时拼 URL          | §19.7 | [png](retrofit-no-query.png)                  | [svg](retrofit-no-query.svg)                  | [mmd](retrofit-no-query.mmd)                  |
-| URL 拼装时序                 | §19.8 | [png](retrofit-url-assemble-sequence.png)     | [svg](retrofit-url-assemble-sequence.svg)     | [mmd](retrofit-url-assemble-sequence.mmd)     |
+| 图                        | 对应章节  | PNG                                                  | SVG                                                  | 源文件                                                  |
+|--------------------------|-------|------------------------------------------------------|------------------------------------------------------|------------------------------------------------------|
+| 整体架构图                    | §1.1  | [png](assets/retrofit-architecture.png)              | [svg](assets/retrofit-architecture.svg)              | [mmd](assets/retrofit-architecture.mmd)              |
+| 五步总览                     | §2.2  | [png](assets/retrofit-five-steps.png)                | [svg](assets/retrofit-five-steps.svg)                | [mmd](assets/retrofit-five-steps.mmd)                |
+| Builder 组装流程             | §3.3  | [png](assets/retrofit-builder-assemble.png)          | [svg](assets/retrofit-builder-assemble.svg)          | [mmd](assets/retrofit-builder-assemble.mmd)          |
+| 动态代理流程                   | §4.2  | [png](assets/retrofit-dynamic-proxy.png)             | [svg](assets/retrofit-dynamic-proxy.svg)             | [mmd](assets/retrofit-dynamic-proxy.mmd)             |
+| 单次方法调用内部流程               | §5.3  | [png](assets/retrofit-method-invoke.png)             | [svg](assets/retrofit-method-invoke.svg)             | [mmd](assets/retrofit-method-invoke.mmd)             |
+| enqueue vs execute       | §6.1  | [png](assets/retrofit-enqueue-vs-execute.png)        | [svg](assets/retrofit-enqueue-vs-execute.svg)        | [mmd](assets/retrofit-enqueue-vs-execute.mmd)        |
+| enqueue 完整时序             | §7.1  | [png](assets/retrofit-enqueue-sequence.png)          | [svg](assets/retrofit-enqueue-sequence.svg)          | [mmd](assets/retrofit-enqueue-sequence.mmd)          |
+| 线程切换                     | §8    | [png](assets/retrofit-thread-switch.png)             | [svg](assets/retrofit-thread-switch.svg)             | [mmd](assets/retrofit-thread-switch.mmd)             |
+| OkHttp 拦截器链              | §9    | [png](assets/retrofit-okhttp-interceptor.png)        | [svg](assets/retrofit-okhttp-interceptor.svg)        | [mmd](assets/retrofit-okhttp-interceptor.mmd)        |
+| 响应解析流程                   | §10.1 | [png](assets/retrofit-parse-response.png)            | [svg](assets/retrofit-parse-response.svg)            | [mmd](assets/retrofit-parse-response.mmd)            |
+| Call 生命周期                | §11   | [png](assets/retrofit-call-lifecycle.png)            | [svg](assets/retrofit-call-lifecycle.svg)            | [mmd](assets/retrofit-call-lifecycle.mmd)            |
+| 端到端一图流                   | §13   | [png](assets/retrofit-e2e-flow.png)                  | [svg](assets/retrofit-e2e-flow.svg)                  | [mmd](assets/retrofit-e2e-flow.mmd)                  |
+| RequestFactory 两阶段模型     | §19.2 | [png](assets/retrofit-request-factory-two-phase.png) | [svg](assets/retrofit-request-factory-two-phase.svg) | [mmd](assets/retrofit-request-factory-two-phase.mmd) |
+| 解析 @GET / @Path / @Query | §19.3 | [png](assets/retrofit-request-factory-parse.png)     | [svg](assets/retrofit-request-factory-parse.svg)     | [mmd](assets/retrofit-request-factory-parse.mmd)     |
+| 运行时拼 Request             | §19.4 | [png](assets/retrofit-request-factory-create.png)    | [svg](assets/retrofit-request-factory-create.svg)    | [mmd](assets/retrofit-request-factory-create.mmd)    |
+| @Path 替换流程               | §19.5 | [png](assets/retrofit-path-replace.png)              | [svg](assets/retrofit-path-replace.svg)              | [mmd](assets/retrofit-path-replace.mmd)              |
+| @Query 拼接流程              | §19.6 | [png](assets/retrofit-query-append.png)              | [svg](assets/retrofit-query-append.svg)              | [mmd](assets/retrofit-query-append.mmd)              |
+| 无 @Query 时拼 URL          | §19.7 | [png](assets/retrofit-no-query.png)                  | [svg](assets/retrofit-no-query.svg)                  | [mmd](assets/retrofit-no-query.mmd)                  |
+| URL 拼装时序                 | §19.8 | [png](assets/retrofit-url-assemble-sequence.png)     | [svg](assets/retrofit-url-assemble-sequence.svg)     | [mmd](assets/retrofit-url-assemble-sequence.mmd)     |
 
-流程图已渲染为 PNG，Android Studio Markdown 预览可直接看图；源文件是同名 `.mmd`。
+流程图已渲染为 PNG，放在 `assets/`；Android Studio Markdown 预览可直接看图；图与源文件在 `assets/`，同名
+`.mmd`。
 
 ---
 
@@ -58,9 +59,9 @@ Call<T> 返回给业务层
 
 ### 1.1 整体架构图
 
-![整体架构图](retrofit-architecture.png)
+![整体架构图](assets/retrofit-architecture.png)
 
-[SVG](retrofit-architecture.svg) · [mermaid 源文件](retrofit-architecture.mmd)
+[SVG](assets/retrofit-architecture.svg) · [mermaid 源文件](assets/retrofit-architecture.mmd)
 
 ---
 
@@ -111,9 +112,9 @@ interface ApiService {
 
 ### 2.2 五步总览
 
-![五步总览](retrofit-five-steps.png)
+![五步总览](assets/retrofit-five-steps.png)
 
-[SVG](retrofit-five-steps.svg) · [mermaid 源文件](retrofit-five-steps.mmd)
+[SVG](assets/retrofit-five-steps.svg) · [mermaid 源文件](assets/retrofit-five-steps.mmd)
 
 | 步骤     | 代码                            | 是否发网  |
 |--------|-------------------------------|-------|
@@ -161,9 +162,9 @@ public Retrofit build() {
 
 ### 3.3 Builder 组装流程图
 
-![Builder 组装流程](retrofit-builder-assemble.png)
+![Builder 组装流程](assets/retrofit-builder-assemble.png)
 
-[SVG](retrofit-builder-assemble.svg) · [mermaid 源文件](retrofit-builder-assemble.mmd)
+[SVG](assets/retrofit-builder-assemble.svg) · [mermaid 源文件](assets/retrofit-builder-assemble.mmd)
 
 ### 3.4 baseUrl 规则
 
@@ -204,9 +205,9 @@ public <T> T create(final Class<T> service) {
 
 ### 4.2 动态代理流程图
 
-![动态代理流程](retrofit-dynamic-proxy.png)
+![动态代理流程](assets/retrofit-dynamic-proxy.png)
 
-[SVG](retrofit-dynamic-proxy.svg) · [mermaid 源文件](retrofit-dynamic-proxy.mmd)
+[SVG](assets/retrofit-dynamic-proxy.svg) · [mermaid 源文件](assets/retrofit-dynamic-proxy.mmd)
 
 ### 4.3 方法解析缓存
 
@@ -269,9 +270,9 @@ ExecutorCallbackCall          ← enqueue 时把 Callback post 到主线程
 
 ### 5.3 单次方法调用内部流程
 
-![单次方法调用内部流程](retrofit-method-invoke.png)
+![单次方法调用内部流程](assets/retrofit-method-invoke.png)
 
-[SVG](retrofit-method-invoke.svg) · [mermaid 源文件](retrofit-method-invoke.mmd)
+[SVG](assets/retrofit-method-invoke.svg) · [mermaid 源文件](assets/retrofit-method-invoke.mmd)
 
 > ⚠️ 此阶段仅创建 Call，未 execute / enqueue，**没有网络请求**。
 
@@ -286,9 +287,9 @@ ExecutorCallbackCall          ← enqueue 时把 Callback post 到主线程
 
 ### 6.1 `enqueue` vs `execute` 对比
 
-![enqueue vs execute](retrofit-enqueue-vs-execute.png)
+![enqueue vs execute](assets/retrofit-enqueue-vs-execute.png)
 
-[SVG](retrofit-enqueue-vs-execute.svg) · [mermaid 源文件](retrofit-enqueue-vs-execute.mmd)
+[SVG](assets/retrofit-enqueue-vs-execute.svg) · [mermaid 源文件](assets/retrofit-enqueue-vs-execute.mmd)
 
 ---
 
@@ -296,9 +297,9 @@ ExecutorCallbackCall          ← enqueue 时把 Callback post 到主线程
 
 ### 7.1 时序图
 
-![enqueue 完整时序](retrofit-enqueue-sequence.png)
+![enqueue 完整时序](assets/retrofit-enqueue-sequence.png)
 
-[SVG](retrofit-enqueue-sequence.svg) · [mermaid 源文件](retrofit-enqueue-sequence.mmd)
+[SVG](assets/retrofit-enqueue-sequence.svg) · [mermaid 源文件](assets/retrofit-enqueue-sequence.mmd)
 
 ### 7.2 ExecutorCallbackCall.enqueue（外层）
 
@@ -355,9 +356,9 @@ private okhttp3.Call createRawCall() throws IOException {
 
 ## 8. 线程切换
 
-![线程切换](retrofit-thread-switch.png)
+![线程切换](assets/retrofit-thread-switch.png)
 
-[SVG](retrofit-thread-switch.svg) · [mermaid 源文件](retrofit-thread-switch.mmd)
+[SVG](assets/retrofit-thread-switch.svg) · [mermaid 源文件](assets/retrofit-thread-switch.mmd)
 
 | 阶段                         | 线程                                |
 |----------------------------|-----------------------------------|
@@ -369,9 +370,9 @@ private okhttp3.Call createRawCall() throws IOException {
 
 ## 9. OkHttp 拦截器链
 
-![OkHttp 拦截器链](retrofit-okhttp-interceptor.png)
+![OkHttp 拦截器链](assets/retrofit-okhttp-interceptor.png)
 
-[SVG](retrofit-okhttp-interceptor.svg) · [mermaid 源文件](retrofit-okhttp-interceptor.mmd)
+[SVG](assets/retrofit-okhttp-interceptor.svg) · [mermaid 源文件](assets/retrofit-okhttp-interceptor.mmd)
 
 Retrofit 不实现网络 IO，最终都交给 OkHttp 这条链。正式示例见 `OkHttpTest.kt`（共享 Client +
 `enqueue`）；拦截器链源码见 `docs/okhttp/okhttp-call-to-response.md`。
@@ -404,9 +405,9 @@ public T convert(ResponseBody value) throws IOException {
 
 ### 10.1 响应解析流程图
 
-![响应解析流程](retrofit-parse-response.png)
+![响应解析流程](assets/retrofit-parse-response.png)
 
-[SVG](retrofit-parse-response.svg) · [mermaid 源文件](retrofit-parse-response.mmd)
+[SVG](assets/retrofit-parse-response.svg) · [mermaid 源文件](assets/retrofit-parse-response.mmd)
 
 ### 10.2 错误处理
 
@@ -434,9 +435,9 @@ override fun onFailure(call: Call<List<EatGame>>, t: Throwable) {
 
 ## 11. Call 生命周期
 
-![Call 生命周期](retrofit-call-lifecycle.png)
+![Call 生命周期](assets/retrofit-call-lifecycle.png)
 
-[SVG](retrofit-call-lifecycle.svg) · [mermaid 源文件](retrofit-call-lifecycle.mmd)
+[SVG](assets/retrofit-call-lifecycle.svg) · [mermaid 源文件](assets/retrofit-call-lifecycle.mmd)
 
 ```kotlin
 call.cancel()       // 取消请求
@@ -506,9 +507,9 @@ call.clone()        // 复制一份新 Call（Call 只能执行一次）
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-![端到端一图流](retrofit-e2e-flow.png)
+![端到端一图流](assets/retrofit-e2e-flow.png)
 
-[SVG](retrofit-e2e-flow.svg) · [mermaid 源文件](retrofit-e2e-flow.mmd)
+[SVG](assets/retrofit-e2e-flow.svg) · [mermaid 源文件](assets/retrofit-e2e-flow.mmd)
 
 ---
 
@@ -641,15 +642,15 @@ fun listRepos(
 
 ### 19.2 两阶段模型
 
-![RequestFactory 两阶段模型](retrofit-request-factory-two-phase.png)
+![RequestFactory 两阶段模型](assets/retrofit-request-factory-two-phase.png)
 
-[SVG](retrofit-request-factory-two-phase.svg) · [mermaid 源文件](retrofit-request-factory-two-phase.mmd)
+[SVG](assets/retrofit-request-factory-two-phase.svg) · [mermaid 源文件](assets/retrofit-request-factory-two-phase.mmd)
 
 ### 19.3 阶段 1：解析 @GET、@Path、@Query
 
-![解析 @GET / @Path / @Query](retrofit-request-factory-parse.png)
+![解析 @GET / @Path / @Query](assets/retrofit-request-factory-parse.png)
 
-[SVG](retrofit-request-factory-parse.svg) · [mermaid 源文件](retrofit-request-factory-parse.mmd)
+[SVG](assets/retrofit-request-factory-parse.svg) · [mermaid 源文件](assets/retrofit-request-factory-parse.mmd)
 
 **@GET 源码：**
 
@@ -667,15 +668,15 @@ value(), false);
 
 ### 19.4 阶段 2：运行时拼 Request
 
-![运行时拼 Request](retrofit-request-factory-create.png)
+![运行时拼 Request](assets/retrofit-request-factory-create.png)
 
-[SVG](retrofit-request-factory-create.svg) · [mermaid 源文件](retrofit-request-factory-create.mmd)
+[SVG](assets/retrofit-request-factory-create.svg) · [mermaid 源文件](assets/retrofit-request-factory-create.mmd)
 
 ### 19.5 @Path 替换流程
 
-![@Path 替换流程](retrofit-path-replace.png)
+![@Path 替换流程](assets/retrofit-path-replace.png)
 
-[SVG](retrofit-path-replace.svg) · [mermaid 源文件](retrofit-path-replace.mmd)
+[SVG](assets/retrofit-path-replace.svg) · [mermaid 源文件](assets/retrofit-path-replace.mmd)
 
 - `@Path` 参数 **不能为 null**
 - 值会做 URL 编码
@@ -683,24 +684,24 @@ value(), false);
 
 ### 19.6 @Query 拼接流程
 
-![@Query 拼接流程](retrofit-query-append.png)
+![@Query 拼接流程](assets/retrofit-query-append.png)
 
-[SVG](retrofit-query-append.svg) · [mermaid 源文件](retrofit-query-append.mmd)
+[SVG](assets/retrofit-query-append.svg) · [mermaid 源文件](assets/retrofit-query-append.mmd)
 
 - `@Query` 值为 **null 则跳过**
 - `Int` 等经 `stringConverter` 转成 `"1"`
 
 ### 19.7 无 @Query 时
 
-![无 @Query 时拼 URL](retrofit-no-query.png)
+![无 @Query 时拼 URL](assets/retrofit-no-query.png)
 
-[SVG](retrofit-no-query.svg) · [mermaid 源文件](retrofit-no-query.mmd)
+[SVG](assets/retrofit-no-query.svg) · [mermaid 源文件](assets/retrofit-no-query.mmd)
 
 ### 19.8 URL 拼装时序图
 
-![URL 拼装时序](retrofit-url-assemble-sequence.png)
+![URL 拼装时序](assets/retrofit-url-assemble-sequence.png)
 
-[SVG](retrofit-url-assemble-sequence.svg) · [mermaid 源文件](retrofit-url-assemble-sequence.mmd)
+[SVG](assets/retrofit-url-assemble-sequence.svg) · [mermaid 源文件](assets/retrofit-url-assemble-sequence.mmd)
 
 ### 19.9 参数顺序约束
 

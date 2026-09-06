@@ -10,12 +10,12 @@ alwaysApply: true
 ## 流程图必须出图引用
 
 - **禁止**仅在 Markdown 里贴 ` ```mermaid ` / ` ```flowchart ` 代码块就算完成。
-- 每张流程图须同时产出：
-  1. 源文件：同名 `.mmd`（Mermaid 源，便于改图）
+- 每张流程图须同时产出（均放在主题包下的 `assets/`）：
+  1. 源文件：`assets/` 内同名 `.mmd`（Mermaid 源，便于改图）
   2. 预览图：至少 `.png`（Android Studio / 多数预览可直接看）；有条件再补 `.svg`
-  3. 正文用图片引用：`![说明](xxx.png)`，不要只靠内嵌 flowchart 文本
+  3. 正文用图片引用：`![说明](assets/xxx.png)`，不要只靠内嵌 flowchart 文本
 - 文首可用表格索引图：名称 | PNG |（可选 SVG）| mmd 源文件，与 `doflog-design-and-flow.md` 一致。
-- 渲染优先：`npx -y @mermaid-js/mermaid-cli -i xxx.mmd -o xxx.png`（或项目已有等价方式）。无法出图时须明确说明，并仍保留 `.mmd` + 计划中的图片路径，**不要**用纯代码块冒充成品图。
+- 渲染优先：`npx -y @mermaid-js/mermaid-cli -i assets/xxx.mmd -o assets/xxx.png`（或项目已有等价方式）。无法出图时须明确说明，并仍保留 `.mmd` + 计划中的图片路径，**不要**用纯代码块冒充成品图。
 
 ```markdown
 <!-- ❌ BAD：只有 flowchart 文本 -->
@@ -24,8 +24,8 @@ flowchart TB
   A --> B
 ```
 
-<!-- ✅ GOOD：同目录有 xxx.mmd / xxx.png，正文引用图 -->
-![流程说明](xxx.png)
+<!-- ✅ GOOD：assets/ 下有 xxx.mmd / xxx.png，正文引用图 -->
+![流程说明](assets/xxx.png)
 ```
 
 ## 内容较多时分包存放
@@ -33,13 +33,13 @@ flowchart TB
 - **短文**（大致一屏、无多图、单主题笔记）：可放 `docs/<name>.md`。
 - **内容较多**（多章节、多流程图、模块级说明）：必须建独立包：
   - 目录：`docs/<topic>/`
-  - 主文档：`docs/<topic>/<topic>-....md`
-  - 图与源文件与 md **同目录**（相对路径引用，如 `![x](foo.png)`）
+  - 主文档：`docs/<topic>/<topic>-....md`（包根只放 `.md`，便于直接浏览正文）
+  - 图与源文件：`docs/<topic>/assets/`（`.mmd` / `.png` / `.svg` / 截图等），正文用相对路径 `![x](assets/foo.png)`
 - 主题名用小写短横线，例如：`docs/doflog/`、`docs/retrofit/`、`docs/mqtt/`。
 - 不要把大量配图和长文堆在 `docs/` 根目录，以免难找、难预览。
 
 ## 检查清单
 
-- [ ] 每张流程/时序/架构图有 `.mmd` + `.png`（及可选 `.svg`）
-- [ ] Markdown 用 `![](...)` 引用图片，而非仅 flowchart 代码块
-- [ ] 多章节 / 多图文档落在 `docs/<topic>/` 包内
+- [ ] 每张流程/时序/架构图有 `assets/` 下的 `.mmd` + `.png`（及可选 `.svg`）
+- [ ] Markdown 用 `![](assets/...)` 引用图片，而非仅 flowchart 代码块
+- [ ] 多章节 / 多图文档落在 `docs/<topic>/` 包内；资源在 `assets/`，包根尽量只有 `.md`

@@ -7,32 +7,32 @@
 
 配套流程图（PNG 可直接预览）：
 
-| 图                  | PNG                                 | 源文件                                 |
-|--------------------|-------------------------------------|-------------------------------------|
-| DOFLog 模块分层        | [png](doflog-architecture.png)      | [mmd](doflog-architecture.mmd)      |
-| DOFLog 类继承关系       | [png](doflog-class-diagram.png)     | [mmd](doflog-class-diagram.mmd)     |
-| 门面模式               | [png](doflog-facade.png)            | [mmd](doflog-facade.mmd)            |
-| 单例模式               | [png](doflog-singleton.png)         | [mmd](doflog-singleton.mmd)         |
-| 策略模式               | [png](doflog-strategy.png)          | [mmd](doflog-strategy.mmd)          |
-| 模板方法               | [png](doflog-template-method.png)   | [mmd](doflog-template-method.mmd)   |
-| 观察者广播              | [png](doflog-pubsub.png)            | [mmd](doflog-pubsub.mmd)            |
-| init 装配 Adapter    | [png](doflog-factory-init.png)      | [mmd](doflog-factory-init.mmd)      |
-| 磁盘异步写入时序           | [png](doflog-producer-consumer.png) | [mmd](doflog-producer-consumer.mmd) |
-| 崩溃处理链              | [png](doflog-crash-chain.png)       | [mmd](doflog-crash-chain.mmd)       |
-| 进程名解析链             | [png](doflog-process-name.png)      | [mmd](doflog-process-name.mmd)      |
-| 初始化流程              | [png](doflog-init-flow.png)         | [mmd](doflog-init-flow.mmd)         |
-| d(tag, msg) 完整打印流程 | [png](doflog-d-call-flow.png)       | [mmd](doflog-d-call-flow.mmd)       |
-| LogHelper 内容分发     | [png](doflog-helper-dispatch.png)   | [mmd](doflog-helper-dispatch.mmd)   |
-| 格式化与栈回溯            | [png](doflog-format-flow.png)       | [mmd](doflog-format-flow.mmd)       |
-| Logcat 通道          | [png](doflog-logcat-flow.png)       | [mmd](doflog-logcat-flow.mmd)       |
-| 本地落盘               | [png](doflog-disk-write.png)        | [mmd](doflog-disk-write.mmd)        |
-| 日志目录选择             | [png](doflog-path-resolve.png)      | [mmd](doflog-path-resolve.mmd)      |
-| 崩溃日志时序             | [png](doflog-crash-sequence.png)    | [mmd](doflog-crash-sequence.mmd)    |
-| 其它入口汇入流水线          | [png](doflog-entry-pipeline.png)    | [mmd](doflog-entry-pipeline.mmd)    |
-| 日常打日志总时序           | [png](doflog-daily-sequence.png)    | [mmd](doflog-daily-sequence.mmd)    |
+| 图                  | PNG                                        | 源文件                                        |
+|--------------------|--------------------------------------------|--------------------------------------------|
+| DOFLog 模块分层        | [png](assets/doflog-architecture.png)      | [mmd](assets/doflog-architecture.mmd)      |
+| DOFLog 类继承关系       | [png](assets/doflog-class-diagram.png)     | [mmd](assets/doflog-class-diagram.mmd)     |
+| 门面模式               | [png](assets/doflog-facade.png)            | [mmd](assets/doflog-facade.mmd)            |
+| 单例模式               | [png](assets/doflog-singleton.png)         | [mmd](assets/doflog-singleton.mmd)         |
+| 策略模式               | [png](assets/doflog-strategy.png)          | [mmd](assets/doflog-strategy.mmd)          |
+| 模板方法               | [png](assets/doflog-template-method.png)   | [mmd](assets/doflog-template-method.mmd)   |
+| 观察者广播              | [png](assets/doflog-pubsub.png)            | [mmd](assets/doflog-pubsub.mmd)            |
+| init 装配 Adapter    | [png](assets/doflog-factory-init.png)      | [mmd](assets/doflog-factory-init.mmd)      |
+| 磁盘异步写入时序           | [png](assets/doflog-producer-consumer.png) | [mmd](assets/doflog-producer-consumer.mmd) |
+| 崩溃处理链              | [png](assets/doflog-crash-chain.png)       | [mmd](assets/doflog-crash-chain.mmd)       |
+| 进程名解析链             | [png](assets/doflog-process-name.png)      | [mmd](assets/doflog-process-name.mmd)      |
+| 初始化流程              | [png](assets/doflog-init-flow.png)         | [mmd](assets/doflog-init-flow.mmd)         |
+| d(tag, msg) 完整打印流程 | [png](assets/doflog-d-call-flow.png)       | [mmd](assets/doflog-d-call-flow.mmd)       |
+| LogHelper 内容分发     | [png](assets/doflog-helper-dispatch.png)   | [mmd](assets/doflog-helper-dispatch.mmd)   |
+| 格式化与栈回溯            | [png](assets/doflog-format-flow.png)       | [mmd](assets/doflog-format-flow.mmd)       |
+| Logcat 通道          | [png](assets/doflog-logcat-flow.png)       | [mmd](assets/doflog-logcat-flow.mmd)       |
+| 本地落盘               | [png](assets/doflog-disk-write.png)        | [mmd](assets/doflog-disk-write.mmd)        |
+| 日志目录选择             | [png](assets/doflog-path-resolve.png)      | [mmd](assets/doflog-path-resolve.mmd)      |
+| 崩溃日志时序             | [png](assets/doflog-crash-sequence.png)    | [mmd](assets/doflog-crash-sequence.mmd)    |
+| 其它入口汇入流水线          | [png](assets/doflog-entry-pipeline.png)    | [mmd](assets/doflog-entry-pipeline.mmd)    |
+| 日常打日志总时序           | [png](assets/doflog-daily-sequence.png)    | [mmd](assets/doflog-daily-sequence.mmd)    |
 
 本文说明当前实现里用了哪些模式、一条日志从调用到 Logcat / 本地文件怎么走完。流程图已渲染为 PNG，Android
-Studio Markdown 预览可直接看图；源文件是同名 `.mmd`。
+Studio Markdown 预览可直接看图；图与源文件在 `assets/`，同名 `.mmd`。
 
 ---
 
@@ -49,11 +49,11 @@ Studio Markdown 预览可直接看图；源文件是同名 `.mmd`。
 | 策略 | `ILogFormat` / `AndroidLogFormat` | 把原始内容变成带时间、栈、进程、线程的字符串                               |
 | 路径 | `LogFileUtil`                     | 解析并创建本地目录                                            |
 
-![DOFLog 模块分层](doflog-architecture.png)
+![DOFLog 模块分层](assets/doflog-architecture.png)
 
 类继承关系：
 
-![DOFLog 类继承关系](doflog-class-diagram.png)
+![DOFLog 类继承关系](assets/doflog-class-diagram.png)
 
 ---
 
@@ -70,7 +70,7 @@ DOFLogUtil.d(TAG, "hostAddress = $hostAddress")
 不必知道 `LogHelper`、adapter、`HandlerThread`、目录选择。所有 `d/i/e/...` 最终都是
 `LogHelper.getInstance().xxx(...)`。
 
-![门面模式](doflog-facade.png)
+![门面模式](assets/doflog-facade.png)
 
 ---
 
@@ -84,7 +84,7 @@ DOFLogUtil.d(TAG, "hostAddress = $hostAddress")
 
 adapter 列表用 `CopyOnWriteArrayList`，避免 `init` 与打日志并发改列表。
 
-![单例模式](doflog-singleton.png)
+![单例模式](assets/doflog-singleton.png)
 
 ---
 
@@ -113,7 +113,7 @@ adapter 列表用 `CopyOnWriteArrayList`，避免 `init` 与打日志并发改�
 - Logcat：策略格式化后 `Log.println`
 - 磁盘：同一策略格式化后异步写文件
 
-![策略模式](doflog-strategy.png)
+![策略模式](assets/doflog-strategy.png)
 
 ---
 
@@ -127,7 +127,7 @@ adapter 列表用 `CopyOnWriteArrayList`，避免 `init` 与打日志并发改�
 
 子类只覆盖「怎么输出」。`PluginDiskLogAdapter` 再扩展 `filter()`：先走父类，再限制 tag。
 
-![模板方法](doflog-template-method.png)
+![模板方法](assets/doflog-template-method.png)
 
 ---
 
@@ -138,7 +138,7 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 
 `CrashAdapter` 的 `log()` 是空实现，它只在构造时装崩溃钩子。
 
-![观察者广播](doflog-pubsub.png)
+![观察者广播](assets/doflog-pubsub.png)
 
 ---
 
@@ -149,7 +149,7 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 - Debug：Logcat + 文件 + 插件文件 + 崩溃
 - Release：无 Logcat，文件和崩溃仍在
 
-![init 装配 Adapter](doflog-factory-init.png)
+![init 装配 Adapter](assets/doflog-factory-init.png)
 
 ---
 
@@ -162,7 +162,7 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 
 避免主线程卡在 IO 上。`flush()` 往队列丢一个 `CountDownLatch`，等写线程处理完当前队列后再返回。
 
-![磁盘异步写入时序](doflog-producer-consumer.png)
+![磁盘异步写入时序](assets/doflog-producer-consumer.png)
 
 ---
 
@@ -173,12 +173,12 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 **崩溃处理链**：`CrashAdapter` 包一层 `UncaughtExceptionHandler`，先同步写文件，再交给原来的 handler（
 `CrashUtils` / 系统）。
 
-![崩溃处理链](doflog-crash-chain.png)
+![崩溃处理链](assets/doflog-crash-chain.png)
 
 **进程名解析链**：API 28 `Application.getProcessName()` → `/proc/pid/cmdline` → AMS → 反射
 `ActivityThread`。
 
-![进程名解析链](doflog-process-name.png)
+![进程名解析链](assets/doflog-process-name.png)
 
 ---
 
@@ -200,7 +200,7 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 
 启动点：`HahaApplication.onCreate()` → `DOFLogUtil.init(this)`。
 
-![初始化流程](doflog-init-flow.png)
+![初始化流程](assets/doflog-init-flow.png)
 
 多进程时目录会变成 `log_<进程后缀>`，文件名 `log_<进程>_yyyyMMddHH.txt`。本项目未声明子进程，主进程一般是：
 
@@ -217,11 +217,11 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 
 以 `DOFLogUtil.d("MainActivity", "hostAddress = 1.2.3.4")` 为例。
 
-![d(tag, msg) 完整打印流程](doflog-d-call-flow.png)
+![d(tag, msg) 完整打印流程](assets/doflog-d-call-flow.png)
 
 ### 4.1 LogHelper 内容分发
 
-![LogHelper 内容分发](doflog-helper-dispatch.png)
+![LogHelper 内容分发](assets/doflog-helper-dispatch.png)
 
 级别与 Android `Log` 对齐：`V=2 D=3 I=4 W=5 E=6 A=7`。默认门槛 `VERBOSE`，所以 `v()` 也会出。
 
@@ -238,7 +238,7 @@ adapter 异常被 `try/catch` 吃掉，不影响其它通道。
 栈回溯用 `Thread.currentThread().stackTrace`，跳过 `com.haha.log.*` 和带 `DOFLogUtil` 的类，尽量落到真正调用方（如
 `MainActivity.kt`）。
 
-![格式化与栈回溯](doflog-format-flow.png)
+![格式化与栈回溯](assets/doflog-format-flow.png)
 
 示例（主线程 `MainActivity.onCreate` 打 log）：
 
@@ -256,7 +256,7 @@ index 2 开始扫并过滤。
 
 ## 6. Logcat 通道
 
-![Logcat 通道](doflog-logcat-flow.png)
+![Logcat 通道](assets/doflog-logcat-flow.png)
 
 避免一条超长 JSON 被系统截断。Release 且 `isDebug=false` 时不会注册该 adapter。
 
@@ -264,11 +264,11 @@ index 2 开始扫并过滤。
 
 ## 7. 本地落盘
 
-![本地落盘](doflog-disk-write.png)
+![本地落盘](assets/doflog-disk-write.png)
 
 路径选择：
 
-![日志目录选择](doflog-path-resolve.png)
+![日志目录选择](assets/doflog-path-resolve.png)
 
 本项目典型路径（`applicationId = com.haha.hahalearn`）：
 
@@ -287,13 +287,13 @@ index 2 开始扫并过滤。
 
 `CrashAdapter` 不参与日常 `d/e`，只在构造时挂钩。必须同步写：进程马上要死，`HandlerThread` 来不及消费。
 
-![崩溃日志时序](doflog-crash-sequence.png)
+![崩溃日志时序](assets/doflog-crash-sequence.png)
 
 ---
 
 ## 9. 其它入口如何汇入同一条流水线
 
-![其它入口汇入流水线](doflog-entry-pipeline.png)
+![其它入口汇入流水线](assets/doflog-entry-pipeline.png)
 
 `logJson(String)` 会先判断 `[` / `{`，解析失败再 `e(tag, "invalid json...")`。
 
@@ -301,7 +301,7 @@ index 2 开始扫并过滤。
 
 ## 10. 日常打日志总时序
 
-![日常打日志总时序](doflog-daily-sequence.png)
+![日常打日志总时序](assets/doflog-daily-sequence.png)
 
 ---
 

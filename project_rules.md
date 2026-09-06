@@ -27,7 +27,7 @@
 - [`docs/mqtt/mqtt-sender-receiver.md`](docs/mqtt/mqtt-sender-receiver.md) — MQTT Fixed Header
   与发送方 /
   接收方 Demo（入口 `MqttTest`，实现在 `retrofit.mqtt` 包，附图
-  [`docs/mqtt/mqtt-fixed-header.jpg`](docs/mqtt/mqtt-fixed-header.jpg)）
+  [`docs/mqtt/assets/mqtt-fixed-header.jpg`](docs/mqtt/assets/mqtt-fixed-header.jpg)）
 
 ---
 

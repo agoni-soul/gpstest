@@ -1,18 +1,15 @@
 package com.haha.service.impl.service;
 
+import java.lang.reflect.Constructor;
 
 /**
- * 默认的Factory，先尝试Provider，再尝试无参数构造
- * <p>
- * Created by jzj on 2018/3/30.
+ * 默认 Factory：无参构造创建实例。
  */
-
 public class DefaultFactory implements IFactory {
 
     public static final DefaultFactory INSTANCE = new DefaultFactory();
 
     DefaultFactory() {
-
     }
 
     @Override
@@ -20,11 +17,8 @@ public class DefaultFactory implements IFactory {
         if (clazz == null) {
             throw new Exception("clazz is null");
         }
-//        T t = ProviderPool.create(clazz);
-//        if (t != null) {
-//            return t;
-//        } else {
-        return clazz.newInstance();
-//        }
+        Constructor<T> constructor = clazz.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        return constructor.newInstance();
     }
 }

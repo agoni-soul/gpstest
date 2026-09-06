@@ -1,232 +1,270 @@
 package com.haha.service.impl.service
 
-import android.util.Log
+import android.app.Application
+import android.content.Context
 import com.haha.service.impl.ServiceImpl
+import com.haha.service.impl.core.Debugger
+import com.haha.service.impl.core.LogcatLogger
+import com.haha.service.impl.service.ServiceLoader.Companion.lazyInit
+import com.haha.service.impl.utils.ProcessUtils
 import com.haha.service.impl.utils.SingletonPool
+import java.util.concurrent.ConcurrentHashMap
 
 /**
- *
- * @author : haha
- * @date   : 2024-09-14
- * @desc   :
- * @version: 1.0
- *
+ * 按接口查找服务实现。注册表由 APT 生成的 [IServiceInit] 在 [lazyInit] 时写入。
  */
-open class ServiceLoader<I>(interfaceClass: Class<*>?) {
+open class ServiceLoader<I> internal constructor() {
+
+    internal val records: LinkedHashSet<ServiceRecord> = LinkedHashSet()
+    internal val byKey: HashMap<String, ServiceRecord> = HashMap()
+    internal var defaultRecord: ServiceRecord? = null
+
     companion object {
-        private val TAG = "ServiceLoader"
+        private const val INIT_CLASS = "com.haha.service.impl.generated.ServiceLoaderInit"
+        private val INIT_LOCK = Any()
 
-        private var mIsHasInit: Boolean = false
+        @Volatile
+        private var initialized: Boolean = false
 
-        val SERVICES: MutableMap<Class<*>, ServiceLoader<*>> by lazy {
-            HashMap()
+        private val SERVICES: ConcurrentHashMap<Class<*>, ServiceLoader<*>> = ConcurrentHashMap()
+
+        @Volatile
+        var application: Application? = null
+            private set
+
+        @JvmStatic
+        @JvmOverloads
+        fun init(context: Context, debug: Boolean = false) {
+            application = context as? Application ?: context.applicationContext as? Application
+            if (!Debugger.isLogSetting()) {
+                Debugger.setLogger(LogcatLogger())
+            }
+            Debugger.setEnableDebug(debug)
+            Debugger.setEnableLog(debug)
+            lazyInit()
+            if (debug) {
+                Debugger.i(dump())
+            }
         }
 
+        @JvmStatic
         fun lazyInit() {
-            synchronized(this) {
-                Log.d(TAG, "lazyInit, mIsHasInit = $mIsHasInit")
-                if (!mIsHasInit) {
-                    try {
-                        // 反射调用Init类，避免引用的类过多，导致main dex capacity exceeded问题
-                        Class.forName("com.haha.service.impl.generated.service.ServiceInit_")
-                            .getMethod("init")
-                            .invoke(null)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                    mIsHasInit = true
+            if (initialized) {
+                return
+            }
+            synchronized(INIT_LOCK) {
+                if (initialized) {
+                    return
                 }
+                try {
+                    Class.forName(INIT_CLASS).getMethod("init").invoke(null)
+                } catch (e: Exception) {
+                    Debugger.e(e)
+                    Debugger.e("ServiceLoaderInit.init failed")
+                    if (Debugger.isEnableDebug()) {
+                        throw e
+                    }
+                }
+                initialized = true
             }
         }
 
         /**
-         * 提供给InitClass使用的初始化接口
-         *
-         * @param interfaceClass 接口类
-         * @param implementClass 实现类
+         * 给生成类 / 插件调用的注册入口。
          */
+        @JvmStatic
         fun put(
             interfaceClass: Class<*>,
-            key: String,
+            key: String?,
             implementClass: Class<*>,
-            singleton: Boolean
+            singleton: Boolean,
+            defaultImpl: Boolean,
+            priority: Int,
+            process: String?
         ) {
-            var loader: ServiceLoader<*>? = SERVICES[interfaceClass]
-            if (loader == null) {
-                loader = ServiceLoader<Any>(interfaceClass)
-                SERVICES[interfaceClass] = loader
+            val processName = process.orEmpty()
+            if (!ProcessUtils.isCurrentProcess(processName)) {
+                Debugger.d(
+                    "skip %s, process=%s current=%s",
+                    implementClass.name,
+                    processName,
+                    ProcessUtils.currentProcessName()
+                )
+                return
             }
-            Log.d(
-                TAG,
-                "interfaceClass = ${interfaceClass.name}\n key = ${key}\n implementClass = ${implementClass.name}"
+            val loader = SERVICES.getOrPut(interfaceClass) { ServiceLoader<Any>() }
+            loader.putRecord(
+                ServiceRecord(
+                    interfaceClass = interfaceClass,
+                    implClass = implementClass,
+                    key = key.orEmpty(),
+                    singleton = singleton,
+                    isDefault = defaultImpl,
+                    priority = priority
+                )
             )
-            loader.putImpl(key, implementClass, singleton)
         }
 
-        /**
-         * 根据接口获取 [ServiceLoader]
-         */
-        fun <T> load(interfaceClass: Class<T>?): ServiceLoader<T>? {
+        @JvmStatic
+        fun <T : Any> load(interfaceClass: Class<T>): ServiceLoader<T> {
+            requireNotNull(interfaceClass) { "ServiceLoader.load 的 class 参数不应为空" }
             lazyInit()
-            if (interfaceClass == null) {
-                NullPointerException("ServiceLoader.load的class参数不应为空")
-                return EmptyServiceLoader.INSTANCE as? ServiceLoader<T>
+            @Suppress("UNCHECKED_CAST")
+            return (SERVICES[interfaceClass] as? ServiceLoader<T>) ?: ServiceLoader()
+        }
+
+        @JvmStatic
+        fun dump(): String {
+            lazyInit()
+            if (SERVICES.isEmpty()) {
+                return "ServiceLoader: empty registry"
             }
-            var service = SERVICES[interfaceClass]
-            if (service == null) {
-                synchronized(SERVICES) {
-                    service = SERVICES[interfaceClass]
-                    if (service == null) {
-                        service = ServiceLoader<T>(interfaceClass)
-                        SERVICES[interfaceClass] = service!!
+            return buildString {
+                append("ServiceLoader dump:\n")
+                SERVICES.forEach { (iface, loader) ->
+                    append("  ").append(iface.name).append('\n')
+                    append("    default=").append(loader.defaultRecord?.implClass?.name)
+                        .append('\n')
+                    append("    keys=").append(loader.byKey.keys).append('\n')
+                    loader.records.forEach { record ->
+                        append("    - ").append(record.implClass.name)
+                            .append(" key=").append(record.key)
+                            .append(" singleton=").append(record.singleton)
+                            .append(" default=").append(record.isDefault)
+                            .append(" priority=").append(record.priority)
+                            .append('\n')
                     }
                 }
             }
-            return service as? ServiceLoader<T>
         }
     }
 
-    private val mMap: HashMap<String, ServiceImpl> by lazy { HashMap() }
-
-    private var mInterfaceName: String = ""
-
-    init {
-        mInterfaceName = if (interfaceClass == null) {
-            ""
+    internal fun putRecord(record: ServiceRecord) {
+        val existing = records.find { it.implClass == record.implClass }
+        val merged = if (existing != null) {
+            records.remove(existing)
+            existing.copy(
+                key = record.key.ifEmpty { existing.key },
+                isDefault = existing.isDefault || record.isDefault,
+                singleton = existing.singleton || record.singleton,
+                priority = maxOf(existing.priority, record.priority)
+            )
         } else {
-            interfaceClass.name
+            record
         }
+        records.add(merged)
+
+        if (merged.key.isNotEmpty()) {
+            val previous = byKey.put(merged.key, merged)
+            if (previous != null && previous.implClass != merged.implClass) {
+                val msg =
+                    "接口${merged.interfaceClass.name}对应key='${merged.key}'存在多个实现: ${previous.implClass.name}, ${merged.implClass.name}"
+                Debugger.e(msg)
+                if (Debugger.isEnableDebug()) {
+                    throw IllegalStateException(msg)
+                }
+            }
+        }
+        if (merged.isDefault) {
+            byKey.putIfAbsent(ServiceImpl.DEFAULT_IMPL_KEY, merged)
+            val previous = defaultRecord
+            if (previous != null && previous.implClass != merged.implClass) {
+                val msg =
+                    "接口${merged.interfaceClass.name} 的默认实现只允许存在一个: ${previous.implClass.name}, ${merged.implClass.name}"
+                Debugger.e(msg)
+                if (Debugger.isEnableDebug()) {
+                    throw IllegalStateException(msg)
+                }
+            }
+            defaultRecord = merged
+        }
+        Debugger.d(
+            "put interface=%s key=%s impl=%s singleton=%s default=%s",
+            merged.interfaceClass.name,
+            merged.key,
+            merged.implClass.name,
+            merged.singleton,
+            merged.isDefault
+        )
     }
 
-    private fun putImpl(key: String?, implementClass: Class<*>?, singleton: Boolean) {
-        key ?: return
-        implementClass ?: return
-        mMap[key] = ServiceImpl(key, implementClass, singleton)
-    }
+    fun <T : I?> getDefault(): T? = createInstance(defaultRecord)
 
     /**
-     * 创建指定key的实现类实例，使用 [IServiceProvider] 方法或无参数构造。对于声明了singleton的实现类，不会重复创建实例。
-     *
-     * @return 可能返回null
+     * @param key 业务 key；空或默认 key 时走默认实现。
      */
     fun <T : I?> get(key: String?): T? {
-        Log.d(TAG, "get: key = ${key}, value = ${mMap[key]}")
-        return createInstance<T>(mMap[key], null)
+        if (key.isNullOrEmpty() || key == ServiceImpl.DEFAULT_IMPL_KEY) {
+            return getDefault()
+        }
+        return createInstance(byKey[key])
     }
 
-    /**
-     * 创建指定key的实现类实例，使用指定的Factory构造。对于声明了singleton的实现类，不会重复创建实例。
-     *
-     * @return 可能返回null
-     */
     fun <T : I?> get(key: String?, factory: IFactory?): T? {
-        return createInstance<T>(mMap[key], factory)
+        val record = if (key.isNullOrEmpty() || key == ServiceImpl.DEFAULT_IMPL_KEY) {
+            defaultRecord
+        } else {
+            byKey[key]
+        }
+        return createInstance(record, factory)
     }
 
-    /**
-     * 创建所有实现类的实例，使用 [IServiceLoader] 方法或无参数构造。对于声明了singleton的实现类，不会重复创建实例。
-     *
-     * @return 可能返回EmptyList，List中的元素不为空
-     */
-    fun <T : I?> getAll(): List<T> {
-        return getAll(null as IFactory?)
-    }
+    fun <T : I?> getAll(): List<T> = getAll(null)
 
-    /**
-     * 创建所有实现类的实例，使用指定Factory构造。对于声明了singleton的实现类，不会重复创建实例。
-     *
-     * @return 可能返回EmptyList，List中的元素不为空
-     */
     open fun <T : I?> getAll(factory: IFactory?): List<T> {
-        val services: Collection<ServiceImpl> = mMap.values
-        Log.d(TAG, "getAll: services.size = ${services.size}")
-        if (services.isEmpty()) {
+        if (records.isEmpty()) {
             return emptyList()
         }
-        val list: MutableList<T> = ArrayList(services.size)
-        for (impl in services) {
-            val instance = createInstance<T>(impl, factory)
-            if (instance != null) {
-                list.add(instance)
-            }
-        }
-        return list
+        return records
+            .sortedByDescending { it.priority }
+            .mapNotNull { createInstance<T>(it, factory) }
     }
 
-    /**
-     * 获取指定key的实现类。注意，对于声明了singleton的实现类，获取Class后还是可以创建新的实例。
-     *
-     * @return 可能返回null
-     */
+    fun uniqueImplCount(): Int = records.map { it.implClass }.toSet().size
+
+    fun hasImplementation(): Boolean = records.isNotEmpty()
+
     fun <T : I?> getClass(key: String?): Class<*>? {
-        return mMap[key]?.implementationClazz
+        if (key.isNullOrEmpty() || key == ServiceImpl.DEFAULT_IMPL_KEY) {
+            return defaultRecord?.implClass
+        }
+        return byKey[key]?.implClass
     }
 
-    /**
-     * 获取所有实现类的Class。注意，对于声明了singleton的实现类，获取Class后还是可以创建新的实例。
-     *
-     * @return 可能返回EmptyList，List中的元素不为空
-     */
     open fun <T : I?> getAllClasses(): List<Class<*>> {
-        val list: MutableList<Class<T>> = ArrayList(mMap.size)
-        for (impl in mMap.values) {
-            val clazz = impl.implementationClazz as? Class<T>
-            if (clazz != null) {
-                list.add(clazz)
-            }
-        }
-        return list
+        return records.map { it.implClass }.distinct()
     }
 
-    private fun <T : I?> createInstance(impl: ServiceImpl?, iFactory: IFactory?): T? {
-        impl ?: return null
-        var factory: IFactory? = iFactory
-        val clazz = impl.implementationClazz as? Class<T>
-        if (impl.isSingleton) {
-            try {
-                return SingletonPool.get(clazz, factory)
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
+    fun <T : I?> getByImplClass(implClass: Class<*>): T? {
+        val record = records.find { it.implClass == implClass } ?: return null
+        return createInstance(record)
+    }
+
+    private fun <T : I?> createInstance(
+        record: ServiceRecord?,
+        factory: IFactory? = null
+    ): T? {
+        record ?: return null
+        @Suppress("UNCHECKED_CAST")
+        val clazz = record.implClass as? Class<T> ?: return null
+        val usedFactory = factory ?: DefaultFactory.INSTANCE
+        return try {
+            if (record.singleton) {
+                SingletonPool.get(clazz, usedFactory)
+            } else {
+                InstanceCreator.create(clazz, usedFactory)
             }
-        } else {
-            try {
-                if (factory == null) {
-                    factory = DefaultFactory()
-                }
-                val t: T? = factory.create(clazz)
-                return t
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
+        } catch (e: Exception) {
+            Debugger.e(e)
+            Debugger.e("create %s failed", clazz.name)
+            if (Debugger.isEnableDebug()) {
+                throw ServiceCreateException(clazz.name, e)
             }
+            null
         }
-        return null
     }
 
     override fun toString(): String {
-        return "ServiceLoader ($mInterfaceName)"
-    }
-
-    class EmptyServiceLoader<I> : ServiceLoader<I>(null) {
-        private val mAllClasses: List<Class<I>>
-            get() = emptyList()
-
-        private val mAll: List<I>
-            get() = emptyList()
-
-        override fun <T : I?> getAll(factory: IFactory?): List<T> {
-            return emptyList()
-        }
-
-        override fun <T : I?> getAllClasses(): List<Class<*>> {
-            return mAllClasses
-        }
-
-        override fun toString(): String {
-            return "EmptyServiceLoader"
-        }
-
-        companion object {
-            val INSTANCE: ServiceLoader<out Any> = EmptyServiceLoader()
-        }
+        return "ServiceLoader(size=${records.size}, default=${defaultRecord?.implClass?.simpleName})"
     }
 }

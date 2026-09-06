@@ -49,5 +49,10 @@ dependencies {
     implementation project(':ServiceRuntime')
     kapt project(':ServiceAnnotationProcessor')
     annotationProcessor project(':ServiceAnnotationProcessor')
+}
 
+kapt {
+    arguments {
+        arg("SERVICE_MODULE_NAME", project.getName())
+    }
 }

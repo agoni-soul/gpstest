@@ -236,5 +236,6 @@ dependencies {
 kapt {
     arguments {
         arg("DOFROUTER_MODULE_NAME", project.getName())
+        arg("SERVICE_MODULE_NAME", project.getName())
     }
 }

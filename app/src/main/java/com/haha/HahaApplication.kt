@@ -9,10 +9,12 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.Log
 import com.haha.base.ActivityManager
+import com.haha.hahalearn.BuildConfig
 import com.haha.leakcanary.LeakCanaryInstaller
 import com.haha.log.DOFLogUtil
 import com.haha.main.timeMonitor.TimeMonitorConfig
 import com.haha.main.timeMonitor.TimeMonitorManager
+import com.haha.service.impl.service.ServiceLoader
 import com.haha.servicerouter.core.DOFRouter
 import java.io.File
 
@@ -86,6 +88,7 @@ class HahaApplication : Application() {
     private fun initComponents() {
         DOFRouter.openDebug()
         DOFRouter.init(this)
+        ServiceLoader.init(this, BuildConfig.DEBUG)
     }
 
     override fun onTerminate() {

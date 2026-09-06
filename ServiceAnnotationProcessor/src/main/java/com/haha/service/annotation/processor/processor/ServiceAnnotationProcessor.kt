@@ -2,41 +2,40 @@ package com.haha.service.annotation.processor.processor
 
 import com.google.auto.service.AutoService
 import com.haha.service.annotation.IServiceLoader
-import com.haha.service.impl.ServiceImpl
-import java.util.Collections
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
+import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.MirroredTypesException
 import javax.lang.model.type.TypeMirror
+import javax.tools.Diagnostic
 
-/**
- *
- * @author : haha
- * @date   : 2024-09-14
- * @desc   : 定义IServiceLoader实现Processor类
- * @version: 1.0
- *
- */
 @AutoService(Processor::class)
-class ServiceAnnotationProcessor: BaseProcessor() {
+class ServiceAnnotationProcessor : BaseProcessor() {
+
     companion object {
-        fun getInterface(service: IServiceLoader): MutableList<out TypeMirror?>? {
-            try {
+        fun readInterfaces(service: IServiceLoader): List<TypeMirror> {
+            return try {
                 service.interfaces
+                emptyList()
             } catch (mte: MirroredTypesException) {
-                return mte.typeMirrors
+                mte.typeMirrors.filterNotNull()
             }
-            return null
         }
     }
 
-    private val mEntityMap: MutableMap<String, Entity> by lazy {
-        mutableMapOf()
+    private val mEntityMap: MutableMap<String, Entity> = LinkedHashMap()
+
+    override fun getSupportedSourceVersion(): SourceVersion {
+        return SourceVersion.latestSupported()
     }
 
-    private var mHash: String? = null
+    override fun getSupportedOptions(): MutableSet<String> {
+        return mutableSetOf(ConstantUtils.OPT_MODULE_NAME)
+    }
 
     override fun process(
         annotations: MutableSet<out TypeElement>?,
@@ -51,13 +50,25 @@ class ServiceAnnotationProcessor: BaseProcessor() {
     }
 
     private fun generateInitClass() {
-        if (mEntityMap.isEmpty() || mHash == null) {
+        if (mEntityMap.isEmpty()) {
             return
         }
-        val generator = ServiceInitClassBuilder("ServiceInit${ConstantUtils.SPLITTER}")//$mHash
+        mEntityMap.values.forEach { it.markUniqueAsDefault() }
+        val moduleName = sanitizeModuleName(
+            mOptions?.get(ConstantUtils.OPT_MODULE_NAME) ?: "Default"
+        )
+        val generator = ServiceInitClassBuilder("ServiceInit${ConstantUtils.SPLITTER}$moduleName")
         for (entry in mEntityMap.entries) {
-            for (service in entry.value.map.values) {
-                generator.put(entry.key, service.key, service.implementation, service.isSingleton)
+            for (spec in entry.value.impls.values) {
+                generator.put(
+                    entry.key,
+                    spec.key,
+                    spec.implementation,
+                    spec.singleton,
+                    spec.defaultImpl,
+                    spec.priority,
+                    spec.process
+                )
             }
         }
         generator.build()
@@ -69,84 +80,148 @@ class ServiceAnnotationProcessor: BaseProcessor() {
             if (element.kind != ElementKind.CLASS || element !is TypeElement) {
                 continue
             }
-            if (mHash == null) {
-                mHash = hash(element.qualifiedName.toString())
-            }
+            validateImplementation(element)
             val service = element.getAnnotation(IServiceLoader::class.java) ?: continue
-            val typeMirrors = getInterface(service)
-            val keys = service.key
+            val typeMirrors = resolveInterfaces(element, service)
+            if (typeMirrors.isEmpty()) {
+                error(
+                    element,
+                    "${element.qualifiedName} 未声明 interfaces，且无法推断业务接口"
+                )
+                continue
+            }
 
             val implementationName = element.qualifiedName.toString()
-            val singleton = service.singleton
-            val defaultImpl = service.defaultImpl
+            val key = service.key
+            if (key.contains(":")) {
+                error(element, "$implementationName: 注解 IServiceLoader 的 key 不可包含冒号")
+                continue
+            }
 
-            if (!typeMirrors.isNullOrEmpty()) {
-                for (mirror in typeMirrors) {
-                    mirror ?: continue
-                    if (!isConcreteSubType(element, mirror)) {
-                        val msg =
-                            "${element.qualifiedName}没有实现注解${IServiceLoader::class.java.name}标注的接口$mirror"
-                        throw RuntimeException(msg)
-                    }
-                    val interfaceName = getClassName(mirror)
-                    var entity = mEntityMap[interfaceName]
-                    if (entity == null) {
-                        entity = Entity(interfaceName)
-                        mEntityMap[interfaceName] = entity
-                    }
-
-                    if (defaultImpl) {
-                        //如果设置为默认实现，则手动添加一个内部标识默认实现的key
-                        entity.put(ServiceImpl.DEFAULT_IMPL_KEY, implementationName, singleton)
-                    }
-
-                    if (keys.isNotEmpty()) {
-                        for (key in keys) {
-                            if (key.contains(":")) {
-                                val msg = String.format(
-                                    "%s: 注解%s的key参数不可包含冒号",
-                                    implementationName, IServiceLoader::class.java.name
-                                )
-                                throw java.lang.RuntimeException(msg)
-                            }
-                            entity.put(key, implementationName, singleton)
-                        }
-                    } else {
-                        entity.put(null, implementationName, singleton)
-                    }
+            for (mirror in typeMirrors) {
+                if (!isConcreteSubType(element, mirror)) {
+                    error(
+                        element,
+                        "${element.qualifiedName} 没有实现注解 IServiceLoader 标注的接口 $mirror"
+                    )
+                    continue
                 }
+                val interfaceName = getClassName(mirror)
+                val entity = mEntityMap.getOrPut(interfaceName) { Entity(interfaceName) }
+                entity.add(
+                    ImplSpec(
+                        implementation = implementationName,
+                        key = key,
+                        singleton = service.singleton,
+                        defaultImpl = service.defaultImpl,
+                        priority = service.priority,
+                        process = service.process
+                    )
+                ) { msg -> error(element, msg) }
             }
         }
+    }
+
+    private fun resolveInterfaces(
+        element: TypeElement,
+        service: IServiceLoader
+    ): List<TypeMirror> {
+        val declared = readInterfaces(service)
+        if (declared.isNotEmpty()) {
+            return declared
+        }
+        return element.interfaces.filter { isServiceInterface(it) }
+    }
+
+    private fun isServiceInterface(mirror: TypeMirror): Boolean {
+        val name = mirror.toString()
+        if (name.startsWith("java.") ||
+            name.startsWith("javax.") ||
+            name.startsWith("kotlin.") ||
+            name.startsWith("android.") ||
+            name.startsWith("androidx.")
+        ) {
+            return false
+        }
+        return name != ConstantUtils.AWARE_CLASS && name != ConstantUtils.LIFECYCLE_CLASS
+    }
+
+    private fun validateImplementation(element: TypeElement) {
+        if (!element.modifiers.contains(Modifier.PUBLIC)) {
+            error(element, "${element.qualifiedName} 必须是 public")
+        }
+        if (element.modifiers.contains(Modifier.ABSTRACT)) {
+            error(element, "${element.qualifiedName} 不能是抽象类")
+        }
+        if (element.nestingKind.isNested && !element.modifiers.contains(Modifier.STATIC)) {
+            error(element, "${element.qualifiedName} 若为内部类必须是 static")
+        }
+        val hasNoArg = element.enclosedElements.any { enclosed ->
+            enclosed is ExecutableElement &&
+                    enclosed.kind == ElementKind.CONSTRUCTOR &&
+                    enclosed.parameters.isEmpty() &&
+                    enclosed.modifiers.contains(Modifier.PUBLIC)
+        }
+        if (!hasNoArg && element.enclosedElements.none { it.kind == ElementKind.CONSTRUCTOR }) {
+            // Kotlin 隐式构造
+            return
+        }
+        if (!hasNoArg) {
+            error(element, "${element.qualifiedName} 需要 public 无参构造")
+        }
+    }
+
+    private fun sanitizeModuleName(raw: String): String {
+        val sanitized = raw.replace(Regex("[^A-Za-z0-9_]"), "_")
+        return sanitized.ifEmpty { "Default" }
+    }
+
+    private fun error(element: TypeElement, msg: String) {
+        mMessager?.printMessage(Diagnostic.Kind.ERROR, msg, element)
+        throw RuntimeException(msg)
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {
-        return HashSet(Collections.singletonList(IServiceLoader::class.java.name))
+        return hashSetOf(IServiceLoader::class.java.name)
     }
 
-    class Entity(private val mInterfaceName: String) {
-        private val mMap: MutableMap<String, ServiceImpl> = HashMap()
+    class ImplSpec(
+        val implementation: String,
+        val key: String,
+        val singleton: Boolean,
+        var defaultImpl: Boolean,
+        val priority: Int,
+        val process: String
+    )
 
-        val map: Map<String, ServiceImpl>
-            get() = mMap
+    class Entity(private val interfaceName: String) {
+        val impls: LinkedHashMap<String, ImplSpec> = LinkedHashMap()
 
-        fun put(key: String?, implementationName: String?, singleton: Boolean) {
-            implementationName ?: return
-            val impl = ServiceImpl(key, implementationName, singleton)
-            val prev: ServiceImpl? = mMap.put(impl.key, impl)
-            val errorMsg: String? = ServiceImpl.checkConflict(mInterfaceName, prev, impl)
-            if (errorMsg != null) {
-                throw RuntimeException(errorMsg)
+        fun add(spec: ImplSpec, onError: (String) -> Unit) {
+            val existing = impls[spec.implementation]
+            if (existing != null) {
+                if (existing.key.isNotEmpty() && spec.key.isNotEmpty() && existing.key != spec.key) {
+                    onError("${interfaceName}: ${spec.implementation} 注册了多个不同 key")
+                    return
+                }
+                existing.defaultImpl = existing.defaultImpl || spec.defaultImpl
+                return
             }
+            if (spec.key.isNotEmpty() && impls.values.any { it.key == spec.key }) {
+                onError("${interfaceName}: key='${spec.key}' 存在多个实现")
+                return
+            }
+            if (spec.defaultImpl && impls.values.any { it.defaultImpl }) {
+                onError("${interfaceName}: 默认实现只允许存在一个")
+                return
+            }
+            impls[spec.implementation] = spec
         }
 
-        val contents: List<String>
-            get() {
-                val list: MutableList<String> = ArrayList()
-                for (impl in mMap.values) {
-                    list.add(impl.toConfig())
-                }
-                return list
+        fun markUniqueAsDefault() {
+            if (impls.size == 1) {
+                impls.values.first().defaultImpl = true
             }
+        }
     }
 }
-

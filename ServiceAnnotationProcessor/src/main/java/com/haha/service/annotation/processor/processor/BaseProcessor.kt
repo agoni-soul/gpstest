@@ -213,73 +213,59 @@ abstract class BaseProcessor: AbstractProcessor() {
      *
      * public class &lt;ClassName&gt; {
      * public static void init() {
-     * ServiceLoader.put(com.xxx.interface1.class, "key1", com.xxx.implementsA.class, false);
-     * ServiceLoader.put(com.xxx.interface2.class, "key2", com.xxx.implementsB.class, false);
+     * ServiceLoader.put(com.xxx.interface1.class, "key1", com.xxx.implementsA.class, true, true, 0, "");
+     * ServiceLoader.put(com.xxx.interface2.class, "key2", com.xxx.implementsB.class, true, false, 0, "");
      * }
      * }
     </pre> *
      */
     inner class ServiceInitClassBuilder(private val className: String) {
         private val builder: CodeBlock.Builder = CodeBlock.builder()
-        private val serviceLoaderClass: ClassName? = className(ConstantUtils.SERVICE_LOADER_CLASS)
+        private val serviceLoaderClass = ClassName.bestGuess(ConstantUtils.SERVICE_LOADER_CLASS)
+        private val serviceInitInterface = ClassName.bestGuess(ConstantUtils.ISERVICE_INIT_CLASS)
 
-        /**
-         * 占位符用于在生成代码时插入字符串、类型或变量名等内容
-         * $S 用于插入字符串
-         * $T 用于插入类型
-         * $N 用于插入变量名
-         */
         fun put(
             interfaceName: String?,
             key: String?,
             implementName: String?,
-            singleton: Boolean
+            singleton: Boolean,
+            defaultImpl: Boolean,
+            priority: Int,
+            process: String?
         ): ServiceInitClassBuilder {
-            serviceLoaderClass ?: return this
             interfaceName ?: return this
             implementName ?: return this
             builder.addStatement(
-                "\$T.Companion.put(\$T.class, \$S, \$T.class, \$L)",
+                "\$T.put(\$T.class, \$S, \$T.class, \$L, \$L, \$L, \$S)",
                 serviceLoaderClass,
-                className(interfaceName),
-                key,
-                className(implementName),
-                singleton
-            )
-            return this
-        }
-
-        fun putDirectly(
-            interfaceName: String?,
-            key: String?,
-            implementName: String?,
-            singleton: Boolean
-        ): ServiceInitClassBuilder {
-            serviceLoaderClass ?: return this
-            interfaceName ?: return this
-            implementName ?: return this
-            // implementName是注解生成的类，直接用$L拼接原始字符串
-            builder.addStatement(
-                "\$T.Companion.put(\$T.class, \$S, \$L.class, \$L)",
-                serviceLoaderClass,
-                className(interfaceName),
-                key,
-                implementName,
-                singleton
+                ClassName.bestGuess(interfaceName),
+                key.orEmpty(),
+                ClassName.bestGuess(implementName),
+                singleton,
+                defaultImpl,
+                priority,
+                process.orEmpty()
             )
             return this
         }
 
         fun build() {
-            val methodSpec = MethodSpec.methodBuilder(ConstantUtils.INIT_METHOD)
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            val instanceInit = MethodSpec.methodBuilder(ConstantUtils.INIT_METHOD)
+                .addAnnotation(Override::class.java)
+                .addModifiers(Modifier.PUBLIC)
                 .returns(TypeName.VOID)
                 .addCode(builder.build())
                 .build()
-
+            val staticInit = MethodSpec.methodBuilder("load")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.VOID)
+                .addStatement("new \$N().\$N()", className, ConstantUtils.INIT_METHOD)
+                .build()
             val typeSpec = TypeSpec.classBuilder(this.className)
-                .addModifiers(Modifier.PUBLIC)
-                .addMethod(methodSpec)
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addSuperinterface(serviceInitInterface)
+                .addMethod(staticInit)
+                .addMethod(instanceInit)
                 .build()
             try {
                 JavaFile.builder(ConstantUtils.GEN_PKG_SERVICE, typeSpec)

@@ -8,7 +8,8 @@ import org.gradle.api.Project
 
 /**
  * 对齐 ARouter arouter-register：
- * 在打包期扫描 RouteLoader / InterceptorLoader，ASM 注入到 Router.loadRouterMap。
+ * 打包期扫描 RouteLoader / InterceptorLoader / IServiceInit，
+ * ASM 注入 Router.loadRouterMap 与 ServiceLoaderInit.loadServiceMap。
  */
 class RouterRegisterPlugin : Plugin<Project> {
 

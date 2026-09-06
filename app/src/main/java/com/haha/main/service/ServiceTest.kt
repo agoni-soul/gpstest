@@ -22,7 +22,7 @@ object ServiceTest {
     private val TAG = javaClass.simpleName
 
     fun test(context: Context) {
-        val iUserService = ServiceLoaderHelper.getService(IUserService::class.java)
+        val iUserService = ServiceLoaderHelper.getService<IUserService>()
         DOFLogUtil.d(
             TAG,
             "iUserService == null: ${iUserService == null}, username = ${
@@ -32,10 +32,10 @@ object ServiceTest {
         iUserService?.start()
 
         val service = ServiceLoader.load(IUserService::class.java)
-        DOFLogUtil.d(TAG, "service == null: ${service == null}")
-        val serviceLoader = service?.getAll<IUserService>()
-        DOFLogUtil.d(TAG, "serviceLoader.size = ${serviceLoader?.size}")
-        serviceLoader?.forEach {
+        DOFLogUtil.d(TAG, "dump = ${ServiceLoader.dump()}")
+        val serviceLoader = service.getAll<IUserService>()
+        DOFLogUtil.d(TAG, "serviceLoader.size = ${serviceLoader.size}")
+        serviceLoader.forEach {
             DOFLogUtil.d(TAG, "serviceLoader = $it")
             DOFLogUtil.d(TAG, "username = ${it.getUserName()}")
             DOFLogUtil.d(TAG, "start = ${it.start()}")

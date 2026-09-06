@@ -87,7 +87,7 @@ internal class Router private constructor() {
      * ServiceRouterPlugin 会在方法末尾插入 register("...RouteLoader_xxx")。
      */
     private fun loadRouterMap() {
-        registerByPlugin = true
+        registerByPlugin = false
         // auto generate register code by gradle plugin: ServiceRouterPlugin
         // register("com.haha.servicerouter.routes.RouteLoader_app")
     }

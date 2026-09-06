@@ -88,6 +88,8 @@ internal class Router private constructor() {
      */
     private fun loadRouterMap() {
         registerByPlugin = true
+        // auto generate register code by gradle plugin: ServiceRouterPlugin
+        // register("com.haha.servicerouter.routes.RouteLoader_app")
     }
 
     /**

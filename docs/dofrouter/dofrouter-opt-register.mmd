@@ -1,0 +1,23 @@
+flowchart TB
+    subgraph before["优化前"]
+        B1["loadRouterMap"]
+        B2["registerByPlugin = true"]
+        B3{"插件存在 register?"}
+        B4["装表"]
+        B5["标志已是 true"]
+        B6["永远不扫 dex"]
+        B1 --> B2 --> B3
+        B3 -->|是| B4
+        B3 -->|否| B5 --> B6
+    end
+    subgraph after["优化后"]
+        A1["loadRouterMap"]
+        A2["registerByPlugin = false"]
+        A3{"插件插入并 register 成功?"}
+        A4["markRegisteredByPlugin"]
+        A5["跳过扫 dex"]
+        A6["ClassUtils 扫 routes 包"]
+        A1 --> A2 --> A3
+        A3 -->|是| A4 --> A5
+        A3 -->|否| A6
+    end

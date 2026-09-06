@@ -1,0 +1,19 @@
+flowchart TB
+    A["DOFRouter.create /gps/main .navigate this"] --> B["Router.navigator"]
+    B --> C["复用 interceptorInstances"]
+    C --> D{"任一 intercept 返回 true?"}
+    D -->|是| E["onIntercept 中止"]
+    D -->|否| F["RouteTable.find /gps/main"]
+    F --> G{"exactRoutes 命中?"}
+    G -->|否| H["onNotFound"]
+    G -->|是| I["onBefore 一次"]
+    I --> J["ActivityHandler"]
+    J --> K{"resultLauncher?"}
+    K -->|是| L["launcher.launch"]
+    K -->|否| M{"requestCode 大于等于 0?"}
+    M -->|是| N["startActivityForResult"]
+    M -->|否| O["startActivity"]
+    L --> P["onArrived"]
+    N --> P
+    O --> P
+    P --> Q["打开 GpsActivity"]

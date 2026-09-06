@@ -1,0 +1,31 @@
+flowchart TB
+    subgraph compile["编译期"]
+        A1["kapt 生成 RouteLoader / InterceptorLoader"]
+        A2["UNKNOWN 直接 ERROR"]
+        A3["拦截器生成 list.add"]
+        A1 --> A2
+        A1 --> A3
+    end
+    subgraph pack["打包期"]
+        B1["单次遍历 CLASSES"]
+        B2["校验跨模块 path 冲突"]
+        B3["ASM 注入 register"]
+        B1 --> B2 --> B3
+    end
+    subgraph boot["启动期"]
+        C1["loadRouterMap 先置 false"]
+        C2{"register 成功?"}
+        C3["跳过扫 dex"]
+        C4["扫 dex 回退"]
+        C5["rebuildIndex + 缓存拦截器"]
+        C1 --> C2
+        C2 -->|是| C3 --> C5
+        C2 -->|否| C4 --> C5
+    end
+    subgraph jump["跳转期"]
+        D1["复用拦截器实例"]
+        D2["RouteTable.find 只命中一条"]
+        D3["requestCode 小于 0 走 startActivity"]
+        D1 --> D2 --> D3
+    end
+    compile --> pack --> boot --> jump

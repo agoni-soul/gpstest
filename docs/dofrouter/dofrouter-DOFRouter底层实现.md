@@ -6,6 +6,9 @@
 示例页：`GpsActivity` 上 `@Route(path = RoutePath.GPS, name = "Gps")`  
 首页跳转：`DOFRouter.create(RoutePath.GPS).navigate(this)`
 
+> 本文按优化前的装表 / 寻址 / 拦截器模型写。2026-09-06 之后的回退标志、`RouteTable.find`、拦截器
+> List、插件单次遍历与对照表，见 [dofrouter-optimization.md](dofrouter-optimization.md)。
+
 配套流程图（PNG 可直接预览）：
 
 | 图                      | PNG                                | 源文件                                |

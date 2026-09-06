@@ -1,0 +1,28 @@
+flowchart TB
+    subgraph before["优化前 addressingComponent"]
+        B1["拿到 requestPath"]
+        B2["遍历 RouteTable.routes 全表"]
+        B3["每条跑 Default / Prefix / Pattern 三个 Matcher"]
+        B4["Pattern 每次 toRegex"]
+        B5["得到 Map 可能多条"]
+        B6["每个 Handler 都 handle"]
+        B1 --> B2 --> B3 --> B4 --> B5 --> B6
+    end
+    subgraph after["优化后 RouteTable.find"]
+        A1["拿到 requestPath"]
+        A2{"exactRoutes HashMap?"}
+        A3["命中精确 path"]
+        A4{"最长前缀 startsWith?"}
+        A5["命中 prefix"]
+        A6{"已编译 Regex?"}
+        A7["命中 pattern"]
+        A8["Not Found"]
+        A9["只 create 一个 Handler"]
+        A1 --> A2
+        A2 -->|是| A3 --> A9
+        A2 -->|否| A4
+        A4 -->|是| A5 --> A9
+        A4 -->|否| A6
+        A6 -->|是| A7 --> A9
+        A6 -->|否| A8
+    end

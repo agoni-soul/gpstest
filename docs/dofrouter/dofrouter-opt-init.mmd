@@ -1,0 +1,17 @@
+flowchart TB
+    A["HahaApplication.initComponents"] --> B["DOFRouter.init"]
+    B --> C["Router.loadRouteTable"]
+    C --> D["loadRouterMap: registerByPlugin = false"]
+    D --> E{"插件注入了 register?"}
+    E -->|是| F["register RouteLoader / InterceptorLoader"]
+    F --> G["loadInto 写入 RouteTable"]
+    G --> H["registerByPlugin = true"]
+    H --> I["跳过扫 dex"]
+    E -->|否| J["ClassUtils 扫 com.haha.servicerouter.routes"]
+    J --> K["反射 newInstance 再 loadInto"]
+    K --> L["registerByPlugin 仍为 false"]
+    I --> M["RouteTable.rebuildIndex"]
+    L --> M
+    M --> N["exact / prefix / pattern 三张索引"]
+    N --> O["warmInterceptors 按 priority 实例化一次"]
+    O --> P["等待 navigate"]

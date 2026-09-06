@@ -1,0 +1,14 @@
+flowchart TB
+    subgraph before["优化前"]
+        B1["APT: map.put priority"]
+        B2["TreeMap 同 priority 后写覆盖"]
+        B3["每次 navigate newInstance"]
+        B1 --> B2 --> B3
+    end
+    subgraph after["优化后"]
+        A1["APT: list.add"]
+        A2["List 同 priority 共存"]
+        A3["init 时 warmInterceptors 排序并缓存"]
+        A4["navigate 复用实例"]
+        A1 --> A2 --> A3 --> A4
+    end

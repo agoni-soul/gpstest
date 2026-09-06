@@ -1,0 +1,8 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+    targetCompatibility rootProject.ext.targetCompatibility_javaVersion
+}

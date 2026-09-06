@@ -6,23 +6,15 @@ plugins {
 }
 
 android {
-    namespace 'com.haha.serviceImpl'
+    namespace 'com.haha.jdkspi.impl'
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
         targetCompatibility rootProject.ext.targetCompatibility_javaVersion
@@ -34,14 +26,8 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation project(':ServiceAnnotation')
-    implementation project(':ServiceApi')
-    implementation project(':ServiceRuntime')
-    kapt project(':ServiceAnnotationProcessor')
-}
-
-kapt {
-    arguments {
-        arg("SERVICE_MODULE_NAME", project.getName())
-    }
+    implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
+    kapt 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
+    implementation project(':JdkSpiApi')
 }

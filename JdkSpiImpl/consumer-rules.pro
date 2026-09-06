@@ -1,0 +1,2 @@
+-keep class * implements com.haha.jdkspi.api.JdkService { *; }
+-keep class com.haha.jdkspi.api.JdkService { *; }

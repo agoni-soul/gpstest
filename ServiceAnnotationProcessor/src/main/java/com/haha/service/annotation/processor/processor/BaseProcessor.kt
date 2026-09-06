@@ -154,10 +154,6 @@ abstract class BaseProcessor: AbstractProcessor() {
         return isConcreteType(element) && isSubType(element, typeMirror)
     }
 
-    fun isInterceptor(element: Element?): Boolean {
-        return isConcreteSubType(element, ConstantUtils.URI_INTERCEPTOR_CLASS)
-    }
-
     fun randomHash(): String {
         return hash(UUID.randomUUID().toString())
     }
@@ -171,38 +167,6 @@ abstract class BaseProcessor: AbstractProcessor() {
             return Integer.toHexString(str.hashCode())
         }
     }
-
-    /**
-     * 创建Handler。格式：`"com.demo.TestActivity"` 或 `new TestHandler()`
-     */
-    fun buildHandler(isActivity: Boolean, cls: TypeElement): CodeBlock {
-        val b = CodeBlock.builder()
-        if (isActivity) {
-            b.add("\$S", cls.qualifiedName.toString())
-        } else {
-            b.add("new \$T()", cls)
-        }
-        return b.build()
-    }
-
-    /**
-     * 创建Interceptors。格式：`, new Interceptor1(), new Interceptor2()`
-     */
-    fun buildInterceptors(interceptors: List<TypeMirror?>?): CodeBlock {
-        val b = CodeBlock.builder()
-        if (!interceptors.isNullOrEmpty()) {
-            for (type in interceptors) {
-                if (type is TypeElement) {
-                    val e = type
-                    if (isInterceptor(e)) {
-                        b.add(", new \$T()", ClassName.bestGuess(e.asType().toString()))
-                    }
-                }
-            }
-        }
-        return b.build()
-    }
-
 
     /**
      * 辅助工具类，用于生成ServiceInitClass，格式如下：

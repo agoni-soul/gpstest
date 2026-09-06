@@ -1,0 +1,23 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.haha.bindview.runtime'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+        targetCompatibility rootProject.ext.targetCompatibility_javaVersion
+    }
+}
+
+dependencies {
+    api project(':BindViewAnnotation')
+}

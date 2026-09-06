@@ -9,10 +9,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.haha.service.annotation.BindView;
-import com.haha.service.annotation.OnClick;
+import com.haha.bindview.annotation.BindView;
+import com.haha.bindview.annotation.OnClick;
+import com.haha.bindview.runtime.BindViewUtils;
 import com.haha.hahalearn.R;
-import com.haha.service.annotation.runtime.BindViewUtils;
 
 /**
  * @author : haha

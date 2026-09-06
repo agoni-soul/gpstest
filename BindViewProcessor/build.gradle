@@ -1,0 +1,19 @@
+plugins {
+    id 'java-library'
+    id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+java {
+    sourceCompatibility rootProject.ext.sourceCompatibility_javaVersion
+    targetCompatibility rootProject.ext.targetCompatibility_javaVersion
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.google.auto.service:auto-service-annotations:1.1.1'
+    implementation 'com.squareup:javapoet:1.13.0'
+    kapt 'com.google.auto.service:auto-service:1.1.1'
+    annotationProcessor 'com.google.auto.service:auto-service:1.1.1'
+    implementation project(':BindViewAnnotation')
+}
